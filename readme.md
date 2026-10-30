@@ -1,17 +1,50 @@
-# BaselHack Code Repo Template
+# Projects
 
-This is the template repository, which makes our lives (and especially the lives of the jury) easier,
-if you follow our structure.
+## [Project Name]
+[Download Link]
+[GitHub Repository](https://github.com/mannaluca02/basel_hack)
+mannaluca02/basel_hack
 
-## Explanation
+[Brief Project Description - One line summary]
 
-Please make sure that everything, that is code related, goes into `code` directory.
+[Detailed Project Description - 2-3 paragraphs explaining what the project does, the problem it solves, and how it works]
 
-If you have documentation about the code (e.g. UML Diagrams, a readme etc.), that should go into the `documentation` directory.
+### Motivation
+[Explain why this project was created, what problem it addresses, and what inspired the team]
 
-If you have assets (like videos, presentations etc.), this can go into the `assets` directory.
+### How it works
+[Technical explanation of how the project functions, key features, and implementation details]
 
-You can use the MIT license in this template. Make sure to adjust the copy right holders in the placeholder `<copyright holder>` and add every team member to it.
-You are also free to choose any other license - depending on the consensus of your team.
+### Technologies Used
+- [Technology 1]
+- [Technology 2]
+- [Technology 3]
 
-Thanks a lot!
+### Setup Instructions
+1. [Step 1]
+```
+[Command 1]
+```
+2. [Step 2]
+```
+[Command 2]
+```
+3. [Step 3 (optional)]
+```
+[Command 3]
+```
+
+### Demo/Screenshots
+[Description of demo or screenshots]
+- [Screenshot 1 description]
+- [Screenshot 2 description]
+
+### Awards/Achievements
+[Awarded [place] prize in BaselHack [year]]
+[Any other notable achievements or recognition]
+
+### Contributors
+[Contributor 1], [Contributor 2], [Contributor 3], [Contributor 4]
+
+### Additional Notes
+[Any additional information, future plans, or special considerations]
