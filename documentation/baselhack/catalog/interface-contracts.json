@@ -1,0 +1,450 @@
+{
+  "spec_date": "2026-10-31",
+  "spec_version": "1.1-draft",
+  "implementation_status": "planned",
+  "source_filenames": [
+    "IMG_7232.HEIC",
+    "IMG_7233.HEIC"
+  ],
+  "source_interpretation": "Named roles and shared JSON case state confirmed by user; HTTP/SSE and storage are implementation proposals",
+  "is_runtime_json_schema": false,
+  "example_data_classification": "synthetic",
+  "authorization_note": "Owners are developer responsibility, not runtime authentication identities.",
+  "workflow_notes": "Semantic contracts independent of in-process vs HTTP deployment; no queue/database technology inferred.",
+  "contracts": [
+    {
+      "id": "I01",
+      "name": "VoiceLog",
+      "producer_owner": "Dario",
+      "consumer_owners": [
+        "Earnie"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "turnId",
+        "source",
+        "locale",
+        "text",
+        "transcriptStatus"
+      ],
+      "semantic_checks": [
+        "Final transcript does not authorize profile mutation",
+        "No raw audio in ordinary logs",
+        "Session/case ownership checked independently of developer name"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "turnId": "turn_demo",
+        "source": "voice",
+        "locale": "de-CH",
+        "text": "Wir moechten in fuenf Jahren ein Haus kaufen.",
+        "transcriptStatus": "final",
+        "expectedCaseRevision": 12
+      }
+    },
+    {
+      "id": "I02",
+      "name": "CaseSnapshot",
+      "producer_owner": "Earnie",
+      "consumer_owners": [
+        "Valentin",
+        "Luca",
+        "Lukas",
+        "Dario"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "caseRevision",
+        "profileVersion",
+        "dataClassification",
+        "profileRef",
+        "goals",
+        "readiness",
+        "runRefs"
+      ],
+      "semantic_checks": [
+        "Case service validates allowed patches and confirmations",
+        "Profile data uses shared domain schemas, not a second person model",
+        "Expected revision for writes",
+        "Dario receives only the authorized AdvisorContext projection"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "caseRevision": 12,
+        "profileVersion": 3,
+        "dataClassification": "synthetic",
+        "profileRef": "profile_demo_03",
+        "goals": [
+          "goal_demo_home"
+        ],
+        "readiness": {
+          "dataCapturePercent": 75,
+          "reviewOpen": true
+        },
+        "runRefs": [
+          "run_demo_03"
+        ]
+      }
+    },
+    {
+      "id": "I03",
+      "name": "AnalysisRequest",
+      "producer_owner": "Earnie",
+      "consumer_owners": [
+        "Valentin"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "profileVersion",
+        "scenarioVersionId",
+        "calculationInputHash",
+        "requestedAreas",
+        "executionMode"
+      ],
+      "semantic_checks": [
+        "References actual validated confirmed snapshot",
+        "Missing need stays needs_input",
+        "No arbitrary provider URL or client token"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "profileVersion": 3,
+        "scenarioVersionId": "scenario_demo_retirement",
+        "calculationInputHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "requestedAreas": [
+          "budget",
+          "risk",
+          "retirement"
+        ],
+        "executionMode": "live-demo"
+      }
+    },
+    {
+      "id": "I04",
+      "name": "AnalysisResult",
+      "producer_owner": "Valentin",
+      "consumer_owners": [
+        "Luca",
+        "Earnie"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "profileVersion",
+        "scenarioVersionId",
+        "runId",
+        "calculationInputHash",
+        "areaStatus",
+        "metrics",
+        "sourceRefs",
+        "reviewReasons"
+      ],
+      "semantic_checks": [
+        "Input hash and profile/scenario must match target view",
+        "Values carry currency, period and basis",
+        "Risk result 0 requires review until clarified"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "profileVersion": 3,
+        "scenarioVersionId": "scenario_demo_retirement",
+        "runId": "run_demo_03",
+        "calculationInputHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "areaStatus": {
+          "budget": "valid",
+          "risk": "requires_review",
+          "retirement": "estimated"
+        },
+        "metrics": [],
+        "sourceRefs": [
+          "source_demo"
+        ],
+        "reviewReasons": [
+          "risk_code_semantics_open"
+        ]
+      }
+    },
+    {
+      "id": "I05",
+      "name": "AgentReply",
+      "producer_owner": "Earnie",
+      "consumer_owners": [
+        "Dario",
+        "Luca"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "turnId",
+        "replyId",
+        "kind",
+        "text",
+        "references",
+        "requiresConfirmation",
+        "locale",
+        "contextRevision"
+      ],
+      "semantic_checks": [
+        "Financial explanation references actual run/context",
+        "Question before calculation needs no fabricated run",
+        "Spoken content stays faithful to visible text"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "turnId": "turn_demo",
+        "replyId": "reply_demo",
+        "kind": "question",
+        "text": "Wie viel Zeit moechtest du dir fuer die Analyse nehmen?",
+        "references": [],
+        "requiresConfirmation": false,
+        "locale": "de-CH",
+        "contextRevision": 18
+      }
+    },
+    {
+      "id": "I06",
+      "name": "VoicePlaybackEvent",
+      "producer_owner": "Dario",
+      "consumer_owners": [
+        "Lukas"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "turnId",
+        "replyId",
+        "playbackId",
+        "event"
+      ],
+      "semantic_checks": [
+        "Started means actual audio playback",
+        "Cancelled playback IDs cannot reactivate avatar",
+        "Progress does not come from playback count"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "turnId": "turn_demo",
+        "replyId": "reply_demo",
+        "playbackId": "playback_demo",
+        "event": "started"
+      }
+    },
+    {
+      "id": "I07",
+      "name": "GraphExplanationRequest",
+      "producer_owner": "Luca",
+      "consumer_owners": [
+        "Earnie",
+        "Valentin"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "turnId",
+        "contextId",
+        "graphContext",
+        "question"
+      ],
+      "semantic_checks": [
+        "Case/run/person/period belongs to authorized case",
+        "Validate current selected context before explaining",
+        "New incompatible context cancels old speech"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "turnId": "turn_demo",
+        "contextId": "context_demo",
+        "graphContext": {
+          "caseId": "case_demo",
+          "profileVersion": 3,
+          "scenarioVersionId": "scenario_demo_retirement",
+          "runId": "run_demo_03",
+          "graphId": "retirement_timeline",
+          "metricId": "income_gap",
+          "personId": "person_demo_01",
+          "periodStart": "2056-06",
+          "periodEnd": "2056-12"
+        },
+        "question": "Weshalb entsteht in dieser Phase eine Luecke?"
+      }
+    },
+    {
+      "id": "I08",
+      "name": "SummaryBundle",
+      "producer_owner": "Earnie",
+      "consumer_owners": [
+        "Luca"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "snapshotId",
+        "profileVersion",
+        "runRefs",
+        "audiences",
+        "reviewOpen",
+        "openQuestions"
+      ],
+      "semantic_checks": [
+        "Customer/advisor views share one snapshot and financial values",
+        "Export does not send email or create appointment",
+        "No credentials in either projection"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "snapshotId": "snapshot_demo",
+        "profileVersion": 3,
+        "runRefs": [
+          "run_demo_03"
+        ],
+        "audiences": [
+          "customer",
+          "advisor"
+        ],
+        "reviewOpen": true,
+        "openQuestions": [
+          "pension_certificate_missing"
+        ]
+      }
+    },
+    {
+      "id": "I09",
+      "name": "ProgressSnapshot",
+      "producer_owner": "Valentin",
+      "consumer_owners": [
+        "Lukas",
+        "Luca",
+        "Earnie"
+      ],
+      "transport": "not_decided",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "profileVersion",
+        "domain",
+        "percent",
+        "openGroups",
+        "reviewOpen"
+      ],
+      "semantic_checks": [
+        "Progress domain is data_capture, not insurance/risk score",
+        "Same object for avatar ring and Progress tab",
+        "Unknown data does not become confirmed through colour"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo",
+        "profileVersion": 3,
+        "domain": "data_capture",
+        "percent": 75,
+        "openGroups": [
+          "pension_certificate"
+        ],
+        "reviewOpen": true
+      }
+    },
+    {
+      "id": "I10",
+      "name": "AdvisorContextUpdate",
+      "producer_owner": "Earnie",
+      "consumer_owners": [
+        "Dario",
+        "Luca"
+      ],
+      "transport": "HTTP snapshot plus SSE events proposed",
+      "required_fields": [
+        "schemaVersion",
+        "messageId",
+        "caseId",
+        "correlationId",
+        "eventId",
+        "contextRevision",
+        "reason",
+        "contextRef",
+        "interruptPolicy"
+      ],
+      "semantic_checks": [
+        "Authorized case-scoped context projection, not a full-file prompt",
+        "Recheck current context and run before financial output",
+        "Ignore duplicate or older events; reconcile snapshot on reconnect",
+        "Cancel invalid financial audio and emit playback cancelled",
+        "Context revision distinct from financial profile version"
+      ],
+      "synthetic_example": {
+        "schemaVersion": "1.0",
+        "messageId": "message_demo_10",
+        "caseId": "case_demo",
+        "correlationId": "correlation_demo_10",
+        "eventId": "event_demo_18",
+        "contextRevision": 18,
+        "reason": "analysis_ready",
+        "contextRef": "/api/cases/case_demo/advisor/context",
+        "interruptPolicy": "if_current_answer_invalid"
+      }
+    }
+  ],
+  "dynamic_context": {
+    "section": "plans/interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario",
+    "canonical_state": "shared versioned JSON case",
+    "runtime_json_schema_implemented": false,
+    "tool_names_proposed": [
+      "get_advisor_context",
+      "request_advisor_reply"
+    ]
+  }
+}

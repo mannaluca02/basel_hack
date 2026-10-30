@@ -1,7 +1,9 @@
 # Pax BaselHack – Teamgrundlage
 
-Stand: 30.10.2026. Recherche, Material und Bauplan; die Advisor-App ist noch nicht implementiert.
+Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; die Advisor-App ist noch nicht implementiert.
 
+- [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
+- [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)
 - [Umsetzbares Ticket-Backlog für fünf Personen](plans/implementation-backlog.md)
 - [Gesamtplan](plans/advisor-plan.md)

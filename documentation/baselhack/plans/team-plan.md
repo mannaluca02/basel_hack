@@ -1,115 +1,102 @@
-# Pax LifeMap – Arbeitsaufteilung für fünf Personen
+# Pax LifeMap – bestätigte Aufgabenverteilung nach dem Workshop
 
-Stand: 30.10.2026. Die Personenbezeichnungen sind Rollenplätze, bis ihr Namen und Stärken zuordnet. Es wurden keine Aufgaben in GitHub erstellt und noch keine App-Funktionen implementiert.
+Stand: 31.10.2026. Quelle: Whiteboard-Foto und ausdrückliche Nutzerbestätigung. UI/Features und Zuständigkeiten sind definiert; die App-Implementierung ist damit nicht nachgewiesen.
 
-Der [detaillierte Angular-Umsetzungsplan](implementation-plan.md) ist die konkrete Bauanleitung. Das [Backlog mit 36 P0-Paketen](implementation-backlog.md) nennt Abhängigkeiten, Aufwand und Abnahme. Angular ist gesetzt; Pax UI wird auf tatsächliche Paketberechtigung und kompatible Versionen geprüft. Für den ersten vollständigen Durchlauf verwenden wir die bereits dokumentierte synthetische Familie TEST Nina / TEST Tom; Quellpersonas und fachliche Musterfälle bleiben getrennt.
+Der [Detailplan](implementation-plan.md) erklärt die Umsetzung, die [Workshop-Entscheide](workshop-decisions.md) trennen Quelle und Interpretation und das [neue Backlog](implementation-backlog.md) enthält die konkreten Arbeitspakete. Angular bleibt gesetzt.
 
-## Gemeinsames Ziel
+## Bestätigte fünf Bereiche
 
-Ein gespeicherter Kundenfall durchläuft Bedarfsaufnahme, Analyse aller drei Säulen, die Szenarien Familie/Eigenheim/Pensionierung, eine nachvollziehbare Empfehlung und den Ablauf bis zur ausdrücklich als Demo gekennzeichneten Police. Der fachliche Gesamtplan steht in [PAX_DIGITAL_ADVISOR_PLAN.md](./advisor-plan.md).
-
-## Fünf Verantwortungsbereiche
-
-| Person | Verantwortung | Erstes eigenständig lieferbares Ergebnis | Übergabe an das Team |
+| Name | Bereich | Ergebnis | Wichtigste Übergabe |
 |---|---|---|---|
-| 1 | Frontend und UX | Bestätigbares Profil und LifeMap mit drei Szenarioansichten auf festen Beispieldaten | Ansichten, Zustände für fehlende Daten/Fehler und Darstellung des Beratungsdossiers |
-| 2 | Datenmodell, Finanzlogik und Logismata | Validierter Serveradapter für Risiko und Pensionierung mit den archivierten Beispielen | Versionierte Berechnungsergebnisse, Einheiten, Datenstatus sowie transparentes Eigenheim-/Ereignismodell |
-| 3 | AI-Dialog und Empfehlungen | Strukturierte Bedarfsaufnahme, gezielte Rückfragen und Erklärungen auf festem Rechenergebnis | Nachvollziehbare Produktregeln, Quellenverweise, Alternativen und Auslöser für menschliche Prüfung |
-| 4 | Fallpersistenz, Antrag und Portal | Fall speichern/wiederaufnehmen; Offerte und Antragsstatus bis zur Sandbox-Police | Klare Adaptergrenzen, Statusübergänge, Wiederaufnahme und sichere fallbezogene Berechtigungen |
-| 5 | Fachliche Qualität, Integration und Demo | Getrennter Persona-/Referenzdatensatz, Pax-Fragenliste und gemeinsame Abnahmekriterien | Prüfung von Angemessenheit, Zeitverlauf und Datenschutz, Integrationsdurchlauf, Demo und Pitch |
+| Luca | UI | Dynamic View und Tabs Progress / Graphics / Chat / Info / Summary | Ein gemeinsamer Fall-/Grafikkontext, Agent-Slot und erreichbare Voice-Steuerung |
+| Lukas | Avatar | Einfacher Agent mit Fortschrittsring und technischen Zuständen | Listening/Thinking/Speaking aus echten Ereignissen; Video erst optional |
+| Dario | Voice | Freigegebener STT-/TTS-Pfad mit Transkriptkorrektur und Stop | Derselbe Advisor-Turn wie Text; keine ungeklärte Audio-Cloud |
+| Valentin | Logik-Backend | Drei Säulen, Budget, drei Szenarien, GraphContext und fachliche Statusregeln | Versionierte Ergebnisse und nachvollziehbare Fachgrenzen |
+| Earnie | KI-Backend | Zeitbudget-Dialog, Feldvorschläge, Rückfragen, Grafik-Erklärung und Summary | Gemeinsamer gespeicherter Fall, Modell-/Toolgrenzen und zwei Summary-Sichten |
 
-Person 5 koordiniert die fachliche Abstimmung und die Abnahme; die Verantwortung für korrekte Umsetzung bleibt bei allen. Sicherheits- und Datenschutzanforderungen werden in jeder Spur umgesetzt, nicht erst am Ende geprüft.
+Die durchgestrichene frühere UI-Zuordnung an Earnie wird nicht weitergeführt. Für gemeinsame Backend-Basis/Session/Persistenz ist Earnie vorgesehen, für fachliche Rechen-/Journeyregeln Valentin. Das ist ein Umsetzungsvorschlag, kein aus dem Foto abgeleiteter Beschluss für zwei Server. Sicherheit und Abnahme liegen gemeinsam beim Team; Luca verantwortet die UI-Gesamtabnahme.
 
-## Schnittstellen zuerst gemeinsam festlegen
+## Gemeinsame Produktentscheidungen
 
-Innerhalb der ersten zwei Stunden ein kleines gemeinsames Beispieldokument vereinbaren:
+1. Grafikzentrierte Dynamic View statt eigenständiger Chat-Hauptapp.
+2. Fünf primäre Ansichten und dauerhaft erreichbarer Agent mit Fortschritt; der Ring ist kein Risiko-Score.
+3. Einstieg nach verfügbarer Zeit; Tempo/Erklärlänge passt sich an, Pflichtprüfung nicht.
+4. Dynamische Grafiken mit expliziter Auswahl von Person, Szenario und Zeitraum.
+5. Agent erklärt eine konkrete Stelle aus demselben Rechenlauf; Text und freigegebene Audioausgabe bleiben konsistent.
+6. Summary für Kunde/interessierte Person und Fachperson aus einem Snapshot; Export ist kein automatischer Versand.
+7. Video-Avatar ausdrücklich Nice-to-have. Follow-up/Overview vorläufig Erweiterung; Dark Mode nur aus dem Mondsymbol abgeleitet.
 
-- `Household` und `Person`: stabile IDs, Beziehungen und getrennte persönliche Angaben.
-- Geldwerte: CHF, Jahr/Monat, Brutto/Netto und Herkunft; fehlende Werte ausdrücklich als unbekannt.
-- `Scenario`: Typ, geänderte Annahmen, Profilversion und Zeitpunkte.
-- `CalculationRun`: ID, Eingabeversion, Operation, Antwortstatus, Datenstand, Ergebnisse und Unsicherheiten.
-- `Recommendation`: Ziel, relevanter Bedarf, referenzierte Rechenläufe, Regel-/Produktversion, Alternative und offene Prüfung.
-- `Case`: aktueller Status sowie Verweise auf Dossier, Offerte, Antrag und gegebenenfalls Demo-Police.
+## Sofort gemeinsam festlegen
 
-Diese Bezeichnungen sind der vereinbarte Ausgangspunkt, keine bereits vorhandenen APIs. Beispiel-JSONs und Schemaindex stehen unter [references/api/](../references/api/).
+`CaseSnapshot`, `InteractionPreference`, `GraphContext`, `AgentPresentation`, `VoiceTurn` und `SummaryBundle`. Geld-/Zeit-/Quellenstatus und Profil-/Szenarioversion gehören zum Vertrag. Jeder Tab und jeder Kanal nutzt ihn. Der erste Testfall bleibt die vollständig erfundene Familie TEST Nina / TEST Tom; Ergänzungen und Originalreferenzen bleiben getrennt.
 
-## So können die fünf Spuren gleichzeitig vorankommen
+## Workflow aus dem zweiten Foto
 
-1. Person 1 baut die Oberflächen zunächst mit demselben synthetischen Datensatz, den Person 2 für den Adapter verwendet.
-2. Person 3 arbeitet mit festen, nachvollziehbaren Rechenergebnissen. Der Dialog darf weder Preise noch Leistungen erfinden.
-3. Person 4 implementiert den gespeicherten Fall und die späteren Statusschritte unabhängig davon, ob Pax eine Sales-API bereitstellt.
-4. Person 5 trennt die bereitgestellten Personas von den ausgefüllten Referenzanalysen und klärt Annahmen mit den Pax-Experten.
-5. Sobald Person 2 echte Adapterantworten liefert, werden dieselben Daten in Frontend, Erklärdienst und Dossier verwendet.
+Nutzer ↔ Dario → Earnie (VoiceLog) → strukturierter Fallstand ↔ Valentin → Luca (Result). Die passende Antwort geht über Earnie/Dario zurück zum Nutzer; Dario meldet reale Playback-Ereignisse an Lukas. Der Agentprogress kommt getrennt aus der Datenreife. Details, Versionsschutz und synthetische Beispiele stehen in den [zehn Schnittstellenverträgen](interface-contracts.md). Der gemeinsame JSON-Fallstand ist bestätigt; Speichertechnik bleibt offen. I10 versorgt Dario mit aktuellem Gesprächskontext. HTTP/SSE ist der P0-Vorschlag; siehe [dynamische Voice-Anbindung](interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario).
 
-## Gemeinsame Integrationspunkte im 48-Stunden-Fenster
+## Integrationsfolge
 
-| Zeitpunkt | Gemeinsamer Nachweis |
+| Gate | Gemeinsamer Funktionsnachweis |
 |---|---|
-| Nach 2 h | Rollen, ein Demo-Fall, Datenvertrag, Modellfreigabe und offene Integrationsgrenzen vereinbart |
-| Nach 8 h | Profil speichern, erste Berechnung abrufen und das Ergebnis in LifeMap anzeigen |
-| Nach 24 h | Alle drei Szenarien auf demselben Fall durchlaufen; fehlende Angaben und Fehler behandeln |
-| Nach 30 h | Erklärbare Empfehlung und menschliche Übergabe aus demselben Beratungsdossier zeigen |
-| Nach 38 h | Empfehlung → Offerte → Antrag → Sandbox-Prüfung → fiktive Police ohne Datenneuerfassung |
-| Nach 44 h | Fachliche Grenzfälle, API-Ausfall, Berechtigungen und Demo-Ablauf geprüft |
-| Restliche Zeit | Fehlerkorrektur, verständliche Darstellung und Drei-Minuten-Pitch |
+| M0 | Angular-Shell, Agentvertrag, Speech-/Modellweg und Fachschema abgestimmt |
+| M1 | Gespeicherter Fall, Feldvorschlag, Baseline und korrekter Fortschritt |
+| M2 | Fünf Tabs, einfacher Agent, Voice und Grafik verbunden |
+| M3 | Familie, Eigenheim und Pensionierung plus ausgewählte Grafik-Erklärung |
+| M4 | Kunden-/Fachperson-Summary und gespeicherter Demo-Antrags-/Policenweg |
+| M5 | Negative Audio-/Avatar-/Sicherheitsfälle und komplette wiederholbare Demo |
 
-Das sind Zeitpunkte im gemeinsamen Arbeitsfenster, nicht 48 Stunden Aufwand pro Person. Teamtempo und tatsächliche Hackathon-Zeiten müssen berücksichtigt werden.
+Die bisherige 48-Stunden-Annahme ist ein Gesamtfenster, keine neue Restzeit ab dem Workshop. Vor weiterem Baustart echte Abgabezeit und vorhandene Zwischenstände abgleichen.
 
-## Erste konkrete Arbeitspakete
+## Erste Arbeit je Owner
 
-### Person 1 – Frontend/UX
+### Luca – UI
 
-- [ ] Ziele und Haushaltsbild vor Produktauswahl darstellen.
-- [ ] Bestätigte, geschätzte und unbekannte Angaben unterscheidbar machen.
-- [ ] Familie, Wohneigentum und Pensionierung mit Vorher-/Nachher-Vergleich anzeigen.
-- [ ] Zeitliche Versorgungslücken und verbleibende offene Fragen sichtbar machen.
-- [ ] Empfehlung, Dossier, Antragsstatus und Portalansicht verbinden.
+- [ ] Pax-UI-/Angular-Kompatibilität prüfen und fünf Tabs auf einer Fallquelle aufbauen.
+- [ ] Zeitbudget und bestätigbare Datenkarten in den Workspace integrieren.
+- [ ] Zeitgrafik, drei Szenariokarten und „Diese Stelle erklären“ verbinden.
+- [ ] Chat/Info und beide Summary-Sichten ohne widersprüchliche Werte anzeigen.
+- [ ] Schmale Ansicht, Tastatur und Demo-Journey gemeinsam testen.
 
-### Person 2 – Berechnung und Daten
+### Lukas – Avatar
 
-- [ ] JSON-Vertrag und Validierung mit Person 4 abstimmen.
-- [ ] Logismata nur serverseitig ansprechen; Token nicht in Client oder Logs ausgeben.
-- [ ] Risiko-`ErrorCode` 0 gegenüber Swagger-OK 1 mit Pax/Logismata klären.
-- [ ] 3. Säule, Liquidität und bestehende Deckungen ohne Doppelzählung integrieren.
-- [ ] Grenzen zeitabhängiger Kinderleistungen und der Eigenheimrechnung ausdrücklich behandeln.
+- [ ] Agent-Host und Darstellungs-Events definieren.
+- [ ] Fortschrittsring und Text mit Datenreife-/Reviewgrenze verbinden.
+- [ ] Idle/Listening/Thinking/Speaking/Error aus echten Vorgängen zeigen.
+- [ ] Stop, verspätete Events und nicht verfügbares Video sauber behandeln.
+- [ ] Video-Avatar erst nach funktionierendem Grundpfad ergänzen.
 
-### Person 3 – AI und Empfehlungen
+### Dario – Voice
 
-- [ ] Angaben in ein bestätigbares Schema überführen und die nächste relevante Rückfrage auswählen.
-- [ ] Erklärungen ausschließlich auf freigegebene Fakten, Berechnungen und Produktmerkmale stützen.
-- [ ] Bedarf, Alternative, Einschränkungen und Datenlücken vor einer Produktempfehlung erklären.
-- [ ] Persönliche Angemessenheit von gemeinsamer Haushaltsplanung trennen.
-- [ ] Menschliche Prüfung und „keine zusätzliche Versicherung angezeigt“ als echte Ergebnisse zulassen.
+- [ ] Freigegebenen Speech-Weg und Demo-Browser prüfen; Mikrofon erst nach Nutzeraktion.
+- [ ] Push-to-talk, Transkriptkorrektur und Bestätigung vor Feldänderung verbinden.
+- [ ] Zahlengetreue Sprachausgabe mit Stop/Mute implementieren.
+- [ ] P0 ohne paralleles Mithören des eigenen TTS; Turn-Abbruch mit Lukas abstimmen.
+- [ ] Permission denied, fehlendes Gerät, Providerfehler und Textfallback testen.
 
-### Person 4 – Fall, Antrag und Portal
+### Valentin – Logik-Backend
 
-- [ ] Persistenz und Zugriff auf genau den berechtigten Kundenfall implementieren.
-- [ ] Profile, Szenarien, Rechenläufe und Empfehlungen versioniert verknüpfen.
-- [ ] Quote-, Antrags- und Policenadapter als getrennte Übergabepunkte definieren.
-- [ ] Antrag, Annahme und Police als unterschiedliche Status darstellen.
-- [ ] Fehlende Pax-Integration durch einen sichtbaren Sandbox-Adapter abdecken, keine reale Ausstellung behaupten.
+- [ ] Einheiten, Quellenstatus, GraphContext und Fortschrittsgruppen mit Earnie vereinbaren.
+- [ ] Logismata-Antworten normalisieren; Risiko-Code 0 bleibt bis Klärung reviewpflichtig.
+- [ ] Budget und Kapitalzuordnung sowie alle drei Szenarien umsetzen.
+- [ ] Keine proportional erfundenen PK-Leistungen oder doppelten Kapitalverwendungen.
+- [ ] Fachliche Demo-Journeyregeln und Quellen-/Domainfragen abnehmen.
 
-### Person 5 – Fachprüfung und Demo
+### Earnie – KI-Backend
 
-- [ ] Synthetische Persona-Ergänzungen und unveränderte Referenzfälle getrennt dokumentieren.
-- [ ] Wartefristen, Krankheit/Unfall, Ende von Kinderleistungen und gestaffelte Pensionierung prüfen.
-- [ ] Aktuelle Bedingungen, offizielles Angemessenheitsformular und Integrationsfreigaben mit Pax abgleichen.
-- [ ] Mit allen Rollen gemeinsam die Abnahmeliste im Gesamtplan durcharbeiten.
-- [ ] Demo mit genau einem durchgängigen Fall vorbereiten und den tatsächlichen Funktionsumfang korrekt präsentieren.
+- [ ] Geschützten gemeinsamen Fall-/Session-/Modellpfad bereitstellen.
+- [ ] Zeitbudgetabhängige Rückfragen und bestätigbare Feldvorschläge implementieren.
+- [ ] Ausgewählte Grafikstelle anhand validierter Ergebnisreferenzen erklären.
+- [ ] Handlungsoptionen vor Produkt und Summary-Sichten aus demselben Snapshot erzeugen.
+- [ ] Rollen, Versionskonflikte, Prompt Injection, Export und Modelldatenwege prüfen.
 
-## Arbeit im Repo
+## Aufwand und gemeinsames Review
 
-- Kleine fachlich zusammenhängende Branches und Pull Requests verwenden; Schnittstellenänderungen mit den betroffenen Rollen abstimmen.
-- Die bestehende Struktur `code/`, `assets/` und `documentation/` bleibt der Ausgangspunkt. Angular ist festgelegt; kompatible Pax-UI-/Angular-Version, Backend-Konfiguration und gemeinsame Modulgrenzen vor dem ersten App-Slice bestätigen.
-- In diesem Paket funktionieren Quellenlinks relativ zum Checkout. Keine absoluten persönlichen Dateipfade in neue Repo-Dokumente übernehmen.
-- Originalquellen unverändert lassen. Änderungen gehören in Produktregeln, Fallmodelle oder neue Notizen mit Quellenbezug.
-- Das Zugangsdaten-Beispiel [logismata.env.example](../logismata.env.example) enthält keinen echten Token. Autorisierte lokale Zugangsdaten gehören ausschließlich nach `private/logismata.env`, mit Dateirechten `0600`.
-- `private/` und generierte `exports/` werden nicht eingecheckt. Zugangsdaten über den freigegebenen Teamweg beziehen, nicht über Git verteilen.
+34 P0-Tickets mit 71 Personenstunden: Luca 15, Lukas 9, Dario 13, Valentin 16, Earnie 18. Hinzu kommen 20 gemeinsame Integrations-/Abstimmungsstunden und 19 Pufferstunden; grober Gesamtansatz 110 Personenstunden. Zwei P1- und ein P2-Ticket sind Erweiterungen außerhalb dieses P0-Ansatzes. Das sind neue Schätzungen und keine vom Team bestätigten Zeitversprechen.
 
-## Was bei Zeitknappheit bleibt
+Kein Owner wartet auf Video, um seinen Pflichtpfad zu integrieren. Paarweise prüfen Luca/Earnie Fall-/Tabzustand, Lukas/Dario Audio-/Agentzustand und Valentin/Earnie Zahlen-/Erklärungsbezug. Alle fünf prüfen den Gesamtfall. Die [55 Abnahmefälle im Detailplan](implementation-plan.md#202-pflichtfälle) ergänzen die Ticketkriterien.
 
-Erhalten bleiben alle drei Szenarien, das vollständige finanzielle Bild und der gespeicherte Ablauf bis zur Demo-Police. Zuerst Anzahl zusätzlicher Produkte, Avatar, Voice und Gestaltungsdetails reduzieren. Niemand beginnt einen zusätzlichen Spezialfall, solange der gemeinsame Hauptfall noch nicht vollständig durchläuft.
+## Repo und Grenzen
 
-## Ergänzung aus dem öffentlichen Referenztest
+Kleine passende Branches und Conventional Commits, gemeinsame Contracts, frühe Integration. Originalquellen unverändert. Zugangsdaten verbleiben lokal in ignorierten Verzeichnissen; keine persönlichen absoluten Dateipfade in Repo-Dokumenten. Eine neue Nachricht an Fachpersonen, eine Sprach-/Videodienst-Buchung oder ein Deployment ist durch die Planübernahme nicht erfolgt.
 
-Der [Testbericht zur aktuellen Pax/vlot-Analyse](../reports/public-pension-analysis.md) gehört zur gemeinsamen Vorbereitung. Die öffentliche Lösung bietet bereits Familienprofil, Säulen-/Steuerbetrachtung und PDF-Export. Person 1 zeigt den zusätzlichen Szenariovergleich, Person 2 versioniert Rechenannahmen, Person 3 hält Ergebnis und Empfehlung konsistent, Person 4 führt den Fall bis zur Demo-Police fort, Person 5 klärt die beobachtete Risikolücken-Abweichung und den PDF-Entwurfsstatus mit Pax. Die synthetische Testauswertung ist kein bestätigter fachlicher Sollwert für Logismata.
+Die drei Szenarien, alle drei Säulen und der deutlich simulierte Vertragsfluss bleiben Pflichtumfang. Zuerst Video, zusätzliche Follow-up-Ansicht, Dark Mode, weitere Produkte/OCR/PDF kürzen. Ein ausgefallener Sprachkanal wird als offen benannt; ein Mikrofon-Icon allein ist kein fertiges Voice-Feature.

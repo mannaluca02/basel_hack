@@ -200,8 +200,10 @@ plan.write_text(body + '\n\n<!-- GENERATED SOURCE APPENDIX -->\n\n' + source_app
 
 (ROOT / 'README.md').write_text(f'''# Pax BaselHack – Teamgrundlage
 
-Stand: 30.10.2026. Recherche, Material und Bauplan; die Advisor-App ist noch nicht implementiert.
+Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; die Advisor-App ist noch nicht implementiert.
 
+- [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
+- [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)
 - [Umsetzbares Ticket-Backlog für fünf Personen](plans/implementation-backlog.md)
 - [Gesamtplan](plans/advisor-plan.md)
@@ -274,7 +276,9 @@ EXPORTS.mkdir(parents=True, exist_ok=True)
 for source, name in [(plan, 'PAX_DIGITAL_ADVISOR_PLAN.md'), (ROOT / 'plans/team-plan.md', 'BASELHACK_TEAMPLAN.md'),
                      (index, 'BASELHACK_QUELLEN.md'),
                      (ROOT / 'plans/implementation-plan.md', 'PAX_LIFEMAP_DETAILPLAN.md'),
-                     (ROOT / 'plans/implementation-backlog.md', 'PAX_LIFEMAP_BACKLOG.md')]:
+                     (ROOT / 'plans/implementation-backlog.md', 'PAX_LIFEMAP_BACKLOG.md'),
+                     (ROOT / 'plans/workshop-decisions.md', 'PAX_WORKSHOP_ENTSCHEIDE.md'),
+                     (ROOT / 'plans/interface-contracts.md', 'PAX_WORKFLOW_SCHNITTSTELLEN.md')]:
     def export_link(match):
         value = match.group(1) or match.group(2)
         if '://' in value or value.startswith('#'):

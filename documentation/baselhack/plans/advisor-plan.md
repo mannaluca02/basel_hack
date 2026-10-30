@@ -1,6 +1,6 @@
 # Pax Digital Advisor: LifeMap
 
-**Recherche- und Umsetzungsplan für BaselHack 2026 · Stand: 30.10.2026 · Sprache: Deutsch**
+**Recherche- und Umsetzungsplan für BaselHack 2026 · Stand: 31.10.2026 · Sprache: Deutsch**
 
 LifeMap macht die finanzielle Lebenssituation sichtbar, lässt Kundinnen und Kunden mögliche Veränderungen ausprobieren und leitet erst danach passende Vorsorgeschritte und Pax-Lösungen ab. Das Kernprodukt ist eine interaktive Lebens- und Versorgungskarte mit einem erklärenden AI Advisor.
 
@@ -8,13 +8,13 @@ LifeMap macht die finanzielle Lebenssituation sichtbar, lässt Kundinnen und Kun
 
 **Status:** Die Quellen wurden heruntergeladen, technische Beispiele erfasst und die Planung ausgearbeitet. Eine eigene Advisor-App ist noch nicht implementiert. Die beschriebenen Funktionen und Arbeitspakete sind der Bauplan für den Prototyp.
 
-Der [detaillierte Angular-Umsetzungsplan](implementation-plan.md) konkretisiert Screens, Datenverträge, Rechenlogik, AI, Statusmodell, Tests und Zeitfenster. Das [Ticket-Backlog](implementation-backlog.md) enthält 36 geplante P0-Pakete für fünf Personen. Für Umsetzung und Priorisierung gilt dieser aktuelle Detailstand; Originalquellen und ihre offenen Fachfragen bleiben unverändert.
+Der [detaillierte Angular-Umsetzungsplan](implementation-plan.md) konkretisiert Screens, Datenverträge, Rechenlogik, AI, Statusmodell, Tests und Zeitfenster. Das [Ticket-Backlog](implementation-backlog.md) enthält 37 Workshop-Pakete (34 P0, 2 P1, 1 P2) für fünf Personen. Für Umsetzung und Priorisierung gilt dieser aktuelle Detailstand; Originalquellen und ihre offenen Fachfragen bleiben unverändert.
 
 ## 1. Entscheidung und Nutzenversprechen
 
 **„Verstehe heute, was deine Entscheidungen für morgen bedeuten.“**
 
-Die Oberfläche verbindet drei Elemente:
+Die [Workshop-UI](workshop-decisions.md) übersetzt diese drei Produktbausteine in die fünf Ansichten Progress / Graphics / Chat / Info / Summary. Die Oberfläche verbindet weiterhin drei fachliche Elemente:
 
 - **LifeMap:** Haushalt, Ziele, Budget und bestehende Versorgung aus allen drei Säulen.
 - **Future Lab:** Vergleich von Familie/Arbeitspensum, Wohneigentum und Pensionierung mit nachvollziehbaren Annahmen.
@@ -55,7 +55,7 @@ Der AI Advisor fragt gezielt nach entscheidungsrelevanten Unbekannten und erklä
 | Menschliche Beratung | Definierte fachliche Auslöser und vollständige Übergabe | Ein Grenzfall wird mit Erklärung an eine Person übergeben |
 | Erklärbarkeit und Datenschutz | Dokumentierte Kriterien, kontrollierte Datenwege, Zugriffsschutz und prüfbare Berechnungen | Herkunft und Annahmen lassen sich öffnen; kein ungeprüfter Modellversand |
 
-Mehrsprachigkeit DE/FR/IT/EN, NPS und aggregierte Abbruchanalysen sind Erweiterungen. Voice und Avatar kommen erst nach einem funktionierenden Kern.
+Die [Workshop-Fassung](workshop-decisions.md) setzt fünf Workspace-Ansichten, Zeitbudget-Opener, grundlegenden Agent/Progress, Voice-Anbindung, Grafik-Erklärungen und Summary-Sichten als aktuellen Umsetzungszuschnitt. Der Video-Avatar bleibt ausdrücklich Nice-to-have; Mehrsprachigkeit, zusätzliche Follow-up-Übersicht, NPS und weitere Abbruchanalysen sind Erweiterungen.
 
 ## 4. Erkenntnisse aus den Unterlagen, die den Plan verändern
 
@@ -140,26 +140,13 @@ In der vermögenden Persona stehen offenbar kopierte Müller-Bezeichnungen bei d
 
 Gesundheitsdaten und echte Ausweiskopien werden für die Hackathon-Demo nicht benötigt. Die Originalunterlagen bleiben im autorisierten lokalen Arbeitsbereich und werden nicht ungeprüft an ein externes Modell übermittelt.
 
-## 6. Beratungsablauf und Bildschirme
+## 6. Workshop-Workspace und Beratungsablauf
 
-| Schritt | Kundenerlebnis | Gespeichertes Ergebnis |
-|---|---|---|
-| 1. Einstieg | Sprache, Demo-Modus und verständliche Information über Datenverarbeitung | Modus, Sprache, Informationsstand und gegebenenfalls erforderliche Einwilligungen |
-| 2. Ziele | „Was möchtest du möglich machen oder absichern?“ | Priorisierte Ziele, Zeitpunkt und gewünschte Flexibilität |
-| 3. Haushalt | Personen, Beziehung, Kinder, Erwerb und Betreuung | Strukturierte Beziehungen, bestätigte Angaben und offene Fragen |
-| 4. Finanzbild | Einkommen, Ausgaben, Vermögen, Schulden, Rücklagen | Nachhaltig verfügbarer Betrag statt bloßes Bruttoeinkommen |
-| 5. Bestehende Vorsorge | Angaben oder kontrollierter Dokumentimport zu allen drei Säulen | Leistungen/Kapital mit Quelle, Datum und Bestätigungsstatus |
-| 6. LifeMap | Heute, wesentliche Ereignisse und spätere Leistungsphasen | Bestätigter Ausgangsfall |
-| 7. Future Lab | Familie, Eigenheim und Pensionierung ändern und vergleichen | Berechnete Szenarioversionen mit Annahmen und Unsicherheiten |
-| 8. Prioritäten | Welche Lücke ist relevant, was ist finanzierbar? | Gewählte Handlungsstrategie; auch Abwarten oder Informationsbeschaffung möglich |
-| 9. Lösungen | Passende Pax-Produkte mit Alternative, Einschränkungen und Begründung | Nachvollziehbare Empfehlung und gegebenenfalls persönliches Anlageprofil |
-| 10. Offerte | Leistung, Laufzeit, Wartefrist, Preis und Dokumente prüfen | Verifizierte oder klar als Demo markierte Offertenversion |
-| 11. Antrag | Angaben bestätigen, erforderliche Prüfungen und Signaturprozess | Antrag mit eigenem Status; noch keine automatische Annahmebehauptung |
-| 12. Portal | Bearbeitungsstand, Dokumente, spätere Police und nächste Überprüfung | Dauerhafter Fallverlauf und kontrollierter Anlass für eine erneute Beratung |
+Die [Workshop-Entscheide](workshop-decisions.md) ersetzen die frühere Aufteilung: Dynamic View mit Grafik/Zeitachse als Hauptfläche, dauerhaft erreichbarer Agent mit Fortschritt und genau fünf primäre Ansichten **Progress, Graphics, Chat, Info, Summary**. Eine Produktfläche bleibt sekundär und erst nach Bedarfsreife sinnvoll befüllt.
 
-Beispiel für eine wertvolle Rückfrage: „Wie lange zahlt dein Arbeitgeber bei Krankheit weiter, und welche Leistungen stehen in deinem PK-Ausweis? Das entscheidet, welche Wartefrist zu deiner Situation passen könnte.“
+Der Opener fragt nach verfügbarer Zeit. Erklärungstiefe und Fragebündelung passen sich an, notwendige Daten/Prüfungen bleiben gleich. Haushalt, Ziele, Budget und alle drei Säulen werden als bestätigbare Karten erfasst. Szenarien erscheinen in derselben Graphics-Ansicht. Chat/Info erklären anhand von GraphContext genau die gewählte Kennzahl, Person und Periode. Text und Voice teilen einen Advisor-Turn.
 
-Jede Rückfrage muss eine relevante Unbekannte schließen. Der Dialog darf sich nicht wiederholt auf bereits bestätigte Daten zurücksetzen.
+Summary stellt Kunden-/Fachpersonensicht desselben Snapshots bereit, mit Quellen und offenen Prüfungen. Export bereitet Übergabe vor und sendet nichts automatisch. Offerte, Antrag, Review und Demo-Portal bleiben gespeicherte Details desselben Falls. Der genaue Begriff „Candidate“ und der reale Übergabekanal bleiben offen. Der [Detailplan](implementation-plan.md) beschreibt die vollständigen Interaktionsverträge.
 
 ## 7. Finanz- und Szenariomodell
 
@@ -212,6 +199,9 @@ Als Alternativen kommen z. B. höhere Liquiditätsreserve, Anpassung des Zielzei
 Ein Produktkatalog enthält mindestens Tarif-ID, Produktfamilie, 3a/3b, Version/Gültigkeitsdatum, zulässige Kombinationen, Leistungsereignis, Wartefrist, Garantie, Kosten, Ausschlüsse, Laufzeit, Flexibilität und Quellenverweis. Broschüre, Tarifblatt und individuelle Offerte sind unterschiedliche Dokumenttypen. Bei Widerspruch wird keine automatische Regel erfunden.
 
 ## 9. Technische Architektur und Datenfluss
+
+Der [Workshop-Workflow](interface-contracts.md) ergänzt die Kommunikationsrichtung Dario → Earnie als VoiceLog, strukturierte Übergabe zur Logik bei Valentin, Result an Luca und tatsächliche Audioereignisse von Dario an Lukas. Die Schnittstellen I01–I10 halten Ein-/Ausgaben, Referenzen und Abbruch fest; die folgende Facharchitektur bleibt davon unabhängig von der gewählten Transporttechnik.
+
 
 ```mermaid
 flowchart LR
@@ -306,36 +296,27 @@ Die UI-Dokumentation beschreibt `@paxch/pax-ui` für Angular 19/20, Bereitstellu
 
 Für LifeMap verwenden: übersichtliche Fortschrittsanzeige, ruhige Karten, klar beschriftete Eingaben, bestätigbare Zusammenfassungen und Szenarien im direkten Vergleich. Lücken nicht nur über Rot/Grün vermitteln, sondern mit Betrag, Zeitraum und Bedeutung. Zahlen bleiben beim Sprachwechsel identisch; Übersetzungen kritischer Produktaussagen werden fachlich geprüft.
 
-Alle vier Zielsprachen werden in der Struktur vorbereitet. Für die erste Demo DE und EN vollständig priorisieren, sofern Teamzeit und Pax-Sprachprüfung nicht die vollständige Vier-Sprachen-Abdeckung erlauben. Voice benötigt zusätzlich einen kontrollierten Datenweg; ein Avatar ist optional.
+Alle vier Zielsprachen werden in der Struktur vorbereitet. Für die erste Demo DE und EN vollständig priorisieren, sofern Teamzeit und Pax-Sprachprüfung nicht die vollständige Vier-Sprachen-Abdeckung erlauben. Dario verantwortet den grundlegenden freigegebenen Voice-Pfad mit Textfallback, Lukas den einfachen Agenten mit Fortschritt. Nur der Video-Avatar bleibt laut Workshop optional; Mikrofon-/Audioverarbeitung benötigt einen kontrollierten Datenweg.
 
 ## 14. Bauplan für ein Hackathon-Wochenende
 
 Das Team besteht aus **fünf Personen**. Die ausführliche Aufgabenverteilung und die gemeinsamen Integrationspunkte stehen im [Teamplan](<team-plan.md>). Die Zeitblöcke beziehen sich auf ein gemeinsames Fenster von ungefähr 48 Stunden, nicht auf 48 Arbeitsstunden pro Person.
 
-| Rolle | Hauptverantwortung |
+| Name | Bestätigter Workshop-Bereich |
 |---|---|
-| Person 1 | Frontend, UX, LifeMap und Szenariovergleich |
-| Person 2 | Datenmodell, Logismata und geprüfte Finanzlogik |
-| Person 3 | AI-Dialog, Rückfragen und erklärbare Empfehlungen |
-| Person 4 | Persistenz, Offerten-/Antragsadapter und Portal |
-| Person 5 | Fachliche Qualität, Integration mit Pax und Demo |
+| Luca | UI |
+| Lukas | Avatar |
+| Dario | Voice |
+| Valentin | Logik-Backend |
+| Earnie | KI-Backend |
 
 Die Rollen entwickeln nach einem gemeinsamen Datenvertrag gleichzeitig und integrieren früh; die folgende Tabelle beschreibt den gemeinsamen Fortschritt.
 
-| Fenster | Gemeinsamer Nachweis |
-|---|---|
-| 0–2 h | Scope, Fixture, Rollen und Paket-/Providergrenzen festgelegt |
-| 2–8 h | Erster gespeicherter Slice mit Profil, tatsächlicher AI-Ausführung und geeignetem Rechenpfad |
-| 8–16 h | LifeMap und erste Szenariovarianten |
-| 16–24 h | Alle drei Pflichtszenarien auf demselben Fall |
-| 24–32 h | Strategie, Empfehlung und erste durchgängige Demo-Journey |
-| 32–38 h | Vollständiger gespeicherter Hauptfall bis zur Demo-Police |
-| 38–44 h | Fach-/Sicherheitsfälle, Daten- und Versionskonsistenz geprüft |
-| 44–48 h | Wiederholbare Demo und dokumentierter Start; Fehlerpuffer |
+Die gemeinsame Integrationsfolge lautet: M0 Shell/Verträge/Providerwege → M1 gespeicherter Fall/Baseline/Progress → M2 fünf Tabs/Agent/Voice → M3 drei Szenarien und Kontext-Erklärung → M4 Summary-Sichten und Demo-Journey → M5 negative Fälle und Demo-Abnahme. Die tatsächliche Restzeit wird nach dem Workshop abgeglichen; das ursprüngliche 48-Stunden-Fenster startet nicht erneut.
 
-Der [Detailplan](implementation-plan.md) enthält die konkreten Übergaben, Risiken und 37 Abnahmefälle. Das [Backlog](implementation-backlog.md) plant 77 Ticket-Personenstunden, 20 gemeinsame Personenstunden und 13 Pufferstunden; 48 Stunden sind ein vorläufiges Veranstaltungsfenster, keine Durcharbeitszeit pro Person.
+Der [Detailplan](implementation-plan.md) enthält 55 Abnahmefälle. Das [Backlog](implementation-backlog.md) plant 34 P0-Tickets mit 71 Personenstunden, 20 gemeinsame Integrations-/Abstimmungsstunden und 19 Pufferstunden. Zwei P1- und ein P2-Paket sind getrennte Erweiterungen. Der Ansatz ist ein Vorschlag, keine Workshop-Zeitzusage.
 
-**P0:** Alle Muss-Anforderungen in einem schmalen, vollständigen Fall. **P1:** mehrsprachiger Dialog einschließlich DE/FR/IT/EN, bestätigbare synthetische Dokumentextraktion, serverseitiger PDF-Export, NPS und datensparsame Abbruchanalyse. **P2:** Voice, Avatar und zusätzliche Spezialfälle.
+**P0:** Fünf Ansichten, grundlegender Agent/Progress und Voice-Zuschnitt, Summary, alle drei Szenarien/Säulen und gespeicherter Demo-Vertragsweg. **P1:** Video-Avatar, zusätzliche Follow-up-Ansicht und sonstige nachrangige Vertiefungen nach vollständigem Kern. **P2:** unbestätigter Dark Mode und weitere Spezialfälle.
 
 Bei Zeitknappheit die Zahl der Zusatzprodukte und die Gestaltungskomplexität reduzieren; keines der drei Szenarien oder der Ende-zu-Ende-Statusfluss fällt weg.
 

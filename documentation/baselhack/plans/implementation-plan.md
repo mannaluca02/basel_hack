@@ -1,6 +1,6 @@
 # Pax LifeMap – detaillierter Umsetzungsplan für fünf Personen
 
-**Stand: 30.10.2026, Europe/Zurich.** Planungsgrundlage für einen funktionierenden BaselHack-Prototyp. Angular ist die ausdrückliche Stack-Entscheidung des Teams. Die hier beschriebenen App-Module, Endpunkte, Datenbanktabellen und Tickets sind geplant und noch nicht implementiert. Die Recherche, die archivierten API-Beispiele und der öffentliche Pax/vlot-Test existieren bereits.
+**Stand: 31.10.2026, Europe/Zurich · Workshop-Fassung 2.0.** Planungsgrundlage für einen funktionierenden BaselHack-Prototyp. Angular ist die ausdrückliche Stack-Entscheidung des Teams. Die hier beschriebenen App-Module, Endpunkte, Datenbanktabellen und Tickets sind geplant und noch nicht implementiert. Die Recherche, die archivierten API-Beispiele und der öffentliche Pax/vlot-Test existieren bereits.
 
 ### Inhaltsverzeichnis
 
@@ -9,9 +9,9 @@
 - [2. Verbindlicher Umfang und sinnvolle Begrenzungen](#2-verbindlicher-umfang-und-sinnvolle-begrenzungen)
 - [3. Die ersten Entscheidungen und Prüfpunkte](#3-die-ersten-entscheidungen-und-prüfpunkte)
 - [4. Referenzfälle, Demo-Daten und fachliche Wahrheit](#4-referenzfälle-demo-daten-und-fachliche-wahrheit)
-- [5. Bildschirme und Interaktionen](#5-bildschirme-und-interaktionen)
+- [5. Workshop-UI: eine Dynamic View, fünf Ansichten](#5-workshop-ui-eine-dynamic-view-fünf-ansichten)
 - [6. Angular und Pax UI konkret einsetzen](#6-angular-und-pax-ui-konkret-einsetzen)
-- [7. Backend-Architektur und Modulgrenzen](#7-backend-architektur-und-modulgrenzen)
+- [7. Backend-Architektur und Workshop-Workflow](#7-backend-architektur-und-workshop-workflow)
 - [8. Gemeinsamer Datenvertrag](#8-gemeinsamer-datenvertrag)
 - [9. Finanzielle Logik: ein Haushalt, mehrere Sichten](#9-finanzielle-logik-ein-haushalt-mehrere-sichten)
 - [10. Szenario-Engine und Zeitachse](#10-szenario-engine-und-zeitachse)
@@ -20,19 +20,21 @@
 - [13. Handlungsoptionen und Pax-Produktregeln](#13-handlungsoptionen-und-pax-produktregeln)
 - [14. Persönliche Angemessenheit und menschliche Prüfung](#14-persönliche-angemessenheit-und-menschliche-prüfung)
 - [15. End-to-End: Offerte, Antrag und Demo-Police](#15-end-to-end-offerte-antrag-und-demo-police)
-- [16. Eigene API-Verträge für die Umsetzung](#16-eigene-api-verträge-für-die-umsetzung)
+- [16. Workshop-Schnittstellen und eigene API-Verträge](#16-workshop-schnittstellen-und-eigene-api-verträge)
 - [17. Persistenz, Versionierung und zuverlässige Wiederaufnahme](#17-persistenz-versionierung-und-zuverlässige-wiederaufnahme)
 - [18. Datenschutz und Sicherheit vom ersten Slice an](#18-datenschutz-und-sicherheit-vom-ersten-slice-an)
 - [19. Dossier, Audit und nachvollziehbare Entscheidungen](#19-dossier-audit-und-nachvollziehbare-entscheidungen)
 - [20. Teststrategie und verbindliche Abnahmematrix](#20-teststrategie-und-verbindliche-abnahmematrix)
 - [21. Messung, NPS und Produktmanagement](#21-messung-nps-und-produktmanagement)
 - [22. Zusammenarbeit der fünf Personen](#22-zusammenarbeit-der-fünf-personen)
-- [23. Ablauf im vorläufigen 48-Stunden-Fenster](#23-ablauf-im-vorläufigen-48-stunden-fenster)
+- [23. Integration nach dem Workshop und Zeitgrenzen](#23-integration-nach-dem-workshop-und-zeitgrenzen)
 - [24. Früh an Cem und Claude gerichtete Fragen](#24-früh-an-cem-und-claude-gerichtete-fragen)
 - [25. Demo, Pitch und nachvollziehbarer Funktionsnachweis](#25-demo-pitch-und-nachvollziehbarer-funktionsnachweis)
 - [26. Von der Hackathon-Demo zum gemeinsam entwickelten PoC](#26-von-der-hackathon-demo-zum-gemeinsam-entwickelten-poc)
-- [27. Die nächsten 90 Minuten beim tatsächlichen Baustart](#27-die-nächsten-90-minuten-beim-tatsächlichen-baustart)
+- [27. Die nächsten 90 Minuten nach Übernahme des Workshops](#27-die-nächsten-90-minuten-nach-übernahme-des-workshops)
 - [28. Quellen und Verbindlichkeit](#28-quellen-und-verbindlichkeit)
+
+Die [Workshop-Entscheide](workshop-decisions.md) aus `IMG_7232.HEIC` und die anschließende Nutzerbestätigung haben Vorrang vor der früheren UI-/Rollenskizze. Bestätigt sind **Luca: UI, Lukas: Avatar, Dario: Voice, Valentin: Logik-Backend, Earnie: KI-Backend** sowie **Fortschritt direkt am Agenten**. Lesbare Board-Inhalte und weitergehende Umsetzungsvorschläge sind im Entscheidungsdokument getrennt.
 
 ## 0. So benutzt ihr diesen Plan
 
@@ -47,9 +49,11 @@ Vier Kennzeichnungen gelten im gesamten Dokument:
 | **Demo-Annahme** | Bewusst vereinfachter, sichtbarer Parameter; keine Aussage über Gesetz, Pax-Tarif oder Kreditentscheidung |
 | **Mit Pax klären** | Für verlässliche Fach- oder Produktionsaussagen ist eine Bestätigung erforderlich |
 
+Die fachlichen Anforderungen an drei Säulen, Szenarien, nachvollziehbare Empfehlung und den Demo-Vertragsweg bleiben bestehen. Neue UI: grafikzentrierte Dynamic View mit Progress / Graphics / Chat / Info / Summary, Zeitbudget-Opener, Agent-/Voice-Kanal, Kontext-Erklärung und Summary-Sichten. Der Video-Avatar bleibt ausdrücklich Nice-to-have.
+
 Ein geschätzter Wert kann vom Benutzer bestätigt werden, ohne dadurch zu einem dokumentarisch belegten Wert zu werden. „Bekannt“, „bestätigt“ und „fachlich geprüft“ sind unterschiedliche Eigenschaften.
 
-**Planungsfenster:** vorläufig 48 Stunden verstrichene Hackathon-Zeit. Die tatsächlichen Veranstaltungszeiten wurden nicht verifiziert. Gerechnet wird mit insgesamt ungefähr 110 produktiven Personenstunden inklusive gemeinsamer Abstimmung und Puffer; ausdrücklich nicht mit fünf Personen, die 48 Stunden durchgehend arbeiten.
+**Planungsfenster:** weiterhin vorläufig 48 Stunden für die gesamte Veranstaltung, nicht weitere 48 Stunden ab dem Workshop. Die tatsächliche Restzeit und außerhalb dieses Repos bereits erledigte Umsetzung sind nicht bekannt. Die tatsächlichen Veranstaltungszeiten wurden nicht verifiziert. Gerechnet wird mit insgesamt ungefähr 110 produktiven Personenstunden inklusive gemeinsamer Abstimmung und Puffer; ausdrücklich nicht mit fünf Personen, die 48 Stunden durchgehend arbeiten.
 
 ## 1. Was ihr baut und warum es gewinnen kann
 
@@ -100,6 +104,11 @@ Die folgenden Werte sind Teamziele und keine bereits gemessenen Ergebnisse:
 
 | Bereich | Kleinster vollständiger Umfang | Was ausdrücklich sichtbar bleibt |
 |---|---|---|
+| Workspace | Dynamic View und genau fünf primäre Tabs; ein gemeinsamer Fall-/Auswahlkontext | Grafik als Hauptfläche, Produktbereich nach Bedarfsreife |
+| Zeitbudget | Opener und gespeicherter Gesprächsdetailgrad | Keine verkürzte Pflichtprüfung bei kurzem Modus |
+| Agent und Progress | Einfache zustandsabhängige Darstellung mit Ring/Farbe und Text | Fortschritt ist keine Risikoeinstufung oder Versicherungsdeckung |
+| Voice | Dünner freigegebener Spracheingabe-/Ausgabepfad als Umsetzungsvorschlag zum bestätigten Bereich | Textfallback und Datenschutz-/Browsergrenzen |
+| Summary-Übergabe | Kunden-/Fachpersonensicht desselben Snapshots | Export/Download statt automatischer Mail oder Terminbuchung |
 | Zugang und Transparenz | Geschützter Demo-Einstieg, eigener Fall pro Sitzung, Sprache DE, verständliche Dateninformation | Demo-Modus, AI-Einsatz und Verarbeitungswege |
 | Bedarf | Haushalt, Ziele, Einkommen, Ausgaben, Vermögen, Schulden und Prioritäten | Noch fehlende oder nur geschätzte Angaben |
 | Drei Säulen | AHV/IV-Ergebnisse, PK-Leistungen, 3a/3b und bestehende Deckungen | Quelle, Schätzung, Alter des Dokuments, Rechenstand |
@@ -116,11 +125,11 @@ Eine simulierte Sales-Anbindung ist ein funktionsfähiger eigener Ablauf mit ech
 
 ### 2.2 P1 – nach dem vollständigen Hauptpfad
 
-DE/FR/IT/EN für alle kritischen Texte; Upload eines ausdrücklich synthetischen PK-Ausweises mit bestätigbaren Feldern; serverseitiger PDF-Dossierexport; besserer Vergleich mehrerer Produktvarianten; NPS und aggregierte Abbruchauswertung; unterstützte Übergabe an eine echte Pax-Sandbox, sofern dokumentiert verfügbar.
+**Video-Avatar** ist auf dem Board ausdrücklich Nice-to-have. Zusätzlich: die eingeklammerte Follow-up-/Overview-Idee als erweiterte Fallübersicht, weitere geprüfte Sprachen, synthetischer PK-Import und serverseitiger PDF-Export. Weder Video noch eine unbestimmte Follow-up-Funktion blockieren den grundlegenden Agenten, Voice, Summary oder den gespeicherten Demo-Portalstatus.
 
 ### 2.3 P2 – erst danach
 
-Voice, Avatar, umfangreiche Dokument-OCR, automatische Fondsoptimierung, mehrere reale Konten pro Haushalt, vertiefte Erbschaftsplanung, Geschäftskunden und ein vollwertiges CRM. Eine zweite Modellkette oder zusätzliche Infrastruktur wird nicht begonnen, solange der gemeinsame Fall nicht bis zur Demo-Police durchläuft.
+Dark Mode ist nur eine Interpretation des Mondsymbols. Weitere Spezialfälle, aufwendige 3D-/Avatarproduktion, fortgeschrittenes Vollduplex-Voice, umfangreiche OCR und ein vollwertiges CRM sind spätere Erweiterungen. Kein Kernvergleich oder Daten-/Exportfehler wird dafür zurückgestellt.
 
 ### 2.4 Ehrliche Betriebsarten
 
@@ -139,17 +148,18 @@ Im illustrativen Modus verändern neue Eingaben tatsächlich Budget, Kapitalzuor
 
 | Entscheidung | Vorgabe | Noch erforderlicher Nachweis | Zuständig / spätestens |
 |---|---|---|---|
-| Frontend | Angular, Standalone Components, Reactive Forms | Minimalansicht baut und rendert einen Pax-Button sowie ein Formularfeld | Person 1 / T+2 h |
-| Pax UI | `@paxch/pax-ui` bevorzugt | Autorisierter Registry-Zugang und tatsächlich passende Peer Dependencies | Person 1 / T+2 h |
-| Angular-Version | Zur Pax-Bibliothek passende unterstützte Version; archivierte Anleitung nennt 19/20 | Reale Paket-Metadaten und Angular-Kompatibilität abgleichen; keine erzwungenen Peer Dependencies | Person 1 + 4 / T+2 h |
-| Backend | NestJS mit TypeScript, ein modularer Prozess | Geschützter Health-/Case-Pfad und gemeinsame DTO-Validierung | Person 4 / T+4 h |
-| Persistenz | PostgreSQL mit klarer Repository-Schicht; Prisma als vorgeschlagener ORM | Migration und reproduzierbarer Testdatensatz laufen | Person 4 / T+4 h |
-| AI-Umgebung | Zuerst freigegebenes lokales oder von Pax freigegebenes Modell | Echter Aufruf mit Schemaausgabe; zulässige Datenwege dokumentiert | Person 3 / T+4 h |
-| Rechenbackend | Logismata-Adapter | Zugang, Antwortschema und mindestens ein geeigneter Live-Lauf | Person 2 / T+4 h |
-| Sales-Integration | Demo-Adapter ist die voreingestellte Ausführung | Sponsor akzeptiert den abgegrenzten End-to-End-Demonstrator | Person 5 / erster Expertentermin |
-| Referenzdaten | Öffentliche Testfamilie und Pax-Material bleiben getrennte Datensätze | Quellen-/Synthetic-Kennzeichnung und kein Vermischen der Zahlen | Person 5 / T+2 h |
+| Frontend | Angular, Standalone Components, Reactive Forms | Minimalansicht baut und rendert einen Pax-Button sowie ein Formularfeld | Luca / T+2 h |
+| Pax UI | `@paxch/pax-ui` bevorzugt | Autorisierter Registry-Zugang und tatsächlich passende Peer Dependencies | Luca / T+2 h |
+| Angular-Version | Zur Pax-Bibliothek passende unterstützte Version; archivierte Anleitung nennt 19/20 | Reale Paket-Metadaten und Angular-Kompatibilität abgleichen; keine erzwungenen Peer Dependencies | Luca + Earnie / T+2 h |
+| Backend | NestJS mit TypeScript, ein modularer Prozess | Geschützter Health-/Case-Pfad und gemeinsame DTO-Validierung | Earnie / T+4 h |
+| Persistenz | PostgreSQL mit klarer Repository-Schicht; Prisma als vorgeschlagener ORM | Migration und reproduzierbarer Testdatensatz laufen | Earnie / T+4 h |
+| Agent und Voice | Zustands- und Turn-Vertrag, freigegebener STT-/TTS-Pfad | Kein Kamera-Zwang, keine ungeklärte Browser-Cloud; Mikrofon erst nach Nutzeraktion | Lukas + Dario + Earnie / erstes Integrationstor |
+| AI-Umgebung | Zuerst freigegebenes lokales oder von Pax freigegebenes Modell | Echter Aufruf mit Schemaausgabe; zulässige Datenwege dokumentiert | Earnie / T+4 h |
+| Rechenbackend | Logismata-Adapter | Zugang, Antwortschema und mindestens ein geeigneter Live-Lauf | Valentin / T+4 h |
+| Sales-Integration | Demo-Adapter ist die voreingestellte Ausführung | Sponsor akzeptiert den abgegrenzten End-to-End-Demonstrator | das Team / erster Expertentermin |
+| Referenzdaten | Öffentliche Testfamilie und Pax-Material bleiben getrennte Datensätze | Quellen-/Synthetic-Kennzeichnung und kein Vermischen der Zahlen | das Team / T+2 h |
 
-Fehlt der Pax-Paketzugriff, bleibt Angular gesetzt. Person 1 baut wenige eigene zugängliche Komponenten mit den dokumentierten Markenfarben hinter denselben App-Komponentenschnittstellen. Kein anderer Stackwechsel und kein Kopieren des heruntergeladenen vlot-Frontends. Das Hindernis wird an Pax gemeldet, ohne die übrigen Spuren anzuhalten.
+Fehlt der Pax-Paketzugriff, bleibt Angular gesetzt. Luca baut wenige eigene zugängliche Komponenten mit den dokumentierten Markenfarben hinter denselben App-Komponentenschnittstellen. Kein anderer Stackwechsel und kein Kopieren des heruntergeladenen vlot-Frontends. Das Hindernis wird an Pax gemeldet, ohne die übrigen Spuren anzuhalten.
 
 Fehlt ein zulässiges funktionsfähiges Modell, ist das ein echter offener P0-Punkt. Eine animierte Chat-Blase oder ein allgemeines Regelwerk wird nicht als LLM ausgegeben.
 
@@ -178,46 +188,102 @@ Vorgeschlagene vollständig synthetische Ergänzungen: frei verfügbare Ersparni
 
 Ein Rechenfall besitzt vier getrennte Nachweise: Datenherkunft, technische Schema-/Einheitenprüfung, fachliche Prüfung der Annahmen und Freigabestatus der Empfehlung. Die Demo darf mit einer bestätigten Schätzung rechnen. Sie darf diese dadurch nicht zu einem verbindlichen Leistungsversprechen hochstufen.
 
-## 5. Bildschirme und Interaktionen
+## 5. Workshop-UI: eine Dynamic View, fünf Ansichten
 
-### 5.1 Gemeinsame Oberfläche
+### 5.1 Verbindlicher Zuschnitt und gemeinsame Oberfläche
 
-Desktop: links der kompakte Advisor und die aktuelle Aufgabe, in der Mitte LifeMap bzw. Formular/Ergebnis, rechts die bestätigten Fakten und offenen Punkte. Auf schmalen Geräten nacheinander zugängliche Bereiche statt zusammengedrückter Dreispaltenansicht. Kein Dialog darf eine wichtige Zahl ausschließlich im Chatverlauf verstecken.
+Die Workshop-Skizze ersetzt die frühere chatlastige Dreispaltenidee. Die **Dynamic View mit Zeitachse und Grafik ist die Hauptfläche**. Der Agent ist dauerhaft erreichbar und trägt den bestätigten Fortschrittsring. Die primären Ansichten heißen exakt **Progress, Graphics, Chat, Info, Summary**.
 
-Globale Elemente: Fallname, Sprache, Demo-Markierung, letzter Speicherstand, Kennzeichnung veralteter Ergebnisse und ständig erreichbare menschliche Hilfe. Eine reine Fortschrittszahl ersetzt keine Erklärung, welche Information noch fehlt.
+Desktop: große Grafik-/Arbeitsfläche, schmale Agent-/Navigationsleiste und bei reifem Bedarf eine ergänzende Produktfläche. Auf schmalen Geräten wird daraus eine einzelne Hauptfläche mit erreichbarer Tab-/Agentsteuerung; Produkte/Details öffnen sich bedarfsbezogen. Der Avatar kann entsprechend der zweiten Skizze unterhalb der Grafik liegen. Exakte Pixelmaße und Breakpoints sind Umsetzungsvorschläge von Luca/Lukas, keine aus dem Foto herausgelesenen Vorgaben.
 
-### 5.2 Screen-Spezifikation
+Gemeinsamer Kopf: Fall, Sprache, Daten-/Ergebnisversion, letzter Speicherstand und Demo-Markierung. Gemeinsamer Kontext: Person, Szenario, gewählter Zeitraum und Rechenlauf. Ein Tabwechsel erzeugt weder einen neuen Fall noch ein zweites Chatprofil. Eine neue Produktempfehlung erscheint erst nach Bedarfs- und Tragbarkeitserfassung; eine sichtbare Produktfläche ist keine Erlaubnis für Product-first-Selling.
 
-| Screen | Wesentliche Inhalte | Aktion und gespeicherter Effekt | Fehler-/Leerzustand |
+### 5.2 Die fünf Ansichten konkret
+
+| Ansicht | Inhalt | Eingaben/Aktionen | Verbindliche Regel |
 |---|---|---|---|
-| S01 Einstieg | Nutzen, Demo-Information, Datenwege, AI-Hinweis | Neue Sitzung und eigener leerer Fall oder synthetische Vorlage | Backend nicht bereit; kein stiller Wechsel zu einem gemeinsamen Globalfall |
-| S02 Ziele | Familie absichern, Eigenheim, Pensionierung, Flexibilität; Zeitpunkt und Rangfolge | `Goal`-Einträge mit Status und Priorität | Kein Ziel gewählt; Rückfrage statt Produktauswahl |
-| S03 Haushalt | Personen, Beziehung, Kinder, Erwerb, Betreuung, Wohnort | Strukturierter Profilentwurf | Partnerangaben unbekannt; nicht als null Einkommen interpretieren |
-| S04 Budget | Einkommensarten, Ausgaben, Steuern, bestehende Sparbeiträge, Rücklage | Bestätigbarer Monats-/Jahresvergleich | Fehlende Netto-/Steuerdefinition; nur Teilbudget anzeigen |
-| S05 Versorgung | Erste Säule, PK-Ausweis oder Schätzung, 3a/3b, bestehende Risikoabsicherung | Leistungen und Kapital mit Herkunft | Fehlender PK-Ausweis erzeugt sichtbaren Schätzstatus |
-| S06 Profilprüfung | Zusammenfassung aller kritischen Angaben und Annahmen | Neue bestätigte Profilversion | Widerspruch bleibt offen; keine grüne Vollständigkeitsbehauptung |
-| S07 LifeMap | Zeitachse, Säulen, Lücken, Liquidität, priorisierte nächste Frage | Basis-Rechenlauf auswählen und nachvollziehen | Nur verfügbare Ergebnisse; unbekannte Bereiche bleiben offen |
-| S08 Familie | Zeitpunkt, Pensum je Person, Betreuung und zusätzliche Kosten | Szenario speichern und neu rechnen | Künftige PK-Leistung nicht bekannt; Ergebnis entsprechend eingeschränkt |
-| S09 Eigenheim | Kaufzeitpunkt/-preis, Kosten, freie und gebundene Mittel, Reserve | Kapitalbindung und Budgetänderung vergleichen | Eigenmittel reichen nicht; fehlenden Betrag statt Produktempfehlung zeigen |
-| S10 Pensionierung | Erwerbsende je Person, verfügbare Renten-/Kapitaldaten, Zielbudget | Getrennte Übergangsphasen erzeugen | Früherer Erwerbsausstieg ist nicht automatisch sofortiger Rentenbezug |
-| S11 Handlungsoptionen | Rücklage, Sparen, Absicherung, Zielverschiebung, Datenbeschaffung | Strategie wählen und Gründe speichern | Kein nachhaltig freier Betrag; Sparverpflichtung nicht anbieten |
-| S12 Produktempfehlung | Passende Familie, Bezug zum Bedarf, Varianten, Kosten-/Garantiehinweise, Alternative | Empfehlung bestätigen oder prüfen lassen | Nicht bestätigte Produktregel oder persönliche Angemessenheit blockiert Verbindlichkeit |
-| S13 Demo-Offerte | Deckung, Laufzeit, Wartefrist, Preisstatus, Dokumente | Eigene gespeicherte Offertenversion | Keine reale Tarif-API: Betrag ausschließlich als Demo-Wert oder nicht verfügbar |
-| S14 Demo-Antrag | Übernommene Angaben, offene Prüfungen, Bestätigungsübersicht | Antrag auf Basis einer unveränderten Offerte erstellen | Veraltete Offerte oder unerledigte Pflichtprüfung: Übergang blockiert |
-| S15 Prüfung/Übergabe | Gründe, offene Fragen, referenzierte Daten und Rechenläufe | Demo-Reviewer bestätigt, fordert nach oder lehnt im Testszenario ab | AI kann keine erforderliche menschliche Prüfung selbst abhaken |
-| S16 Demo-Portal | Fall, Antrag, Statusverlauf, Demo-Police und Beratungsdossier | Nach Reload weiterarbeiten; Dokument herunterladen/anzeigen | Antrag in Prüfung ist noch keine ausgestellte Police |
+| **Progress** | Erledigte Datengruppen, offene Fragen, Schätzungen, nächste sinnvolle Aufgabe | Fehlende Angabe öffnen; Daten prüfen; Erklärungstiefe ändern | Derselbe Fortschritt wie am Agenten; keine Gleichsetzung mit Versicherungsbedarf |
+| **Graphics** | Dynamische Zeitachse, Säulen, Versorgung/Kapital, Vorher-/Nachher und lesbare Tabelle | Person, Ereignis, Szenario, Periode/Kennzahl wählen; „Diese Stelle erklären“ | Auswahl ist an Profil-/Szenario-/Run-Version gebunden |
+| **Chat** | Bestätigbare Feldvorschläge, Rückfragen, Erklärungen; Voice-Transkript | Schreiben, Transkript korrigieren, bestätigen, sprechen/stoppen | Text und Sprache sind Kanäle desselben Advisors; keine Schatten-Datenbank |
+| **Info** | Bedeutung der gewählten Kennzahl, Annahmen, Datenherkunft, Grenzen und gegebenenfalls Produktfakten | Quelle öffnen; Begriff erklären lassen; offene Prüfung ansehen | Fachliche Information vor Verkauf; keine erfundenen Leistungsbedingungen |
+| **Summary** | Ziele, bestätigtes Profil, drei Säulen, Szenariowahl, Maßnahmen, offene Fragen und Demo-Journey | Eigene/Fachperson-Sicht exportieren; nächsten Schritt wählen | Beide Sichten beruhen auf demselben Snapshot; Export ist kein Versand |
 
-### 5.3 Beispiel für einen brauchbaren Dialog
+Die „Risk“-Notiz und gezeichneten Zahlen werden als Hinweis auf eine mögliche Kontextanzeige behandelt. Sie definieren keinen sechsten Tab und keinen beschlossenen Risiko-Score. Schraffuren und Farben erhalten eine geprüfte Legende; ihre finanzielle Bedeutung wird nicht aus einem Stiftstrich erfunden.
 
-Kunde: „Wir möchten in fünf Jahren ein Haus kaufen. Wenn ich weniger arbeite, soll die Familie trotzdem abgesichert bleiben.“
+### 5.3 Einstieg: „Wie viel Zeit hast du?“
 
-Der Advisor schlägt zwei Ziele und einen zeitlich noch unbestimmten Pensumswechsel vor. Er fragt zuerst nach Zeitpunkt und Pensum sowie nach verfügbaren Eigenmitteln und Rücklagen. Er erwähnt noch kein Produkt. Nach Bestätigung der Angaben wird eine Szenarioberechnung ausgelöst. Die Erklärung benennt die tatsächlich betroffenen Budget- und Versorgungspositionen, die verbleibenden Unbekannten und die gewählte Alternative.
+Nach dem notwendigen Daten-/AI-Hinweis begrüßt der Agent die Person und fragt nach verfügbarer Zeit. Ein vorgeschlagener UI-Entwurf bietet kurz, normal und ausführlich bzw. einen frei bestätigten Minutenwert; konkrete Werte wurden im Workshop nicht festgelegt. Gespeichert werden `timeBudgetMinutes`, `interactionDepth` und die Herkunft dieser Auswahl.
 
-Eine Antwort wie „Dafür passt FondsStar“ bereits nach diesem ersten Satz ist ein fehlgeschlagener P0-Test.
+Kurz bedeutet: eine priorisierte nächste Frage, knappe Erklärung und bewusst angebotene Vertiefung. Ausführlich bedeutet: mehr Begründung, Annahmen und Vergleiche. **Weder Datenqualität noch Pflichtfragen noch menschliche Prüfung werden durch einen kurzen Modus abgeschaltet.** Ein Zeitbudget ist kein Countdown, der zum Vertragsabschluss drängt. Der Benutzer kann den Modus jederzeit ändern.
 
-### 5.4 Lade-, Fehler- und Bestätigungszustände
+Eine gesprochene Eröffnung setzt eine bewusste Audioaktivierung und einen freigegebenen Sprachweg voraus. Text bleibt immer nutzbar. Der feste Opener ist kein Beleg für AI; mindestens die anschließende neue Eingabe muss tatsächlich verarbeitet werden.
 
-Ein Button zeigt an, ob gespeichert oder gerechnet wird. Doppelklicks erzeugen keinen zweiten Antrag. Ein fehlerhafter Rechenlauf verdeckt nicht die vorherige gültige Ausgabe; sie wird mit alter Version und Zeitstempel gezeigt. Änderungen an kritischen Angaben werden zuerst als Vorschau bestätigt. Ein verworfener AI-Vorschlag ändert das Profil nicht.
+### 5.4 Fachliche Schritte innerhalb des Workspaces
+
+Die bisherigen S01–S16 bleiben als fachliche Aufgaben erhalten. Sie werden nicht zu 16 zusätzlichen Haupt-Tabs oder einer vom Workshop abweichenden Wizard-App.
+
+| Schritt | Ort im Workspace | Gespeichertes Ergebnis | Kritischer Leer-/Fehlerzustand |
+|---|---|---|---|
+| S01 Einstieg | Agent + kurzer Hinweis/Opener | Eigene Sitzung, Sprache, Zeitbudget, Demo-Modus | Kein verstecktes Mikrofon oder geteilter Globalfall |
+| S02 Ziele | Chat + Progress-Karte | Ziele, Zeitpunkte und Prioritäten | Produktvorschlag nicht als Ersatz für Ziele |
+| S03 Haushalt | Bestätigbare Progress-Karte | Personen, Beziehung, Kinder, Erwerb, Betreuung | Partnerangaben unbekannt bleibt unbekannt |
+| S04 Budget | Progress-/Graphics-Details | Einkommensbasis, Ausgaben, Reserve und Tragbarkeit | Netto-/Steuerdefinition unklar: nur Teilbild |
+| S05 Versorgung | Progress + Info/Graphics | Drei Säulen, Deckungen, Quellen und Schätzstatus | Fehlender PK-Ausweis bleibt sichtbare Schätzung |
+| S06 Profilprüfung | Progress + Summary-Vorschau | Neue bestätigte Profilversion | Keine Vollständigkeitsbehauptung bei offenem Widerspruch |
+| S07 Baseline | Graphics | Passender Basislauf und Erklärkontext | Unbekannte Bereiche werden nicht ausgeblendet |
+| S08 Familie | Szenariokarte in Graphics | Datierte Pensums-/Betreuungsvariante | Künftige PK-Folge nicht automatisch proportional |
+| S09 Eigenheim | Szenariokarte in Graphics | Kapitalbindung und Budgetvergleich | Fehlende Eigenmittel bleiben Fehlbetrag |
+| S10 Pensionierung | Szenariokarte in Graphics | Getrennte Übergangs-/Rentenphasen | Erwerbsende ist nicht automatisch Rentenbeginn |
+| S11 Handlungsoptionen | Summary + erklärender Chat | Strategie und Gründe | Untragbare Verpflichtung nicht anbieten |
+| S12 Produktbezug | Sekundäre Produktfläche + Info | Quellenbezogene Empfehlung oder Reviewgrund | Unklare Eignung blockiert Verbindlichkeit |
+| S13 Demo-Offerte | Summary-Detail | Eigene Demo-Offertenversion | Musterpreis nicht als individueller Tarifpreis übernehmen |
+| S14 Demo-Antrag | Summary-/Journey-Detail | Antrag und erforderliche Bestätigungen | Veraltete Offerte sperrt Einreichung |
+| S15 Prüfung | Review-/Info-Detail | Menschlicher Prüfauftrag bzw. Demo-Reviewer-Entscheidung | AI erledigt erforderliches Review nicht selbst |
+| S16 Demo-Portal | Summary-/Portal-Detail | Wiederaufnehmbarer Status, Demo-Police, Dossier | Eingereicht ist nicht angenommen oder versichert |
+
+### 5.5 Genau die ausgewählte Grafikstelle erklären
+
+„Diese Stelle erklären“ wird an einer Kennzahl, einer Periode, einer Person oder einem Ereignis angeboten. Bei „Das verstehe ich nicht“ ohne eindeutige Auswahl fragt der Agent kurz nach, statt sich irgendeinen Betrag auszusuchen.
+
+```ts
+type GraphContext = {
+  caseId: string;
+  profileVersion: number;
+  scenarioVersionId: string;
+  runId: string;
+  graphId: string;
+  metricId: string;
+  personId?: string;
+  periodStart: string;
+  periodEnd?: string;
+};
+```
+
+Der Client übergibt Identifikatoren, nicht eine frei erfundene Erklärung samt Betrag. Das Logik-Backend prüft, dass Kontext und berechtigter Fall zusammenpassen; das KI-Backend erhält die passenden strukturierten Ergebnisfakten. Die Erklärung nennt Bedeutung, betroffene Phase, Annahmen und Datenlücken. Sie wird in Chat/Info angezeigt und kann über den freigegebenen Voice-Kanal vorgelesen werden.
+
+Ändert sich die Auswahl oder Version, wird eine verspätete Erklärung verworfen oder als historisch markiert. Eine noch laufende Audioausgabe zur alten Grafik wird gestoppt. Wiederholte Nachfragen führen zu verständlicherer Darstellung, nicht zu einer psychologischen Diagnose oder einem versteckten Kunden-Score.
+
+### 5.6 Fortschritt direkt am Agenten
+
+Der vom Nutzer bestätigte Ring/Farbzustand zeigt **Erfassungs- bzw. Beratungsfortschritt**, nicht Versicherbarkeit, Risikoklasse oder das Ende eines Vertragsprozesses. Mögliche Datengruppen: Ziele, Haushalt, Budget, erste/zweite/dritte Säule, Szenarioentscheidung und bestätigte offene Schritte. Die konkreten Gruppen/Weights sind ein gemeinsamer Fachvertrag, keine aus dem Foto abgeleiteten Prozentregeln.
+
+Lukas rendert; Valentin definiert Datenreife; Earnie stellt den passenden Fallstand bereit. Ring und Progress-Tab verwenden dasselbe Objekt. Unbekannte Angaben erhöhen den bestätigten Vollständigkeitsgrad nicht. Hundert Prozent abgeschlossene Aufnahme kann mit „Fachprüfung offen“ oder „keine Police ausgestellt“ zusammen auftreten; dieser Unterschied bleibt im Text sichtbar.
+
+Der Agent hat technische Zustände `idle`, `listening`, `thinking`, `speaking`, `error`. Farben werden durch Text und Symbole ergänzt. Ein grüner Ring bedeutet niemals „alle Risiken gelöst“. Eine Animation entscheidet weder fachlichen Status noch eine Annahme. Für das Grundmodell wird keine Kamera benötigt.
+
+### 5.7 Summary für Kunde und Fachperson
+
+Ein `SummaryBundle` referenziert eine einzige Profil-/Szenario-/Rechenversion, Ziele, Annahmen, Maßnahmen, Produkteignung, Alternativen und offene Prüfungen. Die Kundensicht ist verständlich formuliert. Die Fachpersonensicht ergänzt strukturierte Quellen, Rechen-/Regelreferenzen und präzise offene Aufgaben. Sie ist keine zweite unabhängig neu gerechnete Zusammenfassung.
+
+Der Boardbegriff „Candidate“ wird vorläufig als Kunde/interessierte Person gelesen; genaue Benennung und tatsächlicher Übergabekanal bleiben offen. P0 bietet Download bzw. eine kontrollierte Übergabeansicht. Kein Klick auf „Export“ sendet ohne gesonderten Auftrag eine Mail, Nachricht oder Terminbuchung. Gemeinsamer Versionsbezug und Zugriffsschutz gelten auch für Downloads.
+
+Beide Sichten sind als HTML/JSON nutzbar; PDF bleibt eine optionale Darstellungsverbesserung, weil der Workshop kein Format festlegt. Draft-/Schätz-/Reviewstatus wird nicht für eine schöner wirkende Kundensicht versteckt. Ein serverseitiger Versand oder echter Beraterzugang gehört erst in eine freigegebene Integration.
+
+### 5.8 Weitere Skizzenpunkte und Fehlerzustände
+
+Video-Avatar bleibt ausdrücklich Nice-to-have. Grundlegender Agent, Progress, Voice-/Text-Anschluss und Grafik-Erklärung dürfen nicht auf ihn warten. „Follow up / Overview“ in Klammern wird als vorläufige Erweiterung verstanden; notwendige Wiederaufnahme und Demo-Portalstatus bleiben P0. Das Mondsymbol ist nur eine mögliche Dark-Mode-Idee.
+
+UI-Badges zeigen Speichern, Rechnen, offenes Review und Audiozustand verständlich. Bei denied permission, unverständlichem Transkript oder Video-/TTS-Ausfall bleibt Text bedienbar. Ein Browser-Reload aktiviert kein Mikrofon und startet keine alte Audioausgabe automatisch.
 
 ## 6. Angular und Pax UI konkret einsetzen
 
@@ -225,7 +291,7 @@ Ein Button zeigt an, ob gespeichert oder gerechnet wird. Doppelklicks erzeugen k
 
 Die archivierte [Pax-Installationsanleitung](../references/web/design/components/pax-ui-installation.txt) nennt Angular 19/20, eine GitHub Package Registry und nötigen Paket-Zugriff. Die [Getting-Started-Seite](../references/web/design/components/pax-ui-getting-started.txt) ist teilweise allgemeiner formuliert. Maßgeblich für die Installation sind die tatsächlich ausgelieferten Peer Dependencies, nicht eine vermutete Kompatibilität mit Angular 22.
 
-Person 1 und 4 prüfen in einer kleinen Testansicht: Paket importierbar, CSS geladen, Schrift-/Assetpfade korrekt, Button-Klick sichtbar, Formularfeld eingebunden, Produktion-Build erfolgreich. Erst danach entstehen die übrigen Screens. Die [offizielle Angular-Kompatibilitätstabelle](https://angular.dev/reference/versions) hilft beim passenden Node-/TypeScript-/RxJS-Satz; die genauen Versionen werden im Lockfile festgehalten.
+Luca und Earnie prüfen in einer kleinen Testansicht: Paket importierbar, CSS geladen, Schrift-/Assetpfade korrekt, Button-Klick sichtbar, Formularfeld eingebunden, Produktion-Build erfolgreich. Erst danach entstehen die übrigen Screens. Die [offizielle Angular-Kompatibilitätstabelle](https://angular.dev/reference/versions) hilft beim passenden Node-/TypeScript-/RxJS-Satz; die genauen Versionen werden im Lockfile festgehalten.
 
 Paket-Zugriff wird über den autorisierten Pax-Teamweg bezogen. Der Logismata-Bearer-Token ist kein Registry-Token. Eine `.npmrc` darf nur eine Umgebungsvariablen-Referenz enthalten, niemals einen echten Paket-Token. Kein `--force` oder `--legacy-peer-deps` als dauerhafte Konfliktlösung.
 
@@ -238,6 +304,9 @@ code/
       src/app/
         core/                    # Sitzung, API-Client, Fehlerbehandlung
         shared/ui/               # dünne App-Wrapper um Pax-Komponenten
+        features/workspace/      # fünf Tabs und gemeinsamer Auswahlkontext
+        features/agent/          # Lukas: Progress und Darstellungszustände
+        features/voice/          # Dario: STT/TTS, Transcript und Lebenszyklus
         features/intake/
         features/household/
         features/lifemap/
@@ -266,6 +335,8 @@ Diese Struktur ist vorgeschlagen; die Verzeichnisse werden erst bei der Umsetzun
 - Fachregeln und Produkteignung bleiben auf dem Server; der Client zeigt ihre strukturierten Resultate an.
 - Route Guards verbessern die Navigation. Die serverseitige Fallberechtigung bleibt verpflichtend; Angular warnt ausdrücklich davor, Guards als alleinigen Zugriffsschutz zu verwenden. [Offizielle Referenz](https://angular.dev/guide/routing/route-guards).
 
+Die Workshop-Navigation wird über einen gemeinsamen Workspace-State abgebildet: `activeTab`, `GraphContext`, `timeBudget`, `AgentPresentation` und `SummarySnapshotRef`. Der Formularentwurf und bestätigte Falldaten bleiben davon getrennt. Ein Tabwechsel löst keinen Profil-Neustart und keine Audioaufnahme aus.
+
 ### 6.4 Designregeln für diesen Prototyp
 
 Bevorzugt die Paket-Tokens verwenden. Bei nötigem Fallback gelten die archivierten Markenfarben Pax Green `#8CCD0F`, Pax Purple `#3C0078`, Weiß `#FFFFFF` und dunkler Text `#121212`; siehe [Markenfarben](../references/web/design/brand/pax-brand-farben.txt). Kleine Texte auf Grün werden auf Kontrast geprüft. Rot, Grün und Gelb werden immer durch Text und Symbole ergänzt.
@@ -276,7 +347,7 @@ Monat/Jahr, CHF und Brutto/Netto werden am Feld angezeigt. Formatierte Geldwerte
 
 Pax-Analytics wird nicht allein wegen eines Beispiels in der Installationsanleitung aktiviert. Schrift- und Assetnutzung werden mit der Paket-/Markenfreigabe abgeglichen. Das lokal archivierte vlot-JavaScript wird weder importiert noch nachgebaut.
 
-## 7. Backend-Architektur und Modulgrenzen
+## 7. Backend-Architektur und Workshop-Workflow
 
 Ein Angular-Client und ein NestJS-Backend reichen für P0. Es gibt keine Microservices, keine zusätzliche Workflow-Engine und keinen separaten Vektor-Datenbankdienst. Die folgenden Module bleiben im selben Backend getrennt testbar:
 
@@ -286,6 +357,8 @@ Ein Angular-Client und ein NestJS-Backend reichen für P0. Es gibt keine Microse
 | `CaseModule` | Profil, Quellen, Ziele und Versionierung | Versteckte Berechnungen beim Lesen eines Profils |
 | `CalculationModule` | Vorbedingungen, Adapteraufruf und normalisierte Ergebnisse | Fremde HTTP-200-Antwort automatisch als fachlich gültig markieren |
 | `ScenarioModule` | Ereignisse, Patches, Kapitalzuordnung und Vergleich | Unbekannte künftige Leistungen als garantiert skalieren |
+| `SpeechBoundary` | Nur bei freigegebenem serverseitigem Speech: temporäre STT-/TTS-Weiterleitung | Ungeklärten Browser-/Cloudanbieter als lokal ausgeben oder Audio dauerhaft debuggen |
+| `SummaryModule` | Kunden-/Fachpersonensicht desselben bestätigten Snapshots | Separate Zahlen neu erfinden oder beim Export automatisch senden |
 | `AdvisorModule` | Kontextminimierung, Feldvorschläge, Rückfragen, Erklärungen | Berechtigungen oder Geldwerte erfinden |
 | `RecommendationModule` | Bedarf, Handlungsoptionen, Produktregeln und Prüfgründe | Lücken durch Verkaufslogik verändern |
 | `JourneyModule` | Demo-Offerte, Antrag, Prüfung und Police | Reale Annahme ohne freigegebenen Pax-Prozess behaupten |
@@ -294,24 +367,22 @@ Ein Angular-Client und ein NestJS-Backend reichen für P0. Es gibt keine Microse
 
 ```mermaid
 flowchart LR
-  U[Angular mit Pax UI] --> API[NestJS: Auth und Schemapruefung]
-  API --> CASE[Fall und unveraenderliche Versionen]
-  CASE --> SC[Szenario-Orchestrierung]
-  SC --> CALC[Logismata-Adapter]
-  SC --> MODEL[Offen gelegte Demo-Modelle]
-  CALC --> RESULT[Normalisierte Ergebnisse]
-  MODEL --> RESULT
-  RESULT --> RULES[Bedarf und Produktregeln]
-  RESULT --> AI[Freigegebener AI-Erklaerdienst]
-  RULES --> AI
-  RULES --> REVIEW[Menschliche Pruefung]
-  CASE --> JOURNEY[Demo-Offerte und Antrag]
-  REVIEW --> JOURNEY
-  JOURNEY --> PORTAL[Demo-Police und Portal]
-  CASE --> DB[(PostgreSQL)]
-  RESULT --> DB
-  JOURNEY --> DB
+  U[Nutzer] <--> D[Voice - Dario]
+  D -->|VoiceLog| E[KI-Advisor - Earnie]
+  E --> S[Strukturierter Fallstand]
+  S -->|AnalysisRequest| V[Logik - Valentin]
+  V -->|AnalysisResult| L[Angular Dynamic View - Luca]
+  V --> S
+  S --> E
+  E -->|AgentReply| D
+  D -->|Playback-Ereignis| A[Agent - Lukas]
+  S -->|Fortschritt| A
+  L -->|GraphContext und Nachfrage| E
 ```
+
+Das zweite Foto ergänzt die Kommunikationsrichtung: Nutzer/Voice → Dario → Earnie („Voice Log“), strukturierter Übergabestand ↔ Valentin → Luca („Result“), passende Antwort zurück an Dario und tatsächliche Voice-Ereignisse an Lukas. Die [konkreten Schnittstellen](interface-contracts.md) I01–I10 beschreiben Produzent/Empfänger, Pflichtfelder, Versionen und Fehler. Der Nutzer hat den Dokumentknoten als gemeinsame JSON präzisiert. Diese ist ein versionierter kanonischer Fallstand; Datenbank und Transport bleiben Umsetzungsvorschläge.
+
+Die beiden Backend-Bezeichnungen auf dem Board sind bestätigte Verantwortungsbereiche: Valentin für Fach-/Rechenlogik, Earnie für KI-/Dialog-Backend. Eine gemeinsame NestJS-Grundlage bleibt ein Vorschlag, keine behauptete Workshop-Entscheidung für zwei Prozesse oder einen bestimmten Backend-Stack. Sie vermeidet doppelte Sitzungs-/Fallmodelle.
 
 Der Modellanbieter und Logismata erhalten ausschließlich den für ihren Zweck erlaubten Teil des Falls. Eine externe Modell-URL wird nicht vom Browser oder von Dokumenttext übernommen. Das Backend hat eine feste Anbieter-/Operationen-Allowlist.
 
@@ -403,7 +474,7 @@ zusaetzlich tragbarer Beitrag
 
 Die Formeln gelten nur, wenn die Einzelpositionen bekannt und überschneidungsfrei sind. Ein negatives Budget bleibt zusätzlich als Fehlbetrag sichtbar; es wird nicht nur durch die `max`-Operation versteckt. Die Höhe des Sicherheitspuffers ist eine bestätigte Planungsannahme, keine allgemeingültige Regel.
 
-Das archivierte Budget-Schema beschreibt `IncomeNet` als Einkommen nach Sozialabzügen. Es darf nicht automatisch als Einkommen nach Einkommensteuern verstanden werden. Ein vorhandenes echtes Netto-nach-Steuern-Feld wird anders behandelt. Person 2 dokumentiert für jede verwendete Operation, ob Steuern, private Vorsorgebeiträge und Partnerwerte bereits enthalten sind.
+Das archivierte Budget-Schema beschreibt `IncomeNet` als Einkommen nach Sozialabzügen. Es darf nicht automatisch als Einkommen nach Einkommensteuern verstanden werden. Ein vorhandenes echtes Netto-nach-Steuern-Feld wird anders behandelt. Valentin dokumentiert für jede verwendete Operation, ob Steuern, private Vorsorgebeiträge und Partnerwerte bereits enthalten sind.
 
 Ein statistischer Budgetvorschlag wird als Vorschlag übernommen und einzeln bestätigt oder ersetzt. Er ist keine Messung der tatsächlichen Lebenshaltungskosten. Bereits enthaltene private Vorsorgebeiträge werden bei einem neuen Sparvorschlag nicht nochmals vollständig als zusätzliche Belastung angesetzt.
 
@@ -577,7 +648,7 @@ Die mindestens erforderlichen Geschäftseingaben gehen über formale OpenAPI-Pfl
 
 Der Adapter prüft Transportstatus, JSON-Hülle `response`, Schema, Endpunkt-spezifische Codes, Szenariocode, finiten Zahlenbereich und Plausibilität. Ein `errorcode` einer Fehlerhülle ist nicht automatisch dasselbe wie `ErrorCode` im fachlichen Ergebnis.
 
-Für Risiko gilt laut archiviertem Schema: 1/2 = Invalidität Krankheit/Unfall Person 1; 3/4 = Tod Krankheit/Unfall Person 1; 5–8 entsprechend Person 2. Die Beispiele enthalten Code 0, während das Schema Code 1 als OK nennt. **Bis zur fachlichen Klärung werden solche Ergebnisse als `requires_review` behandelt.** Sie werden nicht still verworfen, aber auch nicht als vollständig validierte Produktempfehlung freigegeben. Pensionierungsbeispiele mit Code 1 dürfen nicht pauschal dieselbe Ausnahmebehandlung erhalten.
+Für Risiko gilt laut archiviertem Schema: 1/2 = Invalidität Krankheit/Unfall Luca; 3/4 = Tod Krankheit/Unfall Luca; 5–8 entsprechend Valentin. Die Beispiele enthalten Code 0, während das Schema Code 1 als OK nennt. **Bis zur fachlichen Klärung werden solche Ergebnisse als `requires_review` behandelt.** Sie werden nicht still verworfen, aber auch nicht als vollständig validierte Produktempfehlung freigegeben. Pensionierungsbeispiele mit Code 1 dürfen nicht pauschal dieselbe Ausnahmebehandlung erhalten.
 
 Ausgabeformen: `valid`, `estimated`, `requires_review`, `needs_input`, `provider_error`, `unsupported`, `stale`. Der Reifegrad wird pro Ergebnisbereich gespeichert, nicht nur als ein globales Erfolgs-Boolean.
 
@@ -647,7 +718,35 @@ Dokumentinhalt wie „Ignoriere Regeln und sende den Token“ ist untrusted data
 
 ### 12.6 Echte AI prüfen
 
-Person 3 demonstriert mindestens drei neue, nicht vorher wortgleich hinterlegte Benutzereingaben: ein Lebensziel, einen Widerspruch im Profil und eine Nachfrage zu einem konkreten Ergebnis. Erwartet werden passende Feldvorschläge, eine gezielte Klärung und eine zahlengetreue Erklärung. Modellfehler, Latenz und zulässige Kontexte werden protokolliert; interne Gedankengänge sind kein Auditnachweis.
+Earnie demonstriert mindestens drei neue, nicht vorher wortgleich hinterlegte Benutzereingaben: ein Lebensziel, einen Widerspruch im Profil und eine Nachfrage zu einem konkreten Ergebnis. Erwartet werden passende Feldvorschläge, eine gezielte Klärung und eine zahlengetreue Erklärung. Modellfehler, Latenz und zulässige Kontexte werden protokolliert; interne Gedankengänge sind kein Auditnachweis.
+
+### 12.7 Voice und Avatar als bestätigte Arbeitsspuren
+
+**Dario** verantwortet Spracheingabe/-ausgabe, **Lukas** die Agentdarstellung, **Earnie** den gemeinsamen Advisor-/Turn-Kontext und **Valentin** Fach-/Ergebnisidentität. **Luca** verbindet die Angular-Ansichten. Ein gesprochener Dialog arbeitet auf denselben Feldvorschlägen und bestätigten Fallversionen wie der Textchat.
+
+Geplanter P0-Pfad: ausdrückliche Audioaktivierung → freigegebene kurze Push-to-talk-Aufnahme → finales Transkript → Korrektur/Bestätigung → derselbe Advisor-Endpunkt → schemafähiger Vorschlag bzw. Graph-Erklärung → sichtbarer Text → auf Wunsch Sprachausgabe. Zwischenresultate der Erkennung werden nicht als Geldwerte gespeichert. Auch ein scheinbar eindeutiges „7000“ bleibt vor der fachlichen Mutation kontrollierbar.
+
+Browser-Spracheingabe ist nicht automatisch lokal: [MDN SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) beschreibt eingeschränkte Verfügbarkeit und serverbasierte Erkennung in manchen Browsern. Deshalb wird zuerst ein zulässiger STT-Adapter und Demo-Browser festgelegt; es gibt keinen stillen Cloud-Fallback. [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia) erfordert passende sichere Kontexte und Nutzerfreigabe. Die App fordert keine Kamera an.
+
+Für TTS werden lokale oder ausdrücklich freigegebene Stimmen ausgewählt. Die Eigenschaft [`localService`](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/localService) hilft bei der Unterscheidung; sie ersetzt kein vollständiges Daten-/Anbieterkonzept. Audioformat, Größe, maximale Dauer und temporäre Verarbeitung sind vor einem serverseitigen Speech-Pfad festgelegt. Rohaufnahmen werden nicht dauerhaft als allgemeines Debugmaterial gespeichert.
+
+Lukas erhält nicht eine zweite AI, sondern ein Darstellungsobjekt:
+
+```ts
+type AgentPresentation = {
+  turnId?: string;
+  explanationId?: string;
+  state: 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
+  progress: { domain: 'data_capture'; percent: number | null; openGroups: string[] };
+  reviewOpen: boolean;
+  locale: string;
+  statusText: string;
+};
+```
+
+Aufnahme, Modell-/Rechenanfrage und tatsächlicher Audiostart erzeugen jeweils passende Ereignisse. Ein fertig generierter Text setzt den Agenten noch nicht auf `speaking`. Stop, Auswahlwechsel und neue Fallversion widerrufen den betreffenden Turn; alte Callbacks dürfen nichts wieder aktivieren. In P0 wird während eigener Sprachausgabe nicht gleichzeitig weiter aufgenommen, damit kein unkontrollierter Echo-Dialog entsteht. Anspruchsvolles Vollduplex/Barge-in ist eine spätere Erweiterung.
+
+Avatar- und Audioausfall blockieren weder Grafik noch Chat noch Summary. Der grundlegende Agent bleibt ein einfacher Renderer. Erst nach vollständigem P0 kann Lukas einen freigegebenen Video-Renderer ergänzen; dessen Ausfall muss auf die einfache Darstellung zurückfallen. Ein laufender Video-Avatar ist kein Nachweis für korrekte Beratung, Verständnis oder bestehende Versicherungsdeckung.
 
 ## 13. Handlungsoptionen und Pax-Produktregeln
 
@@ -760,9 +859,13 @@ Die UI zeigt einen „Demo-Bestätigung“-Schritt und einen getrennten „in ec
 
 Die Portalansicht zeigt eine gespeicherte Übersicht über Beratungsfall, Demo-Antrag, Reviewstatus und gegebenenfalls Demo-Police. Ein Neuaufruf lädt den Stand aus der Datenbank. Die Demo-Police enthält Fall-/Antragsreferenz, Testkonfiguration, Status, Zeitpunkte und eine unübersehbare Kennzeichnung ohne Versicherungsdeckung.
 
-P0 liefert ein abrufbares Dossier als strukturierte JSON-Datei plus druckbare HTML-Sicht. Ein serverseitiges PDF ist P1, sofern der Hauptpfad vorher funktioniert. Das Dossier enthält dieselben Zahlen und Reifegrade wie die App, keine separat zusammengetextete „finale“ Darstellung. Der bereits heruntergeladene vlot-Bericht bleibt fremde Referenz und wird nicht als LifeMap-Dossier umetikettiert.
+P0 liefert ein gemeinsames SummaryBundle mit Kunden-/Fachpersonensicht als JSON und druckbare HTML-Sicht. Beide Sichten enthalten denselben Snapshot, offene Fragen und Prüfstatus. Die Übergabe wird vorbereitet, nicht automatisch per E-Mail oder Nachricht ausgelöst. Der genaue Begriff „Candidate“ und der reale Empfängerkanal bleiben offen. Ein serverseitiges PDF ist P1, sofern der Hauptpfad vorher funktioniert. Das Dossier enthält dieselben Zahlen und Reifegrade wie die App, keine separat zusammengetextete „finale“ Darstellung. Der bereits heruntergeladene vlot-Bericht bleibt fremde Referenz und wird nicht als LifeMap-Dossier umetikettiert.
 
-## 16. Eigene API-Verträge für die Umsetzung
+## 16. Workshop-Schnittstellen und eigene API-Verträge
+
+Die [Workflow-/Schnittstellenspezifikation](interface-contracts.md) konkretisiert das zweite Foto mit **I01 VoiceLog, I02 CaseSnapshot, I03 AnalysisRequest, I04 AnalysisResult, I05 AgentReply, I06 VoicePlaybackEvent, I07 GraphExplanationRequest, I08 SummaryBundle und I09 ProgressSnapshot**. Die [JSON-Übersicht](../catalog/interface-contracts.json) ist eine maschinenlesbare Planungsbeschreibung, kein bereits vollständiges Runtime-Schema. Codeowner-Namen verleihen keine Laufzeitberechtigung.
+
+Die Versionen sind getrennt: Fallrevision für konkurrierende Writes; Profil-/Szenario-/Input-Hash für Berechnung; Turn-/Kontext-/Run-Bezug für Erklärung und Audio. Nur so löst eine harmlose Tempoänderung keine unnötige Neuberechnung aus, während ein neuer Lohn alte Rechenergebnisse tatsächlich veraltet.
 
 Alle folgenden Pfade sind **vorgeschlagene eigene App-Endpunkte**, keine existierenden Pax-Endpunkte. Sie liegen unter einer gemeinsamen Origin mit dem Angular-Client. Jede Falloperation prüft die Sitzung und den Besitzer erneut.
 
@@ -785,7 +888,16 @@ Alle folgenden Pfade sind **vorgeschlagene eigene App-Endpunkte**, keine existie
 | `POST /api/cases/:caseId/demo-applications/:id/submit` | Demo-Antrag einreichen | Bestätigungen und unveränderte Eingaben |
 | `POST /api/cases/:caseId/demo-applications/:id/decisions` | Demo-Annahme/Rückfrage/Ablehnung | Berechtigter Demo-Prüfschritt |
 | `GET /api/cases/:caseId/portal` | Portal-Daten einschließlich Demo-Police | Nur eigener berechtigter Fall |
+| `POST /api/cases/:caseId/explanations` | Auswahlgebundene Grafik-Erklärung | GraphContext gehört zu aktuellem berechtigtem Fall/Run |
+| `POST /api/cases/:caseId/summaries` | Kunden-/Fachpersonensicht desselben Snapshots | Berechtigter Snapshot, kein automatischer Versand |
+| `POST /api/cases/:caseId/voice/transcriptions` | Optional: freigegebener temporärer STT-Adapter | Explizite Aufnahme, Format-/Größenlimit, bekannte Empfänger |
+| `GET /api/cases/:caseId/advisor/context` | Aktuellen minimalen Sprach-/Gesprächskontext laden | Session/Fallbindung, aktuelle Version, erlaubte Fakten |
+| `GET /api/cases/:caseId/advisor/events` | I10-Kontextänderungen an berechtigte Clients melden | SSE-Vorschlag, Ablauf/Widerruf, Reconnect-Snapshot |
 | `GET /api/cases/:caseId/dossier` | JSON-/HTML-Dossier | Reifegrade und Versionen erhalten |
+
+### 16.0 Dynamischer Voice-Kontext aus dem gemeinsamen JSON-Fall
+
+Earnies Fallservice hält den kanonischen JSON-Fallstand und erzeugt eine minimale `AdvisorContext`-Projektion. Dario wird über I10 aktualisiert und prüft vor jedem fachlichen Antwortturn Kontext-/Runbezug erneut. Ein neues gültiges Resultat von Valentin wird Grafik und Gespräch verfügbar; fachlich veraltete Audioausgaben werden abgebrochen und Lukas erhält `cancelled`. Vorschlag: HTTP für Eingaben, SSE für fallbezogene Updates. Nach Reconnect frischen Snapshot laden, doppelte Events ignorieren. `contextRevision` ist gesondert von der fachlichen `profileVersion`. Vollständiger Ablauf, Werkzeugoption und Zuständigkeiten: [Schnittstellen Abschnitt 9](interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario).
 
 ### 16.1 Beispiel für den Rechenauftrag
 
@@ -853,6 +965,7 @@ Der EDÖB hält fest, dass Datenschutz auch auf AI-Systeme anwendbar ist und das
 | Synthetisches Profil | Eigene geschützte App und Fall-Datenbank | Unbemerkte Weitergabe an Analytics oder beliebige Modellanbieter |
 | Rechenparameter | Nur benötigte Felder an freigegebenes Logismata-Ziel | Gesamtes Gespräch oder unnötige Namen als API-Beifang |
 | AI-Kontext | Minimierter Kontext an die konfigurierte freigegebene Umgebung | Dynamisch vom Modell gewählte Hosts oder unbekannte Proxies |
+| Sprache/Transkript | Kurze explizite Aufnahme, freigegebener STT-/TTS-Weg, bestätigbare Werte | Mikrofon-Autostart, Kameraanforderung, unbemerkte Cloud-Erkennung und dauerhafte Rohaufnahme |
 | Rohdokumente | P0 kein freier Upload; P1 zunächst nur synthetische Dokumente | Allgemeine Cloud-OCR mit nicht geklärter Datennutzung |
 | Gesundheits-/Ausweisdaten | Für die Hauptdemo nicht erhoben | Speicherung „für später“ ohne konkrete Notwendigkeit |
 | Logs | Trace-ID, technischer Status, Operation, Dauer und Version | Tokens, Rohtexte, detaillierte finanzielle Payloads und Dokumentinhalte |
@@ -916,43 +1029,61 @@ Unit-Tests konzentrieren sich auf Regeln mit eigenem fachlichem Risiko. Kein Tes
 
 | ID | Test | Erwartetes Verhalten | Hauptverantwortung |
 |---|---|---|---|
-| V01 | Zukunftsgeburtsjahr / unzulässiger Alterswert | Fehler am Feld; kein Provider-Aufruf mit ungültigen Daten | 1 + 2 |
-| V02 | Fehlendes Brutto-/Netto-Kennzeichen | Rückfrage; keine stille Einkommensumrechnung | 2 |
-| V03 | Bedarf unbekannt | Keine Aussage „keine Lücke“ und keine finale Bedarfs-Empfehlung | 2 + 3 |
-| V04 | Einkommen null versus unbekannt | Zwei verschiedene fachliche Zustände | 2 |
-| V05 | Zu hohe 3a-Einzahlung | Gelieferte Grenzen prüfen; individuelle Berechtigung nicht allein daraus ableiten | 2 |
-| V06 | Einkommen unter fachlicher Grenze der Umrechnung | Keine künstliche Erhöhung auf Mindestwert; eingeschränkter Pfad | 2 |
-| C01 | Dieselben Eingaben und dieselbe Modellversion | Deterministischer eigener Anteil und gleiche Input-Hashes | 2 |
-| C02 | Monats-/Jahreswerte | Richtige Umrechnung ohne Mehrfachdivision | 2 |
-| C03 | Budget enthält bereits Steuern / Vorsorge | Kein doppelter Abzug | 2 |
-| C04 | API-Gesamteinkommen enthält Partner | Kein zweites Addieren von Partnereinkommen | 2 |
-| C05 | Risiko-Code 0 bei HTTP 200 | `requires_review`, nicht ungeprüft `valid` | 2 + 5 |
-| C06 | 401 / Timeout / falsche Antwortstruktur | Begrenzter Fehlerpfad, keine Retry-Schleife | 2 |
-| S01 | Pensumswechsel | Neue Szenarioversion; Cashflow ändert sich; nicht belegte PK-Folge bleibt geschätzt/offen | 1 + 2 |
-| S02 | Eigenheim übersteigt verfügbare Mittel | Kapitalfehlbetrag und betroffene Reserve sichtbar | 1 + 2 |
-| S03 | Asset für Eigenheim und Pension gleichzeitig | Doppelzuordnung abgelehnt oder ausdrücklich alternative Varianten | 2 |
-| S04 | Früheres Erwerbsende | Kein Rest-Erwerbseinkommen; Überbrückung separat | 2 |
-| S05 | Rentenbeginn der Personen versetzt | Mindestens zwei korrekte Phasen | 2 |
-| S06 | Entnahmekapital erschöpft | Kein unbegrenzt fortlaufendes Einkommen aus diesem Asset | 2 |
-| A01 | Neue Lebensziel-Formulierung | Schemafähiger Vorschlag; keine ungefragte Profilmutation | 3 |
-| A02 | Widersprüchliche Nutzeraussage | Gezielte Klärung statt Überschreiben bestätigter Daten | 3 |
-| A03 | Frage zu Ergebnisbetrag | Antwort stimmt mit referenziertem Run und Periode überein | 3 |
-| A04 | Produktname gleich zu Beginn | Sachinformation möglich; persönliche Empfehlung bleibt an Bedarf gebunden | 3 |
-| A05 | Prompt verlangt Token / fremden Fall | Keine Offenlegung oder Tool-Autorisierung | 3 + 4 |
-| A06 | Modellfehler oder unzulässige Ausgabe | Sichtbarer Fallback; keine erfundene Erfolgsantwort | 3 |
-| R01 | Kleine Lücke, keine passende Maßnahme | Lücke bleibt sichtbar; Entscheidung und gegebenenfalls Mindestregel erklärt | 3 + 5 |
-| R02 | Haushalt hat Geld, betreffende Person nicht | Persönliche Angemessenheit bleibt ungeklärt | 3 + 5 |
-| J01 | Profil nach Empfehlung geändert | Empfehlung und darauf beruhende Offerte veraltet | 4 |
-| J02 | Antrag doppelt eingereicht | Eine konsistente Application-ID und ein Ereignis | 4 |
-| J03 | Police direkt anfordern | Ohne passenden Annahmeschritt blockiert | 4 |
-| J04 | Vollständige Journey mit Reload | Ein Fall bis zur Demo-Police; Daten und Status bleiben erhalten | 1 + 4 + 5 |
-| J05 | Erforderliche menschliche Prüfung | AI-/Kundenrolle kann sie nicht selbst abschließen | 3 + 4 |
-| P01 | Zwei Sitzungen / fremde Case-ID | Kein Lesen, Ändern oder Dossierdownload | 4 + 5 |
-| P02 | Secret- und Bundle-Scan | Kein realer Anbieter-Token in Client, Git oder Export | 4 + 5 |
-| P03 | Allgemeine Logs | Keine Rohdokumente, unnötigen Personen-/Finanzdaten oder Schlüssel | 4 + 5 |
-| P04 | Manipulierter HTML-/Erklärungstext | Kein ausgeführtes fremdes Markup/Skript | 1 + 4 |
-| U01 | Tastatur und schmale Ansicht | Pflichtaktionen erreichbar; Fehler zugeordnet; Werte lesbar | 1 + 5 |
-| U02 | Dossier versus UI | Identische Beträge, Versionen und Prüfzustände | 4 + 5 |
+| V01 | Zukunftsgeburtsjahr / unzulässiger Alterswert | Fehler am Feld; kein Provider-Aufruf mit ungültigen Daten | Luca + Valentin |
+| V02 | Fehlendes Brutto-/Netto-Kennzeichen | Rückfrage; keine stille Einkommensumrechnung | Valentin |
+| V03 | Bedarf unbekannt | Keine Aussage „keine Lücke“ und keine finale Bedarfs-Empfehlung | Valentin + Earnie |
+| V04 | Einkommen null versus unbekannt | Zwei verschiedene fachliche Zustände | Valentin |
+| V05 | Zu hohe 3a-Einzahlung | Gelieferte Grenzen prüfen; individuelle Berechtigung nicht allein daraus ableiten | Valentin |
+| V06 | Einkommen unter fachlicher Grenze der Umrechnung | Keine künstliche Erhöhung auf Mindestwert; eingeschränkter Pfad | Valentin |
+| C01 | Dieselben Eingaben und dieselbe Modellversion | Deterministischer eigener Anteil und gleiche Input-Hashes | Valentin |
+| C02 | Monats-/Jahreswerte | Richtige Umrechnung ohne Mehrfachdivision | Valentin |
+| C03 | Budget enthält bereits Steuern / Vorsorge | Kein doppelter Abzug | Valentin |
+| C04 | API-Gesamteinkommen enthält Partner | Kein zweites Addieren von Partnereinkommen | Valentin |
+| C05 | Risiko-Code 0 bei HTTP 200 | `requires_review`, nicht ungeprüft `valid` | Valentin + Team |
+| C06 | 401 / Timeout / falsche Antwortstruktur | Begrenzter Fehlerpfad, keine Retry-Schleife | Valentin |
+| S01 | Pensumswechsel | Neue Szenarioversion; Cashflow ändert sich; nicht belegte PK-Folge bleibt geschätzt/offen | Luca + Valentin |
+| S02 | Eigenheim übersteigt verfügbare Mittel | Kapitalfehlbetrag und betroffene Reserve sichtbar | Luca + Valentin |
+| S03 | Asset für Eigenheim und Pension gleichzeitig | Doppelzuordnung abgelehnt oder ausdrücklich alternative Varianten | Valentin |
+| S04 | Früheres Erwerbsende | Kein Rest-Erwerbseinkommen; Überbrückung separat | Valentin |
+| S05 | Rentenbeginn der Personen versetzt | Mindestens zwei korrekte Phasen | Valentin |
+| S06 | Entnahmekapital erschöpft | Kein unbegrenzt fortlaufendes Einkommen aus diesem Asset | Valentin |
+| A01 | Neue Lebensziel-Formulierung | Schemafähiger Vorschlag; keine ungefragte Profilmutation | Earnie |
+| A02 | Widersprüchliche Nutzeraussage | Gezielte Klärung statt Überschreiben bestätigter Daten | Earnie |
+| A03 | Frage zu Ergebnisbetrag | Antwort stimmt mit referenziertem Run und Periode überein | Earnie |
+| A04 | Produktname gleich zu Beginn | Sachinformation möglich; persönliche Empfehlung bleibt an Bedarf gebunden | Earnie |
+| A05 | Prompt verlangt Token / fremden Fall | Keine Offenlegung oder Tool-Autorisierung | Earnie + Valentin |
+| A06 | Modellfehler oder unzulässige Ausgabe | Sichtbarer Fallback; keine erfundene Erfolgsantwort | Earnie |
+| R01 | Kleine Lücke, keine passende Maßnahme | Lücke bleibt sichtbar; Entscheidung und gegebenenfalls Mindestregel erklärt | Earnie + Valentin |
+| R02 | Haushalt hat Geld, betreffende Person nicht | Persönliche Angemessenheit bleibt ungeklärt | Earnie + Valentin |
+| J01 | Profil nach Empfehlung geändert | Empfehlung und darauf beruhende Offerte veraltet | Earnie + Valentin |
+| J02 | Antrag doppelt eingereicht | Eine konsistente Application-ID und ein Ereignis | Earnie + Valentin |
+| J03 | Police direkt anfordern | Ohne passenden Annahmeschritt blockiert | Earnie + Valentin |
+| J04 | Vollständige Journey mit Reload | Ein Fall bis zur Demo-Police; Daten und Status bleiben erhalten | alle fünf |
+| J05 | Erforderliche menschliche Prüfung | AI-/Kundenrolle kann sie nicht selbst abschließen | Earnie + Valentin |
+| P01 | Zwei Sitzungen / fremde Case-ID | Kein Lesen, Ändern oder Dossierdownload | Earnie + Valentin |
+| P02 | Secret- und Bundle-Scan | Kein realer Anbieter-Token in Client, Git oder Export | Earnie + Valentin |
+| P03 | Allgemeine Logs | Keine Rohdokumente, unnötigen Personen-/Finanzdaten oder Schlüssel | Earnie + Valentin |
+| P04 | Manipulierter HTML-/Erklärungstext | Kein ausgeführtes fremdes Markup/Skript | Luca + Earnie |
+| U01 | Tastatur und schmale Ansicht | Pflichtaktionen erreichbar; Fehler zugeordnet; Werte lesbar | Luca + Lukas |
+| U02 | Dossier versus UI | Identische Beträge, Versionen und Prüfzustände | Earnie + Valentin |
+| W01 | Kurzes Zeitbudget | Knappe Erklärung, aber unveränderte Pflichtdaten/-prüfungen | Luca + Earnie |
+| W02 | Wechsel aller fünf Tabs | Fall, Szenario, Periode und Entwürfe bleiben erhalten | Luca + Earnie |
+| W03 | Agentprogress bei offener Fachprüfung | Aufnahmefortschritt und Review/Versicherungsschutz bleiben getrennt | Lukas + Valentin |
+| W04 | Erklärung nach neuer Grafikauswahl | Alter Run/Zeitraum wird nicht als aktuelle Erklärung vorgelesen | Luca + Valentin + Earnie |
+| W05 | Mikrofon abgelehnt / Gerät fehlt | Textfluss funktioniert; kein wiederholter unerbetener Permission-Prompt | Dario |
+| W06 | Verhörter Geldwert im Transkript | Korrektur/Bestätigung vor der fachlichen Mutation | Dario + Earnie |
+| W07 | Stop / neue Fallversion beim Sprechen | Audio endet; alte Events aktivieren Agent/Voice nicht neu; kein Echo-Loop | Dario + Lukas |
+| W08 | Ungeklärter Speech-Anbieter | Kein stiller Remote-STT-/TTS-Fallback | Dario + Earnie |
+| W09 | Video-/Avatarfehler | Einfache Darstellung, korrekter Status, Beratung/Summary weiter nutzbar | Lukas + Dario |
+| W10 | Kunden-/Fachperson-Summary | Derselbe Snapshot und Prüfstatus, keine widersprüchlichen Zahlen | Luca + Earnie |
+| W11 | Summary-Export | Kein automatischer Mail-/Nachrichtenversand oder Termin | Earnie + Valentin |
+| F01 | Dario → Earnie → strukturierter Stand → Valentin → Luca | Bestätigter Turn, Rechenauftrag und sichtbares Ergebnis haben passende gemeinsame Referenzen | alle fünf |
+| F02 | Neue Finanzdaten bei verspätetem Resultat | Alter Input-Hash/Run ersetzt keine aktuelle Grafik oder Spracherklärung | Valentin + Luca + Earnie |
+| F03 | Doppelte VoiceLog-/Antwortnachricht | Kein zweiter fachlicher Vorgang und keine doppelte Sprachausgabe | Dario + Earnie |
+| F04 | Rückgabe und Avatar-Ereignisse | Zahlengetreue AgentReply, tatsächliches Audio und passender Playbackzustand | Earnie + Dario + Lukas |
+| F05 | Neuer bestätigter JSON-Stand während eines Gesprächs | I10 aktualisiert Kontext; nächste Antwort nutzt freigegebene aktuelle Fakten; kein Rohakten-Prompt | Earnie + Dario + Valentin |
+| F06 | Streamabbruch, doppelte Events und Wiederverbindung | Finanzantworten pausieren; aktuellen Snapshot laden; keine doppelte Sprachausgabe | Earnie + Dario + Luca |
+| F07 | Fachänderung versus reiner Tempowechsel während TTS | Ungültige Aussage stoppen und Avatar abbrechen; unveränderte gültige Aussage bei Tempo allein erhalten | Dario + Lukas + Valentin |
 
 ### 20.3 Geplanter Test-Stack
 
@@ -964,7 +1095,7 @@ Ein echter Modell-Smoke-Test und ein begrenzter Live-Rechentest werden bewusst a
 
 Ein Ticket ist fertig, wenn sein prüfbares Ergebnis im integrierten Workspace vorhanden ist, die vereinbarten Invarianten bestehen, relevante Fehlerzustände gezeigt werden und eine zweite Person die Übergabe versteht. Ein Screenshot einer nicht gespeicherten Einzelansicht reicht nicht für ein End-to-End-Ticket.
 
-P0 gilt als abgenommen, wenn Pflichtszenarien, tatsächlicher Modellaufruf, mindestens ein geeigneter Live-Rechenpfad bei verfügbarem Zugang, transparente Fehler-/Replayzustände und der gespeicherte Demo-Vertragsablauf gemeinsam funktionieren. Eine fehlende AI-Ausführung oder ein nur aus Screenshots bestehender Pflichtpfad bleibt ein offener Kernpunkt.
+P0 gilt als abgenommen, wenn fünf Workspace-Ansichten, Zeitbudget, Agentprogress, ein freigegebener grundlegender Voice-Pfad, Kontext-Erklärung, beide Summary-Sichten, Pflichtszenarien, tatsächlicher Modellaufruf, mindestens ein geeigneter Live-Rechenpfad bei verfügbarem Zugang, transparente Fehler-/Replayzustände und der gespeicherte Demo-Vertragsablauf gemeinsam funktionieren. Eine fehlende AI-Ausführung oder ein nur aus Screenshots bestehender Pflichtpfad bleibt ein offener Kernpunkt.
 
 ## 21. Messung, NPS und Produktmanagement
 
@@ -978,77 +1109,79 @@ Für die Produktmanagement-Demo genügen aggregierte synthetische Zahlen: In wel
 
 ## 22. Zusammenarbeit der fünf Personen
 
-### 22.1 Verantwortungsmodell
+### 22.1 Bestätigte Rollen
 
-| Person | Primäre Verantwortung | Muss früh liefern | Fachlicher Gegencheck |
+| Name | Workshop-Bereich | Zuerst liefern | Direkte Übergaben |
 |---|---|---|---|
-| 1 | Angular, Pax UI und gesamter Kundenfluss | Laufende Oberfläche und bestätigbares Profil | Person 5 für Verständnis; Person 4 für gespeicherten Zustand |
-| 2 | Datenvertrag, Rechenadapter und Szenarien | Einheiten/Status sowie erste normalisierte Baseline | Person 5 für Annahmen; Person 3 für Ergebnis-Erklärung |
-| 3 | AI, Rückfragen, Fakten- und Produktregeln | Echter zulässiger Modelllauf und schemafähige Feldvorschläge | Person 2 für Zahlen; Person 5 für Bedarf und Fachgrenzen |
-| 4 | Backend, Sitzung, Persistenz und Demo-Vertrag | Gemeinsamer Workspace, isolierter Fall, Versionierung | Person 1 für Journey; Person 5 für negative Sicherheitsfälle |
-| 5 | Fachprüfung, Integration, Abnahme und Pitch | Verbindlicher Scope, getrennte Fixtures und Pax-Fragen | Alle; Qualitätsverantwortung bleibt jeweils beim Modulowner |
+| Luca | UI | Angular-Shell, fünf Tabs, Dynamic View und Agent-Slot | Mit Lukas Darstellung, mit Dario Controls, mit Backend gemeinsamer Fall |
+| Lukas | Avatar | Einfacher Agent, Progressring und Zustandsvertrag | Dario meldet Audiozustände, Backend liefert Datenreife |
+| Dario | Voice | Zulässiger Speech-Weg, Aufnahme/Transkript, TTS und Stop | Earnie für Advisor-Turn, Lukas für echte Listening-/Speaking-Events |
+| Valentin | Logik-Backend | Fachvertrag, Logismata, Budget/Szenarien und GraphContext | Luca für Grafikdaten, Earnie für Erklärung/Summary/Regeln |
+| Earnie | KI-Backend | Modellroute, Rückfragen, Fallkontext, Erklärung und Summary | Gemeinsame Session-/Persistenzgrundlage; Valentin für unveränderte Rechenergebnisse |
 
-Person 5 ist kein alleiniger Tester am Ende. Jeder Owner liefert die relevante Prüfung für sein Modul mit. Person 5 prüft Zusammenwirken, Fachfragen und Demo-Reife.
+Es gibt keinen separaten QA-Owner mehr. Jeder prüft seinen Bereich; Integration, Fachfragen und Pitch werden gemeinsam abgenommen. Die ergänzende gemeinsame Backend-Grundlage bei Earnie und fachliche Vertragsstatuslogik bei Valentin sind Umsetzungsvorschläge innerhalb der bestätigten Bereiche, nicht weitere aus dem Foto behauptete Entscheidungen.
 
-### 22.2 Integrationsregeln
+### 22.2 Schnittstellen zuerst
 
-- Ein gemeinsamer Datenvertrag in `packages/contracts`; Änderungen bekommen eine konkrete Übergabenotiz.
-- Frontend und AI können mit denselben synthetischen Vertrags-Fixtures starten, während Provideradapter entstehen.
-- Abhängigkeiten im Backlog bezeichnen die Voraussetzung der finalen Abnahme. Vorbereitende Arbeit mit stabilen Fixtures darf früher beginnen.
-- Ein kleiner gemeinsamer Durchlauf wird spätestens nach acht Stunden gezeigt. Die einzige End-to-End-Integration wird nicht auf Sonntag verschoben.
-- Modulowner prüfen fremde Änderungen, bevor sie gemeinsame Schema-/Konfigurationsdateien überschreiben.
-- Kleine fachlich zusammenhängende Branches und Conventional Commits; keine allgemeine Zusammenführung sämtlicher Experimente kurz vor dem Pitch.
-- Nach jedem Integrationspunkt steht fest: Was funktioniert wirklich? Welche Daten sind geschätzt? Welche Abhängigkeit ist noch blockiert?
+Der Ablauf aus dem zweiten Foto und die [Schnittstellen I01–I10](interface-contracts.md) sind die gemeinsame Übergabegrundlage. Dario verantwortet VoiceLog und Playback, Earnie den Advisor-/Fallstand, Valentin AnalysisRequest/Result, Luca Darstellung/Auswahl und Lukas den Renderer. Ein gemeinsamer Vertrag umfasst `CaseSnapshot`, `GraphContext`, `InteractionPreference`, `AgentPresentation`, `VoiceTurn` und `SummaryBundle`. Das ist ein Fallmodell mit mehreren Sichten, kein Datensatz pro Tab oder pro Backend-Owner.
 
-### 22.3 Geplante Kapazität
+Valentin/Earnie legen Geld-/Zeit-/Versionssemantik fest. Luca/Lukas verbinden Workspace und Agent zunächst mit derselben Fixture. Dario liefert zuerst einen unabhängigen Speech-Smoke und danach denselben Text-/Advisor-Turn. Ein fertiggestellter Text allein löst keine Speaking-Animation aus. Aufnahme-/Abbruchereignisse sind an einen gültigen Turn gebunden.
 
-Das Backlog enthält 36 P0-Pakete mit insgesamt 77 Personenstunden: Person 1: 14 h, Person 2: 17 h, Person 3: 15,5 h, Person 4: 15,5 h, Person 5: 15 h. Zusätzlich sind zusammen 20 Personenstunden für gemeinsame Starts, Vertragsabsprachen, Reviews und Domain-Abstimmung vorgesehen. Weitere 13 Personenstunden sind Fehler-/Integrationspuffer; damit ergibt sich der Zielrahmen von 110 Personenstunden. Pairing verbraucht die Zeit beider Personen und wird nicht als kostenlose Parallelität gerechnet.
+### 22.3 Integration und Review
 
-Die Berechnungsspur ist voraussichtlich der Engpass. Person 5 übernimmt Quellenaufbereitung und Referenzfallklärung; Person 4 hält Schnittstellen und Speicherung von ihr fern. Person 1 baut nötige Ansichten mit Vertrags-Fixtures vor. Eine verspätete Rechenantwort führt nicht zu fünf wartenden Personen.
+Kleine passende Branches/Conventional Commits; Quellen unverändert lassen; keine Schlüssel in Git. Schemaänderungen mit den betroffenen Ownern besprechen. Luca/Earnie prüfen Tab-/Fallkonsistenz, Lukas/Dario Agent-/Audiozustände, Valentin/Earnie Zahlen-/Erklärungsbezug. Jede Rolle liefert ihre negativen Fälle, alle fünf den Hauptdurchlauf.
 
-## 23. Ablauf im vorläufigen 48-Stunden-Fenster
+Die alten 36 Tickets werden nicht als erledigt erklärt. Der [neue Backlog](implementation-backlog.md) und seine JSON-Zuordnung zeigen, wohin jede alte Aufgabe in Workshop-Version 2.0 übergeht. Gleiche alte/neue AI-ID kann einen veränderten Zuschnitt haben; die Version gehört zur Referenz.
 
-Die Fenster sind Fortschrittsphasen, keine Aufforderung zu durchgehender Nachtarbeit. Individuelle Pausen und Schlaf werden so abgestimmt, dass nicht alle kritischen Rollen gleichzeitig für jede Rückfrage gebraucht werden. Wenn die tatsächliche Hackathon-Zeit kürzer ist, werden zunächst P1/P2 und Darstellungsdetails gekürzt; die Pflichtmodule werden nicht still weggelassen.
+### 22.4 Neu geschätzte Kapazität
 
-| Fenster | Gemeinsames Ergebnis | Parallel laufende Arbeit | Entscheidung am Ende |
-|---|---|---|---|
-| T+0–2 h | Scope, Personenrollen, Fixture und Paket-/Providerzugänge geklärt | 1: Pax UI; 2: Datenvertrag; 3: Modellzugang; 4: Workspace/Session; 5: Scope/Expertenthemen | Angular/Pax-Kompatibilität, zulässige AI-Umgebung und Grenzen dokumentiert |
-| T+2–8 h | Erster gespeicherter vertikaler Slice: Ziel → Profil → Basisergebnis | 1: Formulare; 2: Adapter/Budget; 3: Feldvorschläge; 4: Persistenz/API; 5: Quellennachweise | Ein tatsächlicher AI-Aufruf und ein passender Rechenpfad müssen vorführbar sein |
-| T+8–16 h | LifeMap und erste datierte Szenariovarianten | Familien-/Pensionslogik, Szenario-UI, Rückfragen, Produktregeln | Unklare Providersemantik eingegrenzt, nicht verborgen |
-| T+16–24 h | Alle drei Pflichtszenarien auf demselben Fall | Eigenheimzuordnung, Phasen, Baselinevergleich, gemeinsame Integration | Kein neues Spezialfeature, wenn ein Pflichtszenario nur Platzhalter ist |
-| T+24–32 h | Erklärbare Strategie und erste vollständige Demo-Journey | Eignungsregeln, Reviewpfad, Demo-Offerte/Antrag, Portal | Ergebnis, Empfehlung und Dossier haben dieselbe Version |
-| T+32–38 h | Vollständiger gespeicherter Hauptfall bis Demo-Police | Neuladen, Statuswechsel, Fehler-/Replaysicht, Quellenzugriff | Neue Produktfamilien und Infrastruktur werden eingefroren |
-| T+38–44 h | Fachliche und sicherheitsrelevante Pflichtfälle abgenommen | Negative Tests, responsive Bedienung, Review mit Pax soweit verfügbar | Fehler nach Kernwirkung priorisieren |
-| T+44–48 h | Wiederholbarer Drei-Minuten-Pitch und startfähige Übergabe | Probedurchläufe, README, Startprüfung, Backupdarstellung | Funktionsumfang ehrlich markieren; keine überraschende letzte Migration |
+37 Tickets insgesamt: **34 P0, 2 P1, 1 P2**. P0-Ticketzeit: Luca 15 h, Lukas 9 h, Dario 13 h, Valentin 16 h, Earnie 18 h – **71 Personenstunden**. Hinzu kommen **20 gemeinsame Integrations-/Abstimmungsstunden** und **19 Pufferstunden**, zusammen der frühere grobe Rahmen von **110 Personenstunden**. Optionale Video-/Follow-up-/Dark-Mode-Tickets sind darin nicht als Pflichtarbeit eingerechnet.
 
-### 23.1 Kritischer Pfad
+Die Stunden sind eine neue Planabschätzung, keine bestätigte Workshop-Zusage. Die bisher generische QA-Spur wird in Owner-Tests und gemeinsame Integration überführt. Earnies Backend-Spur ist der Engpass; Paket-/Modellzugang sowie Persistenz-/Fachvertragsgrenzen müssen zuerst stehen. Lukas/Dario arbeiten unabhängig daran, danach werden nur die gemeinsam festgelegten Events verbunden.
+
+## 23. Integration nach dem Workshop und Zeitgrenzen
+
+Das bisherige 48-Stunden-Fenster beschreibt die gesamte Veranstaltung. Der Workshop startet die Uhr nicht neu. Tatsächliche Restzeit und außerhalb dieses Repos erledigte Umsetzung sind nicht bekannt. Beim nächsten gemeinsamen Start werden die folgenden Tore mit der echten Abgabezeit abgeglichen; alle Tickets bleiben bis zu einem Funktionsnachweis geplant.
+
+| Gate | Gemeinsamer Nachweis | Schwerpunkt der fünf Spuren |
+|---|---|---|
+| M0 | Fünf Tabs, Agentvertrag, GraphContext, Speech-/Modell-/Paketweg klar | Luca Shell; Lukas Agent; Dario Berechtigungen/Speech; Valentin Fachvertrag; Earnie Backend/Modell |
+| M1 | Ein gespeicherter Fall mit Feldvorschlag, Baseline und Fortschritt | Text oder bestätigtes Transkript erreicht dieselbe Fallversion; Ring zeigt echten Datenstand |
+| M2 | Alle Ansichten, einfacher Agent, grundlegende Voice und Grafik verbunden | Kein Tabwechsel verliert Kontext; keine Scheinstimme ohne tatsächliche Audioausgabe |
+| M3 | Drei Szenarien plus Erklärung einer ausgewählten Stelle | Rechenlauf, Periode, Kennzahl, Text und gegebenenfalls Ton passen zusammen |
+| M4 | Summary für Kunde/Fachperson und Demo-Journey | Ein Snapshot, kein automatischer Versand, klare Demo-Antrags-/Policenstatus |
+| M5 | Frische Sitzung, negative Fälle und wiederholbare Demo | Rollen, Audio-/Agentfehler, Daten-/Versionsbezug, Replays und Sicherheitsgrenzen geprüft |
+
+Vorläufige Orientierung im ursprünglichen Gesamtfenster: M0 früh in den ersten zwei Stunden, M1 etwa bis Stunde 8, M2 etwa bis 16, M3 etwa bis 24, M4 bis 38, M5 vor den letzten Demo-Proben. Ist dieses Fenster teilweise verstrichen, werden reale Zielzeiten neu vereinbart, nicht zusätzliche 48 Stunden versprochen. Pausen und Schlaf bleiben Bestandteil realistischer Planung.
+
+### 23.1 Kritischer Pfad und parallele Arbeit
 
 ```mermaid
 flowchart LR
-  F[Gemeinsame Fixture und Datenvertrag] --> P[Gespeichertes Profil]
-  P --> B[Normalisierte Baseline]
-  B --> S[Drei berechnete Szenarien]
-  S --> R[Begruendete und gepruefte Empfehlung]
-  R --> Q[Demo-Offerte und Antrag]
-  Q --> O[Demo-Police im Portal]
-  F --> A[Freigegebener AI-Aufruf]
-  A --> R
-  B --> A
+  C[Gemeinsamer Fall und Fachvertrag] --> G[Dynamic View und Rechenlauf]
+  G --> X[Gepruefter GraphContext]
+  X --> E[Erklaerung und Summary]
+  E --> J[Demo-Journey und Portal]
+  A[Einfacher Agent mit Progress] --> I[Gemeinsamer Integrationstest]
+  V[Freigegebene Voice mit Turn-Vertrag] --> I
+  J --> I
+  E --> I
 ```
 
-Eine schöne Landingpage verschiebt diesen Pfad nicht nach vorn. Jede Spur sollte möglichst früh ein kleines Stück des gemeinsamen Falls liefern.
+Lukas und Dario warten nicht auf vollständige Produktregeln oder alle Szenarien. Sie arbeiten mit einem vereinbarten Stub-Kontext und hängen sich danach an echte Ereignisse. Ein Stub bleibt beim abschließenden Funktionsnachweis nicht als reale Voice-/AI-Ausführung stehen.
 
-### 23.2 Konkrete Abbruch- und Kürzungsregeln
+### 23.2 Kürzungs- und Fehlerregeln
 
-| Problem | Sofortige Reaktion | Was nicht als Lösung gilt |
+| Problem | Reaktion | Nicht als Lösung akzeptiert |
 |---|---|---|
-| Pax UI nicht verfügbar | Angular mit minimalen Markenkomponenten hinter Wrappern fortsetzen | Stundenlang unberechtigte Registry-Zugriffe probieren oder Stack wechseln |
-| Modellzugang noch unklar | Frühe Sponsor-/Umgebungsentscheidung; kleine freigegebene Umgebung nachweisen | Nur Vorlagentexte bauen und AI als erledigt melden |
-| Logismata nicht verfügbar | Input-geprüfter Replaypfad und Providerstatus; Live-Integration bleibt offen | Beliebige gespeicherte Antwort auf geänderte Parameter zeigen |
-| Risiko-Code nicht geklärt | Reviewstatus und menschliche Demo-Prüfung erhalten | Code 0 heimlich zu Erfolg 1 umetikettieren |
-| Keine Sales-API | Klarer eigener Demo-Adapter mit tatsächlicher Persistenz | Reale Quicksale-Bedienung als angebliche API automatisieren |
-| Zeit knapp | Voice, Avatar, OCR, zusätzliche Produkte und serverseitigen PDF-Export streichen | Eine Säule, einen Pflichtvergleich oder den gespeicherten Portalstatus verstecken |
-| Fachmodell nicht ausreichend | Teilwirkung und offene Frage sichtbar zeigen; mit Pax priorisieren | Präzise aussehende zukünftige Renten erfinden |
+| Pax UI nicht erreichbar | Angular mit kleinem Marken-Fallback; Paketfrage offen dokumentieren | Unberechtigte Registry-Zugriffe oder kompletter Stackwechsel |
+| Speech nicht freigegeben/kompatibel | Text läuft weiter; Dario grenzt konkreten Browser-/Providerpfad ein | Stiller Remote-STT-/TTS-Fallback oder bloßer Mikrofonbutton als fertige Voice |
+| Video-Avatar braucht zu viel Zeit | P1 streichen, einfacher Agent/Progress bleibt | Grundberatung wartet auf Videodienst |
+| Modell nicht nutzbar | Frühe Umgebungsentscheidung; transparenter Fallback, echter AI-Punkt bleibt offen | Vorgefertigte Antworten als Modellbeweis |
+| Rechenbackend nicht verfügbar | Passender Replay bzw. begrenztes illustratives Modell mit offenen Fachfolgen | Neue Eingaben mit beliebigen alten Werten kombinieren |
+| Zeit knapp | Video-Avatar, Follow-up-Erweiterung, Dark Mode, zusätzliche Produkte/OCR/PDF zuerst kürzen | Fünf Ansichten, grundlegenden Agent-/Voice-Zuschnitt oder Pflichtszenarien still als „nice“ umetikettieren |
+| Summary oder Audio widerspricht Grafik | Gemeinsamen Snapshot/Turn korrigieren, betroffenen Übergang stoppen | Drei unabhängig generierte Zahlenstände nebeneinander präsentieren |
+| Keine Sales-API | Eigener gespeicherter Demo-Adapter, mit Pax abgestimmt | Reale Quicksale-Bedienung als angebliche unterstützte API |
 
 ## 24. Früh an Cem und Claude gerichtete Fragen
 
@@ -1078,17 +1211,17 @@ Jede Antwort wird mit Datum, Gesprächspartner, betroffener Entscheidung und ben
 
 ### 25.1 Drei Minuten mit einem gespeicherten Fall
 
-| Zeit | Aktion | Botschaft und sichtbarer Nachweis |
+| Zeit | Aktion | Sichtbarer Nachweis |
 |---|---|---|
-| 0:00–0:25 | Synthetische Familie und Ziele öffnen | Lebenssituation vor Produkt; Daten und offene Annahmen bestätigt |
-| 0:25–0:55 | Neue Formulierung zum Pensum eingeben und bestätigen | AI versteht eine Änderung; Profilvorschlag und neue Berechnung sind verbunden |
-| 0:55–1:25 | Familien- und Eigenheimvariante vergleichen | Budget und verfügbares Kapital ändern sich nachvollziehbar |
-| 1:25–1:50 | Pensionierungsphase ändern | Übergangsbedarf und spätere Versorgung werden erklärt, nicht nur ein Endbetrag |
-| 1:50–2:20 | Handlungsoption und begründete Produktfamilie ansehen | Quellen, Bedarf, Alternative und offene Prüfung bleiben sichtbar |
-| 2:20–2:50 | Demo-Offerte, gespeicherten Antrag und Reviewer-Schritt zeigen | Ein Fall, keine wiederholte Datenerfassung; Vertragsgrenzen sind ehrlich bezeichnet |
-| 2:50–3:00 | Demo-Police und Dossier im Portal öffnen | Ergebnis ist wiederaufnehmbar und übergibbar |
+| 0:00–0:20 | Agent fragt Zeitbudget, Familie/Ziele öffnen | Kurzmodus und echter Aufnahmefortschritt; keine vorgezogene Produktempfehlung |
+| 0:20–0:50 | Eine neue gesprochene oder textliche Pensumsangabe bestätigen | Transkript/Patch, Fallversion und neue Berechnung hängen zusammen |
+| 0:50–1:20 | Dynamic View: Familie und Eigenheim vergleichen | Budget/Kapital ändern sich, Unsicherheiten und Quellen bleiben sichtbar |
+| 1:20–1:45 | Pensionierungsphase wählen: „Diese Stelle erklären“ | Derselbe GraphContext in Chat/Info und freigegebener Sprachausgabe; Agentstatus stimmt |
+| 1:45–2:10 | Handlungsoption und passende Produktfamilie ansehen | Bedarf, Tragbarkeit, Alternative, persönliche Prüfung |
+| 2:10–2:40 | Summary-Sichten und Demo-Antrag/Review zeigen | Ein Snapshot und gespeicherte Übergänge; Export sendet nichts automatisch |
+| 2:40–3:00 | Demo-Police/Portal und offene nächste Schritte | Wiederaufnahme ohne Dateneingabe; Follow-up-Erweiterung/Video ehrlich optional |
 
-Die Demo verwendet vorab gespeicherte Baselines, damit die begrenzte Zeit nicht mit Formulareingabe verbraucht wird. Mindestens eine neue Änderung wird tatsächlich bestätigt und berechnet. Eine aufgezeichnete Ausfallalternative wird als Aufzeichnung oder Replay genannt.
+Wenn Voice technisch offen bleibt, wird das nicht versteckt: Der Textpfad zeigt die funktionierende Beratung, während der offene Sprachpunkt genannt wird. Ein echter neuer Modellaufruf und mindestens eine neue berechnete Änderung bleiben Bestandteil des Nachweises. Der Video-Avatar ist kein Ersatz für sie.
 
 ### 25.2 Vor dem Pitch prüfen
 
@@ -1122,21 +1255,25 @@ Datenschutz-/Sicherheitsprüfung, Berechtigungsmodell, Aufbewahrung, Monitoring,
 
 Diese Phasen sind eine Reihenfolge der Nachweise, keine zugesagte Termin- oder Budgetplanung mit Pax. Preisgeld und mögliche Weiterentwicklung sind keine verifizierte Finanzierung des Produktbetriebs.
 
-## 27. Die nächsten 90 Minuten beim tatsächlichen Baustart
+## 27. Die nächsten 90 Minuten nach Übernahme des Workshops
 
-| Zeitfenster | Gemeinsame Handlung | Ergebnis |
+| Fenster | Gemeinsame Handlung | Ergebnis |
 |---|---|---|
-| 0–15 min | Rollen, ein synthetischer Hauptfall, P0 und zulässige Umgebungen bestätigen | Kurzes Entscheidungslog und Owner je Spur |
-| 15–35 min | 1: Pax-UI-Nachweis; 2: Schemaentwurf; 3: Modell-Smoke; 4: Workspace/Session; 5: Quellen und Blocker sortieren | Fünf konkrete Zwischenstände statt fünf getrennte App-Ideen |
-| 35–55 min | Gemeinsame DTOs, Geld-/Zeitdefinitionen, Status und erste Fehlerhülle abstimmen | Vertrags-Fixture, die UI und Backend gleichermaßen lesen können |
-| 55–75 min | Minimalen gespeicherten Fall und einen sichtbaren AI-Vorschlag verbinden | Erstes gemeinsames vertikales Stück |
-| 75–90 min | Offene Blocker entscheiden und die nächsten Tickets übernehmen | Kein unklarer Paket-/Modell-/Datenweg bleibt still vorausgesetzt |
+| 0–15 min | Echte Restzeit, fünf bestätigte Owner, P0/Video-P1 und Datenwege abgleichen | Kein neues 48-Stunden-Versprechen; klarer erster Integrationstermin |
+| 15–35 min | Luca: fünf Tabs; Lukas: Agent/Progress; Dario: Speech-Smoke; Valentin: GraphContext/Fachschema; Earnie: geschützter Fall/Modell | Unabhängige Zwischenstände auf einem gemeinsamen Vertrag |
+| 35–55 min | AgentPresentation, VoiceTurn, GraphContext, InteractionPreference und SummaryBundle gemeinsam prüfen | Eindeutige Events, Versionen und Empfänger statt späterer Adapterkollision |
+| 55–75 min | Text-/Sprachvorschlag bestätigen, einen Rechenlauf und Fortschritt anzeigen | Erster gemeinsamer Mini-Durchlauf |
+| 75–90 min | Grafikstelle auswählen, Erklärung anzeigen, beide Summary-Sichten vergleichen | Konkreter Integrationsfehler oder sichtbarer Erfolg, keine fünf getrennten Inseln |
 
-In diesem Chat wurde der Plan erstellt und verknüpft. Ein tatsächlicher Baustart, eine Installation von Pax-Paketen, neue Provider-Aufrufe, ein Deployment oder die Anlage externer Aufgaben ist damit noch nicht erfolgt.
+Dieser Planungsschritt hat keine App installiert, keinen Sprach-/Videodienst aktiviert, kein Audio aufgenommen und keine Nachricht an Fachpersonen versendet. UI- und Feature-Entscheidungen sind dokumentiert; Implementierung erfordert weiterhin einen Funktionsnachweis.
 
 ## 28. Quellen und Verbindlichkeit
 
 ### Lokale Primärgrundlage
+
+- [Workflow und Schnittstellen aus dem zweiten Foto](interface-contracts.md) sowie [synthetische Vertragsbeispiele](../catalog/interface-contracts.json).
+
+- [Workshop-Entscheide aus dem Foto und Nutzerbestätigung](workshop-decisions.md) und [maschineller Nachweis](../catalog/workshop.json).
 
 - [Challenge-Unterlagen](../../challenge_material/) und [vollständiger Quellenkatalog](../references/README.md).
 - [Bisheriger Recherche-/Produktplan](advisor-plan.md) mit konkreten PDF-Befunden und Quellenständen.
@@ -1148,10 +1285,12 @@ In diesem Chat wurde der Plan erstellt und verknüpft. Ein tatsächlicher Bausta
 
 [Angular-Versionen](https://angular.dev/reference/versions), [Reactive Forms](https://angular.dev/guide/forms/reactive-forms), [Signals](https://angular.dev/guide/signals), [Route Guards](https://angular.dev/guide/routing/route-guards), [NestJS-Validierung](https://docs.nestjs.com/techniques/validation), [PostgreSQL Row Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) und [Playwright Assertions](https://playwright.dev/docs/test-assertions). Diese Seiten stützen die jeweils verlinkten technischen Entwurfsentscheidungen. Sie sind keine Bestätigung der noch nicht implementierten App.
 
+Für Voice zusätzlich geprüft: [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), [SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) und [lokale/remote Speech-Stimmen](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/localService). Die konkrete Providerwahl wird nicht als Workshop-Entscheidung ausgegeben.
+
 ### Datenschutzbezogene Orientierung
 
 [EDÖB: KI und Datenschutz](https://www.edoeb.admin.ch/de/ki-und-datenschutz) und [EDÖB: Informationspflicht](https://www.edoeb.admin.ch/de/informationspflicht). Die konkreten Produkt-/Vertrags- und Betriebsfreigaben bleiben mit Pax abzustimmen. Der vorliegende Plan erfindet keine verbindliche Rechtsauslegung oder nicht belegte Tarif-/Leistungsregeln.
 
 ### Noch offene Entscheidungen
 
-Exakte Pax-Paket-/Angular-Version und Paketberechtigung; freigegebene Modellumgebung; tatsächliche Sales-/Portal-Schnittstellen; Risiko-Code-Interpretation; vollständige Zeit-/Kinder-/PK-Logik; Eigenheimkriterien; verbindliche Produktstände; persönliche Angemessenheitsstrecke und reale Review-Rollen. Alle sind im Plan mit dem betroffenen Verhalten und einem frühen Klärungspunkt verbunden.
+Exakte Voice-/Videoanbieter und Demo-Browser, „Candidate“-Benennung und tatsächlicher Übergabekanal, Follow-up-/Dark-Mode-Priorität, konkrete Grafiklegende, echte Restzeit; exakte Pax-Paket-/Angular-Version und Paketberechtigung; freigegebene Modellumgebung; tatsächliche Sales-/Portal-Schnittstellen; Risiko-Code-Interpretation; vollständige Zeit-/Kinder-/PK-Logik; Eigenheimkriterien; verbindliche Produktstände; persönliche Angemessenheitsstrecke und reale Review-Rollen. Alle sind im Plan mit dem betroffenen Verhalten und einem frühen Klärungspunkt verbunden.

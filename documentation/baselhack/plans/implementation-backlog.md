@@ -1,595 +1,808 @@
-# Pax LifeMap – umsetzbares Ticket-Backlog
+# Pax LifeMap – Ticket-Backlog nach dem Workshop
 
-Stand: 30.10.2026. Angular ist gesetzt. Alle Tickets stehen auf geplant; es wurden keine externen Issues erstellt.
-Der [Detailplan](implementation-plan.md) erklärt Fachregeln, Screens, Schnittstellen und Abnahme. Die [JSON-Fassung](../catalog/implementation-backlog.json) enthält dieselben Aufgaben maschinenlesbar.
+Stand: 31.10.2026 · Version 2.0-workshop. Die Namen und Zuständigkeiten sowie Fortschritt am Agenten wurden vom Nutzer bestätigt. Alle Implementierungstickets sind geplant; der Workshop ist kein Implementierungsnachweis.
 
-## Aufwand und Verwendung
+Der [Detailplan](implementation-plan.md), die [Workshop-Entscheide](workshop-decisions.md) und die [JSON-Fassung](../catalog/implementation-backlog.json) verwenden denselben Zuschnitt.
 
-36 P0-Arbeitspakete mit zusammen **77 Personenstunden**. Dazu **20 Personenstunden** gemeinsame Abstimmung und **13 Personenstunden** Puffer: zusammen ungefähr **110 Personenstunden** in einem vorläufigen 48-Stunden-Fenster. Die Zeit ist eine grobe Schätzung für den abgegrenzten MVP, keine Lieferzusage.
+Die [Schnittstellen I01–I10](interface-contracts.md) aus dem zweiten Foto ergänzen die Übergaben. Das ist eine Konkretisierung der geplanten Arbeit, kein weiterer unbemerkter Zeitblock.
 
-| Person | Eigene Tickets | Schwerpunkt |
-|---|---:|---|
-| Person 1 | 14 h | Angular / UX |
-| Person 2 | 17 h | Daten / Berechnung |
-| Person 3 | 15.5 h | AI / Empfehlungen |
-| Person 4 | 15.5 h | Backend / Journey |
-| Person 5 | 15 h | Fachprüfung / Integration |
+## Umfang und Aufwand
 
-Die 20 gemeinsamen Personenstunden decken zusammen Starts, Schnittstellenabsprachen, Gegenreviews und Domain-Abstimmung ab. Diese Zeit wird nicht noch einmal als kostenloses Pairing angesetzt. Die 13 Pufferstunden sind nicht für neue P1-Funktionen reserviert.
+37 Arbeitspakete: **34 P0**, **2 P1** und **1 P2**. P0 umfasst **71 Personenstunden**, dazu **20 gemeinsame Integrations-/Abstimmungsstunden** und **19 Pufferstunden**: der bisherige grobe Gesamtrahmen bleibt **110 Personenstunden**. Die Schätzung ist neu an die Rollen angepasst und stammt nicht als Zeitvorgabe vom Whiteboard.
 
-Abhängigkeiten benennen Voraussetzungen der endgültigen Abnahme. Vorbereitende UI-/AI-Arbeit mit gemeinsamem Vertrag und Fixture darf früher beginnen. Die Rolle Person 5 prüft Integration und Fachlichkeit; jeder Modulowner bleibt für seine eigenen Tests verantwortlich.
+Das vorläufige 48-Stunden-Fenster beschreibt die gesamte Veranstaltung, keine neue Restzeit nach dem Workshop. Die tatsächliche Restzeit und bereits außerhalb dieses Repos erledigte Arbeiten sind nicht bekannt. P1/P2 sind nicht in der P0-Kapazität eingerechnet.
 
-## Meilensteine
+| Owner | Bestätigter Bereich | P0-Tickets | Eigene P0-Zeit |
+|---|---|---:|---:|
+| Luca | UI | 7 | 15 h |
+| Lukas | Avatar | 6 | 9 h |
+| Dario | Voice | 7 | 13 h |
+| Valentin | Logik-Backend | 7 | 16 h |
+| Earnie | KI-Backend | 7 | 18 h |
 
-| Gate | Ziel |
+Qualität, Fachreview und Integration liegen gemeinsam beim Team. Es gibt keine erfundene sechste QA-Person. Die Backend-Grundlage liegt als zusätzlicher Umsetzungsvorschlag bei Earnie, fachliche Rechen-/Statusregeln bei Valentin; das Foto legt keinen separaten Prozess oder Backend-Stack fest.
+
+## Integrationstore
+
+| Gate | Nachweis |
 |---|---|
-| G0 | T+2: decisions/contracts/fixture |
-| G1 | T+8: first saved vertical slice |
-| G2 | T+16: baseline and first scenarios |
-| G3 | T+24: three scenarios |
-| G4 | T+38: recommendation and complete demo journey |
-| G5 | T+44: integrated technical/domain checks |
-| G6 | T+48: repeatable demo and handoff |
+| M0 | Roles, GraphContext, Agent contract, speech route and Angular shell agreed |
+| M1 | One stored case, transcript/text proposal, progress and baseline work together |
+| M2 | All five tabs, basic agent, voice and selected graphic are connected |
+| M3 | Three scenarios and a truly context-bound explanation |
+| M4 | Customer/advisor Summary export and stored demo journey |
+| M5 | Voice/avatar/security negative cases, fresh-session demo and handoff |
+| OPTIONAL | Only after complete P0 and explicit time check |
 
-## Gesamtübersicht
+Abhängigkeiten gelten für Abnahme/Integration; vorbereitende Komponenten können mit gemeinsamen Fixtures früher entstehen. Der Paket-/Modell-/Speechzugang wird zuerst geprüft. Basic Agent, Voice, Summary und drei Szenarien bleiben im Kern; Video-Avatar und Follow-up sind zuerst kürzbare Erweiterungen.
 
-| ID | Owner | Aufgabe | Aufwand | Gate | Abhängigkeiten |
-|---|---|---|---:|---|---|
-| UX-01 | Person 1 | Angular-/Pax-UI-Nachweis und App-Shell | 1.5 h | G0 | keine |
-| UX-02 | Person 1 | Bestätigbares Profil, Ziele und Budgetformular | 2 h | G1 | UX-01, CAL-01, APP-01 |
-| UX-03 | Person 1 | LifeMap mit Phasen, Säulen und offenen Fragen | 3 h | G2 | UX-02, CAL-03, CAL-04, APP-03 |
-| UX-04 | Person 1 | Drei Szenariobildschirme mit Vorher-/Nachher | 3 h | G3 | UX-03, CAL-05, CAL-06 |
-| UX-05 | Person 1 | Handlungsoptionen, Empfehlung und Journey-Oberfläche | 2 h | G4 | UX-02, AI-05, APP-04 |
-| UX-06 | Person 1 | Responsive Bedienung, Fehler- und Ladezustände | 1.5 h | G5 | UX-04, UX-05 |
-| UX-07 | Person 1 | UI für wiederholbare Vorführung vorbereiten | 1 h | G6 | UX-06, QA-05 |
-| CAL-01 | Person 2 | Gemeinsame Schemas, Einheiten und Status festlegen | 1.5 h | G0 | QA-01 |
-| CAL-02 | Person 2 | Serverseitigen Logismata-Adapter anbinden | 1.5 h | G1 | CAL-01, APP-01 |
-| CAL-03 | Person 2 | Budget und Kapitalverfügbarkeit berechnen | 2 h | G1 | CAL-02 |
-| CAL-04 | Person 2 | Drei-Säulen-Baseline für Risiko und Pensionierung | 3 h | G2 | CAL-02, CAL-07 |
-| CAL-05 | Person 2 | Phasenmodell für Familie und Pensionierung | 3 h | G3 | CAL-03, CAL-04 |
-| CAL-06 | Person 2 | Eigenheim- und Kapitalzuordnungsmodell | 2 h | G3 | CAL-01, CAL-03 |
-| CAL-07 | Person 2 | Ergebnisnormalisierung und begrenzte Ausfallpfade | 2 h | G1 | CAL-02 |
-| CAL-08 | Person 2 | Fachliche Invarianten und Adapterfälle prüfen | 2 h | G5 | CAL-04, CAL-05, CAL-06, CAL-07 |
-| AI-01 | Person 3 | Zulässigen Modellpfad und minimierten Kontext nachweisen | 2 h | G1 | QA-01, CAL-01 |
-| AI-02 | Person 3 | Freitext in bestätigbare Feldvorschläge überführen | 2.5 h | G2 | AI-01 |
-| AI-03 | Person 3 | Nächste sinnvolle Frage und Datenreife bestimmen | 2 h | G2 | AI-02 |
-| AI-04 | Person 3 | Ergebnisse mit Quellen und Unsicherheiten erklären | 2 h | G3 | AI-03, CAL-04 |
-| AI-05 | Person 3 | Bedarfs- und Produktregeln für den Hauptfall | 3 h | G4 | AI-01, CAL-01, QA-02 |
-| AI-06 | Person 3 | Angemessenheitsvorprüfung und menschliche Übergabe | 2 h | G4 | AI-05, APP-03 |
-| AI-07 | Person 3 | AI-Evaluation und Missbrauchsfälle | 2 h | G5 | AI-02, AI-04, AI-05, AI-06 |
-| APP-01 | Person 4 | Workspace, API-Grundgerüst und isolierte Demo-Sitzung | 2.5 h | G1 | keine |
-| APP-02 | Person 4 | Persistenz, unveränderliche Versionen und Seed | 2.5 h | G1 | APP-01, CAL-01 |
-| APP-03 | Person 4 | Case-/Calculation-/Review-Verträge integrieren | 2 h | G2 | APP-02, CAL-01 |
-| APP-04 | Person 4 | Demo-Offerte, Antrag und Statusmaschine | 3 h | G4 | APP-02, AI-05 |
-| APP-05 | Person 4 | Demo-Portal, Police und gemeinsames Dossier | 2 h | G4 | APP-04 |
-| APP-06 | Person 4 | Sicherheits- und Auditschutz nachweisen | 2.5 h | G5 | APP-01, APP-02 |
-| APP-07 | Person 4 | Reproduzierbaren Start und Demo-Konfiguration übergeben | 1 h | G6 | APP-05, APP-06 |
-| QA-01 | Person 5 | Scope, Fixture und Abnahmekriterien festlegen | 2 h | G0 | keine |
-| QA-02 | Person 5 | Produkt- und Fachquellen für den kleinen Katalog aufbereiten | 2 h | G2 | QA-01 |
-| QA-03 | Person 5 | Frühe Pax-Abstimmung und Entscheidungslog | 1.5 h | G3 | QA-01 |
-| QA-04 | Person 5 | Abnahmedatensätze und Testdurchlauf vorbereiten | 2.5 h | G2 | QA-01, CAL-01 |
-| QA-05 | Person 5 | Gemeinsamen Gesamtfluss und drei Szenarien abnehmen | 3 h | G5 | UX-04, UX-05, CAL-08, AI-07, APP-05 |
-| QA-06 | Person 5 | Pitch, Demoablauf und Übergabeunterlagen | 2 h | G6 | QA-05, APP-07 |
-| QA-07 | Person 5 | Negative Sicherheits- und Datenschutzprüfung | 2 h | G5 | APP-06, AI-07 |
+## Übersicht
 
-## Person 1 – Angular / UX
+| ID | Owner | Prio | Aufgabe | Aufwand | Abhängigkeiten |
+|---|---|---|---|---:|---|
+| UI-01 | Luca | P0 | Angular-Shell mit fünf Workspace-Tabs | 2 h | keine |
+| UI-02 | Luca | P0 | Zeitbudget-Einstieg und bestätigbare Profilkarten | 2 h | UI-01, LOG-01, AI-01 |
+| UI-03 | Luca | P0 | Dynamische Zeitgrafik und fachliche Auswahlkontexte | 2.5 h | UI-02, LOG-02, LOG-03 |
+| UI-04 | Luca | P0 | Drei Szenarien als Varianten derselben Dynamic View | 2.5 h | UI-03, LOG-04, LOG-05 |
+| UI-05 | Luca | P0 | Chat, Info und kontextbezogenes Erklären | 2 h | UI-01, UI-03, AI-04 |
+| UI-06 | Luca | P0 | Summary-Exporte und Demo-Journey im Workspace | 2 h | UI-04, AI-06, LOG-06 |
+| UI-07 | Luca | P0 | Responsive Bedienung und Gesamt-UI-Abnahme | 2 h | UI-06, AV-06, VOICE-07, LOG-07, AI-07 |
+| AV-01 | Lukas | P0 | Agent-Host und gemeinsame Darstellungs-Events | 1.5 h | keine |
+| AV-02 | Lukas | P0 | Fortschrittsring und zugängliche Farbanzeige | 2 h | AV-01, LOG-01 |
+| AV-03 | Lukas | P0 | Zustände idle, listening, thinking, speaking, error | 2 h | AV-01 |
+| AV-04 | Lukas | P0 | Agent mit Voice und Grafik-Erklärung verbinden | 1.5 h | AV-03, VOICE-03, AI-04 |
+| AV-05 | Lukas | P0 | Fallback und responsive Agentdarstellung | 1 h | AV-02, AV-04 |
+| AV-06 | Lukas | P0 | Agent-/Progress-Integration und Abnahme | 1 h | AV-05 |
+| VOICE-01 | Dario | P0 | Speech-Datenweg, Berechtigungen und Demo-Browser festlegen | 1.5 h | keine |
+| VOICE-02 | Dario | P0 | Spracheingabe mit temporärer Verarbeitung | 2.5 h | VOICE-01, AI-01 |
+| VOICE-03 | Dario | P0 | Sprachausgabe und sichere Voice-Auswahl | 2 h | VOICE-01 |
+| VOICE-04 | Dario | P0 | Transkriptkorrektur und gemeinsamer Advisor-Turn | 2 h | VOICE-02, AI-03 |
+| VOICE-05 | Dario | P0 | Abbruch, Echovermeidung und Agent-Synchronisation | 2 h | VOICE-03, VOICE-04, AV-03 |
+| VOICE-06 | Dario | P0 | Speech-Fehler- und Datenschutzfälle prüfen | 2 h | VOICE-05 |
+| VOICE-07 | Dario | P0 | Gesprochenen Demo-Dialog integrieren | 1 h | VOICE-06, AI-04 |
+| LOG-01 | Valentin | P0 | Fachvertrag, GraphContext und Fortschrittsdaten | 2 h | keine |
+| LOG-02 | Valentin | P0 | Logismata-Baseline und Antwortnormalisierung | 3 h | LOG-01, AI-01 |
+| LOG-03 | Valentin | P0 | Budget und Kapitalzuordnung ohne Doppelzählung | 2 h | LOG-01, LOG-02 |
+| LOG-04 | Valentin | P0 | Familien- und Pensionierungsphasen | 3 h | LOG-03 |
+| LOG-05 | Valentin | P0 | Eigenheimvergleich und Reserven | 2 h | LOG-03 |
+| LOG-06 | Valentin | P0 | Demo-Vertragsstatus und Regeln für Übergänge | 1.5 h | LOG-03, AI-02, AI-05 |
+| LOG-07 | Valentin | P0 | Fachtests, Quellenreview und Domain-Klärung | 2.5 h | LOG-04, LOG-05, LOG-06 |
+| AI-01 | Earnie | P0 | KI-Backend-Grundlage, geschützter Zugang und Modellroute | 3.5 h | keine |
+| AI-02 | Earnie | P0 | Fallpersistenz, Versionierung und Werkzeuggrenzen | 3 h | AI-01, LOG-01 |
+| AI-03 | Earnie | P0 | Zeitbudget, Rückfragen und bestätigbare Aufnahme | 2.5 h | AI-02 |
+| AI-04 | Earnie | P0 | Erklärung genau der ausgewählten Grafikstelle | 2.5 h | AI-03, LOG-02 |
+| AI-05 | Earnie | P0 | Handlungsoptionen und belegte Produktfakten | 2.5 h | AI-03, LOG-03 |
+| AI-06 | Earnie | P0 | SummaryBundle für Kunde und Fachperson | 2 h | AI-02, AI-04, AI-05 |
+| AI-07 | Earnie | P0 | AI-/Sicherheitsprüfung und startfähige Übergabe | 2 h | AI-06, LOG-06 |
+| AV-07 | Lukas | P1 | Optionalen Video-Avatar ergänzen | 4 h | AV-06, VOICE-07, UI-07 |
+| UI-08 | Luca | P1 | Follow-up-/Overview-Ansicht ergänzen | 2 h | UI-07, AI-06 |
+| UI-09 | Luca | P2 | Optionalen Dark Mode prüfen | 1.5 h | UI-07 |
 
-### UX-01 – Angular-/Pax-UI-Nachweis und App-Shell
+## Luca – UI
 
-P0 · geplant · 1.5 Personenstunden · G0
+### UI-01 – Angular-Shell mit fünf Workspace-Tabs
 
-**Ergebnis:** Angular-Shell mit Theme, Navigation und zwei funktionierenden Pax-Komponenten; dokumentierter Paketstand.
+P0 · geplant · 2 Personenstunden · M0
+
+**Ergebnis:** Dynamic View, Agent-Slot und Navigation Progress / Graphics / Chat / Info / Summary.
 
 **Abhängigkeiten:** keine
 
-**Abnahme:**
+**Workshop-Bezug:** W02, W03
 
-- [ ] Registry-Zugriff und Peer Dependencies tatsächlich geprüft; kein erzwungener Versionskonflikt.
-- [ ] Button und Formularfeld funktionieren im Build; notwendige Styles/Assets geladen.
-- [ ] Bei Paketblockade bleibt Angular aktiv und ein kleiner Marken-Fallback wird transparent verwendet.
-
-### UX-02 – Bestätigbares Profil, Ziele und Budgetformular
-
-P0 · geplant · 2 Personenstunden · G1
-
-**Ergebnis:** Eingabestrecke für Haushalt, Ziele, Budget und Versorgung auf gemeinsamem Fallvertrag.
-
-**Abhängigkeiten:** UX-01, CAL-01, APP-01
+**Schnittstellen:** I02
 
 **Abnahme:**
 
-- [ ] Monat/Jahr, CHF, Brutto/Netto und unbekannte Angaben sind explizit.
-- [ ] Bestätigung erzeugt eine gespeicherte Profilversion; Reload verliert den Fall nicht.
-- [ ] Fehler sind am Feld und per Tastatur erreichbar; keine Produktauswahl vor Bedarfsaufnahme.
+- [ ] Pax-UI-Zugriff und kompatibler Angular-Build geprüft; transparenter Marken-Fallback möglich.
+- [ ] Eine Fall-/Versionsquelle für alle fünf Tabs; kein Chat als separate Schatten-App.
+- [ ] Grafik ist die Hauptfläche; Produktfläche bleibt vor Bedarfsreife ohne Verkaufspriorisierung.
 
-### UX-03 – LifeMap mit Phasen, Säulen und offenen Fragen
+### UI-02 – Zeitbudget-Einstieg und bestätigbare Profilkarten
 
-P0 · geplant · 3 Personenstunden · G2
+P0 · geplant · 2 Personenstunden · M1
 
-**Ergebnis:** Zeitachse, zugängliche Tabelle und Ergebnisdetails für eine normalisierte Baseline.
+**Ergebnis:** Opener, Zeitbudgetwahl und Eingabekarten innerhalb des Workspaces.
 
-**Abhängigkeiten:** UX-02, CAL-03, CAL-04, APP-03
+**Abhängigkeiten:** UI-01, LOG-01, AI-01
 
-**Abnahme:**
+**Workshop-Bezug:** W01, W03
 
-- [ ] Erste, zweite und dritte Säule bleiben erkennbar, auch bei fehlenden Daten.
-- [ ] Perioden, Datenstand, Schätzungen und Reviewstatus sind sichtbar.
-- [ ] Die Oberfläche rechnet Provider-Gesamtleistungen nicht nochmals eigenständig zusammen.
-
-### UX-04 – Drei Szenariobildschirme mit Vorher-/Nachher
-
-P0 · geplant · 3 Personenstunden · G3
-
-**Ergebnis:** Familie, Eigenheim und Pensionierung bearbeiten gespeicherte Szenarien.
-
-**Abhängigkeiten:** UX-03, CAL-05, CAL-06
+**Schnittstellen:** I01, I02, I10
 
 **Abnahme:**
 
-- [ ] Jede Änderung erzeugt einen neuen passenden Lauf statt dekorativer Zahlen.
-- [ ] Baseline bleibt erhalten; geänderte Positionen und nicht berechenbare Folgen werden gezeigt.
-- [ ] Mehrfachklick und verspätete Antwort ersetzen nicht den aktuell gewählten Stand.
+- [ ] Zeitbudget beeinflusst Detailgrad, nicht erforderliche Fachprüfungen.
+- [ ] Ziele, Haushalt, Budget und alle Säulen bleiben im kurzen Modus erfasst oder ausdrücklich offen.
+- [ ] Feldvorschläge werden bestätigt; keine automatische Profilmutation durch Sprache oder Chat.
 
-### UX-05 – Handlungsoptionen, Empfehlung und Journey-Oberfläche
+### UI-03 – Dynamische Zeitgrafik und fachliche Auswahlkontexte
 
-P0 · geplant · 2 Personenstunden · G4
+P0 · geplant · 2.5 Personenstunden · M2
 
-**Ergebnis:** Verbundene UI von Strategie über Demo-Offerte/Antrag bis Portal.
+**Ergebnis:** Zeitachse mit erklärbarer Tabelle und selektierbarer Person, Periode und Kennzahl.
 
-**Abhängigkeiten:** UX-02, AI-05, APP-04
+**Abhängigkeiten:** UI-02, LOG-02, LOG-03
 
-**Abnahme:**
+**Workshop-Bezug:** W02, W05, W07
 
-- [ ] Maßnahmen und Alternative ohne neues Produkt erscheinen vor Produktdetails.
-- [ ] Felder werden aus demselben Fall übernommen; Demo-Bezeichnung bleibt sichtbar.
-- [ ] Reviewpflicht, veraltete Offerte und Zwischenstatus haben eigene Ansichten.
-
-### UX-06 – Responsive Bedienung, Fehler- und Ladezustände
-
-P0 · geplant · 1.5 Personenstunden · G5
-
-**Ergebnis:** Kernfluss auf schmaler und breiter Ansicht mit verständlichen Zuständen.
-
-**Abhängigkeiten:** UX-04, UX-05
+**Schnittstellen:** I04, I07
 
 **Abnahme:**
 
-- [ ] Pflichtaktionen sind per Tastatur möglich und Fokus ist erkennbar.
-- [ ] Farbe allein transportiert weder Datenqualität noch Risiken.
-- [ ] Modell-/Providerfehler behalten den bisherigen Stand mit nachvollziehbarer Kennzeichnung.
+- [ ] Jede Auswahl ist an Profil-, Szenario- und Run-Version gebunden.
+- [ ] Farblegende, Einheiten und Datenqualität sind erkennbar; Skizzenjahre sind keine harte Modellgrenze.
+- [ ] Veraltete Antworten ersetzen nicht den aktuellen Grafikzustand.
 
-### UX-07 – UI für wiederholbare Vorführung vorbereiten
+### UI-04 – Drei Szenarien als Varianten derselben Dynamic View
 
-P0 · geplant · 1 Personenstunden · G6
+P0 · geplant · 2.5 Personenstunden · M3
 
-**Ergebnis:** Aufgeräumter vollständiger Hauptfall und verständliche Herkunftsdetails.
+**Ergebnis:** Familie, Eigenheim und Pensionierung als gespeicherte Vorher-/Nachher-Varianten.
 
-**Abhängigkeiten:** UX-06, QA-05
+**Abhängigkeiten:** UI-03, LOG-04, LOG-05
 
-**Abnahme:**
+**Workshop-Bezug:** W02, W05
 
-- [ ] Keine toten Pflichtbuttons im Demo-Pfad.
-- [ ] Mindestens eine neue Eingabe ist wirklich mit AI und Berechnung verbunden.
-- [ ] Vorbereitung löscht oder verändert nicht still fremde Fälle.
-
-
-## Person 2 – Daten / Berechnung
-
-### CAL-01 – Gemeinsame Schemas, Einheiten und Status festlegen
-
-P0 · geplant · 1.5 Personenstunden · G0
-
-**Ergebnis:** Laufzeit-validierte Contracts und synthetische Vertrags-Fixture.
-
-**Abhängigkeiten:** QA-01
+**Schnittstellen:** I03, I04
 
 **Abnahme:**
 
-- [ ] Geld, Zeitraum, Basis, Herkunft, Bestätigung und Fachreview sind getrennt.
-- [ ] Null, unbekannt und nicht anwendbar sind unterscheidbar.
-- [ ] UI, Backend und AI können dieselbe Profil-/Ergebnishülle verwenden.
+- [ ] Kein Pflichtszenario ist nur ein dekorativer Regler.
+- [ ] Baseline, Kapitalbindung und Unsicherheiten bleiben sichtbar.
+- [ ] Tabwechsel verliert weder gewählte Periode noch aktuelle Variante.
 
-### CAL-02 – Serverseitigen Logismata-Adapter anbinden
+### UI-05 – Chat, Info und kontextbezogenes Erklären
 
-P0 · geplant · 1.5 Personenstunden · G1
+P0 · geplant · 2 Personenstunden · M3
 
-**Ergebnis:** Allowlist-Client mit sauberer Konfiguration, Zeitbegrenzung und Metadaten.
+**Ergebnis:** Einstieg „Diese Stelle erklären“ aus Grafik und Info in denselben Advisor.
 
-**Abhängigkeiten:** CAL-01, APP-01
+**Abhängigkeiten:** UI-01, UI-03, AI-04
 
-**Abnahme:**
+**Workshop-Bezug:** W03, W07
 
-- [ ] Token bleibt serverseitig; lokale Variablennamen werden ausdrücklich zugeordnet.
-- [ ] Ort, Alters-/3a-Grenzen und mindestens ein sinnvoller Rechenpfad sind aufrufbar.
-- [ ] HTTP-Fehler und ungültige Antwortstruktur werden strukturiert zurückgegeben.
-
-### CAL-03 – Budget und Kapitalverfügbarkeit berechnen
-
-P0 · geplant · 2 Personenstunden · G1
-
-**Ergebnis:** Normalisierte Cashflow- und freie-Mittel-Betrachtung.
-
-**Abhängigkeiten:** CAL-02
+**Schnittstellen:** I05, I07
 
 **Abnahme:**
 
-- [ ] Steuern und bestehende Vorsorgebeiträge werden nicht doppelt abgezogen.
-- [ ] Statistische Budgetwerte bleiben bestätigbare Vorschläge.
-- [ ] Negatives Budget und unbekannte Positionen verhindern eine falsche Tragbarkeit.
+- [ ] Graph-ID, Kennzahl, Zeitraum, Person und Run-ID werden explizit übergeben.
+- [ ] Glossar und fachliche Erklärung bleiben von Produktwerbung getrennt.
+- [ ] Ein nicht verstandener Begriff kann textlich und über den freigegebenen Voice-Kanal erklärt werden.
 
-### CAL-04 – Drei-Säulen-Baseline für Risiko und Pensionierung
+### UI-06 – Summary-Exporte und Demo-Journey im Workspace
 
-P0 · geplant · 3 Personenstunden · G2
+P0 · geplant · 2 Personenstunden · M4
 
-**Ergebnis:** Ergebnisbereiche mit Bedarf, vorhandenen Leistungen, Kapital und Validierungsstand.
+**Ergebnis:** Kunden-/Fachperson-Exportauswahl und gespeicherter Demo-Antrags-/Portalstatus.
 
-**Abhängigkeiten:** CAL-02, CAL-07
+**Abhängigkeiten:** UI-04, AI-06, LOG-06
 
-**Abnahme:**
+**Workshop-Bezug:** W06, W03
 
-- [ ] Risikoereignisse und betroffene Personen sind gemäß Schema gemappt.
-- [ ] Fehlender Bedarf wird nicht als Null-Lücke behandelt.
-- [ ] PK-Schätzung und bestätigte Werte bleiben verschieden; Gesamt-/Partnerwerte sind geprüft.
-
-### CAL-05 – Phasenmodell für Familie und Pensionierung
-
-P0 · geplant · 3 Personenstunden · G3
-
-**Ergebnis:** Datierte Ereignisse mit vergleichbaren Phasen und erklärten Rechengrenzen.
-
-**Abhängigkeiten:** CAL-03, CAL-04
+**Schnittstellen:** I08
 
 **Abnahme:**
 
-- [ ] Pensumswechsel ändert nach bestätigter Annahme Einkommen/Kosten und berechenbare Versorgung.
-- [ ] Erwerbsende, Rentenbeginn und Überbrückung sind getrennt.
-- [ ] Unbekannte künftige PK-/Kinderleistungsregeln bleiben als solche sichtbar.
+- [ ] Beide Summary-Sichten verwenden dieselbe bestätigte Datenversion.
+- [ ] Download/Übergabevorbereitung sendet keine Mail oder Nachricht automatisch.
+- [ ] Demo-Offerte, Antrag und Demo-Police sind unterschieden; keine Dateneingabe wird wiederholt.
 
-### CAL-06 – Eigenheim- und Kapitalzuordnungsmodell
+### UI-07 – Responsive Bedienung und Gesamt-UI-Abnahme
 
-P0 · geplant · 2 Personenstunden · G3
+P0 · geplant · 2 Personenstunden · M5
 
-**Ergebnis:** Beispiel-Eigenmittellücke, Reserve und laufender Budgetvergleich.
+**Ergebnis:** Integrierter Workspace auf dem festgelegten Demo-Gerät mit Tastatur-/Fehlerpfaden.
 
-**Abhängigkeiten:** CAL-01, CAL-03
+**Abhängigkeiten:** UI-06, AV-06, VOICE-07, LOG-07, AI-07
 
-**Abnahme:**
+**Workshop-Bezug:** W02, W03, W05, W06, W07
 
-- [ ] Demo-Quoten und Zinsen sind explizite Annahmen, keine Kreditzusage.
-- [ ] Freie, reservierte und gebundene Mittel werden nicht vermischt.
-- [ ] Derselbe Vermögenswert wird nicht vollständig für zwei Ziele gleichzeitig eingesetzt.
-
-### CAL-07 – Ergebnisnormalisierung und begrenzte Ausfallpfade
-
-P0 · geplant · 2 Personenstunden · G1
-
-**Ergebnis:** Status pro Ergebnisbereich, Eingabe-Hashes und kontrollierter Replaymodus.
-
-**Abhängigkeiten:** CAL-02
+**Schnittstellen:** I01, I04, I05, I06, I08, I10
 
 **Abnahme:**
 
-- [ ] Risiko-Code 0 bleibt bis Klärung reviewpflichtig.
-- [ ] Replay nur bei passendem Input-/Modell-Hash; neue Eingaben bekommen keine alten Scheinwerte.
-- [ ] 401/403, Timeout, Schemafehler und Begrenzung führen nicht zu endlosen Wiederholungen.
+- [ ] Agent und Tabaktionen sind auch auf schmalem Display erreichbar.
+- [ ] Grafik, Voice, Info und Summary bleiben versionskonsistent.
+- [ ] Ein kompletter neuer Durchlauf mit Reload und Demo-Police ist gemeinsam gezeigt.
 
-### CAL-08 – Fachliche Invarianten und Adapterfälle prüfen
+### UI-08 – Follow-up-/Overview-Ansicht ergänzen
 
-P0 · geplant · 2 Personenstunden · G5
+P1 · geplant · 2 Personenstunden · OPTIONAL
 
-**Ergebnis:** Aussagekräftige Domain-/Adaptertests mit dokumentierten Referenzannahmen.
+**Ergebnis:** Übersicht offener Schritte und wiederaufnehmbarer Fall nach der Beratung.
 
-**Abhängigkeiten:** CAL-04, CAL-05, CAL-06, CAL-07
+**Abhängigkeiten:** UI-07, AI-06
 
-**Abnahme:**
+**Workshop-Bezug:** W10
 
-- [ ] Einheiten, fehlender Bedarf, Doppelzählung und Kapitalerschöpfung sind abgedeckt.
-- [ ] Beispielantworten werden nicht als fachlich zertifizierte aktuelle Berechnung ausgegeben.
-- [ ] Mindestens ein begrenzter Live-Smoke und seine tatsächlichen Grenzen sind protokolliert.
-
-
-## Person 3 – AI / Empfehlungen
-
-### AI-01 – Zulässigen Modellpfad und minimierten Kontext nachweisen
-
-P0 · geplant · 2 Personenstunden · G1
-
-**Ergebnis:** Tatsächlicher freigegebener Modellaufruf mit strukturierter Antwort.
-
-**Abhängigkeiten:** QA-01, CAL-01
+**Schnittstellen:** I02, I08
 
 **Abnahme:**
 
-- [ ] Empfänger, Datentypen und Konfiguration dokumentiert; kein beliebiger externer Host.
-- [ ] Kein Anbieter-Token oder unnötiges Rohdokument im Modellkontext.
-- [ ] Vorlagen-Fallback ist unterscheidbar und wird nicht als LLM ausgegeben.
+- [ ] Vom notwendigen P0-Portalstatus und Summary-Export unterschieden.
+- [ ] Geplante Folgeaktionen werden nicht automatisch an Dritte versendet.
+- [ ] Kein angeblich beschlossener Kanal oder Versandtermin aus dem eingeklammerten Boardpunkt abgeleitet.
 
-### AI-02 – Freitext in bestätigbare Feldvorschläge überführen
+### UI-09 – Optionalen Dark Mode prüfen
 
-P0 · geplant · 2.5 Personenstunden · G2
+P2 · geplant · 1.5 Personenstunden · OPTIONAL
 
-**Ergebnis:** Schemafähige Profil-/Ziel-Patches mit Bestätigungsschritt.
+**Ergebnis:** Darstellungsvariante nur bei freier Zeit und bestätigter Priorisierung.
 
-**Abhängigkeiten:** AI-01
+**Abhängigkeiten:** UI-07
+
+**Workshop-Bezug:** W11
+
+**Schnittstellen:** kein neuer Payload; Darstellung auf bestehendem Vertrag
 
 **Abnahme:**
 
-- [ ] Mindestens drei neue Eingabeformulierungen sinnvoll verarbeitet.
-- [ ] Kein Modellvorschlag überschreibt bestätigte Felder ohne Benutzeraktion.
-- [ ] Nur erlaubte Pfade; fremde IDs, Rollen und URLs abgewiesen.
+- [ ] Mondsymbol ist eine Interpretation der Skizze, keine bestätigte Pflichtfunktion.
+- [ ] Kontrast und Grafikfarben bleiben verständlich.
+- [ ] Kein Kernvergleich oder Audio-/Exportfehler wird dafür zurückgestellt.
 
-### AI-03 – Nächste sinnvolle Frage und Datenreife bestimmen
 
-P0 · geplant · 2 Personenstunden · G2
+## Lukas – Avatar
 
-**Ergebnis:** Regelbasierte zulässige Fragengruppen mit AI-Formulierung.
+### AV-01 – Agent-Host und gemeinsame Darstellungs-Events
+
+P0 · geplant · 1.5 Personenstunden · M0
+
+**Ergebnis:** Angular-Agentkomponente mit definiertem Input-/Eventvertrag.
+
+**Abhängigkeiten:** keine
+
+**Workshop-Bezug:** W02, W04
+
+**Schnittstellen:** I06, I09
+
+**Abnahme:**
+
+- [ ] Agent ist unabhängig vom aktiven Tab sichtbar.
+- [ ] Komponente entscheidet weder Datenreife noch Versicherbarkeit selbst.
+- [ ] Technische Zustände werden von tatsächlichen App-/Voice-Ereignissen übernommen.
+
+### AV-02 – Fortschrittsring und zugängliche Farbanzeige
+
+P0 · geplant · 2 Personenstunden · M1
+
+**Ergebnis:** Fortschritt direkt am Agenten mit Text und offenen Punkten.
+
+**Abhängigkeiten:** AV-01, LOG-01
+
+**Workshop-Bezug:** W03, W04
+
+**Schnittstellen:** I09
+
+**Abnahme:**
+
+- [ ] Ring ist Erfassungs-/Beratungsfortschritt, kein Risiko- oder Versicherungs-Score.
+- [ ] Unbekannt und menschlich ungeprüft werden nicht durch grüne Darstellung versteckt.
+- [ ] Progress-Tab und Ring lesen denselben Backend-Fortschritt.
+
+### AV-03 – Zustände idle, listening, thinking, speaking, error
+
+P0 · geplant · 2 Personenstunden · M2
+
+**Ergebnis:** Einfache Agentdarstellung ohne verpflichtenden Videodienst.
+
+**Abhängigkeiten:** AV-01
+
+**Workshop-Bezug:** W04
+
+**Schnittstellen:** I06
+
+**Abnahme:**
+
+- [ ] Speaking startet erst bei tatsächlicher Audioausgabe, nicht schon bei fertigem AI-Text.
+- [ ] Kein psychologischer oder emotionaler Kunden-Score aus Avataranimation.
+- [ ] Status ist auch ohne Farbe/Animation verständlich.
+
+### AV-04 – Agent mit Voice und Grafik-Erklärung verbinden
+
+P0 · geplant · 1.5 Personenstunden · M3
+
+**Ergebnis:** Gemeinsame Turn-/Erklärungsreferenz für Agent, Text und Audio.
+
+**Abhängigkeiten:** AV-03, VOICE-03, AI-04
+
+**Workshop-Bezug:** W04, W07
+
+**Schnittstellen:** I05, I06, I07
+
+**Abnahme:**
+
+- [ ] Abbruch, neue Auswahl und Fehler beenden alte Darstellungszustände.
+- [ ] Verspätete Events eines alten Turns werden verworfen.
+- [ ] Agent verweist auf dieselbe Grafikstelle wie der sichtbare Erklärungstext.
+
+### AV-05 – Fallback und responsive Agentdarstellung
+
+P0 · geplant · 1 Personenstunden · M4
+
+**Ergebnis:** Agent bleibt ohne Video, Ton oder Animation nutzbar.
+
+**Abhängigkeiten:** AV-02, AV-04
+
+**Workshop-Bezug:** W04
+
+**Schnittstellen:** I06
+
+**Abnahme:**
+
+- [ ] Video-/TTS-Ausfall blockiert weder Beratung noch Summary.
+- [ ] Kein Kamera-Zugriff allein für die Agentdarstellung.
+- [ ] Reduzierte Bewegung und schmale Ansicht sind berücksichtigt.
+
+### AV-06 – Agent-/Progress-Integration und Abnahme
+
+P0 · geplant · 1 Personenstunden · M5
+
+**Ergebnis:** Prüfbarer Durchlauf der Agentzustände und der Progress-Semantik.
+
+**Abhängigkeiten:** AV-05
+
+**Workshop-Bezug:** W04
+
+**Schnittstellen:** I06, I09
+
+**Abnahme:**
+
+- [ ] 100 Prozent Datenaufnahme wird nicht als bestehender Versicherungsschutz erklärt.
+- [ ] Offener Reviewstatus bleibt auch bei abgeschlossener Aufnahme sichtbar.
+- [ ] Fehler und Unterbrechung hinterlassen keinen dauerhaft sprechenden Agenten.
+
+### AV-07 – Optionalen Video-Avatar ergänzen
+
+P1 · geplant · 4 Personenstunden · OPTIONAL
+
+**Ergebnis:** Freigegebener Video-Renderer hinter unverändertem Agentvertrag.
+
+**Abhängigkeiten:** AV-06, VOICE-07, UI-07
+
+**Workshop-Bezug:** W08
+
+**Schnittstellen:** I06
+
+**Abnahme:**
+
+- [ ] Explizites Nice-to-have; P0 weder davon noch vom Videodienst abhängig.
+- [ ] Kein Kamera-Zwang, keine ungeklärte Audio-/Datenweitergabe.
+- [ ] Ausfall fällt auf einfache Agentdarstellung mit korrektem Status zurück.
+
+
+## Dario – Voice
+
+### VOICE-01 – Speech-Datenweg, Berechtigungen und Demo-Browser festlegen
+
+P0 · geplant · 1.5 Personenstunden · M0
+
+**Ergebnis:** Freigegebene STT-/TTS-Adaptergrenze und dokumentierter Kompatibilitätsnachweis.
+
+**Abhängigkeiten:** keine
+
+**Workshop-Bezug:** W09
+
+**Schnittstellen:** I01, I05, I10
+
+**Abnahme:**
+
+- [ ] Mikrofon erst nach bewusster Nutzeraktion und Browserfreigabe.
+- [ ] Browser-Speech wird nicht pauschal als lokal angenommen; Empfänger sind bekannt.
+- [ ] Bei fehlender Freigabe bleibt Text nutzbar und Voice offen statt als fertig markiert.
+
+### VOICE-02 – Spracheingabe mit temporärer Verarbeitung
+
+P0 · geplant · 2.5 Personenstunden · M1
+
+**Ergebnis:** Kurzer Push-to-talk-Pfad bis zum finalen Transkript.
+
+**Abhängigkeiten:** VOICE-01, AI-01
+
+**Workshop-Bezug:** W09
+
+**Schnittstellen:** I01
+
+**Abnahme:**
+
+- [ ] Audioformat/-größe/-dauer begrenzt; keine unkontrollierte Rohaufnahme gespeichert.
+- [ ] Zwischenresultate gelten nicht als bestätigte Fachdaten.
+- [ ] Ablehnung, fehlendes Gerät, Timeout und unverständliche Eingabe haben Textfallback.
+
+### VOICE-03 – Sprachausgabe und sichere Voice-Auswahl
+
+P0 · geplant · 2 Personenstunden · M2
+
+**Ergebnis:** Vorlesbarer bestätigter Antworttext mit sichtbarer Stop-/Mute-Aktion.
+
+**Abhängigkeiten:** VOICE-01
+
+**Workshop-Bezug:** W09, W07
+
+**Schnittstellen:** I05, I06
+
+**Abnahme:**
+
+- [ ] TTS verwendet denselben Text und dieselben Zahlen wie Chat/Erklärung.
+- [ ] Lokale oder freigegebene Remote-Stimme explizit ausgewählt; keine stille Anbieteränderung.
+- [ ] Audio beginnt erst nach Nutzeraktivierung und lässt sich sofort stoppen.
+
+### VOICE-04 – Transkriptkorrektur und gemeinsamer Advisor-Turn
+
+P0 · geplant · 2 Personenstunden · M2
+
+**Ergebnis:** Bearbeitbares Transkript und Bestätigung vor fachlicher Mutation.
+
+**Abhängigkeiten:** VOICE-02, AI-03
+
+**Workshop-Bezug:** W09, W01
+
+**Schnittstellen:** I01, I02, I10
+
+**Abnahme:**
+
+- [ ] Verhörte Geldwerte werden vor Speicherung korrigierbar gezeigt.
+- [ ] Text und Voice nutzen dieselbe Message-ID und dieselbe Fallversion.
+- [ ] Wiederholtes Senden erzeugt keinen doppelten Feldvorschlag oder Antrag.
+- [ ] I10 aktualisiert den Kontext; vor Antwortstart aktuelle Referenz prüfen, nach Reconnect Snapshot abstimmen.
+
+### VOICE-05 – Abbruch, Echovermeidung und Agent-Synchronisation
+
+P0 · geplant · 2 Personenstunden · M3
+
+**Ergebnis:** Eindeutiger Speech-Lebenszyklus mit Turn-/Kontextbindung.
+
+**Abhängigkeiten:** VOICE-03, VOICE-04, AV-03
+
+**Workshop-Bezug:** W09, W04, W07
+
+**Schnittstellen:** I06, I07, I10
+
+**Abnahme:**
+
+- [ ] P0 zeichnet beim eigenen Vorlesen nicht parallel weiter auf.
+- [ ] Neue Grafikversion oder Stop beendet alte Ausgabe und verwirft verspätete Callbacks.
+- [ ] Listening/Thinking/Speaking werden aus tatsächlichen Vorgängen signalisiert.
+
+### VOICE-06 – Speech-Fehler- und Datenschutzfälle prüfen
+
+P0 · geplant · 2 Personenstunden · M4
+
+**Ergebnis:** Negative Tests der erlaubten Audioverarbeitung.
+
+**Abhängigkeiten:** VOICE-05
+
+**Workshop-Bezug:** W09
+
+**Schnittstellen:** I01, I05, I06
+
+**Abnahme:**
+
+- [ ] Kein Mikrofon-Autostart bei Tabwechsel, Reload oder erneutem Öffnen.
+- [ ] Keine Rohaufnahmen/Transkripte in allgemeiner Telemetrie.
+- [ ] Nicht unterstützte APIs führen nicht zu ungefragtem Cloud-Speech.
+
+### VOICE-07 – Gesprochenen Demo-Dialog integrieren
+
+P0 · geplant · 1 Personenstunden · M5
+
+**Ergebnis:** Eine neue gesprochene Angabe und eine tatsächliche kontextgebundene Audioerklärung.
+
+**Abhängigkeiten:** VOICE-06, AI-04
+
+**Workshop-Bezug:** W09, W07
+
+**Schnittstellen:** I01, I05, I06, I10
+
+**Abnahme:**
+
+- [ ] Aufnahme, Korrektur, Bestätigung und neue Berechnung sind verbunden.
+- [ ] Die Antwort erklärt eine konkret ausgewählte Grafikstelle.
+- [ ] Textbedienung funktioniert durchgängig auch nach Audiofehler.
+
+
+## Valentin – Logik-Backend
+
+### LOG-01 – Fachvertrag, GraphContext und Fortschrittsdaten
+
+P0 · geplant · 2 Personenstunden · M0
+
+**Ergebnis:** Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.
+
+**Abhängigkeiten:** keine
+
+**Workshop-Bezug:** W04, W05, W07
+
+**Schnittstellen:** I02, I03, I04, I07, I09, I10
+
+**Abnahme:**
+
+- [ ] Unbekannt, Schätzung, Bestätigung und Fachreview bleiben getrennt.
+- [ ] GraphContext enthält Run, Profil-/Szenarioversion, Person, Kennzahl und Periode.
+- [ ] Fortschritt basiert auf erledigten Pflichtgruppen, nicht auf Risikolücken.
+
+### LOG-02 – Logismata-Baseline und Antwortnormalisierung
+
+P0 · geplant · 3 Personenstunden · M1
+
+**Ergebnis:** Serverseitiger Adapter für geeignete Baseline-/Grenz-/Metadatenpfade.
+
+**Abhängigkeiten:** LOG-01, AI-01
+
+**Workshop-Bezug:** W05
+
+**Schnittstellen:** I03, I04
+
+**Abnahme:**
+
+- [ ] Token nie im Client; passende Orte, Einheiten und benötigter Bedarf validiert.
+- [ ] Risiko-Code 0 bis zur Klärung reviewpflichtig; HTTP 200 ist nicht alleinige Freigabe.
+- [ ] Begrenzte Fehlerpfade und Replay nur bei passendem vollständigem Input-Hash.
+
+### LOG-03 – Budget und Kapitalzuordnung ohne Doppelzählung
+
+P0 · geplant · 2 Personenstunden · M2
+
+**Ergebnis:** Drei-Säulen-/Budgetausgabe mit Herkunft und verfügbarer Liquidität.
+
+**Abhängigkeiten:** LOG-01, LOG-02
+
+**Workshop-Bezug:** W05
+
+**Schnittstellen:** I04, I09
+
+**Abnahme:**
+
+- [ ] Brutto/Netto, Monate/Jahre und bereits enthaltene Steuern/Beiträge korrekt behandelt.
+- [ ] Bedarf unbekannt erzeugt keine falsche Null-Lücke.
+- [ ] Kapital wird nicht gleichzeitig vollständig mehreren Zielen zugeordnet.
+
+### LOG-04 – Familien- und Pensionierungsphasen
+
+P0 · geplant · 3 Personenstunden · M3
+
+**Ergebnis:** Gespeicherte Szenarioänderungen mit berechenbaren Differenzen und Fachgrenzen.
+
+**Abhängigkeiten:** LOG-03
+
+**Workshop-Bezug:** W05
+
+**Schnittstellen:** I03, I04
+
+**Abnahme:**
+
+- [ ] Pensumswechsel aktualisiert bestätigte Cashflows; PK-Folge nicht pauschal proportional.
+- [ ] Erwerbsende, Rentenbeginn und Überbrückung getrennt.
+- [ ] Phasen und Kapitalerschöpfung sichtbar; nicht unterstützte Regeln bleiben offen.
+
+### LOG-05 – Eigenheimvergleich und Reserven
+
+P0 · geplant · 2 Personenstunden · M3
+
+**Ergebnis:** Beispiel-Eigenmittellücke und Auswirkungen auf andere Ziele.
+
+**Abhängigkeiten:** LOG-03
+
+**Workshop-Bezug:** W05
+
+**Schnittstellen:** I03, I04
+
+**Abnahme:**
+
+- [ ] Quoten/Zinsen sind sichtbare Annahmen, keine Kreditentscheidung.
+- [ ] Gebundene Vorsorgemittel werden nicht still als freie Mittel gerechnet.
+- [ ] Unfinanziertes Ziel und Reserveverzehr bleiben erkennbar.
+
+### LOG-06 – Demo-Vertragsstatus und Regeln für Übergänge
+
+P0 · geplant · 1.5 Personenstunden · M4
+
+**Ergebnis:** Fachliche State Machine vom Vorschlag bis zur Demo-Police auf gespeicherten Objekten.
+
+**Abhängigkeiten:** LOG-03, AI-02, AI-05
+
+**Workshop-Bezug:** W06
+
+**Schnittstellen:** I02, I08
+
+**Abnahme:**
+
+- [ ] Aktuelle Empfehlung/Offerte und erforderlicher Review sind Vorbedingungen.
+- [ ] Antrag, Annahme und Police getrennt; Einreichung idempotent.
+- [ ] Keine echte Signatur, Annahme oder Versicherungsdeckung behauptet.
+
+### LOG-07 – Fachtests, Quellenreview und Domain-Klärung
+
+P0 · geplant · 2.5 Personenstunden · M5
+
+**Ergebnis:** Nachvollziehbare Domain-Invarianten und offene Pax-Fragen mit tatsächlichem Status.
+
+**Abhängigkeiten:** LOG-04, LOG-05, LOG-06
+
+**Workshop-Bezug:** W05, W06, W07
+
+**Schnittstellen:** I03, I04, I08, I10
+
+**Abnahme:**
+
+- [ ] Provider-/Muster-/vlot-Werte werden nicht ohne identische Annahmen gleichgesetzt.
+- [ ] Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.
+- [ ] Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich.
+
+
+## Earnie – KI-Backend
+
+### AI-01 – KI-Backend-Grundlage, geschützter Zugang und Modellroute
+
+P0 · geplant · 3.5 Personenstunden · M0
+
+**Ergebnis:** Gemeinsames Backend-Grundgerüst mit Sitzung, minimiertem Kontext und echtem Modell-Smoke.
+
+**Abhängigkeiten:** keine
+
+**Workshop-Bezug:** W01, W07
+
+**Schnittstellen:** I01, I02, I05, I10
+
+**Abnahme:**
+
+- [ ] Fallbesitzer serverseitig geprüft; Provider-/Registry-Token getrennt und nicht im Client.
+- [ ] Zulässiger Modellaufruf und erlaubter Datenweg nachgewiesen.
+- [ ] Textfallback wird nicht als erfolgreicher Modellaufruf ausgegeben.
+
+### AI-02 – Fallpersistenz, Versionierung und Werkzeuggrenzen
+
+P0 · geplant · 3 Personenstunden · M1
+
+**Ergebnis:** Ein gespeicherter Fall mit gemeinsamen Versionen für alle Tabs/Kanäle.
+
+**Abhängigkeiten:** AI-01, LOG-01
+
+**Workshop-Bezug:** W02, W03, W07
+
+**Schnittstellen:** I02, I03, I04, I10
+
+**Abnahme:**
+
+- [ ] Bestätigte Daten unveränderlich versioniert; Reload und konkurrierende Änderungen behandelt.
+- [ ] AI-Toolargumente umgehen weder Rollen noch erlaubte Felder.
+- [ ] Veralteter Grafik-/Szenariokontext wird nicht mit aktuellen Zahlen gemischt.
+- [ ] Minimaler autorisierter AdvisorContext und Änderungsereignis aus dem bestätigten JSON-Fallstand.
+
+### AI-03 – Zeitbudget, Rückfragen und bestätigbare Aufnahme
+
+P0 · geplant · 2.5 Personenstunden · M2
+
+**Ergebnis:** Adaptiver Gesprächsmodus mit schemafähigen Feldvorschlägen.
 
 **Abhängigkeiten:** AI-02
 
-**Abnahme:**
+**Workshop-Bezug:** W01, W09
 
-- [ ] Budget, Bedarf, bestehende Deckung und PK-Unbekannt haben Vorrang vor Verkauf.
-- [ ] Widersprüche führen zur Klärung, nicht zu stiller Auswahl einer Behauptung.
-- [ ] Erledigungsbedingungen verhindern eine wiederholte Schleife derselben Frage.
-
-### AI-04 – Ergebnisse mit Quellen und Unsicherheiten erklären
-
-P0 · geplant · 2 Personenstunden · G3
-
-**Ergebnis:** Ergebnisgebundene Erklärung mit Run- und Faktenreferenzen.
-
-**Abhängigkeiten:** AI-03, CAL-04
+**Schnittstellen:** I01, I02, I05
 
 **Abnahme:**
 
-- [ ] Betrag, Zeitraum und Ursache stimmen mit dem aktuellen Ergebnis überein.
-- [ ] Geschätzte oder reviewpflichtige Ergebnisse werden nicht als Garantie umformuliert.
-- [ ] Ungültige Modellausgabe hat einen transparenten begrenzten Fehlerpfad.
+- [ ] Opener fragt nach Zeit; Modus und spätere Änderung sind im Fall gespeichert.
+- [ ] Kurzmodus verkürzt Formulierung, nicht Bedarfserfassung oder Pflichtprüfung.
+- [ ] Neue Text-/Voice-Eingaben werden vorgeschlagen und bestätigt statt ungeprüft übernommen.
 
-### AI-05 – Bedarfs- und Produktregeln für den Hauptfall
+### AI-04 – Erklärung genau der ausgewählten Grafikstelle
 
-P0 · geplant · 3 Personenstunden · G4
+P0 · geplant · 2.5 Personenstunden · M3
 
-**Ergebnis:** Kuratierter kleiner Katalog mit Gründen, Sperren und Alternativen.
+**Ergebnis:** Kontextgebundene Erklärungen und verständliche Info-Texte.
 
-**Abhängigkeiten:** AI-01, CAL-01, QA-02
+**Abhängigkeiten:** AI-03, LOG-02
 
-**Abnahme:**
+**Workshop-Bezug:** W07, W03
 
-- [ ] Maximal drei vertiefte Produktfamilien; Herkunft und Version je Regel.
-- [ ] Lücke bleibt bei Nichtempfehlung sichtbar und die Entscheidung ist erklärt.
-- [ ] Keine zusätzliche Versicherung und Datenbeschaffung sind gültige Ergebnisse.
-
-### AI-06 – Angemessenheitsvorprüfung und menschliche Übergabe
-
-P0 · geplant · 2 Personenstunden · G4
-
-**Ergebnis:** Gespeicherte Prüfgründe und Übergabeansicht auf den passenden Fallversionen.
-
-**Abhängigkeiten:** AI-05, APP-03
+**Schnittstellen:** I04, I05, I07, I10
 
 **Abnahme:**
 
-- [ ] Persönliche Tragbarkeit wird nicht aus gemeinsamem Vermögen abgeleitet.
-- [ ] Unbekannte oder nicht freigegebene Fachregeln blockieren die betroffene Verbindlichkeit.
-- [ ] AI kann eine erforderliche menschliche Prüfung nicht selbst erledigen.
+- [ ] Run, Person, Kennzahl und Zeitfenster werden serverseitig geprüft.
+- [ ] Betrag/Periode und Erklärung stimmen mit der Auswahl überein; keine freien Prämien.
+- [ ] Keine behauptete psychologische Diagnose bei wiederholter Nachfrage.
 
-### AI-07 – AI-Evaluation und Missbrauchsfälle
+### AI-05 – Handlungsoptionen und belegte Produktfakten
 
-P0 · geplant · 2 Personenstunden · G5
+P0 · geplant · 2.5 Personenstunden · M4
 
-**Ergebnis:** Dokumentierte positive und negative AI-Fälle.
+**Ergebnis:** Kleine regelbasierte Auswahl mit menschlichem Prüfpfad.
 
-**Abhängigkeiten:** AI-02, AI-04, AI-05, AI-06
+**Abhängigkeiten:** AI-03, LOG-03
 
-**Abnahme:**
+**Workshop-Bezug:** W02, W06
 
-- [ ] Prompt-Injection fordert weder Tokens noch fremde Fälle erfolgreich an.
-- [ ] Produktwunsch am Anfang erzeugt keine voreilige persönliche Empfehlung.
-- [ ] Zahlenbindung, Kontextminimierung und Fallbackverhalten sind geprüft.
-
-
-## Person 4 – Backend / Journey
-
-### APP-01 – Workspace, API-Grundgerüst und isolierte Demo-Sitzung
-
-P0 · geplant · 2.5 Personenstunden · G1
-
-**Ergebnis:** Gemeinsamer startfähiger TypeScript-Workspace mit Angular-/NestJS-Grenze.
-
-**Abhängigkeiten:** keine
+**Schnittstellen:** I04, I05
 
 **Abnahme:**
 
-- [ ] Eine definierte Toolchain; nur Umgebungsvariablen-Referenzen statt echter Schlüssel.
-- [ ] Eigene Sitzung und Fallzuordnung vorhanden; kein global geteilter Fall.
-- [ ] Frontend erreicht geschützte API und Statusfehler werden verständlich zurückgegeben.
+- [ ] Produktfläche erst nach Bedarf, Tragbarkeit und Datenreife freigeben.
+- [ ] Persönliche Angemessenheit nicht aus Haushaltsvermögen ableiten.
+- [ ] Alternative ohne neues Produkt sowie offene Mindest-/Produktregeln erläutern.
 
-### APP-02 – Persistenz, unveränderliche Versionen und Seed
+### AI-06 – SummaryBundle für Kunde und Fachperson
 
-P0 · geplant · 2.5 Personenstunden · G1
+P0 · geplant · 2 Personenstunden · M4
 
-**Ergebnis:** Datenbankmigration, synthetischer Seed und bestätigte Fallversionen.
+**Ergebnis:** Zwei lesbare Sichten desselben Dossiers mit Prüfstatus und offenen Fragen.
 
-**Abhängigkeiten:** APP-01, CAL-01
+**Abhängigkeiten:** AI-02, AI-04, AI-05
 
-**Abnahme:**
+**Workshop-Bezug:** W06
 
-- [ ] Reload stellt den richtigen Fall wieder her.
-- [ ] Bestätigte Profil-/Szenarioversionen werden nicht in-place umgeschrieben.
-- [ ] Konkurrierende Änderungen an veralteter Version werden erkannt.
-
-### APP-03 – Case-/Calculation-/Review-Verträge integrieren
-
-P0 · geplant · 2 Personenstunden · G2
-
-**Ergebnis:** Berechtigte Endpunkte mit Validierung und gemeinsamer Fehlerhülle.
-
-**Abhängigkeiten:** APP-02, CAL-01
+**Schnittstellen:** I08
 
 **Abnahme:**
 
-- [ ] Modell- und UI-Aufträge durchlaufen dieselben Fall-/Fachprüfungen.
-- [ ] Passender Input-Hash und Ergebnisversion werden gespeichert.
-- [ ] Teilweise Ergebnisse und offene Reviewgründe sind abrufbar.
+- [ ] Ein Snapshot/Versionssatz für beide Sichten; kein zweites Rechenmodell für Exporte.
+- [ ] Fachpersonensicht ergänzt nachvollziehbare Quellen/Prüfaufträge, keine Schlüssel.
+- [ ] Export und Übergabevorbereitung senden keine Nachricht und buchen keinen Termin.
 
-### APP-04 – Demo-Offerte, Antrag und Statusmaschine
+### AI-07 – AI-/Sicherheitsprüfung und startfähige Übergabe
 
-P0 · geplant · 3 Personenstunden · G4
+P0 · geplant · 2 Personenstunden · M5
 
-**Ergebnis:** Persistenter Demo-Vertragsprozess mit Idempotenz und Vorbedingungen.
+**Ergebnis:** Geprüfte Modell-/Toolgrenzen, Zugriffsschutz und dokumentierter Start.
 
-**Abhängigkeiten:** APP-02, AI-05
+**Abhängigkeiten:** AI-06, LOG-06
 
-**Abnahme:**
+**Workshop-Bezug:** W06, W07, W09
 
-- [ ] Offerte ist eindeutig Demo und verwendet keine still übernommene Musterprämie.
-- [ ] Doppelte Einreichung erzeugt keinen zweiten Antrag.
-- [ ] Veraltete Daten, offene Pflichtprüfung und fehlende Rolle verhindern unzulässige Übergänge.
-
-### APP-05 – Demo-Portal, Police und gemeinsames Dossier
-
-P0 · geplant · 2 Personenstunden · G4
-
-**Ergebnis:** Wiederaufnehmbarer Portalstand mit HTML-/JSON-Dossier.
-
-**Abhängigkeiten:** APP-04
+**Schnittstellen:** I01, I02, I05, I08, I10
 
 **Abnahme:**
 
-- [ ] Demo-Police erst nach passender protokollierter Demo-Annahme.
-- [ ] Dossier und UI teilen Werte, Versionen und Prüfstatus.
-- [ ] Dokumentdownload ist fallbezogen geschützt.
+- [ ] Fremde Case-ID, Prompt Injection, sensible Logs und Secret-/Bundle-Leaks geprüft.
+- [ ] Benötigte Transport-/Speicherverschlüsselung tatsächlich nachgewiesen; keine Compliance-Pauschalbehauptung.
+- [ ] Echter Modelltest, Reviewrollen und Versionskonsistenz gemeinsam abgenommen.
 
-### APP-06 – Sicherheits- und Auditschutz nachweisen
+## Migration aus dem bisherigen Backlog
 
-P0 · geplant · 2.5 Personenstunden · G5
+Die alten 36 Tickets werden nicht als erledigt markiert. Ihre Aufgaben sind in die bestätigten Rollen neu zugeschnitten. Gleich geschriebene AI-IDs können in Version 2.0 einen anderen Zuschnitt haben; für Übernahmen immer die Version mitführen.
 
-**Ergebnis:** Sitzungs-/Rollenprüfung, Verschlüsselungsnachweis, Redaction und Ereignisverlauf.
+| Alte ID (v1) | Neue IDs (Workshop v2) |
+|---|---|
+| UX-01 | UI-01 |
+| UX-02 | UI-02 |
+| UX-03 | UI-03 |
+| UX-04 | UI-04 |
+| UX-05 | UI-05, UI-06 |
+| UX-06 | UI-07 |
+| UX-07 | UI-07 |
+| CAL-01 | LOG-01 |
+| CAL-02 | LOG-02 |
+| CAL-03 | LOG-03 |
+| CAL-04 | LOG-02, LOG-03 |
+| CAL-05 | LOG-04 |
+| CAL-06 | LOG-05 |
+| CAL-07 | LOG-02 |
+| CAL-08 | LOG-07 |
+| AI-01 | AI-01 |
+| AI-02 | AI-03 |
+| AI-03 | AI-03 |
+| AI-04 | AI-04 |
+| AI-05 | AI-05 |
+| AI-06 | AI-05, AI-06 |
+| AI-07 | AI-07 |
+| APP-01 | AI-01 |
+| APP-02 | AI-02 |
+| APP-03 | AI-02, LOG-01 |
+| APP-04 | LOG-06 |
+| APP-05 | UI-06, AI-06, LOG-06 |
+| APP-06 | AI-07 |
+| APP-07 | AI-07 |
+| QA-01 | UI-01, LOG-01, AI-01 |
+| QA-02 | AI-05, LOG-07 |
+| QA-03 | LOG-07, AI-07 |
+| QA-04 | LOG-07, AI-07, UI-07 |
+| QA-05 | UI-07, AV-06, VOICE-07, LOG-07, AI-07 |
+| QA-06 | UI-07, AV-06, VOICE-07, LOG-07, AI-07 |
+| QA-07 | UI-07, AV-06, VOICE-06, LOG-07, AI-07 |
 
-**Abhängigkeiten:** APP-01, APP-02
+## Dynamische Gesprächsaktualisierung
 
-**Abnahme:**
-
-- [ ] Kein fremder Fall oder fremder Export über manipulierte IDs erreichbar.
-- [ ] Keine realen Tokens im Bundle/Git/Export; notwendige Verschlüsselung tatsächlich eingerichtet.
-- [ ] Auditereignisse dokumentieren Statusversionen ohne vertrauliche Rohpayloads.
-
-### APP-07 – Reproduzierbaren Start und Demo-Konfiguration übergeben
-
-P0 · geplant · 1 Personenstunden · G6
-
-**Ergebnis:** Geprüfte lokale Start-/Migrations-/Seed-Schritte und Betriebsmodi.
-
-**Abhängigkeiten:** APP-05, APP-06
-
-**Abnahme:**
-
-- [ ] Sauberer Start ohne manuell versteckte Datenbankkorrektur.
-- [ ] Live-/Replay-/Fallback- und Demo-Sales-Modi unterscheiden sich sichtbar.
-- [ ] Keine neue Cloudbereitstellung oder Providerberechtigung still vorausgesetzt.
-
-
-## Person 5 – Fachprüfung / Integration
-
-### QA-01 – Scope, Fixture und Abnahmekriterien festlegen
-
-P0 · geplant · 2 Personenstunden · G0
-
-**Ergebnis:** Eine vollständige synthetische Hauptfixture und geordnete Quellenklassen.
-
-**Abhängigkeiten:** keine
-
-**Abnahme:**
-
-- [ ] Öffentliche Testfamilie, Müller-Quelle und Musteranalysen getrennt.
-- [ ] Zusätzliche Ziele/Budgetwerte als eigene synthetische Schicht.
-- [ ] Owner und P0-Nachweise von allen fünf Personen verstanden.
-
-### QA-02 – Produkt- und Fachquellen für den kleinen Katalog aufbereiten
-
-P0 · geplant · 2 Personenstunden · G2
-
-**Ergebnis:** Kuratiertes Faktenpaket mit Dokument-/Abschnittsbezug und offenen Versionsfragen.
-
-**Abhängigkeiten:** QA-01
-
-**Abnahme:**
-
-- [ ] Garantie, Projektion, Kosten, Rückkauf und Deckungsursachen getrennt.
-- [ ] Keine Behauptung vollständiger Prüfung aller archivierten PDFs/Videos.
-- [ ] Nur nachvollziehbare Fakten gehen an AI-/Produktregeln.
-
-### QA-03 – Frühe Pax-Abstimmung und Entscheidungslog
-
-P0 · geplant · 1.5 Personenstunden · G3
-
-**Ergebnis:** Priorisierte Klärung von Integrations-, Modell-, Paket- und Fachblockern.
-
-**Abhängigkeiten:** QA-01
-
-**Abnahme:**
-
-- [ ] Tatsächliche Expertenantwort oder weiterhin offener Punkt wird korrekt dokumentiert.
-- [ ] Demo-Sales-Umfang und Risiko-Code haben nachvollziehbare Entscheidungen.
-- [ ] Keine Nachricht oder Terminbuchung ohne entsprechenden Auftrag versendet.
-
-### QA-04 – Abnahmedatensätze und Testdurchlauf vorbereiten
-
-P0 · geplant · 2.5 Personenstunden · G2
-
-**Ergebnis:** Grenzfälle, geeignete Browserpfade und messbare Abnahmecheckliste.
-
-**Abhängigkeiten:** QA-01, CAL-01
-
-**Abnahme:**
-
-- [ ] Fachliche Annahmen und technische Beispiele werden nicht gleichgesetzt.
-- [ ] Unbekannt, Negativbudget, Kapitaldoppelverwendung und veraltete Version enthalten.
-- [ ] Ein kompletter Journey-Pfad und sinnvolle negative Pfade sind vorbereitet.
-
-### QA-05 – Gemeinsamen Gesamtfluss und drei Szenarien abnehmen
-
-P0 · geplant · 3 Personenstunden · G5
-
-**Ergebnis:** Dokumentierter integrierter Testlauf auf einer frischen Sitzung.
-
-**Abhängigkeiten:** UX-04, UX-05, CAL-08, AI-07, APP-05
-
-**Abnahme:**
-
-- [ ] Drei Pflichtszenarien und echter AI-Aufruf im selben Fall.
-- [ ] Empfehlung, Dossier und Journey verwenden aktuelle Daten.
-- [ ] Alle offenen Kernpunkte stehen sichtbar im Freigabestand.
-
-### QA-06 – Pitch, Demoablauf und Übergabeunterlagen
-
-P0 · geplant · 2 Personenstunden · G6
-
-**Ergebnis:** Wiederholbarer Drei-Minuten-Durchlauf mit ehrlichem Backup.
-
-**Abhängigkeiten:** QA-05, APP-07
-
-**Abnahme:**
-
-- [ ] Zusätzlicher Nutzen gegenüber öffentlicher Pax/vlot-Analyse klar.
-- [ ] Eine neue Änderung wird wirklich verarbeitet und berechnet.
-- [ ] Keine echte Versicherungsdeckung oder vollständige Compliance behauptet.
-
-### QA-07 – Negative Sicherheits- und Datenschutzprüfung
-
-P0 · geplant · 2 Personenstunden · G5
-
-**Ergebnis:** Unabhängiger Gegencheck von Rollen, Export und Datenwegen.
-
-**Abhängigkeiten:** APP-06, AI-07
-
-**Abnahme:**
-
-- [ ] Zweiter Browser kann ersten Fall nicht lesen, ändern oder exportieren.
-- [ ] Modell-/Log-Kontext und Bundle enthalten keine unnötigen Daten oder Schlüssel.
-- [ ] Sicherheitsfehler werden vor P1-Gestaltung priorisiert.
-
-## Was nicht in diese Schätzung eingerechnet ist
-
-Produktiver Rechts-/Sicherheitsfreigabeprozess, echte Annahme und Policenausstellung, vollständige schweizweite Vorsorge-/Hypothekenmodellierung, Voice/Avatar, allgemeine Dokument-OCR und mehrsprachige Fachvalidierung. Diese Arbeit gehört in die abgestimmte PoC-Fortsetzung und wird nicht durch Demo-Kennzeichen als erledigt erklärt.
+I10 konkretisiert die bestehenden Fall-/Voice-Integrationspakete: Earnie baut ContextBuilder und Update-Kanal, Dario aktualisiert vor Turns und bricht veraltete Ausgabe ab, Valentin liefert gültige Runreferenzen, Luca gleicht Grafik/Chat ab, Lukas übernimmt den Abbruch. [Schnittstellen Abschnitt 9](interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario) beschreibt HTTP/SSE als Vorschlag. Die Schätzungen bleiben vorläufig und werden vor Umsetzung gegen die tatsächliche Restzeit geprüft. Die 55 geplanten Abnahmefälle enthalten Reconnect, laufende Fachänderung und Tempowechsel.

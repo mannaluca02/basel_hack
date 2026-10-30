@@ -1,711 +1,1189 @@
 {
-  "plan_date": "2026-10-30",
-  "plan_version": "1.0",
+  "plan_date": "2026-10-31",
+  "plan_version": "2.0-workshop",
+  "supersedes_plan_version": "1.0",
   "implementation_status": "not_started",
-  "frontend_decision": "Angular with Pax UI; compatible versions and access to verify",
-  "planning_window_elapsed_hours": 48,
-  "target_total_person_hours": 110,
-  "ticket_hours": 77.0,
-  "shared_coordination_person_hours": 20,
-  "buffer_person_hours": 13.0,
-  "ticket_hours_by_owner": {
-    "Person 1": 14.0,
-    "Person 2": 17.0,
-    "Person 3": 15.5,
-    "Person 4": 15.5,
-    "Person 5": 15.0
+  "team_confirmed_by_user": true,
+  "team_roles": {
+    "Luca": "UI",
+    "Lukas": "Avatar",
+    "Dario": "Voice",
+    "Valentin": "Logik-Backend",
+    "Earnie": "KI-Backend"
   },
-  "estimate_note": "Rough bounded-MVP estimates; not elapsed hours or a promise of delivery.",
-  "dependency_note": "Dependencies gate final integration/acceptance; work with shared contract fixtures can start earlier.",
+  "frontend_decision": "Angular with Pax UI; compatible versions/access still to verify",
+  "planning_window_elapsed_hours": 48,
+  "remaining_event_hours": null,
+  "time_note": "Inherited provisional whole-event frame, not a new 48-hour allowance after the workshop.",
+  "target_total_person_hours": 110,
+  "ticket_hours": 71.0,
+  "p0_ticket_hours": 71.0,
+  "all_priorities_ticket_hours": 78.5,
+  "shared_coordination_person_hours": 20,
+  "buffer_person_hours": 19.0,
+  "p0_ticket_hours_by_owner": {
+    "Luca": 15.0,
+    "Lukas": 9.0,
+    "Dario": 13.0,
+    "Valentin": 16.0,
+    "Earnie": 18.0
+  },
+  "task_counts": {
+    "P0": 34,
+    "P1": 2,
+    "P2": 1
+  },
+  "estimate_note": "New estimates are planning proposals, not workshop commitments; P1/P2 excluded from P0 capacity.",
+  "workshop_source": "documentation/baselhack/catalog/workshop.json",
+  "legacy_id_mapping_note": "Values are workshop-v2 IDs; some same-spelled AI IDs have changed responsibilities.",
+  "legacy_id_mapping": {
+    "UX-01": [
+      "UI-01"
+    ],
+    "UX-02": [
+      "UI-02"
+    ],
+    "UX-03": [
+      "UI-03"
+    ],
+    "UX-04": [
+      "UI-04"
+    ],
+    "UX-05": [
+      "UI-05",
+      "UI-06"
+    ],
+    "UX-06": [
+      "UI-07"
+    ],
+    "UX-07": [
+      "UI-07"
+    ],
+    "CAL-01": [
+      "LOG-01"
+    ],
+    "CAL-02": [
+      "LOG-02"
+    ],
+    "CAL-03": [
+      "LOG-03"
+    ],
+    "CAL-04": [
+      "LOG-02",
+      "LOG-03"
+    ],
+    "CAL-05": [
+      "LOG-04"
+    ],
+    "CAL-06": [
+      "LOG-05"
+    ],
+    "CAL-07": [
+      "LOG-02"
+    ],
+    "CAL-08": [
+      "LOG-07"
+    ],
+    "AI-01": [
+      "AI-01"
+    ],
+    "AI-02": [
+      "AI-03"
+    ],
+    "AI-03": [
+      "AI-03"
+    ],
+    "AI-04": [
+      "AI-04"
+    ],
+    "AI-05": [
+      "AI-05"
+    ],
+    "AI-06": [
+      "AI-05",
+      "AI-06"
+    ],
+    "AI-07": [
+      "AI-07"
+    ],
+    "APP-01": [
+      "AI-01"
+    ],
+    "APP-02": [
+      "AI-02"
+    ],
+    "APP-03": [
+      "AI-02",
+      "LOG-01"
+    ],
+    "APP-04": [
+      "LOG-06"
+    ],
+    "APP-05": [
+      "UI-06",
+      "AI-06",
+      "LOG-06"
+    ],
+    "APP-06": [
+      "AI-07"
+    ],
+    "APP-07": [
+      "AI-07"
+    ],
+    "QA-01": [
+      "UI-01",
+      "LOG-01",
+      "AI-01"
+    ],
+    "QA-02": [
+      "AI-05",
+      "LOG-07"
+    ],
+    "QA-03": [
+      "LOG-07",
+      "AI-07"
+    ],
+    "QA-04": [
+      "LOG-07",
+      "AI-07",
+      "UI-07"
+    ],
+    "QA-05": [
+      "UI-07",
+      "AV-06",
+      "VOICE-07",
+      "LOG-07",
+      "AI-07"
+    ],
+    "QA-06": [
+      "UI-07",
+      "AV-06",
+      "VOICE-07",
+      "LOG-07",
+      "AI-07"
+    ],
+    "QA-07": [
+      "UI-07",
+      "AV-06",
+      "VOICE-06",
+      "LOG-07",
+      "AI-07"
+    ]
+  },
   "milestones": {
-    "G0": "T+2: decisions/contracts/fixture",
-    "G1": "T+8: first saved vertical slice",
-    "G2": "T+16: baseline and first scenarios",
-    "G3": "T+24: three scenarios",
-    "G4": "T+38: recommendation and complete demo journey",
-    "G5": "T+44: integrated technical/domain checks",
-    "G6": "T+48: repeatable demo and handoff"
+    "M0": "Roles, GraphContext, Agent contract, speech route and Angular shell agreed",
+    "M1": "One stored case, transcript/text proposal, progress and baseline work together",
+    "M2": "All five tabs, basic agent, voice and selected graphic are connected",
+    "M3": "Three scenarios and a truly context-bound explanation",
+    "M4": "Customer/advisor Summary export and stored demo journey",
+    "M5": "Voice/avatar/security negative cases, fresh-session demo and handoff",
+    "OPTIONAL": "Only after complete P0 and explicit time check"
   },
   "tasks": [
     {
-      "id": "UX-01",
-      "owner": "Person 1",
-      "title": "Angular-/Pax-UI-Nachweis und App-Shell",
+      "id": "UI-01",
+      "owner": "Luca",
+      "title": "Angular-Shell mit fünf Workspace-Tabs",
       "priority": "P0",
       "status": "planned",
-      "estimate_person_hours": 1.5,
+      "estimate_person_hours": 2,
       "dependencies": [],
-      "deliverable": "Angular-Shell mit Theme, Navigation und zwei funktionierenden Pax-Komponenten; dokumentierter Paketstand.",
+      "deliverable": "Dynamic View, Agent-Slot und Navigation Progress / Graphics / Chat / Info / Summary.",
       "acceptance_criteria": [
-        "Registry-Zugriff und Peer Dependencies tatsächlich geprüft; kein erzwungener Versionskonflikt.",
-        "Button und Formularfeld funktionieren im Build; notwendige Styles/Assets geladen.",
-        "Bei Paketblockade bleibt Angular aktiv und ein kleiner Marken-Fallback wird transparent verwendet."
+        "Pax-UI-Zugriff und kompatibler Angular-Build geprüft; transparenter Marken-Fallback möglich.",
+        "Eine Fall-/Versionsquelle für alle fünf Tabs; kein Chat als separate Schatten-App.",
+        "Grafik ist die Hauptfläche; Produktfläche bleibt vor Bedarfsreife ohne Verkaufspriorisierung."
       ],
-      "target_milestone": "G0"
+      "target_milestone": "M0",
+      "workshop_features": [
+        "W02",
+        "W03"
+      ],
+      "interface_contracts": [
+        "I02"
+      ]
     },
     {
-      "id": "UX-02",
-      "owner": "Person 1",
-      "title": "Bestätigbares Profil, Ziele und Budgetformular",
+      "id": "UI-02",
+      "owner": "Luca",
+      "title": "Zeitbudget-Einstieg und bestätigbare Profilkarten",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
-        "UX-01",
-        "CAL-01",
-        "APP-01"
+        "UI-01",
+        "LOG-01",
+        "AI-01"
       ],
-      "deliverable": "Eingabestrecke für Haushalt, Ziele, Budget und Versorgung auf gemeinsamem Fallvertrag.",
+      "deliverable": "Opener, Zeitbudgetwahl und Eingabekarten innerhalb des Workspaces.",
       "acceptance_criteria": [
-        "Monat/Jahr, CHF, Brutto/Netto und unbekannte Angaben sind explizit.",
-        "Bestätigung erzeugt eine gespeicherte Profilversion; Reload verliert den Fall nicht.",
-        "Fehler sind am Feld und per Tastatur erreichbar; keine Produktauswahl vor Bedarfsaufnahme."
+        "Zeitbudget beeinflusst Detailgrad, nicht erforderliche Fachprüfungen.",
+        "Ziele, Haushalt, Budget und alle Säulen bleiben im kurzen Modus erfasst oder ausdrücklich offen.",
+        "Feldvorschläge werden bestätigt; keine automatische Profilmutation durch Sprache oder Chat."
       ],
-      "target_milestone": "G1"
+      "target_milestone": "M1",
+      "workshop_features": [
+        "W01",
+        "W03"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I02",
+        "I10"
+      ]
     },
     {
-      "id": "UX-03",
-      "owner": "Person 1",
-      "title": "LifeMap mit Phasen, Säulen und offenen Fragen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "UX-02",
-        "CAL-03",
-        "CAL-04",
-        "APP-03"
-      ],
-      "deliverable": "Zeitachse, zugängliche Tabelle und Ergebnisdetails für eine normalisierte Baseline.",
-      "acceptance_criteria": [
-        "Erste, zweite und dritte Säule bleiben erkennbar, auch bei fehlenden Daten.",
-        "Perioden, Datenstand, Schätzungen und Reviewstatus sind sichtbar.",
-        "Die Oberfläche rechnet Provider-Gesamtleistungen nicht nochmals eigenständig zusammen."
-      ],
-      "target_milestone": "G2"
-    },
-    {
-      "id": "UX-04",
-      "owner": "Person 1",
-      "title": "Drei Szenariobildschirme mit Vorher-/Nachher",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "UX-03",
-        "CAL-05",
-        "CAL-06"
-      ],
-      "deliverable": "Familie, Eigenheim und Pensionierung bearbeiten gespeicherte Szenarien.",
-      "acceptance_criteria": [
-        "Jede Änderung erzeugt einen neuen passenden Lauf statt dekorativer Zahlen.",
-        "Baseline bleibt erhalten; geänderte Positionen und nicht berechenbare Folgen werden gezeigt.",
-        "Mehrfachklick und verspätete Antwort ersetzen nicht den aktuell gewählten Stand."
-      ],
-      "target_milestone": "G3"
-    },
-    {
-      "id": "UX-05",
-      "owner": "Person 1",
-      "title": "Handlungsoptionen, Empfehlung und Journey-Oberfläche",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "UX-02",
-        "AI-05",
-        "APP-04"
-      ],
-      "deliverable": "Verbundene UI von Strategie über Demo-Offerte/Antrag bis Portal.",
-      "acceptance_criteria": [
-        "Maßnahmen und Alternative ohne neues Produkt erscheinen vor Produktdetails.",
-        "Felder werden aus demselben Fall übernommen; Demo-Bezeichnung bleibt sichtbar.",
-        "Reviewpflicht, veraltete Offerte und Zwischenstatus haben eigene Ansichten."
-      ],
-      "target_milestone": "G4"
-    },
-    {
-      "id": "UX-06",
-      "owner": "Person 1",
-      "title": "Responsive Bedienung, Fehler- und Ladezustände",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 1.5,
-      "dependencies": [
-        "UX-04",
-        "UX-05"
-      ],
-      "deliverable": "Kernfluss auf schmaler und breiter Ansicht mit verständlichen Zuständen.",
-      "acceptance_criteria": [
-        "Pflichtaktionen sind per Tastatur möglich und Fokus ist erkennbar.",
-        "Farbe allein transportiert weder Datenqualität noch Risiken.",
-        "Modell-/Providerfehler behalten den bisherigen Stand mit nachvollziehbarer Kennzeichnung."
-      ],
-      "target_milestone": "G5"
-    },
-    {
-      "id": "UX-07",
-      "owner": "Person 1",
-      "title": "UI für wiederholbare Vorführung vorbereiten",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 1,
-      "dependencies": [
-        "UX-06",
-        "QA-05"
-      ],
-      "deliverable": "Aufgeräumter vollständiger Hauptfall und verständliche Herkunftsdetails.",
-      "acceptance_criteria": [
-        "Keine toten Pflichtbuttons im Demo-Pfad.",
-        "Mindestens eine neue Eingabe ist wirklich mit AI und Berechnung verbunden.",
-        "Vorbereitung löscht oder verändert nicht still fremde Fälle."
-      ],
-      "target_milestone": "G6"
-    },
-    {
-      "id": "CAL-01",
-      "owner": "Person 2",
-      "title": "Gemeinsame Schemas, Einheiten und Status festlegen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 1.5,
-      "dependencies": [
-        "QA-01"
-      ],
-      "deliverable": "Laufzeit-validierte Contracts und synthetische Vertrags-Fixture.",
-      "acceptance_criteria": [
-        "Geld, Zeitraum, Basis, Herkunft, Bestätigung und Fachreview sind getrennt.",
-        "Null, unbekannt und nicht anwendbar sind unterscheidbar.",
-        "UI, Backend und AI können dieselbe Profil-/Ergebnishülle verwenden."
-      ],
-      "target_milestone": "G0"
-    },
-    {
-      "id": "CAL-02",
-      "owner": "Person 2",
-      "title": "Serverseitigen Logismata-Adapter anbinden",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 1.5,
-      "dependencies": [
-        "CAL-01",
-        "APP-01"
-      ],
-      "deliverable": "Allowlist-Client mit sauberer Konfiguration, Zeitbegrenzung und Metadaten.",
-      "acceptance_criteria": [
-        "Token bleibt serverseitig; lokale Variablennamen werden ausdrücklich zugeordnet.",
-        "Ort, Alters-/3a-Grenzen und mindestens ein sinnvoller Rechenpfad sind aufrufbar.",
-        "HTTP-Fehler und ungültige Antwortstruktur werden strukturiert zurückgegeben."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "CAL-03",
-      "owner": "Person 2",
-      "title": "Budget und Kapitalverfügbarkeit berechnen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "CAL-02"
-      ],
-      "deliverable": "Normalisierte Cashflow- und freie-Mittel-Betrachtung.",
-      "acceptance_criteria": [
-        "Steuern und bestehende Vorsorgebeiträge werden nicht doppelt abgezogen.",
-        "Statistische Budgetwerte bleiben bestätigbare Vorschläge.",
-        "Negatives Budget und unbekannte Positionen verhindern eine falsche Tragbarkeit."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "CAL-04",
-      "owner": "Person 2",
-      "title": "Drei-Säulen-Baseline für Risiko und Pensionierung",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "CAL-02",
-        "CAL-07"
-      ],
-      "deliverable": "Ergebnisbereiche mit Bedarf, vorhandenen Leistungen, Kapital und Validierungsstand.",
-      "acceptance_criteria": [
-        "Risikoereignisse und betroffene Personen sind gemäß Schema gemappt.",
-        "Fehlender Bedarf wird nicht als Null-Lücke behandelt.",
-        "PK-Schätzung und bestätigte Werte bleiben verschieden; Gesamt-/Partnerwerte sind geprüft."
-      ],
-      "target_milestone": "G2"
-    },
-    {
-      "id": "CAL-05",
-      "owner": "Person 2",
-      "title": "Phasenmodell für Familie und Pensionierung",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "CAL-03",
-        "CAL-04"
-      ],
-      "deliverable": "Datierte Ereignisse mit vergleichbaren Phasen und erklärten Rechengrenzen.",
-      "acceptance_criteria": [
-        "Pensumswechsel ändert nach bestätigter Annahme Einkommen/Kosten und berechenbare Versorgung.",
-        "Erwerbsende, Rentenbeginn und Überbrückung sind getrennt.",
-        "Unbekannte künftige PK-/Kinderleistungsregeln bleiben als solche sichtbar."
-      ],
-      "target_milestone": "G3"
-    },
-    {
-      "id": "CAL-06",
-      "owner": "Person 2",
-      "title": "Eigenheim- und Kapitalzuordnungsmodell",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "CAL-01",
-        "CAL-03"
-      ],
-      "deliverable": "Beispiel-Eigenmittellücke, Reserve und laufender Budgetvergleich.",
-      "acceptance_criteria": [
-        "Demo-Quoten und Zinsen sind explizite Annahmen, keine Kreditzusage.",
-        "Freie, reservierte und gebundene Mittel werden nicht vermischt.",
-        "Derselbe Vermögenswert wird nicht vollständig für zwei Ziele gleichzeitig eingesetzt."
-      ],
-      "target_milestone": "G3"
-    },
-    {
-      "id": "CAL-07",
-      "owner": "Person 2",
-      "title": "Ergebnisnormalisierung und begrenzte Ausfallpfade",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "CAL-02"
-      ],
-      "deliverable": "Status pro Ergebnisbereich, Eingabe-Hashes und kontrollierter Replaymodus.",
-      "acceptance_criteria": [
-        "Risiko-Code 0 bleibt bis Klärung reviewpflichtig.",
-        "Replay nur bei passendem Input-/Modell-Hash; neue Eingaben bekommen keine alten Scheinwerte.",
-        "401/403, Timeout, Schemafehler und Begrenzung führen nicht zu endlosen Wiederholungen."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "CAL-08",
-      "owner": "Person 2",
-      "title": "Fachliche Invarianten und Adapterfälle prüfen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "CAL-04",
-        "CAL-05",
-        "CAL-06",
-        "CAL-07"
-      ],
-      "deliverable": "Aussagekräftige Domain-/Adaptertests mit dokumentierten Referenzannahmen.",
-      "acceptance_criteria": [
-        "Einheiten, fehlender Bedarf, Doppelzählung und Kapitalerschöpfung sind abgedeckt.",
-        "Beispielantworten werden nicht als fachlich zertifizierte aktuelle Berechnung ausgegeben.",
-        "Mindestens ein begrenzter Live-Smoke und seine tatsächlichen Grenzen sind protokolliert."
-      ],
-      "target_milestone": "G5"
-    },
-    {
-      "id": "AI-01",
-      "owner": "Person 3",
-      "title": "Zulässigen Modellpfad und minimierten Kontext nachweisen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "QA-01",
-        "CAL-01"
-      ],
-      "deliverable": "Tatsächlicher freigegebener Modellaufruf mit strukturierter Antwort.",
-      "acceptance_criteria": [
-        "Empfänger, Datentypen und Konfiguration dokumentiert; kein beliebiger externer Host.",
-        "Kein Anbieter-Token oder unnötiges Rohdokument im Modellkontext.",
-        "Vorlagen-Fallback ist unterscheidbar und wird nicht als LLM ausgegeben."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "AI-02",
-      "owner": "Person 3",
-      "title": "Freitext in bestätigbare Feldvorschläge überführen",
+      "id": "UI-03",
+      "owner": "Luca",
+      "title": "Dynamische Zeitgrafik und fachliche Auswahlkontexte",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2.5,
       "dependencies": [
+        "UI-02",
+        "LOG-02",
+        "LOG-03"
+      ],
+      "deliverable": "Zeitachse mit erklärbarer Tabelle und selektierbarer Person, Periode und Kennzahl.",
+      "acceptance_criteria": [
+        "Jede Auswahl ist an Profil-, Szenario- und Run-Version gebunden.",
+        "Farblegende, Einheiten und Datenqualität sind erkennbar; Skizzenjahre sind keine harte Modellgrenze.",
+        "Veraltete Antworten ersetzen nicht den aktuellen Grafikzustand."
+      ],
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W02",
+        "W05",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I04",
+        "I07"
+      ]
+    },
+    {
+      "id": "UI-04",
+      "owner": "Luca",
+      "title": "Drei Szenarien als Varianten derselben Dynamic View",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "UI-03",
+        "LOG-04",
+        "LOG-05"
+      ],
+      "deliverable": "Familie, Eigenheim und Pensionierung als gespeicherte Vorher-/Nachher-Varianten.",
+      "acceptance_criteria": [
+        "Kein Pflichtszenario ist nur ein dekorativer Regler.",
+        "Baseline, Kapitalbindung und Unsicherheiten bleiben sichtbar.",
+        "Tabwechsel verliert weder gewählte Periode noch aktuelle Variante."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W02",
+        "W05"
+      ],
+      "interface_contracts": [
+        "I03",
+        "I04"
+      ]
+    },
+    {
+      "id": "UI-05",
+      "owner": "Luca",
+      "title": "Chat, Info und kontextbezogenes Erklären",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "UI-01",
+        "UI-03",
+        "AI-04"
+      ],
+      "deliverable": "Einstieg „Diese Stelle erklären“ aus Grafik und Info in denselben Advisor.",
+      "acceptance_criteria": [
+        "Graph-ID, Kennzahl, Zeitraum, Person und Run-ID werden explizit übergeben.",
+        "Glossar und fachliche Erklärung bleiben von Produktwerbung getrennt.",
+        "Ein nicht verstandener Begriff kann textlich und über den freigegebenen Voice-Kanal erklärt werden."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W03",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I05",
+        "I07"
+      ]
+    },
+    {
+      "id": "UI-06",
+      "owner": "Luca",
+      "title": "Summary-Exporte und Demo-Journey im Workspace",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "UI-04",
+        "AI-06",
+        "LOG-06"
+      ],
+      "deliverable": "Kunden-/Fachperson-Exportauswahl und gespeicherter Demo-Antrags-/Portalstatus.",
+      "acceptance_criteria": [
+        "Beide Summary-Sichten verwenden dieselbe bestätigte Datenversion.",
+        "Download/Übergabevorbereitung sendet keine Mail oder Nachricht automatisch.",
+        "Demo-Offerte, Antrag und Demo-Police sind unterschieden; keine Dateneingabe wird wiederholt."
+      ],
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W06",
+        "W03"
+      ],
+      "interface_contracts": [
+        "I08"
+      ]
+    },
+    {
+      "id": "UI-07",
+      "owner": "Luca",
+      "title": "Responsive Bedienung und Gesamt-UI-Abnahme",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "UI-06",
+        "AV-06",
+        "VOICE-07",
+        "LOG-07",
+        "AI-07"
+      ],
+      "deliverable": "Integrierter Workspace auf dem festgelegten Demo-Gerät mit Tastatur-/Fehlerpfaden.",
+      "acceptance_criteria": [
+        "Agent und Tabaktionen sind auch auf schmalem Display erreichbar.",
+        "Grafik, Voice, Info und Summary bleiben versionskonsistent.",
+        "Ein kompletter neuer Durchlauf mit Reload und Demo-Police ist gemeinsam gezeigt."
+      ],
+      "target_milestone": "M5",
+      "workshop_features": [
+        "W02",
+        "W03",
+        "W05",
+        "W06",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I04",
+        "I05",
+        "I06",
+        "I08",
+        "I10"
+      ]
+    },
+    {
+      "id": "AV-01",
+      "owner": "Lukas",
+      "title": "Agent-Host und gemeinsame Darstellungs-Events",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [],
+      "deliverable": "Angular-Agentkomponente mit definiertem Input-/Eventvertrag.",
+      "acceptance_criteria": [
+        "Agent ist unabhängig vom aktiven Tab sichtbar.",
+        "Komponente entscheidet weder Datenreife noch Versicherbarkeit selbst.",
+        "Technische Zustände werden von tatsächlichen App-/Voice-Ereignissen übernommen."
+      ],
+      "target_milestone": "M0",
+      "workshop_features": [
+        "W02",
+        "W04"
+      ],
+      "interface_contracts": [
+        "I06",
+        "I09"
+      ]
+    },
+    {
+      "id": "AV-02",
+      "owner": "Lukas",
+      "title": "Fortschrittsring und zugängliche Farbanzeige",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AV-01",
+        "LOG-01"
+      ],
+      "deliverable": "Fortschritt direkt am Agenten mit Text und offenen Punkten.",
+      "acceptance_criteria": [
+        "Ring ist Erfassungs-/Beratungsfortschritt, kein Risiko- oder Versicherungs-Score.",
+        "Unbekannt und menschlich ungeprüft werden nicht durch grüne Darstellung versteckt.",
+        "Progress-Tab und Ring lesen denselben Backend-Fortschritt."
+      ],
+      "target_milestone": "M1",
+      "workshop_features": [
+        "W03",
+        "W04"
+      ],
+      "interface_contracts": [
+        "I09"
+      ]
+    },
+    {
+      "id": "AV-03",
+      "owner": "Lukas",
+      "title": "Zustände idle, listening, thinking, speaking, error",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AV-01"
+      ],
+      "deliverable": "Einfache Agentdarstellung ohne verpflichtenden Videodienst.",
+      "acceptance_criteria": [
+        "Speaking startet erst bei tatsächlicher Audioausgabe, nicht schon bei fertigem AI-Text.",
+        "Kein psychologischer oder emotionaler Kunden-Score aus Avataranimation.",
+        "Status ist auch ohne Farbe/Animation verständlich."
+      ],
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W04"
+      ],
+      "interface_contracts": [
+        "I06"
+      ]
+    },
+    {
+      "id": "AV-04",
+      "owner": "Lukas",
+      "title": "Agent mit Voice und Grafik-Erklärung verbinden",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "AV-03",
+        "VOICE-03",
+        "AI-04"
+      ],
+      "deliverable": "Gemeinsame Turn-/Erklärungsreferenz für Agent, Text und Audio.",
+      "acceptance_criteria": [
+        "Abbruch, neue Auswahl und Fehler beenden alte Darstellungszustände.",
+        "Verspätete Events eines alten Turns werden verworfen.",
+        "Agent verweist auf dieselbe Grafikstelle wie der sichtbare Erklärungstext."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W04",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I05",
+        "I06",
+        "I07"
+      ]
+    },
+    {
+      "id": "AV-05",
+      "owner": "Lukas",
+      "title": "Fallback und responsive Agentdarstellung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1,
+      "dependencies": [
+        "AV-02",
+        "AV-04"
+      ],
+      "deliverable": "Agent bleibt ohne Video, Ton oder Animation nutzbar.",
+      "acceptance_criteria": [
+        "Video-/TTS-Ausfall blockiert weder Beratung noch Summary.",
+        "Kein Kamera-Zugriff allein für die Agentdarstellung.",
+        "Reduzierte Bewegung und schmale Ansicht sind berücksichtigt."
+      ],
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W04"
+      ],
+      "interface_contracts": [
+        "I06"
+      ]
+    },
+    {
+      "id": "AV-06",
+      "owner": "Lukas",
+      "title": "Agent-/Progress-Integration und Abnahme",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1,
+      "dependencies": [
+        "AV-05"
+      ],
+      "deliverable": "Prüfbarer Durchlauf der Agentzustände und der Progress-Semantik.",
+      "acceptance_criteria": [
+        "100 Prozent Datenaufnahme wird nicht als bestehender Versicherungsschutz erklärt.",
+        "Offener Reviewstatus bleibt auch bei abgeschlossener Aufnahme sichtbar.",
+        "Fehler und Unterbrechung hinterlassen keinen dauerhaft sprechenden Agenten."
+      ],
+      "target_milestone": "M5",
+      "workshop_features": [
+        "W04"
+      ],
+      "interface_contracts": [
+        "I06",
+        "I09"
+      ]
+    },
+    {
+      "id": "VOICE-01",
+      "owner": "Dario",
+      "title": "Speech-Datenweg, Berechtigungen und Demo-Browser festlegen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [],
+      "deliverable": "Freigegebene STT-/TTS-Adaptergrenze und dokumentierter Kompatibilitätsnachweis.",
+      "acceptance_criteria": [
+        "Mikrofon erst nach bewusster Nutzeraktion und Browserfreigabe.",
+        "Browser-Speech wird nicht pauschal als lokal angenommen; Empfänger sind bekannt.",
+        "Bei fehlender Freigabe bleibt Text nutzbar und Voice offen statt als fertig markiert."
+      ],
+      "target_milestone": "M0",
+      "workshop_features": [
+        "W09"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I05",
+        "I10"
+      ]
+    },
+    {
+      "id": "VOICE-02",
+      "owner": "Dario",
+      "title": "Spracheingabe mit temporärer Verarbeitung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "VOICE-01",
         "AI-01"
       ],
-      "deliverable": "Schemafähige Profil-/Ziel-Patches mit Bestätigungsschritt.",
+      "deliverable": "Kurzer Push-to-talk-Pfad bis zum finalen Transkript.",
       "acceptance_criteria": [
-        "Mindestens drei neue Eingabeformulierungen sinnvoll verarbeitet.",
-        "Kein Modellvorschlag überschreibt bestätigte Felder ohne Benutzeraktion.",
-        "Nur erlaubte Pfade; fremde IDs, Rollen und URLs abgewiesen."
+        "Audioformat/-größe/-dauer begrenzt; keine unkontrollierte Rohaufnahme gespeichert.",
+        "Zwischenresultate gelten nicht als bestätigte Fachdaten.",
+        "Ablehnung, fehlendes Gerät, Timeout und unverständliche Eingabe haben Textfallback."
       ],
-      "target_milestone": "G2"
+      "target_milestone": "M1",
+      "workshop_features": [
+        "W09"
+      ],
+      "interface_contracts": [
+        "I01"
+      ]
     },
     {
-      "id": "AI-03",
-      "owner": "Person 3",
-      "title": "Nächste sinnvolle Frage und Datenreife bestimmen",
+      "id": "VOICE-03",
+      "owner": "Dario",
+      "title": "Sprachausgabe und sichere Voice-Auswahl",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
-        "AI-02"
+        "VOICE-01"
       ],
-      "deliverable": "Regelbasierte zulässige Fragengruppen mit AI-Formulierung.",
+      "deliverable": "Vorlesbarer bestätigter Antworttext mit sichtbarer Stop-/Mute-Aktion.",
       "acceptance_criteria": [
-        "Budget, Bedarf, bestehende Deckung und PK-Unbekannt haben Vorrang vor Verkauf.",
-        "Widersprüche führen zur Klärung, nicht zu stiller Auswahl einer Behauptung.",
-        "Erledigungsbedingungen verhindern eine wiederholte Schleife derselben Frage."
+        "TTS verwendet denselben Text und dieselben Zahlen wie Chat/Erklärung.",
+        "Lokale oder freigegebene Remote-Stimme explizit ausgewählt; keine stille Anbieteränderung.",
+        "Audio beginnt erst nach Nutzeraktivierung und lässt sich sofort stoppen."
       ],
-      "target_milestone": "G2"
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W09",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I05",
+        "I06"
+      ]
     },
     {
-      "id": "AI-04",
-      "owner": "Person 3",
-      "title": "Ergebnisse mit Quellen und Unsicherheiten erklären",
+      "id": "VOICE-04",
+      "owner": "Dario",
+      "title": "Transkriptkorrektur und gemeinsamer Advisor-Turn",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
-        "AI-03",
-        "CAL-04"
+        "VOICE-02",
+        "AI-03"
       ],
-      "deliverable": "Ergebnisgebundene Erklärung mit Run- und Faktenreferenzen.",
+      "deliverable": "Bearbeitbares Transkript und Bestätigung vor fachlicher Mutation.",
       "acceptance_criteria": [
-        "Betrag, Zeitraum und Ursache stimmen mit dem aktuellen Ergebnis überein.",
-        "Geschätzte oder reviewpflichtige Ergebnisse werden nicht als Garantie umformuliert.",
-        "Ungültige Modellausgabe hat einen transparenten begrenzten Fehlerpfad."
+        "Verhörte Geldwerte werden vor Speicherung korrigierbar gezeigt.",
+        "Text und Voice nutzen dieselbe Message-ID und dieselbe Fallversion.",
+        "Wiederholtes Senden erzeugt keinen doppelten Feldvorschlag oder Antrag.",
+        "I10 aktualisiert den Kontext; vor Antwortstart aktuelle Referenz prüfen, nach Reconnect Snapshot abstimmen."
       ],
-      "target_milestone": "G3"
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W09",
+        "W01"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I02",
+        "I10"
+      ]
     },
     {
-      "id": "AI-05",
-      "owner": "Person 3",
-      "title": "Bedarfs- und Produktregeln für den Hauptfall",
+      "id": "VOICE-05",
+      "owner": "Dario",
+      "title": "Abbruch, Echovermeidung und Agent-Synchronisation",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "VOICE-03",
+        "VOICE-04",
+        "AV-03"
+      ],
+      "deliverable": "Eindeutiger Speech-Lebenszyklus mit Turn-/Kontextbindung.",
+      "acceptance_criteria": [
+        "P0 zeichnet beim eigenen Vorlesen nicht parallel weiter auf.",
+        "Neue Grafikversion oder Stop beendet alte Ausgabe und verwirft verspätete Callbacks.",
+        "Listening/Thinking/Speaking werden aus tatsächlichen Vorgängen signalisiert."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W09",
+        "W04",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I06",
+        "I07",
+        "I10"
+      ]
+    },
+    {
+      "id": "VOICE-06",
+      "owner": "Dario",
+      "title": "Speech-Fehler- und Datenschutzfälle prüfen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "VOICE-05"
+      ],
+      "deliverable": "Negative Tests der erlaubten Audioverarbeitung.",
+      "acceptance_criteria": [
+        "Kein Mikrofon-Autostart bei Tabwechsel, Reload oder erneutem Öffnen.",
+        "Keine Rohaufnahmen/Transkripte in allgemeiner Telemetrie.",
+        "Nicht unterstützte APIs führen nicht zu ungefragtem Cloud-Speech."
+      ],
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W09"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I05",
+        "I06"
+      ]
+    },
+    {
+      "id": "VOICE-07",
+      "owner": "Dario",
+      "title": "Gesprochenen Demo-Dialog integrieren",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1,
+      "dependencies": [
+        "VOICE-06",
+        "AI-04"
+      ],
+      "deliverable": "Eine neue gesprochene Angabe und eine tatsächliche kontextgebundene Audioerklärung.",
+      "acceptance_criteria": [
+        "Aufnahme, Korrektur, Bestätigung und neue Berechnung sind verbunden.",
+        "Die Antwort erklärt eine konkret ausgewählte Grafikstelle.",
+        "Textbedienung funktioniert durchgängig auch nach Audiofehler."
+      ],
+      "target_milestone": "M5",
+      "workshop_features": [
+        "W09",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I05",
+        "I06",
+        "I10"
+      ]
+    },
+    {
+      "id": "LOG-01",
+      "owner": "Valentin",
+      "title": "Fachvertrag, GraphContext und Fortschrittsdaten",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [],
+      "deliverable": "Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.",
+      "acceptance_criteria": [
+        "Unbekannt, Schätzung, Bestätigung und Fachreview bleiben getrennt.",
+        "GraphContext enthält Run, Profil-/Szenarioversion, Person, Kennzahl und Periode.",
+        "Fortschritt basiert auf erledigten Pflichtgruppen, nicht auf Risikolücken."
+      ],
+      "target_milestone": "M0",
+      "workshop_features": [
+        "W04",
+        "W05",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I02",
+        "I03",
+        "I04",
+        "I07",
+        "I09",
+        "I10"
+      ]
+    },
+    {
+      "id": "LOG-02",
+      "owner": "Valentin",
+      "title": "Logismata-Baseline und Antwortnormalisierung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "LOG-01",
+        "AI-01"
+      ],
+      "deliverable": "Serverseitiger Adapter für geeignete Baseline-/Grenz-/Metadatenpfade.",
+      "acceptance_criteria": [
+        "Token nie im Client; passende Orte, Einheiten und benötigter Bedarf validiert.",
+        "Risiko-Code 0 bis zur Klärung reviewpflichtig; HTTP 200 ist nicht alleinige Freigabe.",
+        "Begrenzte Fehlerpfade und Replay nur bei passendem vollständigem Input-Hash."
+      ],
+      "target_milestone": "M1",
+      "workshop_features": [
+        "W05"
+      ],
+      "interface_contracts": [
+        "I03",
+        "I04"
+      ]
+    },
+    {
+      "id": "LOG-03",
+      "owner": "Valentin",
+      "title": "Budget und Kapitalzuordnung ohne Doppelzählung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "LOG-01",
+        "LOG-02"
+      ],
+      "deliverable": "Drei-Säulen-/Budgetausgabe mit Herkunft und verfügbarer Liquidität.",
+      "acceptance_criteria": [
+        "Brutto/Netto, Monate/Jahre und bereits enthaltene Steuern/Beiträge korrekt behandelt.",
+        "Bedarf unbekannt erzeugt keine falsche Null-Lücke.",
+        "Kapital wird nicht gleichzeitig vollständig mehreren Zielen zugeordnet."
+      ],
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W05"
+      ],
+      "interface_contracts": [
+        "I04",
+        "I09"
+      ]
+    },
+    {
+      "id": "LOG-04",
+      "owner": "Valentin",
+      "title": "Familien- und Pensionierungsphasen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "LOG-03"
+      ],
+      "deliverable": "Gespeicherte Szenarioänderungen mit berechenbaren Differenzen und Fachgrenzen.",
+      "acceptance_criteria": [
+        "Pensumswechsel aktualisiert bestätigte Cashflows; PK-Folge nicht pauschal proportional.",
+        "Erwerbsende, Rentenbeginn und Überbrückung getrennt.",
+        "Phasen und Kapitalerschöpfung sichtbar; nicht unterstützte Regeln bleiben offen."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W05"
+      ],
+      "interface_contracts": [
+        "I03",
+        "I04"
+      ]
+    },
+    {
+      "id": "LOG-05",
+      "owner": "Valentin",
+      "title": "Eigenheimvergleich und Reserven",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "LOG-03"
+      ],
+      "deliverable": "Beispiel-Eigenmittellücke und Auswirkungen auf andere Ziele.",
+      "acceptance_criteria": [
+        "Quoten/Zinsen sind sichtbare Annahmen, keine Kreditentscheidung.",
+        "Gebundene Vorsorgemittel werden nicht still als freie Mittel gerechnet.",
+        "Unfinanziertes Ziel und Reserveverzehr bleiben erkennbar."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W05"
+      ],
+      "interface_contracts": [
+        "I03",
+        "I04"
+      ]
+    },
+    {
+      "id": "LOG-06",
+      "owner": "Valentin",
+      "title": "Demo-Vertragsstatus und Regeln für Übergänge",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "LOG-03",
+        "AI-02",
+        "AI-05"
+      ],
+      "deliverable": "Fachliche State Machine vom Vorschlag bis zur Demo-Police auf gespeicherten Objekten.",
+      "acceptance_criteria": [
+        "Aktuelle Empfehlung/Offerte und erforderlicher Review sind Vorbedingungen.",
+        "Antrag, Annahme und Police getrennt; Einreichung idempotent.",
+        "Keine echte Signatur, Annahme oder Versicherungsdeckung behauptet."
+      ],
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W06"
+      ],
+      "interface_contracts": [
+        "I02",
+        "I08"
+      ]
+    },
+    {
+      "id": "LOG-07",
+      "owner": "Valentin",
+      "title": "Fachtests, Quellenreview und Domain-Klärung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "LOG-04",
+        "LOG-05",
+        "LOG-06"
+      ],
+      "deliverable": "Nachvollziehbare Domain-Invarianten und offene Pax-Fragen mit tatsächlichem Status.",
+      "acceptance_criteria": [
+        "Provider-/Muster-/vlot-Werte werden nicht ohne identische Annahmen gleichgesetzt.",
+        "Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.",
+        "Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich."
+      ],
+      "target_milestone": "M5",
+      "workshop_features": [
+        "W05",
+        "W06",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I03",
+        "I04",
+        "I08",
+        "I10"
+      ]
+    },
+    {
+      "id": "AI-01",
+      "owner": "Earnie",
+      "title": "KI-Backend-Grundlage, geschützter Zugang und Modellroute",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3.5,
+      "dependencies": [],
+      "deliverable": "Gemeinsames Backend-Grundgerüst mit Sitzung, minimiertem Kontext und echtem Modell-Smoke.",
+      "acceptance_criteria": [
+        "Fallbesitzer serverseitig geprüft; Provider-/Registry-Token getrennt und nicht im Client.",
+        "Zulässiger Modellaufruf und erlaubter Datenweg nachgewiesen.",
+        "Textfallback wird nicht als erfolgreicher Modellaufruf ausgegeben."
+      ],
+      "target_milestone": "M0",
+      "workshop_features": [
+        "W01",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I02",
+        "I05",
+        "I10"
+      ]
+    },
+    {
+      "id": "AI-02",
+      "owner": "Earnie",
+      "title": "Fallpersistenz, Versionierung und Werkzeuggrenzen",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 3,
       "dependencies": [
         "AI-01",
-        "CAL-01",
-        "QA-02"
+        "LOG-01"
       ],
-      "deliverable": "Kuratierter kleiner Katalog mit Gründen, Sperren und Alternativen.",
+      "deliverable": "Ein gespeicherter Fall mit gemeinsamen Versionen für alle Tabs/Kanäle.",
       "acceptance_criteria": [
-        "Maximal drei vertiefte Produktfamilien; Herkunft und Version je Regel.",
-        "Lücke bleibt bei Nichtempfehlung sichtbar und die Entscheidung ist erklärt.",
-        "Keine zusätzliche Versicherung und Datenbeschaffung sind gültige Ergebnisse."
+        "Bestätigte Daten unveränderlich versioniert; Reload und konkurrierende Änderungen behandelt.",
+        "AI-Toolargumente umgehen weder Rollen noch erlaubte Felder.",
+        "Veralteter Grafik-/Szenariokontext wird nicht mit aktuellen Zahlen gemischt.",
+        "Minimaler autorisierter AdvisorContext und Änderungsereignis aus dem bestätigten JSON-Fallstand."
       ],
-      "target_milestone": "G4"
+      "target_milestone": "M1",
+      "workshop_features": [
+        "W02",
+        "W03",
+        "W07"
+      ],
+      "interface_contracts": [
+        "I02",
+        "I03",
+        "I04",
+        "I10"
+      ]
+    },
+    {
+      "id": "AI-03",
+      "owner": "Earnie",
+      "title": "Zeitbudget, Rückfragen und bestätigbare Aufnahme",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "AI-02"
+      ],
+      "deliverable": "Adaptiver Gesprächsmodus mit schemafähigen Feldvorschlägen.",
+      "acceptance_criteria": [
+        "Opener fragt nach Zeit; Modus und spätere Änderung sind im Fall gespeichert.",
+        "Kurzmodus verkürzt Formulierung, nicht Bedarfserfassung oder Pflichtprüfung.",
+        "Neue Text-/Voice-Eingaben werden vorgeschlagen und bestätigt statt ungeprüft übernommen."
+      ],
+      "target_milestone": "M2",
+      "workshop_features": [
+        "W01",
+        "W09"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I02",
+        "I05"
+      ]
+    },
+    {
+      "id": "AI-04",
+      "owner": "Earnie",
+      "title": "Erklärung genau der ausgewählten Grafikstelle",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "AI-03",
+        "LOG-02"
+      ],
+      "deliverable": "Kontextgebundene Erklärungen und verständliche Info-Texte.",
+      "acceptance_criteria": [
+        "Run, Person, Kennzahl und Zeitfenster werden serverseitig geprüft.",
+        "Betrag/Periode und Erklärung stimmen mit der Auswahl überein; keine freien Prämien.",
+        "Keine behauptete psychologische Diagnose bei wiederholter Nachfrage."
+      ],
+      "target_milestone": "M3",
+      "workshop_features": [
+        "W07",
+        "W03"
+      ],
+      "interface_contracts": [
+        "I04",
+        "I05",
+        "I07",
+        "I10"
+      ]
+    },
+    {
+      "id": "AI-05",
+      "owner": "Earnie",
+      "title": "Handlungsoptionen und belegte Produktfakten",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "AI-03",
+        "LOG-03"
+      ],
+      "deliverable": "Kleine regelbasierte Auswahl mit menschlichem Prüfpfad.",
+      "acceptance_criteria": [
+        "Produktfläche erst nach Bedarf, Tragbarkeit und Datenreife freigeben.",
+        "Persönliche Angemessenheit nicht aus Haushaltsvermögen ableiten.",
+        "Alternative ohne neues Produkt sowie offene Mindest-/Produktregeln erläutern."
+      ],
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W02",
+        "W06"
+      ],
+      "interface_contracts": [
+        "I04",
+        "I05"
+      ]
     },
     {
       "id": "AI-06",
-      "owner": "Person 3",
-      "title": "Angemessenheitsvorprüfung und menschliche Übergabe",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "AI-05",
-        "APP-03"
-      ],
-      "deliverable": "Gespeicherte Prüfgründe und Übergabeansicht auf den passenden Fallversionen.",
-      "acceptance_criteria": [
-        "Persönliche Tragbarkeit wird nicht aus gemeinsamem Vermögen abgeleitet.",
-        "Unbekannte oder nicht freigegebene Fachregeln blockieren die betroffene Verbindlichkeit.",
-        "AI kann eine erforderliche menschliche Prüfung nicht selbst erledigen."
-      ],
-      "target_milestone": "G4"
-    },
-    {
-      "id": "AI-07",
-      "owner": "Person 3",
-      "title": "AI-Evaluation und Missbrauchsfälle",
+      "owner": "Earnie",
+      "title": "SummaryBundle für Kunde und Fachperson",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
         "AI-02",
         "AI-04",
-        "AI-05",
-        "AI-06"
-      ],
-      "deliverable": "Dokumentierte positive und negative AI-Fälle.",
-      "acceptance_criteria": [
-        "Prompt-Injection fordert weder Tokens noch fremde Fälle erfolgreich an.",
-        "Produktwunsch am Anfang erzeugt keine voreilige persönliche Empfehlung.",
-        "Zahlenbindung, Kontextminimierung und Fallbackverhalten sind geprüft."
-      ],
-      "target_milestone": "G5"
-    },
-    {
-      "id": "APP-01",
-      "owner": "Person 4",
-      "title": "Workspace, API-Grundgerüst und isolierte Demo-Sitzung",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2.5,
-      "dependencies": [],
-      "deliverable": "Gemeinsamer startfähiger TypeScript-Workspace mit Angular-/NestJS-Grenze.",
-      "acceptance_criteria": [
-        "Eine definierte Toolchain; nur Umgebungsvariablen-Referenzen statt echter Schlüssel.",
-        "Eigene Sitzung und Fallzuordnung vorhanden; kein global geteilter Fall.",
-        "Frontend erreicht geschützte API und Statusfehler werden verständlich zurückgegeben."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "APP-02",
-      "owner": "Person 4",
-      "title": "Persistenz, unveränderliche Versionen und Seed",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2.5,
-      "dependencies": [
-        "APP-01",
-        "CAL-01"
-      ],
-      "deliverable": "Datenbankmigration, synthetischer Seed und bestätigte Fallversionen.",
-      "acceptance_criteria": [
-        "Reload stellt den richtigen Fall wieder her.",
-        "Bestätigte Profil-/Szenarioversionen werden nicht in-place umgeschrieben.",
-        "Konkurrierende Änderungen an veralteter Version werden erkannt."
-      ],
-      "target_milestone": "G1"
-    },
-    {
-      "id": "APP-03",
-      "owner": "Person 4",
-      "title": "Case-/Calculation-/Review-Verträge integrieren",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "APP-02",
-        "CAL-01"
-      ],
-      "deliverable": "Berechtigte Endpunkte mit Validierung und gemeinsamer Fehlerhülle.",
-      "acceptance_criteria": [
-        "Modell- und UI-Aufträge durchlaufen dieselben Fall-/Fachprüfungen.",
-        "Passender Input-Hash und Ergebnisversion werden gespeichert.",
-        "Teilweise Ergebnisse und offene Reviewgründe sind abrufbar."
-      ],
-      "target_milestone": "G2"
-    },
-    {
-      "id": "APP-04",
-      "owner": "Person 4",
-      "title": "Demo-Offerte, Antrag und Statusmaschine",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "APP-02",
         "AI-05"
       ],
-      "deliverable": "Persistenter Demo-Vertragsprozess mit Idempotenz und Vorbedingungen.",
+      "deliverable": "Zwei lesbare Sichten desselben Dossiers mit Prüfstatus und offenen Fragen.",
       "acceptance_criteria": [
-        "Offerte ist eindeutig Demo und verwendet keine still übernommene Musterprämie.",
-        "Doppelte Einreichung erzeugt keinen zweiten Antrag.",
-        "Veraltete Daten, offene Pflichtprüfung und fehlende Rolle verhindern unzulässige Übergänge."
+        "Ein Snapshot/Versionssatz für beide Sichten; kein zweites Rechenmodell für Exporte.",
+        "Fachpersonensicht ergänzt nachvollziehbare Quellen/Prüfaufträge, keine Schlüssel.",
+        "Export und Übergabevorbereitung senden keine Nachricht und buchen keinen Termin."
       ],
-      "target_milestone": "G4"
+      "target_milestone": "M4",
+      "workshop_features": [
+        "W06"
+      ],
+      "interface_contracts": [
+        "I08"
+      ]
     },
     {
-      "id": "APP-05",
-      "owner": "Person 4",
-      "title": "Demo-Portal, Police und gemeinsames Dossier",
+      "id": "AI-07",
+      "owner": "Earnie",
+      "title": "AI-/Sicherheitsprüfung und startfähige Übergabe",
       "priority": "P0",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
-        "APP-04"
+        "AI-06",
+        "LOG-06"
       ],
-      "deliverable": "Wiederaufnehmbarer Portalstand mit HTML-/JSON-Dossier.",
+      "deliverable": "Geprüfte Modell-/Toolgrenzen, Zugriffsschutz und dokumentierter Start.",
       "acceptance_criteria": [
-        "Demo-Police erst nach passender protokollierter Demo-Annahme.",
-        "Dossier und UI teilen Werte, Versionen und Prüfstatus.",
-        "Dokumentdownload ist fallbezogen geschützt."
+        "Fremde Case-ID, Prompt Injection, sensible Logs und Secret-/Bundle-Leaks geprüft.",
+        "Benötigte Transport-/Speicherverschlüsselung tatsächlich nachgewiesen; keine Compliance-Pauschalbehauptung.",
+        "Echter Modelltest, Reviewrollen und Versionskonsistenz gemeinsam abgenommen."
       ],
-      "target_milestone": "G4"
+      "target_milestone": "M5",
+      "workshop_features": [
+        "W06",
+        "W07",
+        "W09"
+      ],
+      "interface_contracts": [
+        "I01",
+        "I02",
+        "I05",
+        "I08",
+        "I10"
+      ]
     },
     {
-      "id": "APP-06",
-      "owner": "Person 4",
-      "title": "Sicherheits- und Auditschutz nachweisen",
-      "priority": "P0",
+      "id": "AV-07",
+      "owner": "Lukas",
+      "title": "Optionalen Video-Avatar ergänzen",
+      "priority": "P1",
       "status": "planned",
-      "estimate_person_hours": 2.5,
+      "estimate_person_hours": 4,
       "dependencies": [
-        "APP-01",
-        "APP-02"
+        "AV-06",
+        "VOICE-07",
+        "UI-07"
       ],
-      "deliverable": "Sitzungs-/Rollenprüfung, Verschlüsselungsnachweis, Redaction und Ereignisverlauf.",
+      "deliverable": "Freigegebener Video-Renderer hinter unverändertem Agentvertrag.",
       "acceptance_criteria": [
-        "Kein fremder Fall oder fremder Export über manipulierte IDs erreichbar.",
-        "Keine realen Tokens im Bundle/Git/Export; notwendige Verschlüsselung tatsächlich eingerichtet.",
-        "Auditereignisse dokumentieren Statusversionen ohne vertrauliche Rohpayloads."
+        "Explizites Nice-to-have; P0 weder davon noch vom Videodienst abhängig.",
+        "Kein Kamera-Zwang, keine ungeklärte Audio-/Datenweitergabe.",
+        "Ausfall fällt auf einfache Agentdarstellung mit korrektem Status zurück."
       ],
-      "target_milestone": "G5"
+      "target_milestone": "OPTIONAL",
+      "workshop_features": [
+        "W08"
+      ],
+      "interface_contracts": [
+        "I06"
+      ]
     },
     {
-      "id": "APP-07",
-      "owner": "Person 4",
-      "title": "Reproduzierbaren Start und Demo-Konfiguration übergeben",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 1,
-      "dependencies": [
-        "APP-05",
-        "APP-06"
-      ],
-      "deliverable": "Geprüfte lokale Start-/Migrations-/Seed-Schritte und Betriebsmodi.",
-      "acceptance_criteria": [
-        "Sauberer Start ohne manuell versteckte Datenbankkorrektur.",
-        "Live-/Replay-/Fallback- und Demo-Sales-Modi unterscheiden sich sichtbar.",
-        "Keine neue Cloudbereitstellung oder Providerberechtigung still vorausgesetzt."
-      ],
-      "target_milestone": "G6"
-    },
-    {
-      "id": "QA-01",
-      "owner": "Person 5",
-      "title": "Scope, Fixture und Abnahmekriterien festlegen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [],
-      "deliverable": "Eine vollständige synthetische Hauptfixture und geordnete Quellenklassen.",
-      "acceptance_criteria": [
-        "Öffentliche Testfamilie, Müller-Quelle und Musteranalysen getrennt.",
-        "Zusätzliche Ziele/Budgetwerte als eigene synthetische Schicht.",
-        "Owner und P0-Nachweise von allen fünf Personen verstanden."
-      ],
-      "target_milestone": "G0"
-    },
-    {
-      "id": "QA-02",
-      "owner": "Person 5",
-      "title": "Produkt- und Fachquellen für den kleinen Katalog aufbereiten",
-      "priority": "P0",
+      "id": "UI-08",
+      "owner": "Luca",
+      "title": "Follow-up-/Overview-Ansicht ergänzen",
+      "priority": "P1",
       "status": "planned",
       "estimate_person_hours": 2,
       "dependencies": [
-        "QA-01"
+        "UI-07",
+        "AI-06"
       ],
-      "deliverable": "Kuratiertes Faktenpaket mit Dokument-/Abschnittsbezug und offenen Versionsfragen.",
+      "deliverable": "Übersicht offener Schritte und wiederaufnehmbarer Fall nach der Beratung.",
       "acceptance_criteria": [
-        "Garantie, Projektion, Kosten, Rückkauf und Deckungsursachen getrennt.",
-        "Keine Behauptung vollständiger Prüfung aller archivierten PDFs/Videos.",
-        "Nur nachvollziehbare Fakten gehen an AI-/Produktregeln."
+        "Vom notwendigen P0-Portalstatus und Summary-Export unterschieden.",
+        "Geplante Folgeaktionen werden nicht automatisch an Dritte versendet.",
+        "Kein angeblich beschlossener Kanal oder Versandtermin aus dem eingeklammerten Boardpunkt abgeleitet."
       ],
-      "target_milestone": "G2"
+      "target_milestone": "OPTIONAL",
+      "workshop_features": [
+        "W10"
+      ],
+      "interface_contracts": [
+        "I02",
+        "I08"
+      ]
     },
     {
-      "id": "QA-03",
-      "owner": "Person 5",
-      "title": "Frühe Pax-Abstimmung und Entscheidungslog",
-      "priority": "P0",
+      "id": "UI-09",
+      "owner": "Luca",
+      "title": "Optionalen Dark Mode prüfen",
+      "priority": "P2",
       "status": "planned",
       "estimate_person_hours": 1.5,
       "dependencies": [
-        "QA-01"
+        "UI-07"
       ],
-      "deliverable": "Priorisierte Klärung von Integrations-, Modell-, Paket- und Fachblockern.",
+      "deliverable": "Darstellungsvariante nur bei freier Zeit und bestätigter Priorisierung.",
       "acceptance_criteria": [
-        "Tatsächliche Expertenantwort oder weiterhin offener Punkt wird korrekt dokumentiert.",
-        "Demo-Sales-Umfang und Risiko-Code haben nachvollziehbare Entscheidungen.",
-        "Keine Nachricht oder Terminbuchung ohne entsprechenden Auftrag versendet."
+        "Mondsymbol ist eine Interpretation der Skizze, keine bestätigte Pflichtfunktion.",
+        "Kontrast und Grafikfarben bleiben verständlich.",
+        "Kein Kernvergleich oder Audio-/Exportfehler wird dafür zurückgestellt."
       ],
-      "target_milestone": "G3"
-    },
-    {
-      "id": "QA-04",
-      "owner": "Person 5",
-      "title": "Abnahmedatensätze und Testdurchlauf vorbereiten",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2.5,
-      "dependencies": [
-        "QA-01",
-        "CAL-01"
+      "target_milestone": "OPTIONAL",
+      "workshop_features": [
+        "W11"
       ],
-      "deliverable": "Grenzfälle, geeignete Browserpfade und messbare Abnahmecheckliste.",
-      "acceptance_criteria": [
-        "Fachliche Annahmen und technische Beispiele werden nicht gleichgesetzt.",
-        "Unbekannt, Negativbudget, Kapitaldoppelverwendung und veraltete Version enthalten.",
-        "Ein kompletter Journey-Pfad und sinnvolle negative Pfade sind vorbereitet."
-      ],
-      "target_milestone": "G2"
-    },
-    {
-      "id": "QA-05",
-      "owner": "Person 5",
-      "title": "Gemeinsamen Gesamtfluss und drei Szenarien abnehmen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 3,
-      "dependencies": [
-        "UX-04",
-        "UX-05",
-        "CAL-08",
-        "AI-07",
-        "APP-05"
-      ],
-      "deliverable": "Dokumentierter integrierter Testlauf auf einer frischen Sitzung.",
-      "acceptance_criteria": [
-        "Drei Pflichtszenarien und echter AI-Aufruf im selben Fall.",
-        "Empfehlung, Dossier und Journey verwenden aktuelle Daten.",
-        "Alle offenen Kernpunkte stehen sichtbar im Freigabestand."
-      ],
-      "target_milestone": "G5"
-    },
-    {
-      "id": "QA-06",
-      "owner": "Person 5",
-      "title": "Pitch, Demoablauf und Übergabeunterlagen",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "QA-05",
-        "APP-07"
-      ],
-      "deliverable": "Wiederholbarer Drei-Minuten-Durchlauf mit ehrlichem Backup.",
-      "acceptance_criteria": [
-        "Zusätzlicher Nutzen gegenüber öffentlicher Pax/vlot-Analyse klar.",
-        "Eine neue Änderung wird wirklich verarbeitet und berechnet.",
-        "Keine echte Versicherungsdeckung oder vollständige Compliance behauptet."
-      ],
-      "target_milestone": "G6"
-    },
-    {
-      "id": "QA-07",
-      "owner": "Person 5",
-      "title": "Negative Sicherheits- und Datenschutzprüfung",
-      "priority": "P0",
-      "status": "planned",
-      "estimate_person_hours": 2,
-      "dependencies": [
-        "APP-06",
-        "AI-07"
-      ],
-      "deliverable": "Unabhängiger Gegencheck von Rollen, Export und Datenwegen.",
-      "acceptance_criteria": [
-        "Zweiter Browser kann ersten Fall nicht lesen, ändern oder exportieren.",
-        "Modell-/Log-Kontext und Bundle enthalten keine unnötigen Daten oder Schlüssel.",
-        "Sicherheitsfehler werden vor P1-Gestaltung priorisiert."
-      ],
-      "target_milestone": "G5"
+      "interface_contracts": []
     }
-  ]
+  ],
+  "interface_spec": "documentation/baselhack/catalog/interface-contracts.json",
+  "planned_acceptance_cases": 55
 }
