@@ -1,0 +1,49 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+				107 container
+					108 container savings-page-vt
+						109 heading Bankkonten und Vermögen, Value: 1
+							110 text Bankkonten und Vermögen
+						111 button Description: Beratung, ID: open-savings-help-dialog
+						112 text Haben Sie Ersparnisse fürs Alter?
+						113 button Ja, ID: savings-Target-yes-vt
+						114 button Nein, ID: savings-Target-no-vt
+						115 button Ich weiss es nicht, ID: savings-Target-dunno-vt
+						116 button QR-Code scannen, ID: savings-qr-scan-button-cu
+						117 container
+							118 combo box (collapsed, settable) Kontotyp auswählen, Value: 3a Sparen, ID: savings-item-variant-select-input-Target, Secondary Actions: Expand
+							119 text Kontotyp auswählen
+						120 container
+							121 text field (settable) Name, Value: TEST 3a Sparkonto, ID: savings-item-name-input-input-Target
+							122 text Name
+						123 text Freie Bezeichnung für Übersicht und Zuordnung.
+						133 container
+							134 text field (settable) CHF Jährliche Ersparnisse Jährlich zulässige 3a-Beträge sollten zwischen CHF 0 und CHF 7’258 liegen., Value: 99’999, ID: flux-annual-p3a-cu-default
+							135 text CHF Jährliche Ersparnisse Jährlich zulässige 3a-Beträge sollten zwischen CHF 0 und CHF 7’258 liegen.
+						136 container
+							137 text field (settable) CHF Gesamtersparnisse, Value: 20’000, ID: savings-item-total-input-Target
+							138 text CHF Gesamtersparnisse
+						124 button (disabled) Hinzufügen, ID: save-new-savings-item-button-Target
+						125 text Hat TEST Tom Ersparnisse fürs Alter?
+						126 button Ja, ID: savings-Partner-yes-vt
+						127 button Nein, ID: savings-Partner-no-vt
+						128 button Ich weiss es nicht, ID: savings-Partner-dunno-vt
+						129 text Haben Sie gemeinsame Ersparnisse fürs Alter?
+						130 button Ja, ID: savings-Both-yes-vt
+						131 button Nein, ID: savings-Both-no-vt
+						132 button Ich weiss es nicht, ID: savings-Both-dunno-vt
+				104 container
+					105 button Zurück, ID: back-button-vt
+					106 button (disabled) Weiter, ID: next-button-vt
+
+The focused UI element is 137 text field (settable) CHF Gesamtersparnisse, Value: 20’000, ID: savings-item-total-input-Target

@@ -107,3 +107,7 @@ Das sind Zeitpunkte im gemeinsamen Arbeitsfenster, nicht 48 Stunden Aufwand pro 
 ## Was bei Zeitknappheit bleibt
 
 Erhalten bleiben alle drei Szenarien, das vollständige finanzielle Bild und der gespeicherte Ablauf bis zur Demo-Police. Zuerst Anzahl zusätzlicher Produkte, Avatar, Voice und Gestaltungsdetails reduzieren. Niemand beginnt einen zusätzlichen Spezialfall, solange der gemeinsame Hauptfall noch nicht vollständig durchläuft.
+
+## Ergänzung aus dem öffentlichen Referenztest
+
+Der [Testbericht zur aktuellen Pax/vlot-Analyse](../reports/public-pension-analysis.md) gehört zur gemeinsamen Vorbereitung. Die öffentliche Lösung bietet bereits Familienprofil, Säulen-/Steuerbetrachtung und PDF-Export. Person 1 zeigt den zusätzlichen Szenariovergleich, Person 2 versioniert Rechenannahmen, Person 3 hält Ergebnis und Empfehlung konsistent, Person 4 führt den Fall bis zur Demo-Police fort, Person 5 klärt die beobachtete Risikolücken-Abweichung und den PDF-Entwurfsstatus mit Pax. Die synthetische Testauswertung ist kein bestätigter fachlicher Sollwert für Logismata.

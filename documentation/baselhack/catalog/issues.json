@@ -1,6 +1,10 @@
 {
   "resolved": [
     {
+      "item": "Öffentliche Vorsorgeanalyse",
+      "resolution": "Synthetic family flow completed; original 17-page draft PDF downloaded"
+    },
+    {
       "item": "FondsStar-Flyer",
       "resolution": "PDF downloaded and validated"
     },
@@ -18,6 +22,14 @@
     }
   ],
   "open": [
+    {
+      "item": "Öffentliche Analyse: Risikolücken",
+      "detail": "Risk overview shows monthly gaps CHF 210/40; solutions show no gap and CHF 0 annual protection. Also present in PDF pages 3/4/11/12. No root cause established."
+    },
+    {
+      "item": "Öffentliche Analyse: PDF-Status",
+      "detail": "Successfully finalized 17-page PDF is marked Entwurf / Unvollständige Eingaben. Missing partner certificate and BVG estimate were disclosed; causal link not proven."
+    },
     {
       "item": "Risiko-ErrorCode",
       "detail": "Risk examples return 0; Swagger declares 1 as OK. Domain clarification remains necessary."

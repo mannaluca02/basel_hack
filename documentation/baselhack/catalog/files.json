@@ -265,6 +265,111 @@
     "sha256": "ddff78a5234f60d4a5ebc54f1a1ae826bf1bf0a916aad1a8d285ced7d50b46a1"
   },
   {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/00-intro.png",
+    "bytes": 88479,
+    "sha256": "5b07620655e19b9a4a868b2e4384e4cc41bd0f6407ec4b80ff3c60e8499acd8a"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/02-future-birth-year-invalid.png",
+    "bytes": 43505,
+    "sha256": "934fa2e073f035b6b5b4069ee377fa4cb5cba7f0cb159f72046a775924a3aaf4"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/03-customer-profile.png",
+    "bytes": 52811,
+    "sha256": "e968a45d636bd94af97620ff918fe3f3b0088447f3b58ce19ad91fd25b11cfc8"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/04-children.png",
+    "bytes": 46060,
+    "sha256": "c55514b6ab84684501326dff3b7e474a14eed13a911e17edad39030f363c0d8e"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/05-customer-income.png",
+    "bytes": 53438,
+    "sha256": "775a624bb4905ec0e7a46f9be728c60240cbe4b209630b0a357ced1b55800b40"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/06-partner-income.png",
+    "bytes": 53542,
+    "sha256": "fe92ae16fc6f5fb9169273b207635cbf32ee570321ca766acce67b6251cf5427"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/07-pension-fund-manual.png",
+    "bytes": 62570,
+    "sha256": "c8a062f182e399eac2b7178efb3a10c806b608cedc98e56bb01dda65f85e5203"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/08-pension-fund-estimate.png",
+    "bytes": 73280,
+    "sha256": "59b0c939879f04f7384e43366f0a634840de6b2961bf91a6cf043f0e57a90ed7"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/09-3a-limit-invalid.png",
+    "bytes": 52275,
+    "sha256": "29d273a350b8d412533443934596f145917521c71f91fef23d0d24004d6a2ce1"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/10-savings-3a.png",
+    "bytes": 54256,
+    "sha256": "2ff26c765cfc5584298bb2fd312a75571289ae4c15b7301115f7811a5d8d79d5"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/11-housing-rent.png",
+    "bytes": 35794,
+    "sha256": "e639391016bbca8fff1d034333002f057f6b1dad16daadee3be715d3988de25a"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/12-results-overview.png",
+    "bytes": 72318,
+    "sha256": "9325bf5b5313d1d3fbd0892b89cdfaa3b3be72cdf950c70eca60f7737288f260"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/13-results-family.png",
+    "bytes": 64975,
+    "sha256": "985b9a400cc36a9f57cc4c1104a6bfdc3fb537a04c8f0606ba597d772e767c8c"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/14-results-disability-details.png",
+    "bytes": 63569,
+    "sha256": "a8d417e67ff1d5b2a05fc3e361ef096bdeca5fe943256da411e3786de47e870d"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/15-results-retirement.png",
+    "bytes": 74776,
+    "sha256": "d126811597e3e163953513a081db5cc587b1274f3272cad4b09e1fece6ed4de2"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/16-results-taxes.png",
+    "bytes": 48372,
+    "sha256": "b31b3195914c51b9370aa138bcdb83eb9310a79e5eedefe608f4096351a5ccce"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/17-results-solutions.png",
+    "bytes": 89764,
+    "sha256": "768b1cb9718a055b121e11aa8341cacbd2583c1951e04fd70f13cd9c4c9ec3b8"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/18-risk-solution-discrepancy.png",
+    "bytes": 41648,
+    "sha256": "74539285077df005e5f2e210caa5235bd737b7b17c6d897c25c7bd8d1825bb3d"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/20-finalize-pdf-notice.png",
+    "bytes": 78368,
+    "sha256": "d773dbc08f651dd5fff33f77604aab2d422c87888f96dc38968c5cf1b54b9a02"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/21-analysis-finalized.png",
+    "bytes": 81847,
+    "sha256": "c57fd79c54e8a4498de82ba5757dc1b12c68c045374d4be1be70f858fa3db47f"
+  },
+  {
+    "path": "documentation/baselhack/evidence/screenshots/public-pension-analysis/22-pax-result-download.png",
+    "bytes": 93771,
+    "sha256": "a2c0570b7810e0fa7c26169013020836551578040c9b69df27016e4f2ef3655c"
+  },
+  {
     "path": "documentation/baselhack/references/api/examples/3a-limiten.json",
     "bytes": 438,
     "sha256": "90a022b362af283c319fed50ac16e8c53211eba66c6ae1b513ac33a368916ebe"
@@ -640,6 +745,141 @@
     "sha256": "f37f9f01583256e411d1f22664418b70f59f9b2a54d5d69a540a4e17872f28bc"
   },
   {
+    "path": "documentation/baselhack/references/public-pension-analysis/inputs/fictitious-family.json",
+    "bytes": 2200,
+    "sha256": "1b304ac4020650484f7c9b4c68226459a6d043040ea2ee61d72fbd5af56e5957"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/legal/privacy-de.pdf",
+    "bytes": 148533,
+    "sha256": "0b6b55af5f7b6fe4907e5e43aeadd33745808bb64eb96b48385cc4033a170e2b"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/legal/terms-de.pdf",
+    "bytes": 98327,
+    "sha256": "66c5b9cc0ba5db3b7f86d35bd4470332717881ee21deac064fc2b0084f461b27"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/reports/analysis-fictitious-family.pdf",
+    "bytes": 2414875,
+    "sha256": "1a59fdf1cf509ac88f38073560f01e75012591dc3d2f60bbde17ee24237727fa"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/00-intro.txt",
+    "bytes": 2136,
+    "sha256": "1fd3e1226fbb82212778fec583bfd8890724e57fc58a506118b7786d04bee096"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/01-situation-required.txt",
+    "bytes": 1624,
+    "sha256": "2574513991f44e8a694a386521032927eb321a8be47c82405c534e1dd56d3188"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/02-future-birth-year-invalid.txt",
+    "bytes": 3297,
+    "sha256": "2a6b8da1f24e506fb1af23e93e9e2162fdf80153820aea9d9d93faaaf9ed27be"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/03-customer-profile.txt",
+    "bytes": 2599,
+    "sha256": "aeba8606f37e5d9c95453612e86d2cdbfa539523663ce99595bf5fc98c59dd20"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/04-children.txt",
+    "bytes": 3507,
+    "sha256": "de7d6e1072e600cb2eea3d7df7e88e42b2aae123b711c95c1cc16ea5c720eb20"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/05-customer-income.txt",
+    "bytes": 2346,
+    "sha256": "4d7f67544c9688c1ceb412985d8c0ce7680453e6eca144b6d33157a89a8d1663"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/06-partner-income.txt",
+    "bytes": 2340,
+    "sha256": "dd917eee1cba545ecfa4d51123885035ddf23f51c169c7d3451a49fecf7f7947"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/07-pension-fund-manual.txt",
+    "bytes": 3965,
+    "sha256": "540d02c42d7bc03ab29d48ba7dc86b428eb4e29560b65d7bd84205c862c84c06"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/08-pension-fund-estimate.txt",
+    "bytes": 2049,
+    "sha256": "8ee3c190700fe2f3707d60fa045a12d49c1c158dcea2128e3d009ae5063b6e4e"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/09-3a-limit-invalid.txt",
+    "bytes": 2995,
+    "sha256": "8d0324f2f6a2c53910eaaccbdcd66eb3019cd4419f56594c340322172ecae074"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/10-savings-3a.txt",
+    "bytes": 2324,
+    "sha256": "a593ab7d740f7c0cabde3484592dbdda41f1301e794a831231b4fff841811644"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/11-housing-rent.txt",
+    "bytes": 1715,
+    "sha256": "36bbe32f220e6bb0ffe0334d4e54636aca23deb60de0e19c58ea343b750859c6"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/12-results-overview.txt",
+    "bytes": 3365,
+    "sha256": "79d4bc4d69923620df14724a452e285ebe63b840f92637940026f63870252b66"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/13-results-family.txt",
+    "bytes": 2535,
+    "sha256": "e398a9d0c850d3a43feeda7d1ef21d644b7961797db5549f06ae422d8ff49048"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/14-results-disability-details.txt",
+    "bytes": 3222,
+    "sha256": "6d756b53816526bb1b5d73d5540446fd61717f5cd26bc95cdf4681c5c9857b41"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/15-results-retirement.txt",
+    "bytes": 4384,
+    "sha256": "1c095bc742e244bc1b0d98205ec7f06d40faff144144e71fafd89dccc35e9549"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/16-results-taxes.txt",
+    "bytes": 1918,
+    "sha256": "75efb96df1f809946abb9d7fbf826e505d04df36291049e0c7a4c0caa104fdee"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/17-results-solutions.txt",
+    "bytes": 3326,
+    "sha256": "444ae18fa75a37df983145b09ac6923d187c541fee1987d2ca0a97f69d9711be"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/18-risk-solution-discrepancy.txt",
+    "bytes": 4356,
+    "sha256": "4fb2777b27b7268f7e5d90c3012897be42b6d555387324c82750643a0462bbb1"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/19-navigation-version.txt",
+    "bytes": 4386,
+    "sha256": "3a14c8bd7834e3548206410783200ee18cc46755a3697303b09179c363b9d846"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/20-finalize-pdf-notice.txt",
+    "bytes": 3786,
+    "sha256": "ad1422a877996f8e623f413439f49278358950f50bbd2e53459e837f8f24a6c6"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/21-analysis-finalized.txt",
+    "bytes": 1598,
+    "sha256": "001c3909935d7e8cadeb19fe0906e3372790ed0c7f7625a34e6cc013d0dc1707"
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/snapshots/22-pax-result-download.txt",
+    "bytes": 14741,
+    "sha256": "a50bc60adcf573221186154a77db7be3e0d5d098206883747cd057530f4cfb84"
+  },
+  {
     "path": "documentation/baselhack/references/videos/transcripts/pension/death-and-disability-protection--MrXkbWJz5-Y.de-orig.vtt",
     "bytes": 12286,
     "sha256": "f62d4938e57ad7f23280fda8b23b7e1717f30d97dfc4c07887c2bcc0dd4572e4"
@@ -938,6 +1178,16 @@
     "path": "documentation/baselhack/references/web/pax/services/portale-und-login.txt",
     "bytes": 9572,
     "sha256": "8dae348a90d171efc406f0f6b8ccd323bc49cba5928c70dad6363fd0909a2f49"
+  },
+  {
+    "path": "documentation/baselhack/references/web/pax/services/public-pension-analysis-result.txt",
+    "bytes": 14741,
+    "sha256": "a50bc60adcf573221186154a77db7be3e0d5d098206883747cd057530f4cfb84"
+  },
+  {
+    "path": "documentation/baselhack/references/web/pax/services/public-pension-analysis.txt",
+    "bytes": 2136,
+    "sha256": "1fd3e1226fbb82212778fec583bfd8890724e57fc58a506118b7786d04bee096"
   },
   {
     "path": "documentation/baselhack/references/web/pax/services/quicksale-product-overview.txt",

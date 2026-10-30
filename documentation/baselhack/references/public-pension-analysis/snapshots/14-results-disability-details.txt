@@ -1,0 +1,63 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+					67 container nova-tabs
+						74 button Übersicht, ID: nova-tab-overview
+						75 container
+							76 button Familienvorsorge, ID: nova-tab-risk
+						71 button Pensionierung, ID: nova-tab-retirement
+						72 button Steuern, ID: nova-tab-taxes
+						73 button Lösung, ID: nova-tab-solutions
+				77 container nova-page-risk-details-cu-Disability
+					78 container
+						79 heading Was geschieht, wenn TEST Nina erwerbsunfähig wird?, Value: 1
+							80 text Was geschieht, wenn TEST Nina erwerbsunfähig wird?
+						81 text Die potenzielle Lücke zwischen den aktuellen Leistungen für die Familie von TEST Nina und dem... 
+						82 link Description: Mehr anzeigen, Value: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID#
+					83 container std-of-living-summary-cu
+						84 container
+							85 heading Das ist Ihre Situation im November 2028, Value: 2, ID: nova-details-table-date-title-2028-11
+								86 text Das ist Ihre Situation im November 2028
+							87 button Description: Was bedeuten diese Zahlen?, ID: std-of-living-summary-information-button
+							88 text Das Ziel-Einkommen kann verändert werden, um Ihren Bedürfnissen zu entsprechen.
+						89 container
+							90 text CHF 7’322 Aktuelle Leistungen
+						91 container
+							92 image
+							93 text CHF 210 Monatliche Lücke
+						94 button Lücke schliessen, ID: std-of-living-summary-cover-gap-button
+							95 text Lücke schliessen
+					96 container
+						97 text CHF 210 Lücke
+					98 container nova-details-table-Customer-Compact
+						99 text Vorname
+						100 text TEST Nina
+						101 text Alter
+						102 text 37
+						103 container
+							104 container 1. Säule - IV Reduziert aufgrund von Fehljahren, ID: end-user-details-table-Pillar1
+								105 text 1. Säule - IV
+								106 text Reduziert aufgrund von Fehljahren
+							107 text 1. Säule
+						108 text 3’822
+						109 container
+							110 container 2. Säule - Pensionskasse, ID: end-user-details-table-Pillar2
+								111 text 2. Säule - Pensionskasse
+							112 text 2. Säule
+						113 text 3’500
+						114 text Subtotal
+						115 text 7’322
+						116 text Lücke
+						117 text 210
+				118 button Description: Zurück, ID: back-button-vt
+
+The focused UI element is 60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID

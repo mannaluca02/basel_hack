@@ -1,0 +1,29 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+				107 container
+					108 container partner-pension-fund-page-vt
+						109 heading Pensionskasse für TEST Tom, Value: 1
+							110 text Pensionskasse für TEST Tom
+						111 text Die Pensionskassenleistungen haben bei Krankheit, Invalidität oder Tod eine wichtige Absicherungsfunktion und sind für die Analyse zentral.
+						112 text Haben Sie den Vorsorgeausweis von TEST Tom verfügbar?
+						113 button Verfügbar, ID: has-pension-fund-details-Partner-yes
+						114 button Nicht verfügbar, ID: has-pension-fund-details-Partner-no
+						115 text Sollen durchschnittliche Pensionskassenleistungen oder die gesetzlichen Minimalleistungen nach BVG für die Analyse verwendet werden?
+						116 text Durch die Verwendung von BVG-Minimalleistungen sowie CH-Durchschnittswerten reduziert sich die Genauigkeit der Analyse. Falls möglich empfehlen wir die Angabe der exakten Werte vom PK-Ausweis.
+						117 button CH-Durchschnittswerte, ID: pension-fund-Partner-avg
+						118 button Minimalleistungen, ID: pension-fund-Partner-bvg
+				104 container
+					105 button Zurück, ID: back-button-vt
+					106 button Weiter, ID: next-button-vt
+
+The focused UI element is 118 button Minimalleistungen, ID: pension-fund-Partner-bvg

@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+from urllib.parse import urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
@@ -57,8 +58,11 @@ for row in pdfs:
         suffix = relative.relative_to('documentation/baselhack/references')
     extracted = ROOT / 'generated/extracted-text' / suffix.with_suffix('.txt')
     extracted.parent.mkdir(parents=True, exist_ok=True)
-    extracted.write_text('\n\n'.join(f'===== SEITE {i+1} =====\n' + (page.extract_text() or '')
-                                    for i, page in enumerate(reader.pages)))
+    extracted_text = '\n\n'.join(f'===== SEITE {i+1} =====\n' + (page.extract_text() or '')
+                                  for i, page in enumerate(reader.pages))
+    if row.get('document_type') == 'synthetic_analysis_report':
+        extracted_text = re.sub(r'(AnalysisId:\s*)\S+', r'\1[REDACTED_SESSION_REFERENCE]', extracted_text)
+    extracted.write_text(extracted_text)
     row.update({'pages': len(reader.pages), 'bytes': len(data), 'sha256': checksum,
                 'text_path': extracted.relative_to(REPO).as_posix(),
                 'technical_validation': 'pdf_parsed_and_text_extracted',
@@ -71,7 +75,11 @@ for path in sorted((ROOT / 'references/web').rglob('*.txt')):
     assert not re.search(r'eyJ[\w-]+\.[\w-]+\.[\w-]+', text), path.name
     match = re.search(r'URL: "(https://[^\"]+)"', text)
     assert match, path
-    web.append({'path': path.relative_to(REPO).as_posix(), 'url': match.group(1),
+    source_url = match.group(1)
+    if any(key in source_url for key in ['customerId=', 'requestId=', 'versionId=']):
+        parts = urlsplit(source_url)
+        source_url = urlunsplit((parts.scheme, parts.netloc, parts.path, '', ''))
+    web.append({'path': path.relative_to(REPO).as_posix(), 'url': source_url,
                 'bytes': path.stat().st_size, 'sha256': sha(path),
                 'status': 'historical_404' if 'Title: "404' in text else 'captured'})
 save('web.json', web)
@@ -101,22 +109,34 @@ brand = load('brand-assets.json')
 for asset in brand:
     assert sha(target(asset['path'])) == asset['sha256']
 
+public_analysis = load('public-pension-analysis.json')
+insurance_pdfs = [row for row in pdfs if row.get('document_type') not in {'legal_notice', 'synthetic_analysis_report'}]
+product_pdfs = [row for row in insurance_pdfs if row['category'] != 'Challenge']
 pdf_pages = sum(row['pages'] for row in pdfs)
 source_records = sum(len(row['sources']) for row in pdfs)
 issues = {'resolved': [
+    {'item': 'Öffentliche Vorsorgeanalyse', 'resolution': 'Synthetic family flow completed; original 17-page draft PDF downloaded'},
     {'item': 'FondsStar-Flyer', 'resolution': 'PDF downloaded and validated'},
     {'item': 'LifeStar-Produktseite', 'resolution': 'Current lowercase URL captured; legacy 404 snapshot preserved'},
     {'item': 'LifeStar-Produktblatt', 'resolution': 'PDF downloaded and validated'},
     {'item': 'Pax-Videoreferenzen', 'resolution': f'{len(videos)} identified clips downloaded; available German subtitles saved'},
 ], 'open': [
+    {'item': 'Öffentliche Analyse: Risikolücken', 'detail': public_analysis['findings'][0]['observation']},
+    {'item': 'Öffentliche Analyse: PDF-Status', 'detail': public_analysis['findings'][1]['observation']},
     {'item': 'Risiko-ErrorCode', 'detail': 'Risk examples return 0; Swagger declares 1 as OK. Domain clarification remains necessary.'},
     {'item': 'Inhaltliche Vollprüfung', 'detail': 'Not every PDF page or video has been fully reviewed. Download is not review.'},
     {'item': 'Produktionsintegration', 'detail': 'Actual application acceptance, signature and policy issuance not verified.'},
 ]}
 save('issues.json', issues)
 manifest = {'capture_date': '2026-10-30', 'path_base': 'repository root',
-            'unique_insurance_pdfs': len(pdfs), 'pdf_download_records': source_records,
-            'insurance_pdf_pages': pdf_pages, 'web_snapshots': len(web), 'api_examples': len(examples),
+            'unique_insurance_pdfs': len(insurance_pdfs), 'pdf_download_records': source_records,
+            'insurance_pdf_pages': sum(row['pages'] for row in insurance_pdfs),
+            'reference_pdfs': len(pdfs), 'reference_pdf_pages': pdf_pages,
+            'legal_notice_pdfs': 2, 'synthetic_analysis_reports': 1,
+            'public_pension_analysis': {'visible_version': public_analysis['visible_version'],
+                                       'test_cases': len(public_analysis['tests']),
+                                       'pdf_report_pages': public_analysis['pdf_report_pages'],
+                                       'frontend_files_local_only': public_analysis['frontend_archive']['file_count']}, 'web_snapshots': len(web), 'api_examples': len(examples),
             'downloaded_videos': len(videos), 'video_bytes': sum(row['bytes'] for row in videos),
             'subtitle_files': sum(len(row['caption_files']) for row in videos),
             'extracted_logo_assets': len(brand),
@@ -127,9 +147,10 @@ save('manifest.json', manifest)
 
 def source_appendix(document):
     lines = ['## Quellenkatalog', '',
-             f'{len(pdfs)} unterschiedliche Fach-PDFs mit {pdf_pages} Seiten aus {source_records} Downloadquellen. '
+             f'{len(pdfs)} unterschiedliche Referenz-PDFs mit {pdf_pages} Seiten aus {source_records} Downloadquellen. '
              f'Dazu {len(web)} Webseitenstände, 24 API-Beispiele, {len(videos)} Videodateien und {len(brand)} entpackte Logo-Dateien. '
-             'Logo-PDFs zählen zu den Markenassets und sind nicht nochmals als Fach-PDFs gezählt.', '',
+             'Darunter sind 35 Fach-PDFs, zwei Nutzungs-/Datenschutz-PDFs und eine ausschließlich synthetische Testauswertung. '
+             'Logo-PDFs zählen separat zu den Markenassets.', '',
              '### PDF-Unterlagen', '', '| Kategorie | Kanonische Datei | Seiten | Herkunft |', '|---|---|---:|---|']
     for row in pdfs:
         sources = ', '.join(f"[Quelle {n+1}]({source['url']})" for n, source in enumerate(row['sources']))
@@ -155,6 +176,10 @@ def source_appendix(document):
     for video in videos:
         captions = ', '.join(link('/'.join(c['languages']), c['path'], document) for c in video['caption_files']) or 'nicht verfügbar'
         lines.append(f"| [{clean(video['title'])}]({video['url']}) | {link('MP4', video['path'], document)} | {captions} | technisch heruntergeladen; nicht vollständig gesichtet |")
+    lines += ['', '### Öffentliche Vorsorgeanalyse', '',
+              link('Testbericht, Beobachtungen und Grenzen', public_analysis['report_path'], document), '',
+              link('Original-PDF mit ausschließlich Testdaten (Entwurf)', public_analysis['pdf_report_path'], document), '',
+              link('Testdaten und technisches Protokoll', 'documentation/baselhack/catalog/public-pension-analysis.json', document), '']
     lines += ['', '### Maschinenlesbare Bestandsdaten', '',
               '- ' + link('Manifest', 'documentation/baselhack/catalog/manifest.json', document),
               '- ' + link('PDF-Herkunft und Prüfsummen', 'documentation/baselhack/catalog/pdfs.json', document),
@@ -170,7 +195,7 @@ index.write_text('# Quellen und Medien – Pax BaselHack 2026\n\nStand: 30.10.20
 plan = ROOT / 'plans/advisor-plan.md'
 body = plan.read_text().split('<!-- GENERATED SOURCE APPENDIX -->')[0].rstrip()
 body = re.sub(r'6 technische Tarifunterlagen und \d+ weitere Produkt-/Fondsunterlagen, zusammen \d+ Seiten',
-              f'6 technische Tarifunterlagen und {len(pdfs)-16} weitere Produkt-/Fondsunterlagen, zusammen {pdf_pages-268} Seiten', body)
+              f"6 technische Tarifunterlagen und {len(product_pdfs)-6} weitere Produkt-/Fondsunterlagen, zusammen {sum(row['pages'] for row in product_pdfs)} Seiten", body)
 plan.write_text(body + '\n\n<!-- GENERATED SOURCE APPENDIX -->\n\n' + source_appendix(plan))
 
 (ROOT / 'README.md').write_text(f'''# Pax BaselHack – Teamgrundlage
@@ -180,8 +205,9 @@ Stand: 30.10.2026. Recherche, Material und Bauplan; die Advisor-App ist noch nic
 - [Gesamtplan](plans/advisor-plan.md)
 - [Aufteilung für fünf Personen](plans/team-plan.md)
 - [Vollständiger Quellen- und Medienkatalog](references/README.md)
+- [Öffentliche Pax/vlot-Analyse: Test und Download](reports/public-pension-analysis.md)
 
-**Bestand:** {len(pdfs)} unterschiedliche Fach-PDFs / {pdf_pages} Seiten, {source_records} PDF-Downloadquellen,
+**Bestand:** {len(pdfs)} Referenz-PDFs / {pdf_pages} Seiten (35 Fach-PDFs, zwei Nutzungs-/Datenschutz-PDFs, eine synthetische Testauswertung), {source_records} PDF-Downloadquellen,
 {len(web)} Webseitenstände, 24 API-Beispiele, {len(videos)} Videos, {manifest['subtitle_files']} Untertiteldateien und {len(brand)} Original-Logo-Dateien.
 Heruntergeladen und technisch geprüft bedeutet keine vollständige inhaltliche Prüfung.
 
@@ -193,6 +219,8 @@ Heruntergeladen und technisch geprüft bedeutet keine vollständige inhaltliche 
 | `../challenge_material/` | Die zehn gemeinsamen Original-PDFs und der Challenge-Text; keine zusätzliche Kopie |
 | `references/products/` | Broschüren, Produktblätter, Basisinformationen und technische Tarifunterlagen |
 | `references/funds/` | Fondslisten und Fondsinformationen |
+| `references/public-pension-analysis/` | AGB, Datenschutz, synthetische Originalauswertung, Eingabedaten und UI-Textstände |
+| `reports/` | Testbericht mit Beobachtungen und Prüfumfang |
 | `references/api/` | OpenAPI, Schemaindex, JSON-Beispiele und ursprüngliche Rechneransichten |
 | `references/web/` | Webseitenstände nach Hub, Pax-Produkten, Ratgebern, Services und Design getrennt |
 | `references/videos/transcripts/` | Verfügbare Untertitel; MP4-Dateien liegen unter `assets/pax/videos/` im Repo |
@@ -201,7 +229,7 @@ Heruntergeladen und technisch geprüft bedeutet keine vollständige inhaltliche 
 | `generated/previews/` | Gerenderte PDF-Stichproben |
 | `evidence/screenshots/` | Nachweise der Recherche und synthetischer Tests |
 | `scripts/` | Lokale Katalogprüfung und Erzeugung der Dokumentindizes |
-| `private/` | Lokaler, ignorierter API-Zugang; Datei mit Rechten 0600 |
+| `private/` | Lokaler API-Zugang und privater Frontend-Referenzstand; nicht mit Git geteilt |
 | `exports/` | Ignorierte Markdown-Downloadkopien; kein automatisch erzeugtes ZIP |
 
 Die entpackten Logos stehen im Repo unter `assets/pax/logos/online/` und `assets/pax/logos/print/`.
@@ -230,6 +258,8 @@ source_files = []
 paths = {row['path'] for row in pdfs} | {row['path'] for row in web} | {row['path'] for row in brand} | {row['path'] for row in videos}
 paths |= {c['path'] for row in videos for c in row['caption_files']}
 paths |= {path.relative_to(REPO).as_posix() for path in (ROOT / 'references/api').rglob('*') if path.is_file()}
+paths |= {path.relative_to(REPO).as_posix() for folder in [ROOT / 'references/public-pension-analysis', ROOT / 'evidence/screenshots/public-pension-analysis']
+          for path in folder.rglob('*') if path.is_file()}
 for relative in sorted(paths):
     path = target(relative)
     source_files.append({'path': relative, 'bytes': path.stat().st_size, 'sha256': sha(path)})

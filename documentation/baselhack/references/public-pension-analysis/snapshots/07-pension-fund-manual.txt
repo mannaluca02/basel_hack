@@ -1,0 +1,58 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+				107 container
+					108 container customer-pension-fund-page-vt
+						109 heading Ihre Pensionskasse, Value: 1
+							110 text Ihre Pensionskasse
+						111 text Die Pensionskassenleistungen haben bei Krankheit, Invalidität oder Tod eine wichtige Absicherungsfunktion und sind für die Analyse zentral.
+						112 text Haben Sie Ihren Vorsorgeausweis verfügbar?
+						113 button Verfügbar, ID: has-pension-fund-details-Customer-yes
+						114 button Nicht verfügbar, ID: has-pension-fund-details-Customer-no
+						115 container complex-pension-fund-view-simple-Customer
+							116 heading Basisplan, Value: 2
+								117 text Basisplan
+							118 text Beinhaltet Ihr Pensionskassenzertifikat einen QR-Code? Scannen Sie diesen anstatt die Daten manuell zu übertragen
+							119 button QR-Code scannen, ID: scan-pensionfund-qrcode-Employer1-BasePlan
+							120 text Risikoleistungen
+							121 container
+								122 text field (settable) CHF Jährliche Invalidenrente, Value: 30’000, ID: pension-fund-details-Customer-Employer1-BasePlan-disability
+								123 text CHF Jährliche Invalidenrente
+							124 container
+								125 text field (settable) CHF Jährliche Invalidenrente pro Kind, Value: 6’000, ID: pension-fund-details-Customer-Employer1-BasePlan-child
+								126 text CHF Jährliche Invalidenrente pro Kind
+							127 container
+								128 text field (settable) CHF Jährliche Witwen-/Witwerrente, Value: 18’000, ID: pension-fund-details-Customer-Employer1-BasePlan-survivor
+								129 text CHF Jährliche Witwen-/Witwerrente
+							130 text Alternative Bezeichnungen: Hinterlassenenrente, Hinterbliebenenrente, Partnerrente etc.
+							131 container
+								132 text field (settable) CHF Jährliche Waisenrente, Value: 6’000, ID: pension-fund-details-Customer-Employer1-BasePlan-orphan
+								133 text CHF Jährliche Waisenrente
+							134 container
+								135 text field (settable) CHF Einmaliges Todesfallkapital, Value: 50’000, ID: pension-fund-details-Customer-Employer1-BasePlan-deathLumpSum
+								136 text CHF Einmaliges Todesfallkapital
+							137 text Wie hoch sind Ihre Rentenleistungen aus der Pensionskasse?
+							138 text Falls auf Ihrem PK-Ausweis unterschiedliche Altersleistungen aufgelistet sind, verwenden Sie bitte diejenigen mit Zins.
+							139 container
+								140 text Alter 65
+							141 container
+								142 text field (settable) CHF Jährliche Rente, Value: 24’000, ID: pension-fund-details-Customer-Employer1-BasePlan-ret-proj-pension
+								143 text CHF Jährliche Rente
+							144 container
+								145 text field (settable) CHF Alterskapital (projiziert), Value: 400’000, ID: pension-fund-details-Customer-Employer1-BasePlan-ret-proj-capital
+								146 text CHF Alterskapital (projiziert)
+							147 button Zusätzlichen Vorsorgeplan hinzufügen, ID: complex-pension-fund-view-btn-Customer
+				104 container
+					105 button Zurück, ID: back-button-vt
+					106 button Weiter, ID: next-button-vt
+
+The focused UI element is 145 text field (settable) CHF Alterskapital (projiziert), Value: 400’000, ID: pension-fund-details-Customer-Employer1-BasePlan-ret-proj-capital

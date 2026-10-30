@@ -4,7 +4,7 @@ Stand: 30.10.2026.
 
 ## Quellenkatalog
 
-35 unterschiedliche Fach-PDFs mit 391 Seiten aus 37 Downloadquellen. Dazu 46 Webseitenstände, 24 API-Beispiele, 16 Videodateien und 37 entpackte Logo-Dateien. Logo-PDFs zählen zu den Markenassets und sind nicht nochmals als Fach-PDFs gezählt.
+38 unterschiedliche Referenz-PDFs mit 417 Seiten aus 40 Downloadquellen. Dazu 48 Webseitenstände, 24 API-Beispiele, 16 Videodateien und 37 entpackte Logo-Dateien. Darunter sind 35 Fach-PDFs, zwei Nutzungs-/Datenschutz-PDFs und eine ausschließlich synthetische Testauswertung. Logo-PDFs zählen separat zu den Markenassets.
 
 ### PDF-Unterlagen
 
@@ -45,6 +45,9 @@ Stand: 30.10.2026.
 | Tarifblatt | [disability.pdf](<products/technical-terms/disability.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/12fee4331c/private-vorsorge-technische-tarifbestimmungen-sirjl-sir.pdf) |
 | Produktblatt | [fondsstar.pdf](<products/flyers/fondsstar.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/a2e900a257/private-vorsorge-information-pax-flyer-fondsstar.pdf) |
 | Produktblatt | [lifestar.pdf](<products/flyers/lifestar.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/25179d5cf2/private-vorsorge-information-pax-flyer-lifestar.pdf) |
+| Öffentliche Analyse – Nutzungsbedingungen | [terms-de.pdf](<public-pension-analysis/legal/terms-de.pdf>) | 3 | [Quelle 1](https://static.svc.vlot.ch/panda/docs/Pax_GTC_2023-10_DE.pdf) |
+| Öffentliche Analyse – Datenschutz | [privacy-de.pdf](<public-pension-analysis/legal/privacy-de.pdf>) | 6 | [Quelle 1](https://static.svc.vlot.ch/panda/docs/Pax_Privacy-Notice_2023-10_DE.pdf) |
+| Synthetische Testauswertung | [analysis-fictitious-family.pdf](<public-pension-analysis/reports/analysis-fictitious-family.pdf>) | 17 | [Quelle 1](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat) |
 
 ### Webseitenstände
 
@@ -94,6 +97,8 @@ Stand: 30.10.2026.
 | [digitalantrag](https://www.pax.ch/de/vertriebspartner/aktuelles/digitalantrag) | [TXT](<web/pax/services/digitalantrag.txt>) | captured |
 | [download-center-fondsstar](https://www.pax.ch/de/download-center) | [TXT](<web/pax/services/download-center-fondsstar.txt>) | captured |
 | [portale-und-login](https://www.pax.ch/de/kontakt-und-services/portale-und-login) | [TXT](<web/pax/services/portale-und-login.txt>) | captured |
+| [public-pension-analysis-result](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat) | [TXT](<web/pax/services/public-pension-analysis-result.txt>) | captured |
+| [public-pension-analysis](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded) | [TXT](<web/pax/services/public-pension-analysis.txt>) | captured |
 | [quicksale-product-overview](https://portal.pax.ch/quicksale/edu/) | [TXT](<web/pax/services/quicksale-product-overview.txt>) | captured |
 | [logismata-official-calculators](https://services.logismata.ch/rso-internetrechner/app/) | [TXT](<web/providers/logismata-official-calculators.txt>) | captured |
 
@@ -150,6 +155,15 @@ Alle aufgeführten Videos sind lokal gespeichert. Die verfügbare Auflösung ste
 | [Wohneigentum finanzieren](https://www.youtube.com/watch?v=9n6PZL8_Sgk) | [MP4](<../../../assets/pax/videos/pension/home-financing--9n6PZL8_Sgk.mp4>) | [de/de-orig](<videos/transcripts/pension/home-financing--9n6PZL8_Sgk.de.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
 | [Zum Eigenheim mit einem Pensionskassenvorbezug? Darauf solltest du achten! 🏡](https://www.youtube.com/watch?v=fxYEfS0IU2U) | [MP4](<../../../assets/pax/videos/pension/shorts/pension-withdrawal-for-home--fxYEfS0IU2U.mp4>) | [de-orig/de](<videos/transcripts/pension/shorts/pension-withdrawal-for-home--fxYEfS0IU2U.de-orig.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
 | [LifeStar einfach erklärt](https://www.youtube.com/watch?v=BSHbQZ4FY0k) | [MP4](<../../../assets/pax/videos/products/lifestar--BSHbQZ4FY0k.mp4>) | [de/de-orig](<videos/transcripts/products/lifestar--BSHbQZ4FY0k.de.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
+
+### Öffentliche Vorsorgeanalyse
+
+[Testbericht, Beobachtungen und Grenzen](<../reports/public-pension-analysis.md>)
+
+[Original-PDF mit ausschließlich Testdaten (Entwurf)](<public-pension-analysis/reports/analysis-fictitious-family.pdf>)
+
+[Testdaten und technisches Protokoll](<../catalog/public-pension-analysis.json>)
+
 
 ### Maschinenlesbare Bestandsdaten
 

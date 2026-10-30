@@ -603,5 +603,75 @@
     "text_path": "documentation/baselhack/generated/extracted-text/products/flyers/lifestar.txt",
     "technical_validation": "pdf_parsed_and_text_extracted",
     "full_content_review": false
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/legal/terms-de.pdf",
+    "category": "Öffentliche Analyse – Nutzungsbedingungen",
+    "document_type": "legal_notice",
+    "sources": [
+      {
+        "url": "https://static.svc.vlot.ch/panda/docs/Pax_GTC_2023-10_DE.pdf",
+        "original_filename": "Pax_GTC_2023-10_DE.pdf",
+        "original_sha256": "66c5b9cc0ba5db3b7f86d35bd4470332717881ee21deac064fc2b0084f461b27",
+        "acquisition_method": "public_pdf_download"
+      }
+    ],
+    "pages": 3,
+    "bytes": 98327,
+    "sha256": "66c5b9cc0ba5db3b7f86d35bd4470332717881ee21deac064fc2b0084f461b27",
+    "text_path": "documentation/baselhack/generated/extracted-text/public-pension-analysis/legal/terms-de.txt",
+    "technical_validation": "pdf_parsed_and_text_extracted",
+    "full_content_review": false,
+    "parser_note": "pypdf reported cross-reference offset warnings; text extracted and page 2 rendered successfully. Original PDF bytes preserved."
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/legal/privacy-de.pdf",
+    "category": "Öffentliche Analyse – Datenschutz",
+    "document_type": "legal_notice",
+    "sources": [
+      {
+        "url": "https://static.svc.vlot.ch/panda/docs/Pax_Privacy-Notice_2023-10_DE.pdf",
+        "original_filename": "Pax_Privacy-Notice_2023-10_DE.pdf",
+        "original_sha256": "0b6b55af5f7b6fe4907e5e43aeadd33745808bb64eb96b48385cc4033a170e2b",
+        "acquisition_method": "public_pdf_download"
+      }
+    ],
+    "pages": 6,
+    "bytes": 148533,
+    "sha256": "0b6b55af5f7b6fe4907e5e43aeadd33745808bb64eb96b48385cc4033a170e2b",
+    "text_path": "documentation/baselhack/generated/extracted-text/public-pension-analysis/legal/privacy-de.txt",
+    "technical_validation": "pdf_parsed_and_text_extracted",
+    "full_content_review": false,
+    "parser_note": "pypdf reported cross-reference offset warnings; text extracted and page 2 rendered successfully. Original PDF bytes preserved."
+  },
+  {
+    "path": "documentation/baselhack/references/public-pension-analysis/reports/analysis-fictitious-family.pdf",
+    "category": "Synthetische Testauswertung",
+    "document_type": "synthetic_analysis_report",
+    "sources": [
+      {
+        "url": "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat",
+        "original_filename": "vorsorgeanalyse-[REDACTED_ANALYSIS_ID].pdf",
+        "original_sha256": "1a59fdf1cf509ac88f38073560f01e75012591dc3d2f60bbde17ee24237727fa",
+        "acquisition_method": "browser_download_button",
+        "original_filename_redacted": true
+      }
+    ],
+    "synthetic": true,
+    "reported_status": "Entwurf / Unvollständige Eingaben",
+    "source_note": "Generated for the fixture; no permanent public file URL. Original PDF bytes preserved.",
+    "original_pdf_contains_synthetic_analysis_reference": true,
+    "visual_review_pages": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "pages": 17,
+    "bytes": 2414875,
+    "sha256": "1a59fdf1cf509ac88f38073560f01e75012591dc3d2f60bbde17ee24237727fa",
+    "text_path": "documentation/baselhack/generated/extracted-text/public-pension-analysis/reports/analysis-fictitious-family.txt",
+    "technical_validation": "pdf_parsed_and_text_extracted",
+    "full_content_review": false
   }
 ]

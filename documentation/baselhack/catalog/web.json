@@ -308,6 +308,20 @@
     "status": "captured"
   },
   {
+    "path": "documentation/baselhack/references/web/pax/services/public-pension-analysis-result.txt",
+    "url": "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat",
+    "bytes": 14741,
+    "sha256": "a50bc60adcf573221186154a77db7be3e0d5d098206883747cd057530f4cfb84",
+    "status": "captured"
+  },
+  {
+    "path": "documentation/baselhack/references/web/pax/services/public-pension-analysis.txt",
+    "url": "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded",
+    "bytes": 2136,
+    "sha256": "1fd3e1226fbb82212778fec583bfd8890724e57fc58a506118b7786d04bee096",
+    "status": "captured"
+  },
+  {
     "path": "documentation/baselhack/references/web/pax/services/quicksale-product-overview.txt",
     "url": "https://portal.pax.ch/quicksale/edu/",
     "bytes": 7547,

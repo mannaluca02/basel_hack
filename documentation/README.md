@@ -9,6 +9,7 @@ from the challenge hub, the Logismata API and the material PDFs.
 | [Logismata API](baselhack/references/api/) | Logismata APICalc: auth, all 24 operations, enum codes, verified example calls, quirks |
 | [Advisor plan: domain and recommendations](baselhack/plans/advisor-plan.md) | Swiss 3-pillar basics, personas, Pax "Vorsorgecheck" structure, suitability scoring, Pax product catalogue |
 | [Sources and tools](baselhack/references/README.md) | Challenge hub, reference calculators, Quicksale, Pax UI (Angular), Pax brand |
+| [Public Pax/vlot analysis test](baselhack/reports/public-pension-analysis.md) | Current public flow, synthetic fixture, 17-page PDF export and open findings |
 | [Five-person team plan](baselhack/plans/team-plan.md) | Responsibilities, schedule and integration checkpoints |
 | [challenge_material/challenge.md](challenge_material/challenge.md) | Original challenge text from baselhack.ch |
 | [challenge_material/APICalc-swagger.yaml](challenge_material/APICalc-swagger.yaml) | OpenAPI 3.1 spec of the Logismata API (downloaded from the hub) |

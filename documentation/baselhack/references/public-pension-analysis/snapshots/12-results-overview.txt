@@ -1,0 +1,68 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+					67 container nova-tabs
+						68 container
+							69 button Übersicht, ID: nova-tab-overview
+						70 button Familienvorsorge, ID: nova-tab-risk
+						71 button Pensionierung, ID: nova-tab-retirement
+						72 button Steuern, ID: nova-tab-taxes
+						73 button Lösung, ID: nova-tab-solutions
+				74 container nova-page-overview
+					75 container
+						76 heading Die Prioritäten für Ihr finanzielles Wohlergehen, Value: 1
+							77 text Die Prioritäten für Ihr finanzielles Wohlergehen
+						78 text Erfahren Sie mehr, welche Lücken für Sie relevant sind und identifizieren Sie Wege zur Verbesserung Ihrer Situation.
+					79 button 773 1000
+						80 container
+							81 image
+							82 text 773
+							83 text 1000
+					84 button Prio 1 Pensionierung von TEST Nina CHF 2’689 Monatliche Lücke, ID: nova-prio-card-cu-Retirement
+						85 image
+							86 text Prio
+							87 text 1
+						88 text Pensionierung von TEST Nina
+						89 text CHF 2’689
+						90 text Monatliche Lücke
+					91 button 2 Invalidität von TEST Nina CHF 210 Monatliche Lücke, ID: nova-prio-card-cu-Disability
+						92 image
+							93 text 2
+						94 text Invalidität von TEST Nina
+						95 text CHF 210
+						96 text Monatliche Lücke
+					97 button 3 Invalidität von TEST Tom CHF 40 Monatliche Lücke, ID: nova-prio-card-pa-Disability
+						98 image
+							99 text 3
+						100 text Invalidität von TEST Tom
+						101 text CHF 40
+						102 text Monatliche Lücke
+					103 button 4 Tod von TEST Nina, ID: nova-prio-card-cu-Death
+						104 image
+							105 text 4
+						106 text Tod von TEST Nina
+					107 button 5 Tod von TEST Tom, ID: nova-prio-card-pa-Death
+						108 image
+							109 text 5
+						110 text Tod von TEST Tom
+					111 button 6 Pensionierung von TEST Tom, ID: nova-prio-card-pa-Retirement
+						112 image
+							113 text 6
+						114 text Pensionierung von TEST Tom
+					115 button 7 Potenzielle Steuerersparnisse, ID: nova-tax-savings-card
+						116 image
+							117 text 7
+						118 text Potenzielle Steuerersparnisse
+					119 text Unsere digitale Vorsorgeanalyse gibt Ihnen eine erste Orientierung. Bitte beachten Sie: Die eingegebenen Daten werden nicht automatisch geprüft. Für eine präzise und persönliche Lösung empfehlen wir die kostenlose und unverbindliche Überprüfung durch unsere zertifizierten Berater/innen.
+				120 button Weiter, ID: next-button-vt
+
+The focused UI element is 60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID

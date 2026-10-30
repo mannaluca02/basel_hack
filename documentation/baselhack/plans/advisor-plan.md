@@ -117,6 +117,14 @@ Die zwei nachgeladenen Produktblätter sind unter [FondsStar](<../references/pro
 
 Die 16 identifizierten Videodateien und 16 verfügbaren Untertiteldateien ergänzen die Quellenbasis, einschließlich der drei Quicksale-Anleitungen. Sie sind technisch auf lesbare Bild- und Tonstreams geprüft, aber nicht vollständig inhaltlich gesichtet. Erklärungen aus den Videos werden daher nicht ungeprüft als verbindliche Prozess- oder Vertragsregeln übernommen. Der Medienkatalog führt Quelle, Downloadstatus, Auflösung, Untertitel und Prüftiefe getrennt auf.
 
+### 4.9 Aktuelle öffentliche Analyse als bestehende Referenz
+
+Die öffentliche [Pax/vlot-Analyse](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded) wurde am 30.10.2026 mit einem erfundenen Paar und zwei Kindern bis zum 17-seitigen PDF-Export getestet. Bereits vorhanden sind ein Familienprofil, drei Säulen über Renten und Kapitalverzehr, Steuerbetrachtung, eine Lückenrangfolge und eine zeitversetzte Pensionierung. Der PoC muss seinen zusätzlichen Nutzen gegenüber diesem Ist-Stand zeigen. Die Challenge-Beschreibung einer ausschließlich menschlichen Beratung ist deshalb als Aufgabenbeschreibung und nicht als vollständige Bestandsaufnahme der aktuellen öffentlichen Website zu lesen.
+
+Die LifeMap-Demo konzentriert sich auf gezielte Rückfragen, explizite Ziele und Tragbarkeit, gemeinsam veränderte Zukunftsszenarien mit erklärtem Vorher-/Nachher-Effekt sowie die Fallübergabe bis zur klar gekennzeichneten Demo-Police. Bestehende Säulentabellen und PDF-Export sind die Referenzbasis. vlot und Logismata dürfen weder fachlich noch technisch ohne Nachweis gleichgesetzt werden.
+
+Die Referenz zeigt zwei ungeklärte Punkte: kleine Invaliditätslücken erscheinen in der Lösung als ohne Lücke, und der PDF-Export ist trotz durchlaufenem Abschluss als Entwurf mit unvollständigen Eingaben markiert. Unser Abnahmekriterium: Ergebnis, Empfehlung und Export müssen dieselbe Daten-/Annahmenversion, dieselbe Lücke und einen verständlichen Prüfstatus zeigen. Schwellenwerte und Schätzungen sind ausdrücklich zu erklären. Details, Testdaten und Grenzen stehen im [Testbericht](../reports/public-pension-analysis.md); die unveränderte [Testauswertung](../references/public-pension-analysis/reports/analysis-fictitious-family.pdf) ist keine fachlich freigegebene Kundenberatung.
+
 ## 5. Personas und Datenbasis
 
 Es gibt zwei unterschiedliche Quellengruppen, die getrennt bleiben:
@@ -374,6 +382,8 @@ Zusätzlicher fachlicher Beleg außerhalb der Hauptgeschichte: Im Referenzfall d
 
 ## 18. Prüftiefe und Quellenqualität
 
+- Die öffentliche Pax/vlot-Analyse wurde mit ausschließlich synthetischen Angaben bis zum Original-PDF getestet; die fachliche Richtigkeit ihrer Ergebnisse und die Ursache des Entwurfsstatus wurden nicht unabhängig bestätigt.
+
 - Herunterladen und technische Validierung sind von einer vollständigen inhaltlichen Durchsicht zu unterscheiden. Die PDF-Texte wurden extrahiert und planrelevante Abschnitte ausgewertet; es wird keine vollständige Lektüre jeder Seite behauptet.
 - Die fehlenden FondsStar- und LifeStar-Produktblätter sind nachgeladen. Die aktuelle LifeStar-Seite ist unter dem kleingeschriebenen Pfad erreichbar; die ältere 404-Aufnahme bleibt als historischer Quellenstand dokumentiert.
 - Die auf den elf untersuchten Pax-Seiten identifizierten 16 Videoreferenzen werden im Medienkatalog mit Downloadstatus, Dateipfad, Prüfsumme und gegebenenfalls Untertiteln geführt. Download bedeutet keine vollständige Sichtung oder fachliche Freigabe des Videos.
@@ -390,7 +400,7 @@ Der folgende Anhang wird aus dem Katalog unter `catalog/` erzeugt. Er führt die
 
 ## Quellenkatalog
 
-35 unterschiedliche Fach-PDFs mit 391 Seiten aus 37 Downloadquellen. Dazu 46 Webseitenstände, 24 API-Beispiele, 16 Videodateien und 37 entpackte Logo-Dateien. Logo-PDFs zählen zu den Markenassets und sind nicht nochmals als Fach-PDFs gezählt.
+38 unterschiedliche Referenz-PDFs mit 417 Seiten aus 40 Downloadquellen. Dazu 48 Webseitenstände, 24 API-Beispiele, 16 Videodateien und 37 entpackte Logo-Dateien. Darunter sind 35 Fach-PDFs, zwei Nutzungs-/Datenschutz-PDFs und eine ausschließlich synthetische Testauswertung. Logo-PDFs zählen separat zu den Markenassets.
 
 ### PDF-Unterlagen
 
@@ -431,6 +441,9 @@ Der folgende Anhang wird aus dem Katalog unter `catalog/` erzeugt. Er führt die
 | Tarifblatt | [disability.pdf](<../references/products/technical-terms/disability.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/12fee4331c/private-vorsorge-technische-tarifbestimmungen-sirjl-sir.pdf) |
 | Produktblatt | [fondsstar.pdf](<../references/products/flyers/fondsstar.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/a2e900a257/private-vorsorge-information-pax-flyer-fondsstar.pdf) |
 | Produktblatt | [lifestar.pdf](<../references/products/flyers/lifestar.pdf>) | 2 | [Quelle 1](https://assets.pax.ch/x/25179d5cf2/private-vorsorge-information-pax-flyer-lifestar.pdf) |
+| Öffentliche Analyse – Nutzungsbedingungen | [terms-de.pdf](<../references/public-pension-analysis/legal/terms-de.pdf>) | 3 | [Quelle 1](https://static.svc.vlot.ch/panda/docs/Pax_GTC_2023-10_DE.pdf) |
+| Öffentliche Analyse – Datenschutz | [privacy-de.pdf](<../references/public-pension-analysis/legal/privacy-de.pdf>) | 6 | [Quelle 1](https://static.svc.vlot.ch/panda/docs/Pax_Privacy-Notice_2023-10_DE.pdf) |
+| Synthetische Testauswertung | [analysis-fictitious-family.pdf](<../references/public-pension-analysis/reports/analysis-fictitious-family.pdf>) | 17 | [Quelle 1](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat) |
 
 ### Webseitenstände
 
@@ -480,6 +493,8 @@ Der folgende Anhang wird aus dem Katalog unter `catalog/` erzeugt. Er führt die
 | [digitalantrag](https://www.pax.ch/de/vertriebspartner/aktuelles/digitalantrag) | [TXT](<../references/web/pax/services/digitalantrag.txt>) | captured |
 | [download-center-fondsstar](https://www.pax.ch/de/download-center) | [TXT](<../references/web/pax/services/download-center-fondsstar.txt>) | captured |
 | [portale-und-login](https://www.pax.ch/de/kontakt-und-services/portale-und-login) | [TXT](<../references/web/pax/services/portale-und-login.txt>) | captured |
+| [public-pension-analysis-result](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/resultat) | [TXT](<../references/web/pax/services/public-pension-analysis-result.txt>) | captured |
+| [public-pension-analysis](https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded) | [TXT](<../references/web/pax/services/public-pension-analysis.txt>) | captured |
 | [quicksale-product-overview](https://portal.pax.ch/quicksale/edu/) | [TXT](<../references/web/pax/services/quicksale-product-overview.txt>) | captured |
 | [logismata-official-calculators](https://services.logismata.ch/rso-internetrechner/app/) | [TXT](<../references/web/providers/logismata-official-calculators.txt>) | captured |
 
@@ -536,6 +551,15 @@ Alle aufgeführten Videos sind lokal gespeichert. Die verfügbare Auflösung ste
 | [Wohneigentum finanzieren](https://www.youtube.com/watch?v=9n6PZL8_Sgk) | [MP4](<../../../assets/pax/videos/pension/home-financing--9n6PZL8_Sgk.mp4>) | [de/de-orig](<../references/videos/transcripts/pension/home-financing--9n6PZL8_Sgk.de.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
 | [Zum Eigenheim mit einem Pensionskassenvorbezug? Darauf solltest du achten! 🏡](https://www.youtube.com/watch?v=fxYEfS0IU2U) | [MP4](<../../../assets/pax/videos/pension/shorts/pension-withdrawal-for-home--fxYEfS0IU2U.mp4>) | [de-orig/de](<../references/videos/transcripts/pension/shorts/pension-withdrawal-for-home--fxYEfS0IU2U.de-orig.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
 | [LifeStar einfach erklärt](https://www.youtube.com/watch?v=BSHbQZ4FY0k) | [MP4](<../../../assets/pax/videos/products/lifestar--BSHbQZ4FY0k.mp4>) | [de/de-orig](<../references/videos/transcripts/products/lifestar--BSHbQZ4FY0k.de.vtt>) | technisch heruntergeladen; nicht vollständig gesichtet |
+
+### Öffentliche Vorsorgeanalyse
+
+[Testbericht, Beobachtungen und Grenzen](<../reports/public-pension-analysis.md>)
+
+[Original-PDF mit ausschließlich Testdaten (Entwurf)](<../references/public-pension-analysis/reports/analysis-fictitious-family.pdf>)
+
+[Testdaten und technisches Protokoll](<../catalog/public-pension-analysis.json>)
+
 
 ### Maschinenlesbare Bestandsdaten
 

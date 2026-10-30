@@ -1,0 +1,39 @@
+Browser tab: 11, Title: "Embedded - Pax", URL: "https://www.pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded".
+0 AXWebArea Embedded - Pax, URL: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded
+	8 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse/embedded#maincontent
+	9 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	10 container Description: Vlot, ID: vlot-iframe
+		60 AXWebArea Pax Vorsorgeanalyse mit vlot, URL: check.pax.vlot.ch/v1/flow?customerId=REDACTED_SESSION_ID&requestId=REDACTED_SESSION_ID
+			61 container flow-app
+				62 container
+					63 button Description: Navigation, ID: show-nav-menu-vt
+					64 button Description: Beratung, ID: open-help-and-support-dialog
+					65 pop up button DE, ID: show-lang-menu-button-vt
+					66 image Logo Pax
+					67 container nova-tabs
+						74 button Übersicht, ID: nova-tab-overview
+						75 button Familienvorsorge, ID: nova-tab-risk
+						155 button Pensionierung, ID: nova-tab-retirement
+						156 container
+							157 button Steuern, ID: nova-tab-taxes
+						73 button Lösung, ID: nova-tab-solutions
+				158 container nova-page-taxes-savings
+					159 container
+						160 heading Optimierung der Steuern, Value: 1
+							161 text Optimierung der Steuern
+						162 text Entdecken Sie Möglichkeiten, Ihre Steuerlast zu verringern und Ihre Ersparnisse zu optimieren.
+					163 text TEST Nina Momentane 3a / Jahr
+					164 text CHF 5’000
+					165 text Potenzielle 3a / Jahr
+					166 text CHF 2’258
+					167 text TEST Tom Momentane 3a / Jahr
+					168 text CHF 0
+					169 text Potenzielle 3a / Jahr
+					170 text CHF 7’258
+					171 text Familie Potenzielle Steuerersparnisse / Jahr
+					172 text CHF 2’422
+				152 container
+					153 button Description: Zurück, ID: back-button-vt
+					154 button Weiter, ID: next-button-vt
+
+The focused UI element is 157 button Steuern, ID: nova-tab-taxes
