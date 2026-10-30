@@ -5,6 +5,8 @@ from the challenge hub, the Logismata API and the material PDFs.
 
 | File | Contents |
 |---|---|
+| [Detailed Angular implementation plan](baselhack/plans/implementation-plan.md) | Screens, domain logic, AI, interfaces, state machine, security and 37 acceptance cases |
+| [Implementation backlog](baselhack/plans/implementation-backlog.md) | 36 planned P0 tickets, five owners, dependencies, estimates and acceptance criteria |
 | [Advisor plan: requirements](baselhack/plans/advisor-plan.md#3-anforderungen-an-das-ergebnis) | Must-haves, nice-to-haves, no-gos, legal framework turned into concrete requirements, demo checklist |
 | [Logismata API](baselhack/references/api/) | Logismata APICalc: auth, all 24 operations, enum codes, verified example calls, quirks |
 | [Advisor plan: domain and recommendations](baselhack/plans/advisor-plan.md) | Swiss 3-pillar basics, personas, Pax "Vorsorgecheck" structure, suitability scoring, Pax product catalogue |

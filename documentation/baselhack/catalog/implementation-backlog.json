@@ -1,0 +1,711 @@
+{
+  "plan_date": "2026-10-30",
+  "plan_version": "1.0",
+  "implementation_status": "not_started",
+  "frontend_decision": "Angular with Pax UI; compatible versions and access to verify",
+  "planning_window_elapsed_hours": 48,
+  "target_total_person_hours": 110,
+  "ticket_hours": 77.0,
+  "shared_coordination_person_hours": 20,
+  "buffer_person_hours": 13.0,
+  "ticket_hours_by_owner": {
+    "Person 1": 14.0,
+    "Person 2": 17.0,
+    "Person 3": 15.5,
+    "Person 4": 15.5,
+    "Person 5": 15.0
+  },
+  "estimate_note": "Rough bounded-MVP estimates; not elapsed hours or a promise of delivery.",
+  "dependency_note": "Dependencies gate final integration/acceptance; work with shared contract fixtures can start earlier.",
+  "milestones": {
+    "G0": "T+2: decisions/contracts/fixture",
+    "G1": "T+8: first saved vertical slice",
+    "G2": "T+16: baseline and first scenarios",
+    "G3": "T+24: three scenarios",
+    "G4": "T+38: recommendation and complete demo journey",
+    "G5": "T+44: integrated technical/domain checks",
+    "G6": "T+48: repeatable demo and handoff"
+  },
+  "tasks": [
+    {
+      "id": "UX-01",
+      "owner": "Person 1",
+      "title": "Angular-/Pax-UI-Nachweis und App-Shell",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [],
+      "deliverable": "Angular-Shell mit Theme, Navigation und zwei funktionierenden Pax-Komponenten; dokumentierter Paketstand.",
+      "acceptance_criteria": [
+        "Registry-Zugriff und Peer Dependencies tatsächlich geprüft; kein erzwungener Versionskonflikt.",
+        "Button und Formularfeld funktionieren im Build; notwendige Styles/Assets geladen.",
+        "Bei Paketblockade bleibt Angular aktiv und ein kleiner Marken-Fallback wird transparent verwendet."
+      ],
+      "target_milestone": "G0"
+    },
+    {
+      "id": "UX-02",
+      "owner": "Person 1",
+      "title": "Bestätigbares Profil, Ziele und Budgetformular",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "UX-01",
+        "CAL-01",
+        "APP-01"
+      ],
+      "deliverable": "Eingabestrecke für Haushalt, Ziele, Budget und Versorgung auf gemeinsamem Fallvertrag.",
+      "acceptance_criteria": [
+        "Monat/Jahr, CHF, Brutto/Netto und unbekannte Angaben sind explizit.",
+        "Bestätigung erzeugt eine gespeicherte Profilversion; Reload verliert den Fall nicht.",
+        "Fehler sind am Feld und per Tastatur erreichbar; keine Produktauswahl vor Bedarfsaufnahme."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "UX-03",
+      "owner": "Person 1",
+      "title": "LifeMap mit Phasen, Säulen und offenen Fragen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "UX-02",
+        "CAL-03",
+        "CAL-04",
+        "APP-03"
+      ],
+      "deliverable": "Zeitachse, zugängliche Tabelle und Ergebnisdetails für eine normalisierte Baseline.",
+      "acceptance_criteria": [
+        "Erste, zweite und dritte Säule bleiben erkennbar, auch bei fehlenden Daten.",
+        "Perioden, Datenstand, Schätzungen und Reviewstatus sind sichtbar.",
+        "Die Oberfläche rechnet Provider-Gesamtleistungen nicht nochmals eigenständig zusammen."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "UX-04",
+      "owner": "Person 1",
+      "title": "Drei Szenariobildschirme mit Vorher-/Nachher",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "UX-03",
+        "CAL-05",
+        "CAL-06"
+      ],
+      "deliverable": "Familie, Eigenheim und Pensionierung bearbeiten gespeicherte Szenarien.",
+      "acceptance_criteria": [
+        "Jede Änderung erzeugt einen neuen passenden Lauf statt dekorativer Zahlen.",
+        "Baseline bleibt erhalten; geänderte Positionen und nicht berechenbare Folgen werden gezeigt.",
+        "Mehrfachklick und verspätete Antwort ersetzen nicht den aktuell gewählten Stand."
+      ],
+      "target_milestone": "G3"
+    },
+    {
+      "id": "UX-05",
+      "owner": "Person 1",
+      "title": "Handlungsoptionen, Empfehlung und Journey-Oberfläche",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "UX-02",
+        "AI-05",
+        "APP-04"
+      ],
+      "deliverable": "Verbundene UI von Strategie über Demo-Offerte/Antrag bis Portal.",
+      "acceptance_criteria": [
+        "Maßnahmen und Alternative ohne neues Produkt erscheinen vor Produktdetails.",
+        "Felder werden aus demselben Fall übernommen; Demo-Bezeichnung bleibt sichtbar.",
+        "Reviewpflicht, veraltete Offerte und Zwischenstatus haben eigene Ansichten."
+      ],
+      "target_milestone": "G4"
+    },
+    {
+      "id": "UX-06",
+      "owner": "Person 1",
+      "title": "Responsive Bedienung, Fehler- und Ladezustände",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "UX-04",
+        "UX-05"
+      ],
+      "deliverable": "Kernfluss auf schmaler und breiter Ansicht mit verständlichen Zuständen.",
+      "acceptance_criteria": [
+        "Pflichtaktionen sind per Tastatur möglich und Fokus ist erkennbar.",
+        "Farbe allein transportiert weder Datenqualität noch Risiken.",
+        "Modell-/Providerfehler behalten den bisherigen Stand mit nachvollziehbarer Kennzeichnung."
+      ],
+      "target_milestone": "G5"
+    },
+    {
+      "id": "UX-07",
+      "owner": "Person 1",
+      "title": "UI für wiederholbare Vorführung vorbereiten",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1,
+      "dependencies": [
+        "UX-06",
+        "QA-05"
+      ],
+      "deliverable": "Aufgeräumter vollständiger Hauptfall und verständliche Herkunftsdetails.",
+      "acceptance_criteria": [
+        "Keine toten Pflichtbuttons im Demo-Pfad.",
+        "Mindestens eine neue Eingabe ist wirklich mit AI und Berechnung verbunden.",
+        "Vorbereitung löscht oder verändert nicht still fremde Fälle."
+      ],
+      "target_milestone": "G6"
+    },
+    {
+      "id": "CAL-01",
+      "owner": "Person 2",
+      "title": "Gemeinsame Schemas, Einheiten und Status festlegen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "QA-01"
+      ],
+      "deliverable": "Laufzeit-validierte Contracts und synthetische Vertrags-Fixture.",
+      "acceptance_criteria": [
+        "Geld, Zeitraum, Basis, Herkunft, Bestätigung und Fachreview sind getrennt.",
+        "Null, unbekannt und nicht anwendbar sind unterscheidbar.",
+        "UI, Backend und AI können dieselbe Profil-/Ergebnishülle verwenden."
+      ],
+      "target_milestone": "G0"
+    },
+    {
+      "id": "CAL-02",
+      "owner": "Person 2",
+      "title": "Serverseitigen Logismata-Adapter anbinden",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "CAL-01",
+        "APP-01"
+      ],
+      "deliverable": "Allowlist-Client mit sauberer Konfiguration, Zeitbegrenzung und Metadaten.",
+      "acceptance_criteria": [
+        "Token bleibt serverseitig; lokale Variablennamen werden ausdrücklich zugeordnet.",
+        "Ort, Alters-/3a-Grenzen und mindestens ein sinnvoller Rechenpfad sind aufrufbar.",
+        "HTTP-Fehler und ungültige Antwortstruktur werden strukturiert zurückgegeben."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "CAL-03",
+      "owner": "Person 2",
+      "title": "Budget und Kapitalverfügbarkeit berechnen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "CAL-02"
+      ],
+      "deliverable": "Normalisierte Cashflow- und freie-Mittel-Betrachtung.",
+      "acceptance_criteria": [
+        "Steuern und bestehende Vorsorgebeiträge werden nicht doppelt abgezogen.",
+        "Statistische Budgetwerte bleiben bestätigbare Vorschläge.",
+        "Negatives Budget und unbekannte Positionen verhindern eine falsche Tragbarkeit."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "CAL-04",
+      "owner": "Person 2",
+      "title": "Drei-Säulen-Baseline für Risiko und Pensionierung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "CAL-02",
+        "CAL-07"
+      ],
+      "deliverable": "Ergebnisbereiche mit Bedarf, vorhandenen Leistungen, Kapital und Validierungsstand.",
+      "acceptance_criteria": [
+        "Risikoereignisse und betroffene Personen sind gemäß Schema gemappt.",
+        "Fehlender Bedarf wird nicht als Null-Lücke behandelt.",
+        "PK-Schätzung und bestätigte Werte bleiben verschieden; Gesamt-/Partnerwerte sind geprüft."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "CAL-05",
+      "owner": "Person 2",
+      "title": "Phasenmodell für Familie und Pensionierung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "CAL-03",
+        "CAL-04"
+      ],
+      "deliverable": "Datierte Ereignisse mit vergleichbaren Phasen und erklärten Rechengrenzen.",
+      "acceptance_criteria": [
+        "Pensumswechsel ändert nach bestätigter Annahme Einkommen/Kosten und berechenbare Versorgung.",
+        "Erwerbsende, Rentenbeginn und Überbrückung sind getrennt.",
+        "Unbekannte künftige PK-/Kinderleistungsregeln bleiben als solche sichtbar."
+      ],
+      "target_milestone": "G3"
+    },
+    {
+      "id": "CAL-06",
+      "owner": "Person 2",
+      "title": "Eigenheim- und Kapitalzuordnungsmodell",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "CAL-01",
+        "CAL-03"
+      ],
+      "deliverable": "Beispiel-Eigenmittellücke, Reserve und laufender Budgetvergleich.",
+      "acceptance_criteria": [
+        "Demo-Quoten und Zinsen sind explizite Annahmen, keine Kreditzusage.",
+        "Freie, reservierte und gebundene Mittel werden nicht vermischt.",
+        "Derselbe Vermögenswert wird nicht vollständig für zwei Ziele gleichzeitig eingesetzt."
+      ],
+      "target_milestone": "G3"
+    },
+    {
+      "id": "CAL-07",
+      "owner": "Person 2",
+      "title": "Ergebnisnormalisierung und begrenzte Ausfallpfade",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "CAL-02"
+      ],
+      "deliverable": "Status pro Ergebnisbereich, Eingabe-Hashes und kontrollierter Replaymodus.",
+      "acceptance_criteria": [
+        "Risiko-Code 0 bleibt bis Klärung reviewpflichtig.",
+        "Replay nur bei passendem Input-/Modell-Hash; neue Eingaben bekommen keine alten Scheinwerte.",
+        "401/403, Timeout, Schemafehler und Begrenzung führen nicht zu endlosen Wiederholungen."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "CAL-08",
+      "owner": "Person 2",
+      "title": "Fachliche Invarianten und Adapterfälle prüfen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "CAL-04",
+        "CAL-05",
+        "CAL-06",
+        "CAL-07"
+      ],
+      "deliverable": "Aussagekräftige Domain-/Adaptertests mit dokumentierten Referenzannahmen.",
+      "acceptance_criteria": [
+        "Einheiten, fehlender Bedarf, Doppelzählung und Kapitalerschöpfung sind abgedeckt.",
+        "Beispielantworten werden nicht als fachlich zertifizierte aktuelle Berechnung ausgegeben.",
+        "Mindestens ein begrenzter Live-Smoke und seine tatsächlichen Grenzen sind protokolliert."
+      ],
+      "target_milestone": "G5"
+    },
+    {
+      "id": "AI-01",
+      "owner": "Person 3",
+      "title": "Zulässigen Modellpfad und minimierten Kontext nachweisen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "QA-01",
+        "CAL-01"
+      ],
+      "deliverable": "Tatsächlicher freigegebener Modellaufruf mit strukturierter Antwort.",
+      "acceptance_criteria": [
+        "Empfänger, Datentypen und Konfiguration dokumentiert; kein beliebiger externer Host.",
+        "Kein Anbieter-Token oder unnötiges Rohdokument im Modellkontext.",
+        "Vorlagen-Fallback ist unterscheidbar und wird nicht als LLM ausgegeben."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "AI-02",
+      "owner": "Person 3",
+      "title": "Freitext in bestätigbare Feldvorschläge überführen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "AI-01"
+      ],
+      "deliverable": "Schemafähige Profil-/Ziel-Patches mit Bestätigungsschritt.",
+      "acceptance_criteria": [
+        "Mindestens drei neue Eingabeformulierungen sinnvoll verarbeitet.",
+        "Kein Modellvorschlag überschreibt bestätigte Felder ohne Benutzeraktion.",
+        "Nur erlaubte Pfade; fremde IDs, Rollen und URLs abgewiesen."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "AI-03",
+      "owner": "Person 3",
+      "title": "Nächste sinnvolle Frage und Datenreife bestimmen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AI-02"
+      ],
+      "deliverable": "Regelbasierte zulässige Fragengruppen mit AI-Formulierung.",
+      "acceptance_criteria": [
+        "Budget, Bedarf, bestehende Deckung und PK-Unbekannt haben Vorrang vor Verkauf.",
+        "Widersprüche führen zur Klärung, nicht zu stiller Auswahl einer Behauptung.",
+        "Erledigungsbedingungen verhindern eine wiederholte Schleife derselben Frage."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "AI-04",
+      "owner": "Person 3",
+      "title": "Ergebnisse mit Quellen und Unsicherheiten erklären",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AI-03",
+        "CAL-04"
+      ],
+      "deliverable": "Ergebnisgebundene Erklärung mit Run- und Faktenreferenzen.",
+      "acceptance_criteria": [
+        "Betrag, Zeitraum und Ursache stimmen mit dem aktuellen Ergebnis überein.",
+        "Geschätzte oder reviewpflichtige Ergebnisse werden nicht als Garantie umformuliert.",
+        "Ungültige Modellausgabe hat einen transparenten begrenzten Fehlerpfad."
+      ],
+      "target_milestone": "G3"
+    },
+    {
+      "id": "AI-05",
+      "owner": "Person 3",
+      "title": "Bedarfs- und Produktregeln für den Hauptfall",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "AI-01",
+        "CAL-01",
+        "QA-02"
+      ],
+      "deliverable": "Kuratierter kleiner Katalog mit Gründen, Sperren und Alternativen.",
+      "acceptance_criteria": [
+        "Maximal drei vertiefte Produktfamilien; Herkunft und Version je Regel.",
+        "Lücke bleibt bei Nichtempfehlung sichtbar und die Entscheidung ist erklärt.",
+        "Keine zusätzliche Versicherung und Datenbeschaffung sind gültige Ergebnisse."
+      ],
+      "target_milestone": "G4"
+    },
+    {
+      "id": "AI-06",
+      "owner": "Person 3",
+      "title": "Angemessenheitsvorprüfung und menschliche Übergabe",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AI-05",
+        "APP-03"
+      ],
+      "deliverable": "Gespeicherte Prüfgründe und Übergabeansicht auf den passenden Fallversionen.",
+      "acceptance_criteria": [
+        "Persönliche Tragbarkeit wird nicht aus gemeinsamem Vermögen abgeleitet.",
+        "Unbekannte oder nicht freigegebene Fachregeln blockieren die betroffene Verbindlichkeit.",
+        "AI kann eine erforderliche menschliche Prüfung nicht selbst erledigen."
+      ],
+      "target_milestone": "G4"
+    },
+    {
+      "id": "AI-07",
+      "owner": "Person 3",
+      "title": "AI-Evaluation und Missbrauchsfälle",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "AI-02",
+        "AI-04",
+        "AI-05",
+        "AI-06"
+      ],
+      "deliverable": "Dokumentierte positive und negative AI-Fälle.",
+      "acceptance_criteria": [
+        "Prompt-Injection fordert weder Tokens noch fremde Fälle erfolgreich an.",
+        "Produktwunsch am Anfang erzeugt keine voreilige persönliche Empfehlung.",
+        "Zahlenbindung, Kontextminimierung und Fallbackverhalten sind geprüft."
+      ],
+      "target_milestone": "G5"
+    },
+    {
+      "id": "APP-01",
+      "owner": "Person 4",
+      "title": "Workspace, API-Grundgerüst und isolierte Demo-Sitzung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [],
+      "deliverable": "Gemeinsamer startfähiger TypeScript-Workspace mit Angular-/NestJS-Grenze.",
+      "acceptance_criteria": [
+        "Eine definierte Toolchain; nur Umgebungsvariablen-Referenzen statt echter Schlüssel.",
+        "Eigene Sitzung und Fallzuordnung vorhanden; kein global geteilter Fall.",
+        "Frontend erreicht geschützte API und Statusfehler werden verständlich zurückgegeben."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "APP-02",
+      "owner": "Person 4",
+      "title": "Persistenz, unveränderliche Versionen und Seed",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "APP-01",
+        "CAL-01"
+      ],
+      "deliverable": "Datenbankmigration, synthetischer Seed und bestätigte Fallversionen.",
+      "acceptance_criteria": [
+        "Reload stellt den richtigen Fall wieder her.",
+        "Bestätigte Profil-/Szenarioversionen werden nicht in-place umgeschrieben.",
+        "Konkurrierende Änderungen an veralteter Version werden erkannt."
+      ],
+      "target_milestone": "G1"
+    },
+    {
+      "id": "APP-03",
+      "owner": "Person 4",
+      "title": "Case-/Calculation-/Review-Verträge integrieren",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "APP-02",
+        "CAL-01"
+      ],
+      "deliverable": "Berechtigte Endpunkte mit Validierung und gemeinsamer Fehlerhülle.",
+      "acceptance_criteria": [
+        "Modell- und UI-Aufträge durchlaufen dieselben Fall-/Fachprüfungen.",
+        "Passender Input-Hash und Ergebnisversion werden gespeichert.",
+        "Teilweise Ergebnisse und offene Reviewgründe sind abrufbar."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "APP-04",
+      "owner": "Person 4",
+      "title": "Demo-Offerte, Antrag und Statusmaschine",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "APP-02",
+        "AI-05"
+      ],
+      "deliverable": "Persistenter Demo-Vertragsprozess mit Idempotenz und Vorbedingungen.",
+      "acceptance_criteria": [
+        "Offerte ist eindeutig Demo und verwendet keine still übernommene Musterprämie.",
+        "Doppelte Einreichung erzeugt keinen zweiten Antrag.",
+        "Veraltete Daten, offene Pflichtprüfung und fehlende Rolle verhindern unzulässige Übergänge."
+      ],
+      "target_milestone": "G4"
+    },
+    {
+      "id": "APP-05",
+      "owner": "Person 4",
+      "title": "Demo-Portal, Police und gemeinsames Dossier",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "APP-04"
+      ],
+      "deliverable": "Wiederaufnehmbarer Portalstand mit HTML-/JSON-Dossier.",
+      "acceptance_criteria": [
+        "Demo-Police erst nach passender protokollierter Demo-Annahme.",
+        "Dossier und UI teilen Werte, Versionen und Prüfstatus.",
+        "Dokumentdownload ist fallbezogen geschützt."
+      ],
+      "target_milestone": "G4"
+    },
+    {
+      "id": "APP-06",
+      "owner": "Person 4",
+      "title": "Sicherheits- und Auditschutz nachweisen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "APP-01",
+        "APP-02"
+      ],
+      "deliverable": "Sitzungs-/Rollenprüfung, Verschlüsselungsnachweis, Redaction und Ereignisverlauf.",
+      "acceptance_criteria": [
+        "Kein fremder Fall oder fremder Export über manipulierte IDs erreichbar.",
+        "Keine realen Tokens im Bundle/Git/Export; notwendige Verschlüsselung tatsächlich eingerichtet.",
+        "Auditereignisse dokumentieren Statusversionen ohne vertrauliche Rohpayloads."
+      ],
+      "target_milestone": "G5"
+    },
+    {
+      "id": "APP-07",
+      "owner": "Person 4",
+      "title": "Reproduzierbaren Start und Demo-Konfiguration übergeben",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1,
+      "dependencies": [
+        "APP-05",
+        "APP-06"
+      ],
+      "deliverable": "Geprüfte lokale Start-/Migrations-/Seed-Schritte und Betriebsmodi.",
+      "acceptance_criteria": [
+        "Sauberer Start ohne manuell versteckte Datenbankkorrektur.",
+        "Live-/Replay-/Fallback- und Demo-Sales-Modi unterscheiden sich sichtbar.",
+        "Keine neue Cloudbereitstellung oder Providerberechtigung still vorausgesetzt."
+      ],
+      "target_milestone": "G6"
+    },
+    {
+      "id": "QA-01",
+      "owner": "Person 5",
+      "title": "Scope, Fixture und Abnahmekriterien festlegen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [],
+      "deliverable": "Eine vollständige synthetische Hauptfixture und geordnete Quellenklassen.",
+      "acceptance_criteria": [
+        "Öffentliche Testfamilie, Müller-Quelle und Musteranalysen getrennt.",
+        "Zusätzliche Ziele/Budgetwerte als eigene synthetische Schicht.",
+        "Owner und P0-Nachweise von allen fünf Personen verstanden."
+      ],
+      "target_milestone": "G0"
+    },
+    {
+      "id": "QA-02",
+      "owner": "Person 5",
+      "title": "Produkt- und Fachquellen für den kleinen Katalog aufbereiten",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "QA-01"
+      ],
+      "deliverable": "Kuratiertes Faktenpaket mit Dokument-/Abschnittsbezug und offenen Versionsfragen.",
+      "acceptance_criteria": [
+        "Garantie, Projektion, Kosten, Rückkauf und Deckungsursachen getrennt.",
+        "Keine Behauptung vollständiger Prüfung aller archivierten PDFs/Videos.",
+        "Nur nachvollziehbare Fakten gehen an AI-/Produktregeln."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "QA-03",
+      "owner": "Person 5",
+      "title": "Frühe Pax-Abstimmung und Entscheidungslog",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 1.5,
+      "dependencies": [
+        "QA-01"
+      ],
+      "deliverable": "Priorisierte Klärung von Integrations-, Modell-, Paket- und Fachblockern.",
+      "acceptance_criteria": [
+        "Tatsächliche Expertenantwort oder weiterhin offener Punkt wird korrekt dokumentiert.",
+        "Demo-Sales-Umfang und Risiko-Code haben nachvollziehbare Entscheidungen.",
+        "Keine Nachricht oder Terminbuchung ohne entsprechenden Auftrag versendet."
+      ],
+      "target_milestone": "G3"
+    },
+    {
+      "id": "QA-04",
+      "owner": "Person 5",
+      "title": "Abnahmedatensätze und Testdurchlauf vorbereiten",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2.5,
+      "dependencies": [
+        "QA-01",
+        "CAL-01"
+      ],
+      "deliverable": "Grenzfälle, geeignete Browserpfade und messbare Abnahmecheckliste.",
+      "acceptance_criteria": [
+        "Fachliche Annahmen und technische Beispiele werden nicht gleichgesetzt.",
+        "Unbekannt, Negativbudget, Kapitaldoppelverwendung und veraltete Version enthalten.",
+        "Ein kompletter Journey-Pfad und sinnvolle negative Pfade sind vorbereitet."
+      ],
+      "target_milestone": "G2"
+    },
+    {
+      "id": "QA-05",
+      "owner": "Person 5",
+      "title": "Gemeinsamen Gesamtfluss und drei Szenarien abnehmen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 3,
+      "dependencies": [
+        "UX-04",
+        "UX-05",
+        "CAL-08",
+        "AI-07",
+        "APP-05"
+      ],
+      "deliverable": "Dokumentierter integrierter Testlauf auf einer frischen Sitzung.",
+      "acceptance_criteria": [
+        "Drei Pflichtszenarien und echter AI-Aufruf im selben Fall.",
+        "Empfehlung, Dossier und Journey verwenden aktuelle Daten.",
+        "Alle offenen Kernpunkte stehen sichtbar im Freigabestand."
+      ],
+      "target_milestone": "G5"
+    },
+    {
+      "id": "QA-06",
+      "owner": "Person 5",
+      "title": "Pitch, Demoablauf und Übergabeunterlagen",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "QA-05",
+        "APP-07"
+      ],
+      "deliverable": "Wiederholbarer Drei-Minuten-Durchlauf mit ehrlichem Backup.",
+      "acceptance_criteria": [
+        "Zusätzlicher Nutzen gegenüber öffentlicher Pax/vlot-Analyse klar.",
+        "Eine neue Änderung wird wirklich verarbeitet und berechnet.",
+        "Keine echte Versicherungsdeckung oder vollständige Compliance behauptet."
+      ],
+      "target_milestone": "G6"
+    },
+    {
+      "id": "QA-07",
+      "owner": "Person 5",
+      "title": "Negative Sicherheits- und Datenschutzprüfung",
+      "priority": "P0",
+      "status": "planned",
+      "estimate_person_hours": 2,
+      "dependencies": [
+        "APP-06",
+        "AI-07"
+      ],
+      "deliverable": "Unabhängiger Gegencheck von Rollen, Export und Datenwegen.",
+      "acceptance_criteria": [
+        "Zweiter Browser kann ersten Fall nicht lesen, ändern oder exportieren.",
+        "Modell-/Log-Kontext und Bundle enthalten keine unnötigen Daten oder Schlüssel.",
+        "Sicherheitsfehler werden vor P1-Gestaltung priorisiert."
+      ],
+      "target_milestone": "G5"
+    }
+  ]
+}

@@ -8,6 +8,8 @@ LifeMap macht die finanzielle Lebenssituation sichtbar, lässt Kundinnen und Kun
 
 **Status:** Die Quellen wurden heruntergeladen, technische Beispiele erfasst und die Planung ausgearbeitet. Eine eigene Advisor-App ist noch nicht implementiert. Die beschriebenen Funktionen und Arbeitspakete sind der Bauplan für den Prototyp.
 
+Der [detaillierte Angular-Umsetzungsplan](implementation-plan.md) konkretisiert Screens, Datenverträge, Rechenlogik, AI, Statusmodell, Tests und Zeitfenster. Das [Ticket-Backlog](implementation-backlog.md) enthält 36 geplante P0-Pakete für fünf Personen. Für Umsetzung und Priorisierung gilt dieser aktuelle Detailstand; Originalquellen und ihre offenen Fachfragen bleiben unverändert.
+
 ## 1. Entscheidung und Nutzenversprechen
 
 **„Verstehe heute, was deine Entscheidungen für morgen bedeuten.“**
@@ -134,7 +136,7 @@ Es gibt zwei unterschiedliche Quellengruppen, die getrennt bleiben:
 
 In der vermögenden Persona stehen offenbar kopierte Müller-Bezeichnungen bei den Arbeitspensen. Das wird als Quellenunklarheit markiert und nicht automatisch Personen zugeordnet.
 
-**Demo-Hauptfall:** die Müller-Persona. Fehlende PK-Werte, Budgetpositionen und zusätzliche Ziele wie „Eigenheim in fünf Jahren“ werden für die Demo ausdrücklich als synthetische Ergänzungen bezeichnet. Ein separater Referenzmodus zeigt die unveränderten Werte des Paar-Vorsorgechecks.
+**Erster Entwicklungs-/Demo-Hauptfall:** die vollständig erfundene Familie TEST Nina / TEST Tom aus dem dokumentierten öffentlichen Test. Zusätzliche Budgetpositionen und Lebensziele liegen in einer getrennten synthetischen Fixture-Schicht. Die Müller-Persona bleibt Zielgruppen- und Fachreferenz; eine darauf beruhende zweite Demo-Version wird erst nach Kennzeichnung ihrer offenen Angaben ergänzt. Der Paar-Vorsorgecheck bleibt ein separater unveränderter Referenzfall. Details und Begründung stehen im [Umsetzungsplan](implementation-plan.md).
 
 Gesundheitsdaten und echte Ausweiskopien werden für die Hackathon-Demo nicht benötigt. Die Originalunterlagen bleiben im autorisierten lokalen Arbeitsbereich und werden nicht ungeprüft an ein externes Modell übermittelt.
 
@@ -227,7 +229,7 @@ flowchart LR
     O --> UI
 ```
 
-**Frontend:** Der Stack wird nach Teamkenntnissen gewählt. Wenn Paketfreigabe vorhanden ist, passt Angular zur dokumentierten Pax-UI-Bibliothek. Andernfalls die dokumentierten Marken- und Design-Tokens im vorhandenen Stack nutzen, ohne die App von einer ungeklärten Paketberechtigung abhängig zu machen.
+**Frontend:** Angular ist die ausdrückliche Teamentscheidung. Pax UI wird nach Prüfung von Registry-Zugriff und Peer Dependencies eingebunden; die archivierte Installationsanleitung nennt Angular 19/20. Ohne Paketzugriff bleibt Angular gesetzt und wenige eigene Markenkomponenten dienen als transparenter Fallback. Reactive Forms und gemeinsame Datenverträge sind im [Detailplan](implementation-plan.md) beschrieben. Als Backend ist NestJS/TypeScript mit PostgreSQL vorgeschlagen; genaue kompatible Paketversionen werden beim Baustart festgehalten.
 
 **Server:** Profilvalidierung, alle API-Aufrufe, Berechnungs- und Empfehlungsversionen, Zugriffskontrolle und Auditereignisse. Der Client erhält keine Anbieter-Zugangsdaten.
 
@@ -320,17 +322,20 @@ Das Team besteht aus **fünf Personen**. Die ausführliche Aufgabenverteilung un
 
 Die Rollen entwickeln nach einem gemeinsamen Datenvertrag gleichzeitig und integrieren früh; die folgende Tabelle beschreibt den gemeinsamen Fortschritt.
 
-| Block | Arbeit | Fertig, wenn |
-|---|---|---|
-| 0–4 h | Fachfragen mit Cem/Claude, Demo-Datensatz, freigegebene Modellumgebung, Paket-/API-Zugang | Offene Annahmen markiert, Grenzen des Prototyps beschlossen |
-| 4–12 h | Persistentes Profil, Ziele/Budget, Serveradapter und Eingabeprüfung | Derselbe Fall lässt sich speichern und wieder öffnen; Risiko- und Altersrechnung laufen über den Adapter |
-| 12–22 h | LifeMap und drei Szenariomodule | Änderungen aktualisieren Resultate und ihre Annahmen; keine Doppelzählung von Kapital |
-| 22–30 h | Rückfragen, Erklärungen, Produktregeln und persönliche Vorprüfung | Empfehlung referenziert bestätigten Bedarf, Quellen und konkrete Merkmale |
-| 30–38 h | Offerte, Antragsstatus, menschliche Übergabe und Portal-Sandbox | Die durchgängige Journey funktioniert mit klar bezeichneten Integrationsgrenzen |
-| 38–44 h | Fachvergleich, Fehlerfälle, Datenschutzprüfung und Demo-Feinschliff | Abnahmekriterien bestanden; alle Aussagen entsprechen dem tatsächlich verfügbaren Funktionsstand |
-| 44–48 h | Präsentation und Puffer | Drei-Minuten-Demo ohne manuelle Datenreparatur möglich |
+| Fenster | Gemeinsamer Nachweis |
+|---|---|
+| 0–2 h | Scope, Fixture, Rollen und Paket-/Providergrenzen festgelegt |
+| 2–8 h | Erster gespeicherter Slice mit Profil, tatsächlicher AI-Ausführung und geeignetem Rechenpfad |
+| 8–16 h | LifeMap und erste Szenariovarianten |
+| 16–24 h | Alle drei Pflichtszenarien auf demselben Fall |
+| 24–32 h | Strategie, Empfehlung und erste durchgängige Demo-Journey |
+| 32–38 h | Vollständiger gespeicherter Hauptfall bis zur Demo-Police |
+| 38–44 h | Fach-/Sicherheitsfälle, Daten- und Versionskonsistenz geprüft |
+| 44–48 h | Wiederholbare Demo und dokumentierter Start; Fehlerpuffer |
 
-**P0:** Alle Muss-Anforderungen in einem schmalen, vollständigen Fall. **P1:** zweisprachiger Dialog, einfache Dokumentextraktion, NPS und datensparsame Abbruchanalyse. **P2:** vier vollständig geprüfte Sprachen, Voice, Avatar und zusätzliche Spezialfälle.
+Der [Detailplan](implementation-plan.md) enthält die konkreten Übergaben, Risiken und 37 Abnahmefälle. Das [Backlog](implementation-backlog.md) plant 77 Ticket-Personenstunden, 20 gemeinsame Personenstunden und 13 Pufferstunden; 48 Stunden sind ein vorläufiges Veranstaltungsfenster, keine Durcharbeitszeit pro Person.
+
+**P0:** Alle Muss-Anforderungen in einem schmalen, vollständigen Fall. **P1:** mehrsprachiger Dialog einschließlich DE/FR/IT/EN, bestätigbare synthetische Dokumentextraktion, serverseitiger PDF-Export, NPS und datensparsame Abbruchanalyse. **P2:** Voice, Avatar und zusätzliche Spezialfälle.
 
 Bei Zeitknappheit die Zahl der Zusatzprodukte und die Gestaltungskomplexität reduzieren; keines der drei Szenarien oder der Ende-zu-Ende-Statusfluss fällt weg.
 
@@ -356,7 +361,7 @@ Für Referenzvergleiche die bereitgestellten Analysen mit identischen Annahmen n
 
 ## 16. Drei-Minuten-Demogeschichte
 
-1. **0:00–0:30:** Müller-Persona öffnen. Lebensziele und Haushaltslage bestätigen; fehlende Angaben sichtbar ergänzen.
+1. **0:00–0:30:** Synthetische Familie TEST Nina / TEST Tom öffnen. Lebensziele und Haushaltslage bestätigen; fehlende Angaben sichtbar ergänzen.
 2. **0:30–1:05:** Ein Arbeitspensum bzw. den Wiedereinstieg ändern. Budget, Versorgung und offene Fragen aktualisieren sich.
 3. **1:05–1:35:** Eigenheimvariante vergleichen. Gebundenes Kapital und Auswirkungen auf spätere Ziele gemeinsam sehen.
 4. **1:35–2:00:** Pensionierungszeitpunkte ändern. Übergangsphase und langfristige Lücke vergleichen.

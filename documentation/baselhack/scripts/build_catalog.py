@@ -202,6 +202,8 @@ plan.write_text(body + '\n\n<!-- GENERATED SOURCE APPENDIX -->\n\n' + source_app
 
 Stand: 30.10.2026. Recherche, Material und Bauplan; die Advisor-App ist noch nicht implementiert.
 
+- [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)
+- [Umsetzbares Ticket-Backlog für fünf Personen](plans/implementation-backlog.md)
 - [Gesamtplan](plans/advisor-plan.md)
 - [Aufteilung für fünf Personen](plans/team-plan.md)
 - [Vollständiger Quellen- und Medienkatalog](references/README.md)
@@ -270,12 +272,16 @@ for path in list((ROOT / 'references').rglob('*')) + list(CATALOG.rglob('*')):
 
 EXPORTS.mkdir(parents=True, exist_ok=True)
 for source, name in [(plan, 'PAX_DIGITAL_ADVISOR_PLAN.md'), (ROOT / 'plans/team-plan.md', 'BASELHACK_TEAMPLAN.md'),
-                     (index, 'BASELHACK_QUELLEN.md')]:
+                     (index, 'BASELHACK_QUELLEN.md'),
+                     (ROOT / 'plans/implementation-plan.md', 'PAX_LIFEMAP_DETAILPLAN.md'),
+                     (ROOT / 'plans/implementation-backlog.md', 'PAX_LIFEMAP_BACKLOG.md')]:
     def export_link(match):
         value = match.group(1) or match.group(2)
         if '://' in value or value.startswith('#'):
             return match.group(0)
-        return '](<' + str((source.parent / value).resolve()) + '>)'
+        file_part, separator, fragment = value.partition('#')
+        path = (source.parent / file_part).resolve()
+        return '](<' + str(path) + (separator + fragment if separator else '') + '>)'
     exported = re.sub(r'\]\((?:<([^>]+)>|([^\s)]+))\)', export_link, source.read_text())
     (EXPORTS / name).write_text(exported)
 print(json.dumps(manifest, ensure_ascii=False))

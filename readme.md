@@ -2,6 +2,8 @@
 
 Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Quellen und Bauplan; eine eigene Advisor-App ist noch nicht implementiert.
 
+- [Detaillierter Angular-Umsetzungsplan](documentation/baselhack/plans/implementation-plan.md)
+- [Ticket-Backlog für fünf Personen](documentation/baselhack/plans/implementation-backlog.md)
 - [Gesamtplan und Quellen](documentation/baselhack/plans/advisor-plan.md)
 - [Aufteilung für fünf Personen](documentation/baselhack/plans/team-plan.md)
 - [Materialübersicht und Archivaufbau](documentation/baselhack/README.md)

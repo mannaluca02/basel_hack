@@ -2,6 +2,8 @@
 
 Stand: 30.10.2026. Recherche, Material und Bauplan; die Advisor-App ist noch nicht implementiert.
 
+- [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)
+- [Umsetzbares Ticket-Backlog für fünf Personen](plans/implementation-backlog.md)
 - [Gesamtplan](plans/advisor-plan.md)
 - [Aufteilung für fünf Personen](plans/team-plan.md)
 - [Vollständiger Quellen- und Medienkatalog](references/README.md)

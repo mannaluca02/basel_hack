@@ -2,6 +2,8 @@
 
 Stand: 30.10.2026. Die Personenbezeichnungen sind Rollenplätze, bis ihr Namen und Stärken zuordnet. Es wurden keine Aufgaben in GitHub erstellt und noch keine App-Funktionen implementiert.
 
+Der [detaillierte Angular-Umsetzungsplan](implementation-plan.md) ist die konkrete Bauanleitung. Das [Backlog mit 36 P0-Paketen](implementation-backlog.md) nennt Abhängigkeiten, Aufwand und Abnahme. Angular ist gesetzt; Pax UI wird auf tatsächliche Paketberechtigung und kompatible Versionen geprüft. Für den ersten vollständigen Durchlauf verwenden wir die bereits dokumentierte synthetische Familie TEST Nina / TEST Tom; Quellpersonas und fachliche Musterfälle bleiben getrennt.
+
 ## Gemeinsames Ziel
 
 Ein gespeicherter Kundenfall durchläuft Bedarfsaufnahme, Analyse aller drei Säulen, die Szenarien Familie/Eigenheim/Pensionierung, eine nachvollziehbare Empfehlung und den Ablauf bis zur ausdrücklich als Demo gekennzeichneten Police. Der fachliche Gesamtplan steht in [PAX_DIGITAL_ADVISOR_PLAN.md](./advisor-plan.md).
@@ -45,7 +47,7 @@ Diese Bezeichnungen sind der vereinbarte Ausgangspunkt, keine bereits vorhandene
 |---|---|
 | Nach 2 h | Rollen, ein Demo-Fall, Datenvertrag, Modellfreigabe und offene Integrationsgrenzen vereinbart |
 | Nach 8 h | Profil speichern, erste Berechnung abrufen und das Ergebnis in LifeMap anzeigen |
-| Nach 20 h | Alle drei Szenarien auf demselben Fall durchlaufen; fehlende Angaben und Fehler behandeln |
+| Nach 24 h | Alle drei Szenarien auf demselben Fall durchlaufen; fehlende Angaben und Fehler behandeln |
 | Nach 30 h | Erklärbare Empfehlung und menschliche Übergabe aus demselben Beratungsdossier zeigen |
 | Nach 38 h | Empfehlung → Offerte → Antrag → Sandbox-Prüfung → fiktive Police ohne Datenneuerfassung |
 | Nach 44 h | Fachliche Grenzfälle, API-Ausfall, Berechtigungen und Demo-Ablauf geprüft |
@@ -98,7 +100,7 @@ Das sind Zeitpunkte im gemeinsamen Arbeitsfenster, nicht 48 Stunden Aufwand pro 
 ## Arbeit im Repo
 
 - Kleine fachlich zusammenhängende Branches und Pull Requests verwenden; Schnittstellenänderungen mit den betroffenen Rollen abstimmen.
-- Die bestehende Struktur `code/`, `assets/` und `documentation/` bleibt der Ausgangspunkt. Framework und Modulstruktur gemeinsam vor dem ersten App-Slice festlegen.
+- Die bestehende Struktur `code/`, `assets/` und `documentation/` bleibt der Ausgangspunkt. Angular ist festgelegt; kompatible Pax-UI-/Angular-Version, Backend-Konfiguration und gemeinsame Modulgrenzen vor dem ersten App-Slice bestätigen.
 - In diesem Paket funktionieren Quellenlinks relativ zum Checkout. Keine absoluten persönlichen Dateipfade in neue Repo-Dokumente übernehmen.
 - Originalquellen unverändert lassen. Änderungen gehören in Produktregeln, Fallmodelle oder neue Notizen mit Quellenbezug.
 - Das Zugangsdaten-Beispiel [logismata.env.example](../logismata.env.example) enthält keinen echten Token. Autorisierte lokale Zugangsdaten gehören ausschließlich nach `private/logismata.env`, mit Dateirechten `0600`.
