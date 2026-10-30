@@ -1,0 +1,15 @@
+# Agent rule files (local only)
+RULES.md
+CLAUDE.md
+AGENTS.md
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Environments and dependencies
+.venv/
+node_modules/
+__pycache__/
+.DS_Store
