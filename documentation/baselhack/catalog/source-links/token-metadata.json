@@ -1,0 +1,17 @@
+{
+  "expiry_utc": "2026-11-03T22:59:59+00:00",
+  "signature_verified": false,
+  "note": "Ablaufdatum nur aus JWT gelesen; keine Signaturvalidierung.",
+  "scopes": [
+    "calc.tax.purchasep2",
+    "calc.tax.estategain",
+    "calc.tax.income",
+    "calc.tax.inheritance",
+    "calc.tax.corporateentity",
+    "calc.tax.capital",
+    "calc.saving",
+    "calc.check.retirement",
+    "calc.check.risk",
+    "calc.tax.saving3a"
+  ]
+}

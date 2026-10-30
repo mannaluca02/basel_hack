@@ -1,0 +1,33 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/grundstueckgewinnsteuer",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateEstateGainTax",
+  "http_status": 200,
+  "request": {
+    "TaxLocationID": 400100000,
+    "Relationship": 1,
+    "Confession1": 4,
+    "Confession2": 4,
+    "ConfessionPart1": 0,
+    "TaxableGain": 200000,
+    "OwnerYears": 10,
+    "OwnerMonths": 0,
+    "Revenues": 800000,
+    "FirstCosts": 500000,
+    "BuildingInvest": 50000,
+    "HasBuilding": true,
+    "SelfInhabited": false,
+    "SelfInhabYears": 0,
+    "HasDiscount": false
+  },
+  "response": {
+    "response": {
+      "FederalTax": 0,
+      "StateTax": 36703,
+      "CommunityTax": 36703,
+      "ChurchTax": 0,
+      "TotalTaxes": 73406
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/einkommens-vermoegenssteuer",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateIncomeFortuneTax",
+  "http_status": 200,
+  "request": {
+    "IncomeType": 1,
+    "Income": 120000,
+    "Fortune": 200000,
+    "TaxLocationID": 400100000,
+    "Relationship": 2,
+    "Confession1": 4,
+    "Confession2": 4,
+    "NumberOfChildren": 2,
+    "BirthYear": 1985
+  },
+  "response": {
+    "response": {
+      "CommunityTax": 4011,
+      "ChurchTax": 0,
+      "StateTax": 4011,
+      "FederalTax": 523,
+      "FortuneTax": 90,
+      "PollTax": 0,
+      "TotalTaxes": 8635,
+      "TaxFreedomDay": 29,
+      "MarginalTaxRate": 25
+    }
+  }
+}

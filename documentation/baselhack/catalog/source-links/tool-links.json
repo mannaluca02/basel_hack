@@ -1,0 +1,134 @@
+[
+  {
+    "text": "BaselHack 2026",
+    "url": "https://pax-hackathon-2026.vercel.app/"
+  },
+  {
+    "text": "Challenge",
+    "url": "https://pax-hackathon-2026.vercel.app/challenge"
+  },
+  {
+    "text": "Material",
+    "url": "https://pax-hackathon-2026.vercel.app/material"
+  },
+  {
+    "text": "Tools",
+    "url": "https://pax-hackathon-2026.vercel.app/tools"
+  },
+  {
+    "text": "DE",
+    "url": "https://pax-hackathon-2026.vercel.app/de/tools"
+  },
+  {
+    "text": "",
+    "url": "https://pax-hackathon-2026.vercel.app/"
+  },
+  {
+    "text": "APICalc-swagger.yaml",
+    "url": "https://pax-hackathon-2026.vercel.app/APICalc-swagger.yaml"
+  },
+  {
+    "text": "Open the official Logismata calculators",
+    "url": "https://services.logismata.ch/rso-internetrechner/app/"
+  },
+  {
+    "text": "Convert income Convert between gross, taxable and net income. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/einkommen-umrechnen"
+  },
+  {
+    "text": "Real-estate capital gains tax The tax on the gain from selling a property. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/grundstueckgewinnsteuer"
+  },
+  {
+    "text": "Income & wealth tax The ordinary tax on income and wealth at a Swiss place of residence. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/einkommens-vermoegenssteuer"
+  },
+  {
+    "text": "Lump-sum benefit tax The separate tax on a lump-sum payout from pension savings. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/kapitalleistungssteuer"
+  },
+  {
+    "text": "Corporate tax Profit and capital tax of a legal entity. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/unternehmenssteuer"
+  },
+  {
+    "text": "Inheritance tax – overview The tax on an amount for all relationship degrees at a glance. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-uebersicht"
+  },
+  {
+    "text": "Inheritance tax – by group The tax for a relationship group – such as children or siblings. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-gruppe"
+  },
+  {
+    "text": "Inheritance tax – beneficiary The tax for a specifically named beneficiary. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-beguenstigter"
+  },
+  {
+    "text": "Pillar 3a – saving & taxes Final capital and tax saving of a 3a contribution over the years. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/saeule-3a"
+  },
+  {
+    "text": "Pension-fund buy-in The tax saving of a voluntary buy-in into the 2nd pillar. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/pk-einkauf"
+  },
+  {
+    "text": "Savings calculator How an initial capital grows with regular deposits and interest. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/sparen"
+  },
+  {
+    "text": "Withdrawal calculator How long a capital lasts with regular withdrawals and interest. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/entnahme"
+  },
+  {
+    "text": "Budget proposal A household budget from income and life situation. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/budget"
+  },
+  {
+    "text": "Risk – base data The base values of the risk check without need assumptions. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/risiko-grunddaten"
+  },
+  {
+    "text": "Risk check The income gap on disability and death – with scenarios. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/risiko-check"
+  },
+  {
+    "text": "Retirement – base data The base values of the retirement check without need assumptions. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/pensionierung-grunddaten"
+  },
+  {
+    "text": "Retirement check Income and capital need in retirement – and the remaining gap. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/pensionierungs-check"
+  },
+  {
+    "text": "Pillar 3a limits The maximum 3a contribution with and without a pension fund. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/3a-limiten"
+  },
+  {
+    "text": "Age limits The relevant age limits by sex and birth year. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/altersgrenzen"
+  },
+  {
+    "text": "Tax-base status Version and date of the stored tax-base data. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/steuerstand"
+  },
+  {
+    "text": "Search location Find tax locations by postcode or town. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/standort-suche"
+  },
+  {
+    "text": "Search location (geo) Find tax locations within a radius of coordinates. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/standort-suche-geo"
+  },
+  {
+    "text": "Look up location The details of a tax location by its ID. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/standort"
+  },
+  {
+    "text": "Real-estate capital gain – extra fields Which cantonal extra fields a location has for the real-estate capital gains tax. \nOpen",
+    "url": "https://pax-hackathon-2026.vercel.app/rechner/grundstueckgewinn-zusatzfelder"
+  },
+  {
+    "text": "Home",
+    "url": "https://pax-hackathon-2026.vercel.app/"
+  }
+]

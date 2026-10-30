@@ -1,0 +1,30 @@
+Browser tab: 5, Title: "Tools · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/tools#design".
+1 AXWebArea Tools · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/tools#design
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 tab group Tools
+			12 tab (selectable, settable, boolean) Analysis, Value: 0, ID: tab-analysis
+			13 tab (selectable, settable, boolean) Sales, Value: 0, ID: tab-sales
+			14 tab (selected, settable, boolean) Design, Value: 1, ID: tab-design
+		81 container Description: Design, ID: panel-design
+			82 heading Design, Value: 2
+				83 text Design
+			84 text The same design language as this hub. Use it if you want to build your prototype in the Pax look.
+			85 content list
+				86 link Description: ui.pax.ch Pax UI — design system and component library., Value: ui.pax.ch/
+				87 link Description: brand.pax.ch Pax Brand — logos, colours, type and brand guidelines., Value: brand.pax.ch/
+	75 container Breadcrumb
+		76 content list
+			77 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			78 text Tools
+	79 container
+		80 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 14 tab (selected, settable, boolean) Design, Value: 1, ID: tab-design

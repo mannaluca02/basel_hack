@@ -1,0 +1,14 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/steuerstand",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getTaxBaseInfo",
+  "http_status": 200,
+  "request": {},
+  "response": {
+    "response": {
+      "TaxBaseVersion": "26.09",
+      "TaxBaseDate": "10.09.2026"
+    }
+  }
+}

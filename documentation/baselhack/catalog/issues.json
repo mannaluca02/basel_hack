@@ -1,0 +1,34 @@
+{
+  "resolved": [
+    {
+      "item": "FondsStar-Flyer",
+      "resolution": "PDF downloaded and validated"
+    },
+    {
+      "item": "LifeStar-Produktseite",
+      "resolution": "Current lowercase URL captured; legacy 404 snapshot preserved"
+    },
+    {
+      "item": "LifeStar-Produktblatt",
+      "resolution": "PDF downloaded and validated"
+    },
+    {
+      "item": "Pax-Videoreferenzen",
+      "resolution": "16 identified clips downloaded; available German subtitles saved"
+    }
+  ],
+  "open": [
+    {
+      "item": "Risiko-ErrorCode",
+      "detail": "Risk examples return 0; Swagger declares 1 as OK. Domain clarification remains necessary."
+    },
+    {
+      "item": "Inhaltliche Vollprüfung",
+      "detail": "Not every PDF page or video has been fully reviewed. Download is not review."
+    },
+    {
+      "item": "Produktionsintegration",
+      "detail": "Actual application acceptance, signature and policy issuance not verified."
+    }
+  ]
+}

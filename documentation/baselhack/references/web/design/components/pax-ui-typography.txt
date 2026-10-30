@@ -1,0 +1,529 @@
+Browser tab: 7, Title: "Guide / Typography System - Docs ⋅ Storybook", URL: "https://ui.pax.ch/?path=/docs/guide-typography-system--docs".
+0 AXWebArea Guide / Typography System - Docs ⋅ Storybook, URL: ui.pax.ch/?path=/docs/guide-typography-system--docs
+	1 container root
+		2 container
+			7 container
+				8 button Apply a grid to the preview
+					9 image
+				10 button Apply outlines to the preview
+					11 image
+				12 button Description: Go full screen, Help: Go full screen [⌥ F]
+					13 image
+			14 container storybook-preview-wrapper
+				15 link Description: Skip to sidebar, Value: ui.pax.ch/?path=/docs/guide-typography-system--docs#guide-typography-system--docs
+				16 container storybook-preview-iframe
+					17 AXWebArea guide-typography-system--docs, URL: ui.pax.ch/iframe.html?viewMode=docs&id=guide-typography-system--docs&globals=
+						18 container storybook-docs
+							536 heading Typography System, Value: 1, ID: typography-system
+								564 text Typography System
+							565 container
+								566 text Pax UI uses  Civil Premium  as the primary typeface with system font fallbacks.
+							537 heading Tailwind Classes, Value: 2, ID: tailwind-classes
+								567 text Tailwind Classes
+							538 heading Display Text, Value: 3, ID: display-text
+								568 text Display Text
+							539 container
+								569 container
+									570 text < h1 class = " text-display-xxl " > Hero Text </ h1 > <!-- 110px desktop / 60px mobile --> < h1 class = " text-display-xl " > Large Display </ h1 > <!-- 96px desktop / 50px mobile --> < h1 class = " text-display-l " > Medium Display </ h1 > <!-- 72px desktop / 40px mobile --> < h1 class = " text-display-m " > Medium Display </ h1 > <!-- 60px desktop / 30px mobile --> < h1 class = " text-display-s " > Small Display </ h1 > <!-- 52px desktop / 24px mobile -->
+								540 button Copy
+							541 heading Headings, Value: 3, ID: headings
+								571 text Headings
+							542 container
+								572 container
+									573 text < h1 class = " text-heading-xl " > Page Title </ h1 > <!-- 44px desktop / 32px mobile --> < h2 class = " text-heading-l " > Section Title </ h2 > <!-- 38px desktop / 26px mobile --> < h3 class = " text-heading-m " > Subsection Title </ h3 > <!-- 28px desktop / 22px mobile --> < h4 class = " text-heading-s " > Small Heading </ h4 > <!-- 22px desktop / 18px mobile -->
+								543 button Copy
+							544 heading Body Text, Value: 3, ID: body-text
+								574 text Body Text
+							545 container
+								575 container
+									576 text < p class = " text-paragraph-l " > Large paragraph text </ p > <!-- 22px desktop / 18px mobile --> < p class = " text-paragraph-m " > Default paragraph text </ p > <!-- 18px desktop / 17px mobile --> < p class = " text-paragraph-s " > Small paragraph text </ p > <!-- 16px all sizes --> < p class = " text-paragraph-xs " > Caption text </ p > <!-- 14px all sizes --> < p class = " text-paragraph-xxs " > Micro text </ p > <!-- 12px all sizes -->
+								546 button Copy
+							547 heading Special Text, Value: 3, ID: special-text
+								577 text Special Text
+							548 container
+								578 container
+									579 text < span class = " text-overline " > CATEGORY LABEL </ span > <!-- 22px desktop / 20px mobile --> < button class = " text-button " > Button Text </ button > <!-- 16px all sizes -->
+								549 button Copy
+							550 heading Colors, Value: 2, ID: colors
+								580 text Colors
+							551 container
+								581 container
+									582 text < p class = " text-neutral-black " > Primary text </ p > < p class = " text-neutral-gray-6 " > Secondary text </ p > < p class = " text-brand-pax-green " > Brand text </ p > < p class = " text-system-error " > Error text </ p >
+								552 button Copy
+							553 heading Font Weights, Value: 2, ID: font-weights
+								583 text Font Weights
+							584 content list
+								585 container
+									586 AXListMarker • 
+									587 text font-normal (400) : Body text, paragraphs
+								588 container
+									589 AXListMarker • 
+									590 text font-medium (500) : Buttons, emphasized content
+								591 container
+									592 AXListMarker • 
+									593 text font-bold (700) : Headings, display text
+							554 heading Responsive Behavior, Value: 2, ID: responsive-behavior
+								594 text Responsive Behavior
+							595 text Typography automatically scales between desktop (1024px+) and mobile breakpoints:
+							596 table
+								597 row
+									598 cell
+										599 text Style
+									600 cell
+										601 text Desktop Size
+									602 cell
+										603 text Mobile Size
+									604 cell
+										605 text Usage
+								606 row
+									607 cell
+										608 text Display XXL
+									609 cell
+										610 text 110px
+									611 cell
+										612 text 60px
+									613 cell
+										614 text Hero sections, landing headers
+								615 row
+									616 cell
+										617 text Display XL
+									618 cell
+										619 text 96px
+									620 cell
+										621 text 50px
+									622 cell
+										623 text Large hero text
+								624 row
+									625 cell
+										626 text Display L
+									627 cell
+										628 text 72px
+									629 cell
+										630 text 40px
+									631 cell
+										632 text Section heroes
+								633 row
+									634 cell
+										635 text Display M
+									636 cell
+										637 text 60px
+									638 cell
+										639 text 30px
+									640 cell
+										641 text Subsection headers
+								642 row
+									643 cell
+										644 text Display S
+									645 cell
+										646 text 52px
+									647 cell
+										648 text 24px
+									649 cell
+										650 text Small display text
+								651 row
+									652 cell
+										653 text Heading XL
+									654 cell
+										655 text 44px
+									656 cell
+										657 text 32px
+									658 cell
+										659 text Page titles
+								660 row
+									661 cell
+										662 text Heading L
+									663 cell
+										664 text 38px
+									665 cell
+										666 text 26px
+									667 cell
+										668 text Section headings
+								669 row
+									670 cell
+										671 text Heading M
+									672 cell
+										673 text 28px
+									674 cell
+										675 text 22px
+									676 cell
+										677 text Subsection titles
+								678 row
+									679 cell
+										680 text Heading S
+									681 cell
+										682 text 22px
+									683 cell
+										684 text 18px
+									685 cell
+										686 text Small headings
+								687 row
+									688 cell
+										689 text Paragraph L
+									690 cell
+										691 text 22px
+									692 cell
+										693 text 18px
+									694 cell
+										695 text Introduction text
+								696 row
+									697 cell
+										698 text Paragraph M
+									699 cell
+										700 text 18px
+									701 cell
+										702 text 17px
+									703 cell
+										704 text Body text
+								705 row
+									706 cell
+										707 text Paragraph S
+									708 cell
+										709 text 16px
+									710 cell
+										711 text 16px
+									712 cell
+										713 text Secondary content
+								714 row
+									715 cell
+										716 text Paragraph XS
+									717 cell
+										718 text 14px
+									719 cell
+										720 text 14px
+									721 cell
+										722 text Captions, meta info
+								723 row
+									724 cell
+										725 text Paragraph XXS
+									726 cell
+										727 text 12px
+									728 cell
+										729 text 12px
+									730 cell
+										731 text Micro text, fine print
+							555 heading Usage Guidelines, Value: 2, ID: usage-guidelines
+								732 text Usage Guidelines
+							733 content list
+								734 container
+									735 AXListMarker • 
+									736 text Display sizes : Hero sections, landing headers
+								737 container
+									738 AXListMarker • 
+									739 text Headings : Page titles, section headings
+								740 container
+									741 AXListMarker • 
+									742 text Paragraphs : Body text, descriptions
+								743 container
+									744 AXListMarker • 
+									745 text Overline : Category labels, tags
+								746 container
+									747 AXListMarker • 
+									748 text Button : CTA text, navigation
+							749 text All typography meets WCAG 2.1 AA contrast standards and includes proper line heights for optimal readability across devices.
+		6 container
+			239 container
+				240 container
+					241 link Description: Skip to canvas, Value: ui.pax.ch/?path=/docs/guide-typography-system--docs#storybook-preview-wrapper
+					242 link Description: Pax UI, Value: pax.ch/
+					243 button Shortcuts
+						244 image
+				245 text Search for components
+				246 combo box (collapsed) Search for components, Secondary Actions: Expand
+					247 image
+					248 search text field (settable) Search for components, ID: storybook-explorer-searchfield
+					249 container
+						250 text ⌘ K
+					251 button Tag filters
+						252 image
+				253 container
+					254 image
+					255 link Description: Getting Started, Value: ui.pax.ch/?path=/docs/getting-started--docs, ID: getting-started--docs
+					257 container guide
+						258 button (expanded) GUIDE, Secondary Actions: Collapse
+							259 image
+							260 text GUIDE
+						261 button Collapse
+							262 image
+					263 button (expanded) Design Tokens, ID: guide-design-tokens, Secondary Actions: Collapse
+						264 image
+						265 image
+						266 text Design Tokens
+					267 link Description: Docs, Value: ui.pax.ch/?path=/docs/guide-design-tokens--docs, ID: guide-design-tokens--docs
+					268 link Description: Design Token System, Value: ui.pax.ch/?path=/story/guide-design-tokens--design-tokens, ID: guide-design-tokens--design-tokens
+					269 link Description: Colors, Value: ui.pax.ch/?path=/story/guide-design-tokens--colors, ID: guide-design-tokens--colors
+					270 link Description: Spacing, Value: ui.pax.ch/?path=/story/guide-design-tokens--spacing, ID: guide-design-tokens--spacing
+					271 link Description: Borders, Value: ui.pax.ch/?path=/story/guide-design-tokens--borders, ID: guide-design-tokens--borders
+					272 link Description: Semantic Tokens, Value: ui.pax.ch/?path=/story/guide-design-tokens--semantic-tokens, ID: guide-design-tokens--semantic-tokens
+					273 link Description: Installation & Setup, Value: ui.pax.ch/?path=/docs/guide-installation-setup--docs, ID: guide-installation-setup--docs
+					274 button (expanded) Typography System, ID: guide-typography-system, Secondary Actions: Collapse
+						275 image
+						276 image
+						277 text Typography System
+					556 link Description: Docs, Value: ui.pax.ch/?path=/docs/guide-typography-system--docs, ID: guide-typography-system--docs
+					557 link Description: Skip to canvas, Value: ui.pax.ch/?path=/docs/guide-typography-system--docs#storybook-preview-wrapper
+					558 link Description: Typography System, Value: ui.pax.ch/?path=/story/guide-typography-system--typography-scale, ID: guide-typography-system--typography-scale
+					559 link Description: Display Sizes, Value: ui.pax.ch/?path=/story/guide-typography-system--display-sizes, ID: guide-typography-system--display-sizes
+					560 link Description: Headings, Value: ui.pax.ch/?path=/story/guide-typography-system--headings, ID: guide-typography-system--headings
+					561 link Description: Body Text, Value: ui.pax.ch/?path=/story/guide-typography-system--body-text, ID: guide-typography-system--body-text
+					562 link Description: Text Colors, Value: ui.pax.ch/?path=/story/guide-typography-system--text-colors, ID: guide-typography-system--text-colors
+					563 link Description: Responsive Typography, Value: ui.pax.ch/?path=/story/guide-typography-system--responsive-demo, ID: guide-typography-system--responsive-demo
+					278 container analytics
+						279 button (expanded) ANALYTICS, Secondary Actions: Collapse
+							280 image
+							281 text ANALYTICS
+						282 button Collapse
+							283 image
+					284 link Description: Setup & Usage, Value: ui.pax.ch/?path=/docs/analytics-setup-usage--docs, ID: analytics-setup-usage--docs
+					285 button (collapsed) Cookie Banner, ID: analytics-cookie-banner, Secondary Actions: Expand
+						286 image
+						287 image
+						288 text Cookie Banner
+					289 link Description: Google Tag Manager Setup, Value: ui.pax.ch/?path=/docs/analytics-google-tag-manager-setup--docs, ID: analytics-google-tag-manager-setup--docs
+					290 container buttons
+						291 button (expanded) BUTTONS, Secondary Actions: Collapse
+							292 image
+							293 text BUTTONS
+						294 button Collapse
+							295 image
+					296 button (collapsed) Button, ID: buttons-button, Secondary Actions: Expand
+						297 image
+						298 image
+						299 text Button
+					300 container cards
+						301 button (expanded) CARDS, Secondary Actions: Collapse
+							302 image
+							303 text CARDS
+						304 button Collapse
+							305 image
+					306 button (collapsed) Feedback Card, ID: cards-feedback-card, Secondary Actions: Expand
+						307 image
+						308 image
+						309 text Feedback Card
+					310 button (collapsed) Image Card, ID: cards-image-card, Secondary Actions: Expand
+						311 image
+						312 image
+						313 text Image Card
+					314 button (collapsed) Quick Access Card, ID: cards-quick-access-card, Secondary Actions: Expand
+						315 image
+						316 image
+						317 text Quick Access Card
+					318 button (collapsed) Wide Card, ID: cards-wide-card, Secondary Actions: Expand
+						319 image
+						320 image
+						321 text Wide Card
+					322 container containers
+						323 button (expanded) CONTAINERS, Secondary Actions: Collapse
+							324 image
+							325 text CONTAINERS
+						326 button Collapse
+							327 image
+					328 button (collapsed) Accordion, ID: containers-accordion, Secondary Actions: Expand
+						329 image
+						330 image
+						331 text Accordion
+					332 button (collapsed) Content, ID: containers-content, Secondary Actions: Expand
+						333 image
+						334 image
+						335 text Content
+					336 container dialog
+						337 button (expanded) DIALOG, Secondary Actions: Collapse
+							338 image
+							339 text DIALOG
+						340 button Collapse
+							341 image
+					342 button (collapsed) Confirm Dialog, ID: dialog-confirm-dialog, Secondary Actions: Expand
+						343 image
+						344 image
+						345 text Confirm Dialog
+					346 button (collapsed) Confirm Warning Dialog, ID: dialog-confirm-warning-dialog, Secondary Actions: Expand
+						347 image
+						348 image
+						349 text Confirm Warning Dialog
+					350 button (collapsed) Dialog, ID: dialog-dialog, Secondary Actions: Expand
+						351 image
+						352 image
+						353 text Dialog
+					354 button (collapsed) Feedback Dialog, ID: dialog-feedback-dialog, Secondary Actions: Expand
+						355 image
+						356 image
+						357 text Feedback Dialog
+					358 container forms
+						359 button (expanded) FORMS, Secondary Actions: Collapse
+							360 image
+							361 text FORMS
+						362 button Collapse
+							363 image
+					364 button (collapsed) Autocomplete, ID: forms-autocomplete, Secondary Actions: Expand
+						365 image
+						366 image
+						367 text Autocomplete
+					368 button (collapsed) Button Group, ID: forms-button-group, Secondary Actions: Expand
+						369 image
+						370 image
+						371 text Button Group
+					372 button (collapsed) Button Toggle, ID: forms-button-toggle, Secondary Actions: Expand
+						373 image
+						374 image
+						375 text Button Toggle
+					376 button (collapsed) Checkbox Group, ID: forms-checkbox-group, Secondary Actions: Expand
+						377 image
+						378 image
+						379 text Checkbox Group
+					380 button (collapsed) Checkbox, ID: forms-checkbox, Secondary Actions: Expand
+						381 image
+						382 image
+						383 text Checkbox
+					384 button (collapsed) Counter, ID: forms-counter, Secondary Actions: Expand
+						385 image
+						386 image
+						387 text Counter
+					388 button (collapsed) Date Input, ID: forms-date-input, Secondary Actions: Expand
+						389 image
+						390 image
+						391 text Date Input
+					392 button (collapsed) Date Picker, ID: forms-date-picker, Secondary Actions: Expand
+						393 image
+						394 image
+						395 text Date Picker
+					396 button (collapsed) Date Range Picker, ID: forms-date-range-picker, Secondary Actions: Expand
+						397 image
+						398 image
+						399 text Date Range Picker
+					400 button (collapsed) File Upload, ID: forms-file-upload, Secondary Actions: Expand
+						401 image
+						402 image
+						403 text File Upload
+					404 button (collapsed) Input, ID: forms-input, Secondary Actions: Expand
+						405 image
+						406 image
+						407 text Input
+					408 button (collapsed) OTP, ID: forms-otp, Secondary Actions: Expand
+						409 image
+						410 image
+						411 text OTP
+					412 button (collapsed) Radio Group, ID: forms-radio-group, Secondary Actions: Expand
+						413 image
+						414 image
+						415 text Radio Group
+					416 button (collapsed) Select, ID: forms-select, Secondary Actions: Expand
+						417 image
+						418 image
+						419 text Select
+					420 button (collapsed) Slider, ID: forms-slider, Secondary Actions: Expand
+						421 image
+						422 image
+						423 text Slider
+					424 button (collapsed) Switch, ID: forms-switch, Secondary Actions: Expand
+						425 image
+						426 image
+						427 text Switch
+					428 button (collapsed) Textarea, ID: forms-textarea, Secondary Actions: Expand
+						429 image
+						430 image
+						431 text Textarea
+					432 container information
+						433 button (expanded) INFORMATION, Secondary Actions: Collapse
+							434 image
+							435 text INFORMATION
+						436 button Collapse
+							437 image
+					438 button (collapsed) Info Box, ID: information-info-box, Secondary Actions: Expand
+						439 image
+						440 image
+						441 text Info Box
+					442 button (collapsed) Notification, ID: information-notification, Secondary Actions: Expand
+						443 image
+						444 image
+						445 text Notification
+					446 button (collapsed) Toast Container, ID: information-toast-container, Secondary Actions: Expand
+						447 image
+						448 image
+						449 text Toast Container
+					450 button (collapsed) Tooltip, ID: information-tooltip, Secondary Actions: Expand
+						451 image
+						452 image
+						453 text Tooltip
+					454 container lists
+						455 button (expanded) LISTS, Secondary Actions: Collapse
+							456 image
+							457 text LISTS
+						458 button Collapse
+							459 image
+					460 button (collapsed) Feature List, ID: lists-feature-list, Secondary Actions: Expand
+						461 image
+						462 image
+						463 text Feature List
+					464 button (collapsed) List Item, ID: lists-list-item, Secondary Actions: Expand
+						465 image
+						466 image
+						467 text List Item
+					468 container misc
+						469 button (expanded) MISC, Secondary Actions: Collapse
+							470 image
+							471 text MISC
+						472 button Collapse
+							473 image
+					474 button (collapsed) Spinner, ID: misc-spinner, Secondary Actions: Expand
+						475 image
+						476 image
+						477 text Spinner
+					478 container navigation
+						479 button (expanded) NAVIGATION, Secondary Actions: Collapse
+							480 image
+							481 text NAVIGATION
+						482 button Collapse
+							483 image
+					484 button (collapsed) Bottom Navigation, ID: navigation-bottom-navigation, Secondary Actions: Expand
+						485 image
+						486 image
+						487 text Bottom Navigation
+					488 button (collapsed) Fullscreen Menu, ID: navigation-fullscreen-menu, Secondary Actions: Expand
+						489 image
+						490 image
+						491 text Fullscreen Menu
+					492 button (collapsed) Breadcrumb, ID: navigation-breadcrumb, Secondary Actions: Expand
+						493 image
+						494 image
+						495 text Breadcrumb
+					496 button (collapsed) Footer, ID: navigation-footer, Secondary Actions: Expand
+						497 image
+						498 image
+						499 text Footer
+					500 button (collapsed) Header Mobile, ID: navigation-header-mobile, Secondary Actions: Expand
+						501 image
+						502 image
+						503 text Header Mobile
+					504 button (collapsed) Header, ID: navigation-header, Secondary Actions: Expand
+						505 image
+						506 image
+						507 text Header
+					508 button (collapsed) Progress Steps, ID: navigation-progress-steps, Secondary Actions: Expand
+						509 image
+						510 image
+						511 text Progress Steps
+					512 container overlay
+						513 button (expanded) OVERLAY, Secondary Actions: Collapse
+							514 image
+							515 text OVERLAY
+						516 button Collapse
+							517 image
+					518 button (collapsed) Popover List Item, ID: overlay-popover-list-item, Secondary Actions: Expand
+						519 image
+						520 image
+						521 text Popover List Item
+					522 button (collapsed) Popover, ID: overlay-popover, Secondary Actions: Expand
+						523 image
+						524 image
+						525 text Popover
+					526 container sections
+						527 button (expanded) SECTIONS, Secondary Actions: Collapse
+							528 image
+							529 text SECTIONS
+						530 button Collapse
+							531 image
+					532 button (collapsed) Hero, ID: sections-hero, Secondary Actions: Expand
+						533 image
+						534 image
+						535 text Hero
+
+The focused UI element is 274 button (expanded) Typography System, ID: guide-typography-system, Secondary Actions: Collapse

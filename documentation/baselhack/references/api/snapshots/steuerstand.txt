@@ -1,0 +1,49 @@
+Browser tab: 5, Title: "Tax-base status · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/steuerstand".
+1 AXWebArea Tax-base status · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/steuerstand
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Tax-base status, Value: 1
+			12 text Tax-base status
+		13 text Version and date of the stored tax-base data.
+		14 text APICalc_getTaxBaseInfo API-Key calc.*
+		15 container
+			16 button Calculate
+				17 text Calculate
+				18 image
+			19 button Load example
+			20 button Reset
+		21 heading Result, Value: 3
+			22 text Result
+		23 definition list
+			24 container Tax-base version
+				25 text Tax-base version
+			26 text 26.09
+			27 container Tax-base status
+				28 text Tax-base status
+			29 text 10.09.2026
+		40 container
+			41 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				42 text Raw data (request & response)
+			43 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getTaxBaseInfo {} Response (HTTP 200) {
+  "response": {
+    "TaxBaseVersion": "26.09",
+    "TaxBaseDate": "10.09.2026"
+  }
+}
+	32 container Breadcrumb
+		33 content list
+			34 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			35 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			36 text Basics & lookup
+			37 text Tax-base status
+	38 container
+		39 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 41 button (expanded) Raw data (request & response), Secondary Actions: Collapse

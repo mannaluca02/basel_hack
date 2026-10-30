@@ -1,0 +1,597 @@
+Browser tab: 7, Title: "Guide / Installation & Setup - Docs ⋅ Storybook", URL: "https://ui.pax.ch/?path=/docs/guide-installation-setup--docs".
+0 AXWebArea Guide / Installation & Setup - Docs ⋅ Storybook, URL: ui.pax.ch/?path=/docs/guide-installation-setup--docs
+	1 container root
+		2 container
+			7 container
+				8 button Apply a grid to the preview
+					9 image
+				10 button Apply outlines to the preview
+					11 image
+				12 button Description: Go full screen, Help: Go full screen [⌥ F]
+					13 image
+			14 container storybook-preview-wrapper
+				15 link Description: Skip to sidebar, Value: ui.pax.ch/?path=/docs/guide-installation-setup--docs#guide-installation-setup--docs
+				16 container storybook-preview-iframe
+					17 AXWebArea guide-installation-setup--docs, URL: ui.pax.ch/iframe.html?viewMode=docs&id=guide-installation-setup--docs&globals=
+						18 container storybook-docs
+							536 heading Installation & Setup, Value: 1, ID: installation--setup
+								537 text Installation & Setup
+							538 text This guide provides detailed instructions for installing and configuring the Pax UI library in your Angular application.
+							539 heading Prerequisites, Value: 2, ID: prerequisites
+								540 text Prerequisites
+							541 text Before installing Pax UI, ensure your development environment meets these requirements:
+							542 content list
+								543 container
+									544 AXListMarker • 
+									545 text Node.js : v18 or higher
+								546 container
+									547 AXListMarker • 
+									548 text npm : v9 or higher (or pnpm v8+, or yarn v1.22+)
+								549 container
+									550 AXListMarker • 
+									551 text Angular : v19 or v20
+								552 container
+									553 AXListMarker • 
+									554 text TypeScript : v5.0 or higher
+							555 heading Optional Dependencies, Value: 3, ID: optional-dependencies
+								556 text Optional Dependencies
+							557 content list
+								558 container
+									559 AXListMarker • 
+									560 text ngx-mask : v18.0+ (required only if using input mask features)
+							561 heading Installation, Value: 2, ID: installation
+								562 text Installation
+							563 heading Step 1: Access to GitHub Package Registry, Value: 3, ID: step-1-access-to-github-package-registry
+								564 text Step 1: Access to GitHub Package Registry
+							565 text Since Pax UI is published to GitHub Package Registry, you need access to the Pax organization:
+							566 content list
+								567 text Ensure you have access to the Pax organization on GitHub
+								568 container
+									569 text Create a personal access token with  read:packages  permission
+							570 heading Step 2: Configure npm Registry, Value: 3, ID: step-2-configure-npm-registry
+								571 text Step 2: Configure npm Registry
+							572 container
+								573 text Add the following line to your  .npmrc  file in your project root:
+							574 container
+								575 container
+									576 text @paxch:registry = https://npm.pkg.github.com/
+								577 button Copy
+							578 text If you need to authenticate, also add:
+							579 container
+								580 container
+									581 text //npm.pkg.github.com/:_authToken = YOUR_GITHUB_TOKEN
+								582 button Copy
+							583 heading Step 3: Install the Package, Value: 3, ID: step-3-install-the-package
+								584 text Step 3: Install the Package
+							585 text Install Pax UI using your preferred package manager:
+							586 container
+								587 container
+									588 text # npm npm install  @paxch/pax-ui
+ # pnpm pnpm add  @paxch/pax-ui
+ # yarn yarn add  @paxch/pax-ui
+								589 button Copy
+							590 heading Step 4: Install Optional Dependencies (if needed), Value: 3, ID: step-4-install-optional-dependencies-if-needed
+								591 text Step 4: Install Optional Dependencies (if needed)
+							592 text If you plan to use input mask features, install ngx-mask:
+							593 container
+								594 container
+									595 text # npm npm install  ngx-mask
+ # pnpm pnpm add  ngx-mask
+ # yarn yarn add  ngx-mask
+								596 button Copy
+							597 container
+								598 text Note : ngx-mask is automatically configured by the pax-input component when using mask features. No additional setup is required.
+							599 heading Configuration, Value: 2, ID: configuration
+								600 text Configuration
+							601 heading Angular Configuration, Value: 3, ID: angular-configuration
+								602 text Angular Configuration
+							603 container
+								604 text Add the required styles and assets to your  angular.json  file:
+							605 container
+								606 container
+									607 text { "projects" : { "your-app" : { "architect" : { "build" : { "options" : { "styles" : [ "node_modules/@paxch/pax-ui/styles/pax-ui.css" , "src/styles.scss" ] , "assets" : [ "src/favicon.ico" , "src/assets" , { "glob" : "**/*" , "input" : "node_modules/@paxch/pax-ui/assets" , "output" : "/" } ] } } , "test" : { "options" : { "styles" : [ "node_modules/@paxch/pax-ui/styles/pax-ui.css" , "src/styles.scss" ] , "assets" : [ "src/favicon.ico" , "src/assets" , { "glob" : "**/*" , "input" : "node_modules/@paxch/pax-ui/assets" , "output" : "/" } ] } } } } } }
+								608 button Copy
+							609 heading Global Configuration (Optional), Value: 3, ID: global-configuration-optional
+								610 text Global Configuration (Optional)
+							611 text For applications that need analytics or other global features, configure the library in your main application module:
+							612 heading With NgModule, Value: 4, ID: with-ngmodule
+								613 text With NgModule
+							614 container
+								615 container
+									616 text import { NgModule } from '@angular/core' ; import { BrowserModule } from '@angular/platform-browser' ; import {  providePaxUiAnalytics  } from '@paxch/pax-ui/analytics' ; import {  environment  } from '../environments/environment' ; import { AppComponent } from './app.component' ; @ NgModule ( {   declarations : [ AppComponent ] ,   imports : [ BrowserModule ] ,   providers : [ providePaxUiAnalytics ( {       platform_env :  environment . production ? 'production' : 'development' ,       application_name : 'MyApp' ,       debug : ! environment . production ,       cookieDomain : '.yourdomain.com' // Optional: for cross-subdomain consent } ) ] ,   bootstrap : [ AppComponent ] } ) export class AppModule { }
+								617 button Copy
+							618 heading With Standalone Bootstrap, Value: 4, ID: with-standalone-bootstrap
+								619 text With Standalone Bootstrap
+							620 container
+								621 container
+									622 text import {  bootstrapApplication  } from '@angular/platform-browser' ; import {  providePaxUiAnalytics  } from '@paxch/pax-ui/analytics' ; import {  environment  } from './environments/environment' ; import { AppComponent } from './app/app.component' ; bootstrapApplication ( AppComponent , {   providers : [ providePaxUiAnalytics ( {       platform_env :  environment . production ? 'production' : 'development' ,       application_name : 'MyApp' ,       debug : ! environment . production ,       cookieDomain : '.yourdomain.com' // Optional: for cross-subdomain consent } ) ] } ) . catch ( ( err ) => console . error ( err ) ) ;
+								623 button Copy
+							624 heading Tailwind CSS Integration (Optional), Value: 2, ID: tailwind-css-integration-optional
+								625 text Tailwind CSS Integration (Optional)
+							626 text If your project uses Tailwind CSS, you can extend your configuration with Pax UI's theme:
+							627 heading tailwind.config.js, Value: 3, ID: tailwindconfigjs
+								628 text tailwind.config.js
+							629 container
+								630 container
+									631 text const  paxUIConfig  = require ( '@paxch/pax-ui/tailwind.theme.js' ) ; module . exports = { content : [ './src/**/*.{html,ts}' , './node_modules/@paxch/pax-ui/**/*.{html,js}' ] , theme : { extend : { ... paxUIConfig . theme . extend , // Your custom theme extensions colors : { ... paxUIConfig . theme . extend . colors // Your custom colors } } } , plugins : [ ... paxUIConfig . plugins // Your custom plugins ] } ;
+								632 button Copy
+							633 heading Theme Configuration, Value: 2, ID: theme-configuration
+								634 text Theme Configuration
+							635 heading Automatic Theme Detection, Value: 3, ID: automatic-theme-detection
+								636 text Automatic Theme Detection
+							637 text By default, Pax UI respects the user's system theme preference:
+							638 container
+								639 container
+									640 text <!-- No configuration needed - respects prefers-color-scheme --> < body > < app-root > </ app-root > </ body >
+								641 button Copy
+							642 heading Manual Theme Control, Value: 3, ID: manual-theme-control
+								643 text Manual Theme Control
+							644 text You can manually control the theme using data attributes:
+							645 container
+								646 container
+									647 text import { Component } from '@angular/core' ; @ Component ( {   selector : 'app-root' ,   template : `     <button (click)="toggleTheme()">{{ isDark ? 'Light' : 'Dark' }} Mode</button>
+     <router-outlet></router-outlet>
+ ` } ) export class AppComponent {   isDark  = false ; toggleTheme ( ) { this . isDark = ! this . isDark ; document . body . setAttribute ( 'data-theme' , this . isDark ? 'dark' : 'light' ) ; } }
+								648 button Copy
+							649 heading Component Import Patterns, Value: 2, ID: component-import-patterns
+								650 text Component Import Patterns
+							651 heading Individual Component Imports, Value: 3, ID: individual-component-imports
+								652 text Individual Component Imports
+							653 text Import only the components you need for optimal bundle size:
+							654 container
+								655 container
+									656 text import { Component } from '@angular/core' ; import { FormsModule } from '@angular/forms' ; import { ButtonComponent } from '@paxch/pax-ui/buttons' ; import { InputComponent } from '@paxch/pax-ui/forms' ; import { ImageCardComponent } from '@paxch/pax-ui/cards' ; @ Component ( {   selector : 'app-feature' ,   standalone : true ,   imports : [ FormsModule , ButtonComponent , InputComponent , ImageCardComponent ] ,   template : `     <pax-input label="Name" [(ngModel)]="name"></pax-input>
+     <pax-image-card [image]="cardImage" [title]="cardTitle"></pax-image-card>
+     <pax-button variant="default" (click)="submit()">Submit</pax-button>
+ ` } ) export class FeatureComponent {   name  = '' ;   cardImage  = 'https://example.com/image.jpg' ;   cardTitle  = 'Example Card' ; submit ( ) { console . log ( 'Submitted:' , this . name ) ; } }
+								657 button Copy
+							658 heading Multiple Component Imports, Value: 3, ID: multiple-component-imports
+								659 text Multiple Component Imports
+							660 text For larger applications, you might want to create a shared module that imports commonly used components:
+							661 container
+								662 container
+									663 text import { NgModule } from '@angular/core' ; import { ButtonComponent } from '@paxch/pax-ui/buttons' ; import { InputComponent , SelectComponent , CheckboxComponent } from '@paxch/pax-ui/forms' ; import { ImageCardComponent , FeedbackCardComponent } from '@paxch/pax-ui/cards' ; @ NgModule ( {   imports : [ ButtonComponent , InputComponent , SelectComponent , CheckboxComponent , ImageCardComponent , FeedbackCardComponent ] ,   exports : [ ButtonComponent , InputComponent , SelectComponent , CheckboxComponent , ImageCardComponent , FeedbackCardComponent ] } ) export class SharedPaxUiModule { }
+								664 button Copy
+							665 heading Using Input Masks (Optional), Value: 3, ID: using-input-masks-optional
+								666 text Using Input Masks (Optional)
+							667 text If you've installed ngx-mask, you can use input masks with the pax-input component:
+							668 container
+								669 container
+									670 text import { Component } from '@angular/core' ; import { FormsModule } from '@angular/forms' ; import { InputComponent } from '@paxch/pax-ui/forms' ; @ Component ( {   selector : 'app-form' ,   standalone : true ,   imports : [ FormsModule , InputComponent ] ,   template : `     <!-- Phone number mask -->
+     <pax-input
+       label="Phone Number"
+       placeholder="(000) 000-0000"
+       [maskConfig]="{ mask: '(000) 000-0000' }"
+       [(ngModel)]="phone"
+     ></pax-input>
+     <!-- Date mask -->
+     <pax-input
+       label="Date of Birth"
+       placeholder="DD/MM/YYYY"
+       [maskConfig]="{ mask: 'd0/M0/0000' }"
+       [(ngModel)]="dateOfBirth"
+     ></pax-input>
+     <!-- Currency mask with prefix -->
+     <pax-input
+       label="Amount"
+       placeholder="Enter amount"
+       [maskConfig]="{ mask: 'separator.2', thousandSeparator: ',', prefix: '$ ' }"
+       [(ngModel)]="amount"
+     ></pax-input>
+ ` } ) export class FormComponent {   phone  = '' ;   dateOfBirth  = '' ;   amount  = '' ; }
+								671 button Copy
+							672 container
+								673 text The  maskConfig  accepts all ngx-mask configuration options. See the 
+								674 link Description: Forms/Input, Value: ui.pax.ch/?path=/?path=/docs/forms-input--docs
+								675 text  component documentation for more mask examples.
+							676 heading Analytics Setup (Optional), Value: 2, ID: analytics-setup-optional
+								677 text Analytics Setup (Optional)
+							678 text If you plan to use the analytics features, add the cookie banner to your app template:
+							679 container
+								680 container
+									681 text import { Component , OnInit } from '@angular/core' ; import { CookieBannerComponent , ConsentService , ConsentCategory } from '@paxch/pax-ui/analytics' ; @ Component ( {   selector : 'app-root' ,   standalone : true ,   imports : [ CookieBannerComponent ] ,   template : `     <pax-cookie-banner
+       [visible]="showBanner"
+       [consentState]="consentState"
+       language="en"
+       (acceptAll)="handleAcceptAll($event)"
+       (rejectAll)="handleRejectAll($event)"
+       (savePreferences)="handleSavePreferences($event)"
+     ></pax-cookie-banner>
+     <router-outlet></router-outlet>
+ ` } ) export class AppComponent implements OnInit {   showBanner  = false ;   consentState : Record < ConsentCategory , boolean > = {     ad_storage : false ,     analytics_storage : false ,     functionality_storage : false ,     security_storage : true ,     personalization_storage : false } ; constructor ( private  consentService : ConsentService ) { } ngOnInit ( ) { this . consentService . loadStoredConsent ( ) ; this . showBanner = ! this . consentService . hasProvidedConsent ( ) ; } handleAcceptAll ( consent : Record < ConsentCategory , boolean > ) { this . consentService . updateConsent ( consent ) ; this . showBanner = false ; } handleRejectAll ( consent : Record < ConsentCategory , boolean > ) { this . consentService . updateConsent ( consent ) ; this . showBanner = false ; } handleSavePreferences ( consent : Record < ConsentCategory , boolean > ) { this . consentService . updateConsent ( consent ) ; this . showBanner = false ; } }
+								682 button Copy
+							683 heading Verification, Value: 2, ID: verification
+								684 text Verification
+							685 text To verify your installation is working correctly, create a simple test component:
+							686 container
+								687 container
+									688 text import { Component } from '@angular/core' ; import { ButtonComponent } from '@paxch/pax-ui/buttons' ; @ Component ( {   selector : 'app-test' ,   standalone : true ,   imports : [ ButtonComponent ] ,   template : `  <pax-button variant="default" (click)="test()"> Test Pax UI </pax-button>  ` } ) export class TestComponent { test ( ) { alert ( 'Pax UI is working! 🎉' ) ; } }
+								689 button Copy
+							690 heading Troubleshooting, Value: 2, ID: troubleshooting
+								691 text Troubleshooting
+							692 heading Common Issues, Value: 3, ID: common-issues
+								693 text Common Issues
+							694 heading Package Not Found, Value: 4, ID: package-not-found
+								695 text Package Not Found
+							696 container
+								697 container
+									698 text Error:  npm  ERR ! 404  Not Found - GET https://registry.npmjs.org/@paxch%2fpax-ui
+								699 button Copy
+							700 container
+								701 text Solution : Ensure your  .npmrc  file is configured correctly with the GitHub Package Registry.
+							702 heading Assets Not Loading, Value: 4, ID: assets-not-loading
+								703 text Assets Not Loading
+							704 text If icons or fonts are missing:
+							705 content list
+								706 container
+									707 text Verify the assets configuration in  angular.json
+								708 text Check that the build process copies the assets correctly
+								709 text Ensure the glob pattern matches all required files
+							710 heading Theme Not Applied, Value: 4, ID: theme-not-applied
+								711 text Theme Not Applied
+							712 text If the theme isn't working:
+							713 content list
+								714 container
+									715 text Verify the CSS file is imported in  angular.json
+								716 text Check that the CSS file is being loaded in the browser
+								717 text Ensure there are no conflicting CSS rules
+							718 heading TypeScript Errors, Value: 4, ID: typescript-errors
+								719 text TypeScript Errors
+							720 text If you encounter TypeScript errors:
+							721 content list
+								722 text Ensure you're using TypeScript 5.0+
+								723 container
+									724 text Update your  tsconfig.json  if necessary
+								725 text Check that all peer dependencies are installed
+							726 heading Performance Optimization, Value: 3, ID: performance-optimization
+								727 text Performance Optimization
+							728 heading Bundle Size Optimization, Value: 4, ID: bundle-size-optimization
+								729 text Bundle Size Optimization
+							730 text To minimize bundle size:
+							731 content list
+								732 text Import only the components you need
+								733 text Use tree-shaking compatible imports
+								734 text Consider lazy loading for large component sets
+							735 heading CSS Optimization, Value: 4, ID: css-optimization
+								736 text CSS Optimization
+							737 text The single CSS file is optimized and minified (~61KB), but you can further optimize by:
+							738 content list
+								739 text Using CSS purging tools if needed
+								740 text Implementing critical CSS loading for large applications
+								741 text Using CDN for static assets
+							742 heading Build Configuration, Value: 3, ID: build-configuration
+								743 text Build Configuration
+							744 text For production builds, ensure your build configuration includes:
+							745 container
+								746 container
+									747 text { "build" : { "configurations" : { "production" : { "optimization" : true , "sourceMap" : false , "namedChunks" : false , "aot" : true , "extractLicenses" : true , "vendorChunk" : false , "buildOptimizer" : true } } } }
+								748 button Copy
+							749 heading Next Steps, Value: 2, ID: next-steps
+								750 text Next Steps
+							751 text Now that you have Pax UI installed and configured:
+							752 content list
+								753 text Explore the component documentation in Storybook
+								754 container
+									755 text Check out the 
+									756 link Description: Getting Started, Value: ui.pax.ch/?path=/?path=/docs/getting-started--docs
+									757 text  guide for usage examples
+								758 container
+									759 text Learn about the 
+									760 link Description: Typography, Value: ui.pax.ch/?path=/?path=/docs/typography--docs
+									761 text  system
+								762 container
+									763 text Review the 
+									764 link Description: Branching Strategy, Value: ui.pax.ch/?path=/?path=/docs/branching-strategy--docs
+									765 text  if you plan to contribute
+							766 heading Support, Value: 2, ID: support
+								767 text Support
+							768 text If you encounter issues during installation:
+							769 content list
+								770 container
+									771 text Check the 
+									772 link Description: Troubleshooting, Value: ui.pax.ch/iframe.html?viewMode=docs&id=guide-installation-setup--docs&globals=#troubleshooting
+									773 text  section above
+								774 container
+									775 text Search existing 
+									776 link Description: GitHub Issues, Value: github.com/paxch/pax-ui/issues
+								777 text Create a new issue with detailed information about your setup
+		6 container
+			239 container
+				240 container
+					241 link Description: Skip to canvas, Value: ui.pax.ch/?path=/docs/guide-installation-setup--docs#storybook-preview-wrapper
+					242 link Description: Pax UI, Value: pax.ch/
+					243 button Shortcuts
+						244 image
+				245 text Search for components
+				246 combo box (collapsed) Search for components, Secondary Actions: Expand
+					247 image
+					248 search text field (settable) Search for components, ID: storybook-explorer-searchfield
+					249 container
+						250 text ⌘ K
+					251 button Tag filters
+						252 image
+				253 container
+					254 image
+					255 link Description: Getting Started, Value: ui.pax.ch/?path=/docs/getting-started--docs, ID: getting-started--docs
+					257 container guide
+						258 button (expanded) GUIDE, Secondary Actions: Collapse
+							259 image
+							260 text GUIDE
+						261 button Collapse
+							262 image
+					263 button (expanded) Design Tokens, ID: guide-design-tokens, Secondary Actions: Collapse
+						264 image
+						265 image
+						266 text Design Tokens
+					267 link Description: Docs, Value: ui.pax.ch/?path=/docs/guide-design-tokens--docs, ID: guide-design-tokens--docs
+					268 link Description: Design Token System, Value: ui.pax.ch/?path=/story/guide-design-tokens--design-tokens, ID: guide-design-tokens--design-tokens
+					269 link Description: Colors, Value: ui.pax.ch/?path=/story/guide-design-tokens--colors, ID: guide-design-tokens--colors
+					270 link Description: Spacing, Value: ui.pax.ch/?path=/story/guide-design-tokens--spacing, ID: guide-design-tokens--spacing
+					271 link Description: Borders, Value: ui.pax.ch/?path=/story/guide-design-tokens--borders, ID: guide-design-tokens--borders
+					272 link Description: Semantic Tokens, Value: ui.pax.ch/?path=/story/guide-design-tokens--semantic-tokens, ID: guide-design-tokens--semantic-tokens
+					273 link Description: Installation & Setup, Value: ui.pax.ch/?path=/docs/guide-installation-setup--docs, ID: guide-installation-setup--docs
+					778 link Description: Skip to canvas, Value: ui.pax.ch/?path=/docs/guide-installation-setup--docs#storybook-preview-wrapper
+					274 button (collapsed) Typography System, ID: guide-typography-system, Secondary Actions: Expand
+						275 image
+						276 image
+						277 text Typography System
+					278 container analytics
+						279 button (expanded) ANALYTICS, Secondary Actions: Collapse
+							280 image
+							281 text ANALYTICS
+						282 button Collapse
+							283 image
+					284 link Description: Setup & Usage, Value: ui.pax.ch/?path=/docs/analytics-setup-usage--docs, ID: analytics-setup-usage--docs
+					285 button (collapsed) Cookie Banner, ID: analytics-cookie-banner, Secondary Actions: Expand
+						286 image
+						287 image
+						288 text Cookie Banner
+					289 link Description: Google Tag Manager Setup, Value: ui.pax.ch/?path=/docs/analytics-google-tag-manager-setup--docs, ID: analytics-google-tag-manager-setup--docs
+					290 container buttons
+						291 button (expanded) BUTTONS, Secondary Actions: Collapse
+							292 image
+							293 text BUTTONS
+						294 button Collapse
+							295 image
+					296 button (collapsed) Button, ID: buttons-button, Secondary Actions: Expand
+						297 image
+						298 image
+						299 text Button
+					300 container cards
+						301 button (expanded) CARDS, Secondary Actions: Collapse
+							302 image
+							303 text CARDS
+						304 button Collapse
+							305 image
+					306 button (collapsed) Feedback Card, ID: cards-feedback-card, Secondary Actions: Expand
+						307 image
+						308 image
+						309 text Feedback Card
+					310 button (collapsed) Image Card, ID: cards-image-card, Secondary Actions: Expand
+						311 image
+						312 image
+						313 text Image Card
+					314 button (collapsed) Quick Access Card, ID: cards-quick-access-card, Secondary Actions: Expand
+						315 image
+						316 image
+						317 text Quick Access Card
+					318 button (collapsed) Wide Card, ID: cards-wide-card, Secondary Actions: Expand
+						319 image
+						320 image
+						321 text Wide Card
+					322 container containers
+						323 button (expanded) CONTAINERS, Secondary Actions: Collapse
+							324 image
+							325 text CONTAINERS
+						326 button Collapse
+							327 image
+					328 button (collapsed) Accordion, ID: containers-accordion, Secondary Actions: Expand
+						329 image
+						330 image
+						331 text Accordion
+					332 button (collapsed) Content, ID: containers-content, Secondary Actions: Expand
+						333 image
+						334 image
+						335 text Content
+					336 container dialog
+						337 button (expanded) DIALOG, Secondary Actions: Collapse
+							338 image
+							339 text DIALOG
+						340 button Collapse
+							341 image
+					342 button (collapsed) Confirm Dialog, ID: dialog-confirm-dialog, Secondary Actions: Expand
+						343 image
+						344 image
+						345 text Confirm Dialog
+					346 button (collapsed) Confirm Warning Dialog, ID: dialog-confirm-warning-dialog, Secondary Actions: Expand
+						347 image
+						348 image
+						349 text Confirm Warning Dialog
+					350 button (collapsed) Dialog, ID: dialog-dialog, Secondary Actions: Expand
+						351 image
+						352 image
+						353 text Dialog
+					354 button (collapsed) Feedback Dialog, ID: dialog-feedback-dialog, Secondary Actions: Expand
+						355 image
+						356 image
+						357 text Feedback Dialog
+					358 container forms
+						359 button (expanded) FORMS, Secondary Actions: Collapse
+							360 image
+							361 text FORMS
+						362 button Collapse
+							363 image
+					364 button (collapsed) Autocomplete, ID: forms-autocomplete, Secondary Actions: Expand
+						365 image
+						366 image
+						367 text Autocomplete
+					368 button (collapsed) Button Group, ID: forms-button-group, Secondary Actions: Expand
+						369 image
+						370 image
+						371 text Button Group
+					372 button (collapsed) Button Toggle, ID: forms-button-toggle, Secondary Actions: Expand
+						373 image
+						374 image
+						375 text Button Toggle
+					376 button (collapsed) Checkbox Group, ID: forms-checkbox-group, Secondary Actions: Expand
+						377 image
+						378 image
+						379 text Checkbox Group
+					380 button (collapsed) Checkbox, ID: forms-checkbox, Secondary Actions: Expand
+						381 image
+						382 image
+						383 text Checkbox
+					384 button (collapsed) Counter, ID: forms-counter, Secondary Actions: Expand
+						385 image
+						386 image
+						387 text Counter
+					388 button (collapsed) Date Input, ID: forms-date-input, Secondary Actions: Expand
+						389 image
+						390 image
+						391 text Date Input
+					392 button (collapsed) Date Picker, ID: forms-date-picker, Secondary Actions: Expand
+						393 image
+						394 image
+						395 text Date Picker
+					396 button (collapsed) Date Range Picker, ID: forms-date-range-picker, Secondary Actions: Expand
+						397 image
+						398 image
+						399 text Date Range Picker
+					400 button (collapsed) File Upload, ID: forms-file-upload, Secondary Actions: Expand
+						401 image
+						402 image
+						403 text File Upload
+					404 button (collapsed) Input, ID: forms-input, Secondary Actions: Expand
+						405 image
+						406 image
+						407 text Input
+					408 button (collapsed) OTP, ID: forms-otp, Secondary Actions: Expand
+						409 image
+						410 image
+						411 text OTP
+					412 button (collapsed) Radio Group, ID: forms-radio-group, Secondary Actions: Expand
+						413 image
+						414 image
+						415 text Radio Group
+					416 button (collapsed) Select, ID: forms-select, Secondary Actions: Expand
+						417 image
+						418 image
+						419 text Select
+					420 button (collapsed) Slider, ID: forms-slider, Secondary Actions: Expand
+						421 image
+						422 image
+						423 text Slider
+					424 button (collapsed) Switch, ID: forms-switch, Secondary Actions: Expand
+						425 image
+						426 image
+						427 text Switch
+					428 button (collapsed) Textarea, ID: forms-textarea, Secondary Actions: Expand
+						429 image
+						430 image
+						431 text Textarea
+					432 container information
+						433 button (expanded) INFORMATION, Secondary Actions: Collapse
+							434 image
+							435 text INFORMATION
+						436 button Collapse
+							437 image
+					438 button (collapsed) Info Box, ID: information-info-box, Secondary Actions: Expand
+						439 image
+						440 image
+						441 text Info Box
+					442 button (collapsed) Notification, ID: information-notification, Secondary Actions: Expand
+						443 image
+						444 image
+						445 text Notification
+					446 button (collapsed) Toast Container, ID: information-toast-container, Secondary Actions: Expand
+						447 image
+						448 image
+						449 text Toast Container
+					450 button (collapsed) Tooltip, ID: information-tooltip, Secondary Actions: Expand
+						451 image
+						452 image
+						453 text Tooltip
+					454 container lists
+						455 button (expanded) LISTS, Secondary Actions: Collapse
+							456 image
+							457 text LISTS
+						458 button Collapse
+							459 image
+					460 button (collapsed) Feature List, ID: lists-feature-list, Secondary Actions: Expand
+						461 image
+						462 image
+						463 text Feature List
+					464 button (collapsed) List Item, ID: lists-list-item, Secondary Actions: Expand
+						465 image
+						466 image
+						467 text List Item
+					468 container misc
+						469 button (expanded) MISC, Secondary Actions: Collapse
+							470 image
+							471 text MISC
+						472 button Collapse
+							473 image
+					474 button (collapsed) Spinner, ID: misc-spinner, Secondary Actions: Expand
+						475 image
+						476 image
+						477 text Spinner
+					478 container navigation
+						479 button (expanded) NAVIGATION, Secondary Actions: Collapse
+							480 image
+							481 text NAVIGATION
+						482 button Collapse
+							483 image
+					484 button (collapsed) Bottom Navigation, ID: navigation-bottom-navigation, Secondary Actions: Expand
+						485 image
+						486 image
+						487 text Bottom Navigation
+					488 button (collapsed) Fullscreen Menu, ID: navigation-fullscreen-menu, Secondary Actions: Expand
+						489 image
+						490 image
+						491 text Fullscreen Menu
+					492 button (collapsed) Breadcrumb, ID: navigation-breadcrumb, Secondary Actions: Expand
+						493 image
+						494 image
+						495 text Breadcrumb
+					496 button (collapsed) Footer, ID: navigation-footer, Secondary Actions: Expand
+						497 image
+						498 image
+						499 text Footer
+					500 button (collapsed) Header Mobile, ID: navigation-header-mobile, Secondary Actions: Expand
+						501 image
+						502 image
+						503 text Header Mobile
+					504 button (collapsed) Header, ID: navigation-header, Secondary Actions: Expand
+						505 image
+						506 image
+						507 text Header
+					508 button (collapsed) Progress Steps, ID: navigation-progress-steps, Secondary Actions: Expand
+						509 image
+						510 image
+						511 text Progress Steps
+					512 container overlay
+						513 button (expanded) OVERLAY, Secondary Actions: Collapse
+							514 image
+							515 text OVERLAY
+						516 button Collapse
+							517 image
+					518 button (collapsed) Popover List Item, ID: overlay-popover-list-item, Secondary Actions: Expand
+						519 image
+						520 image
+						521 text Popover List Item
+					522 button (collapsed) Popover, ID: overlay-popover, Secondary Actions: Expand
+						523 image
+						524 image
+						525 text Popover
+					526 container sections
+						527 button (expanded) SECTIONS, Secondary Actions: Collapse
+							528 image
+							529 text SECTIONS
+						530 button Collapse
+							531 image
+					532 button (collapsed) Hero, ID: sections-hero, Secondary Actions: Expand
+						533 image
+						534 image
+						535 text Hero
+
+The focused UI element is 273 link Description: Installation & Setup, URL: ui.pax.ch/?path=/docs/guide-installation-setup--docs, ID: guide-installation-setup--docs

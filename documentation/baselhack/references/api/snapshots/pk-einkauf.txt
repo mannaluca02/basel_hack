@@ -1,0 +1,208 @@
+Browser tab: 5, Title: "Pension-fund buy-in · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/pk-einkauf".
+1 AXWebArea Pension-fund buy-in · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/pk-einkauf
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Pension-fund buy-in, Value: 1
+			12 text Pension-fund buy-in
+		13 text The tax saving of a voluntary buy-in into the 2nd pillar.
+		14 text APICalc_calculatePurchaseP2 API-Key calc.tax.purchasep2
+		15 container
+			16 text Total buy-in * CHF
+			17 text field (settable) 50’000
+			18 text Contribution period (years) *
+			19 text field (settable) Contribution period (years) *, Value: 5, ID: pax-input-pqx7esq6v
+			20 text over how many years to contribute (the investment is split across them) Interest rate (%) *
+			21 text field (settable) Interest rate (%) *, Value: 1.5, ID: pax-input-u90oqrfmg
+			22 text Conversion rate (%)
+			23 text field (settable) Conversion rate (%), Value: 6, ID: pax-input-mwwhc0bae
+			24 text Umwandlungssatz Type of income *
+			25 combo box (collapsed) Value: Gross income, ID: pax-select-bvjjrt0ro, Secondary Actions: Expand
+				26 text Gross income
+				27 image
+			28 text Income * CHF
+			29 text field (settable) 120’000
+			30 text Rate-determining income (canton) CHF
+			31 text field (settable)
+			32 text Taxable income (federal) CHF
+			33 text field (settable)
+			34 text Rate-determining income (federal) CHF
+			35 text field (settable)
+			36 text Tax location *
+			37 container
+				38 text field (settable) Tax location *, Value: 4001 Basel (BS), ID: pax-input-d1m44khg8
+				39 image
+			40 text Marital status *
+			41 combo box (collapsed) Value: Single, ID: pax-select-iefhlpwn4, Secondary Actions: Expand
+				42 text Single
+				43 image
+			44 text Religious denomination *
+			45 combo box (collapsed) Value: None, ID: pax-select-6qv5d8ufw, Secondary Actions: Expand
+				46 text None
+				47 image
+			48 text Religious denomination (partner)
+			49 combo box (collapsed) Value: None, ID: pax-select-pszeaiy3r, Secondary Actions: Expand
+				50 text None
+				51 image
+			52 text Denomination share (%)
+			53 text field (settable) Denomination share (%), ID: pax-input-r9j56dslf
+			54 text Denomination 1 share (what percentage of the family has this denomination, 0 = automatic) Number of children *
+			55 text field (settable) Number of children *, Value: 0, ID: pax-input-tb0f14hw1
+			56 text dependent children Sex *
+			57 combo box (collapsed) Value: Male, ID: pax-select-7ij70rdng, Secondary Actions: Expand
+				58 text Male
+				59 image
+			60 text Birth year *
+			61 text field (settable) Birth year *, Value: 1985, ID: pax-input-ot8um8wt1
+			62 button Calculate
+				63 text Calculate
+				64 image
+			65 button Load example
+			66 button Reset
+		67 heading What the buy-in costs — and returns, Value: 3
+			80 text What the buy-in costs — and returns
+		68 image
+			81 text 0
+			82 text Buy-in
+		83 content list
+			84 container
+				85 text Tax saving CHF 13’800
+			86 container
+				87 text Net cost CHF 36’200
+		69 heading Result, Value: 3
+			88 text Result
+		89 definition list
+			90 container Tax saving
+				91 text Tax saving
+			92 text CHF 13’800
+			93 container Net cost
+				94 text Net cost
+			95 text CHF 36’200
+			96 container Tax saving (%)
+				97 text Tax saving (%)
+			98 text 27,6 %
+			99 container Years to retirement
+				100 text Years to retirement
+			101 text 24
+			102 container Additional capital
+				103 text Additional capital
+			104 text CHF 69’394
+			105 container Additional pension
+				106 text Additional pension
+			107 text CHF 4’164
+			108 container Net yield (%)
+				109 text Net yield (%)
+			110 text 2,7800000000000002 %
+			111 container Conversion rate (%)
+				112 text Conversion rate (%)
+			113 text 6 %
+			114 text Details Capital
+			115 container Periods
+				116 text Periods
+			117 text 24
+			118 container Start of year
+				119 text Start of year
+			120 text 10’000, 20’150, 30’452, 40’909, 51’523, 52’296, 53’080, 53’876, 54’684, 55’505, 56’337, 57’182 … (+12)
+			121 container End of year
+				122 text End of year
+			123 text 10’150, 20’452, 30’909, 41’523, 52’296, 53’080, 53’876, 54’684, 55’505, 56’337, 57’182, 58’040 … (+12)
+		124 container
+			125 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				126 text Raw data (request & response)
+			127 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculatePurchaseP2 {
+  "Investment": 50000,
+  "PaymentDuration": 5,
+  "InterestRate": 1.5,
+  "ConversionRate": 6,
+  "IncomeType": 1,
+  "Income": 120000,
+  "TaxLocationID": 400100000,
+  "Relationship": 1,
+  "Confession1": 4,
+  "Confession2": 4,
+  "NumberOfChildren": 0,
+  "Sex": 1,
+  "BirthYear": 1985
+} Response (HTTP 200) {
+  "response": {
+    "TaxSavings": 13800,
+    "NetInvestment": 36200,
+    "TaxSavingsPercentage": 27.6,
+    "YearsToRetirement": 24,
+    "AdditionalCapital": 69394,
+    "AdditionalPension": 4164,
+    "NetYield": 2.7800000000000002,
+    "ConversionRate": 6,
+    "DetailsCapital": {
+      "Periods": 24,
+      "Data1": [
+        10000,
+        20150,
+        30452,
+        40909,
+        51523,
+        52296,
+        53080,
+        53876,
+        54684,
+        55505,
+        56337,
+        57182,
+        58040,
+        58911,
+        59794,
+        60691,
+        61601,
+        62525,
+        63463,
+        64415,
+        65382,
+        66362,
+        67358,
+        68368
+      ],
+      "Data2": [
+        10150,
+        20452,
+        30909,
+        41523,
+        52296,
+        53080,
+        53876,
+        54684,
+        55505,
+        56337,
+        57182,
+        58040,
+        58911,
+        59794,
+        60691,
+        61601,
+        62525,
+        63463,
+        64415,
+        65382,
+        66362,
+        67358,
+        68368,
+        69394
+      ]
+    }
+  }
+}
+	72 container Breadcrumb
+		73 content list
+			74 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			75 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			76 text Saving & investing
+			77 text Pension-fund buy-in
+	78 container
+		79 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 125 button (expanded) Raw data (request & response), Secondary Actions: Collapse

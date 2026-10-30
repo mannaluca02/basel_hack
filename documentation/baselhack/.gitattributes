@@ -1,0 +1,3 @@
+# Preserve captured third-party sources and generated extraction bytes.
+references/** -text -whitespace
+generated/** -text -whitespace

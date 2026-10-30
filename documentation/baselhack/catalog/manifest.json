@@ -1,0 +1,49 @@
+{
+  "capture_date": "2026-10-30",
+  "path_base": "repository root",
+  "unique_insurance_pdfs": 35,
+  "pdf_download_records": 37,
+  "insurance_pdf_pages": 391,
+  "web_snapshots": 46,
+  "api_examples": 24,
+  "downloaded_videos": 16,
+  "video_bytes": 116252262,
+  "subtitle_files": 16,
+  "extracted_logo_assets": 37,
+  "scope": "Challenge hub and identified directly relevant sources, not a full Pax website crawl",
+  "credentials": "Local private/ only; excluded from catalogue and Git",
+  "issues": {
+    "resolved": [
+      {
+        "item": "FondsStar-Flyer",
+        "resolution": "PDF downloaded and validated"
+      },
+      {
+        "item": "LifeStar-Produktseite",
+        "resolution": "Current lowercase URL captured; legacy 404 snapshot preserved"
+      },
+      {
+        "item": "LifeStar-Produktblatt",
+        "resolution": "PDF downloaded and validated"
+      },
+      {
+        "item": "Pax-Videoreferenzen",
+        "resolution": "16 identified clips downloaded; available German subtitles saved"
+      }
+    ],
+    "open": [
+      {
+        "item": "Risiko-ErrorCode",
+        "detail": "Risk examples return 0; Swagger declares 1 as OK. Domain clarification remains necessary."
+      },
+      {
+        "item": "Inhaltliche Vollprüfung",
+        "detail": "Not every PDF page or video has been fully reviewed. Download is not review."
+      },
+      {
+        "item": "Produktionsintegration",
+        "detail": "Actual application acceptance, signature and policy issuance not verified."
+      }
+    ]
+  }
+}

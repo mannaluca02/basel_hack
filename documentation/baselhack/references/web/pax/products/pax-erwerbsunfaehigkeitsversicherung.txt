@@ -1,0 +1,184 @@
+Browser tab: 7, Title: "Erwerbsunfähigkeitsversicherung günstig für Einsteiger | Pax - Pax", URL: "https://www.pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung".
+1 AXWebArea Erwerbsunfähigkeitsversicherung günstig für Einsteiger | Pax - Pax, URL: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung#maincontent
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Pax Erwerbsunfähigkeitsversicherung, Value: 1
+				28 text Pax Erwerbsunfähigkeitsversicherung
+			29 text Finanzielle Absicherung bei Krankheit und Unfall
+			30 text Was passiert, wenn Sie einen Unfall oder eine Krankheit haben und nicht mehr arbeiten können? Die Erwerbs­unfähigkeits­rente aus der staatlichen und der beruflichen Vorsorge reicht oft nicht für die Weiterführung des gewohnten Lebensstandards aus. Eine Erwerbs­unfähigkeits­versicherung schliesst diese Einkommens­lücke für Sie und Ihre Familie.
+			31 link Description: Beratung anfordern, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern?param=Erwerbsunf%C3%A4higkeitsversicherung
+			32 link Description: Broschüre herunterladen, Value: assets.pax.ch/x/e27a00826e/private-vorsorge-produktbroschuere-pax-erwerbsunfaehigkeitsversicherung.pdf
+			33 image Erwerbsunfähigkeitsversicherung
+		34 container
+			35 heading Was deckt die Erwerbs­­un­fähig­keits­­ver­sicher­ung?, Value: 2
+				36 text Was deckt die Erwerbs­­un­fähig­keits­­ver­sicher­ung?
+			37 text Eine Erwerbs­­unfähig­keits­­­versicher­ung deckt das Risiko ab, wenn Sie durch einen Unfall oder eine Krank­heit nicht mehr arbeiten können. So sind Sie bei einer Erwerbs­­unfähigkeit finanziell abgesichert.
+			38 heading Erwerbsunfähigkeit / Invalidität, Value: 3
+				39 text Erwerbsunfähigkeit / Invalidität
+			40 text Wenn Sie aufgrund einer körper­lichen oder psychischen Be­ein­trächtigung nicht mehr arbeiten können, erhalten Sie von der staat­lichen und der beruflichen Vor­sorge eine IV-Rente. Sie ist meist deutlich tiefer als Ihr gewohntes Einkommen. Eine Versicherung deckt diese Lücke.
+			41 heading Leistung bei Invalidität, Value: 3
+				42 text Leistung bei Invalidität
+			43 text Bei Pax erhalten Sie eine Rente ab einem Erwerbs­unfähigkeits­grad von 25 Prozent. Ab einem Erwerbs­unfähigkeits­grad von 66.6 Prozent erhalten Sie die volle Rente aus­bezahlt. Sie erhalten die Rente bis zum Vertragsablauf, maximal bis zu Ihrer ordentlichen Pensionierung.
+		44 container
+			45 heading Die Vorteile der Pax Erwerbs­­un­fähig­keits­­ver­sicher­ung, Value: 2
+				46 text Die Vorteile der Pax Erwerbs­­un­fähig­keits­­ver­sicher­ung
+			47 heading Ausschluss von psychischen Krankheiten wählbar, Value: 3
+				48 text Ausschluss von psychischen Krankheiten wählbar
+			49 heading Garantierte Auszahlung einer Summe bis CHF 36’000, Value: 3
+				50 text Garantierte Auszahlung einer Summe bis CHF 36’000
+			51 heading Deckung bleibt auch bei Umzug innerhalb Westeuropas bestehen, Value: 3
+				52 text Deckung bleibt auch bei Umzug innerhalb Westeuropas bestehen
+			53 heading Krisencoach und Prämienbefreiung bei Erwerbsunfähigkeit inkludiert, Value: 3
+				54 text Krisencoach und Prämienbefreiung bei Erwerbsunfähigkeit inkludiert
+			55 heading Tiefere Prämie dank Überschüssen der Genossenschaft, Value: 3
+				56 text Tiefere Prämie dank Überschüssen der Genossenschaft
+		57 container
+			58 heading Flexible Ab­sicherung mit Bau­steinen, Value: 2
+				59 text Flexible Ab­sicherung mit Bau­steinen
+			60 text Wir gehen mit individuellen Leistungspaketen bei der Erwerbs­­unfähigkeits­­­versicherung auf Ihre persönliche Situation ein.
+			61 heading Vorteilhafter Eintritt bis zum Alter von 28 Jahren, Value: 3
+				62 text Vorteilhafter Eintritt bis zum Alter von 28 Jahren
+			63 text Bis zum Alter von 28 Jahren bietet Pax Ihnen einen günstigen Einsteigertarif an und zwei Jahre lang höhere Abzüge von Ihrer Prämie. Zudem erhalten Sie bis zum Alter von 30 Jahren kostenlos die Option, Ihre Rente ohne Gesundheitsprüfung bis zu einer Maximalrente von CHF 36’000 prozentual zur Lohnanpassung zu erhöhen.
+			64 heading Ausbaugarantie ohne Gesundheitsprüfung, Value: 3
+				65 text Ausbaugarantie ohne Gesundheitsprüfung
+			66 text Hat sich Ihre Lebenssituation geändert? Beantragen Sie eine Erhöhung Ihrer Erwerbsunfähigkeitsrente um bis zu CHF 12’000 ohne Gesundheitsprüfung. Möglich ist das bei Heirat, Scheidung, Kauf von Wohneigentum, Gehaltserhöhung und Wegfall von Kinderrenten aufgrund Ausbildungsende.
+			67 heading Option ohne psychische Krankheiten, Value: 3
+				68 text Option ohne psychische Krankheiten
+			69 text Pax bietet einen Spezialtarif bei Ausschluss psychischer Krankheiten an. Wenn Sie bereits aufgrund eines psychischen Leidens in Behandlung waren, versichern wir Sie für alle anderen Risiken uneingeschränkt, wenn es die Gesundheitsprüfung zulässt.
+			70 heading Option ohne Unfalldeckung, Value: 3
+				71 text Option ohne Unfalldeckung
+			72 text Sie definieren die Höhe der Erwerbsunfähigkeitsrente gemäss Ihrem Bedarf und danach, ob Sie Leistungen bei Krankheit und Unfall wünschen. Auf Wunsch können Sie die Unfalldeckung auch ausschliessen.
+			73 heading Kapitaloption, Value: 3
+				74 text Kapitaloption
+			75 text Mit dem Zusatzbaustein Hilfeleistungen erhalten Sie während fünf Jahren bei einer vollen Erwerbsunfähigkeit jährlich ein Kapital von CHF 10’000 zusätzlich zu Ihrer Erwerbsunfähigkeitsrente.
+			76 heading Optionale Lebensberatung, Value: 3
+				77 text Optionale Lebensberatung
+			78 text Bei Erwerbsunfähigkeit unterstützen wir Sie auf Wunsch mit einem Krisencoach. Er steht Ihnen mit Betreuungs-, Beratungs- und Organisationsdienstleistungen zur Seite.
+		79 container
+			80 heading Für wen eignet sich die Erwerbs­unfähigkeits­versicherung?, Value: 2
+				81 text Für wen eignet sich die Erwerbs­unfähigkeits­versicherung?
+			82 text Egal, ob Sie arbeiten, noch lernen oder sich hauptsächlich um andere kümmern. Mit einer Erwerbs­unfähigkeits­versicherung in der Säule 3a oder 3b sind Sie finanziell gut abgesichert. 
+			83 heading Familien und Paare, Value: 3, ID: familien-und-paare
+				84 text Familien und Paare
+			85 text Verdienen Sie am meisten Geld in Ihrer Familie? Bei einer Er­werbs­un­fähig­keit reichen die Leistungen aus der 1. und der 2. Säule für die Weiter­führung des gewohnten Lebens­standards meist nicht aus. Sichern Sie sich und Ihre Familie zusätzlich ab.
+			86 heading Nichterwerbstätige, Value: 3, ID: nichterwerbsttige
+				87 text Nichterwerbstätige
+			88 text Viele Frauen und immer mehr Männer sind für einige Zeit nicht berufstätig, wenn sie Eltern werden. Mit einer Erwerb­s­un­fähig­keits­­ver­sicherung erhalten Sie eine Rente, wenn Sie den Familien­alltag nicht mehr ohne Unter­stützung bewältigen können.
+			89 heading Jugendliche, Schüler und Studierende, Value: 3, ID: jugendliche-schler-und-studierende
+				90 text Jugendliche, Schüler und Studierende
+			91 text Eine Krankheit oder ein Unfall trifft junge Menschen besonders hart. Im jungen Alter sind die Leistungen der staatlichen Vorsorge tief, was den finanziellen Engpass noch einschneidender macht. Eine Erwerbs­­unfähigkeits­­rente schafft finanziellen Spielraum.
+			92 heading (Teilzeit-)Angestellte , Value: 3, ID: teilzeit-angestellte
+				93 text (Teilzeit-)Angestellte 
+			94 text Die Leistungen der staatlichen und der beruflichen Vorsorge reichen bei einem Erwerbs­ausfall meist nicht aus. Die Erwerbs­­un­fähig­keits­­versicherung ergänzt diese Leistungen und schliesst mögliche Ein­kommens­lücken.
+			95 heading Selbstständige, Value: 3, ID: selbststndige
+				96 text Selbstständige
+			97 text Wenn Sie in der Selbstständigkeit keiner Pensionskasse angehören, können Sie bei einer Erwerbs­unfähig­keit auf keine Rente aus der beruflichen Vorsorge zählen. Dann springt die Erwerbs­­unfähigkeits­­­versicherung von Pax ein und garantiert Ihnen eine regelmässige Rente.
+		98 container
+			99 heading Häufig gestellte Fragen zur Er­werbs­­unf­ähig­keits­­ver­sicherung, Value: 2
+				100 text Häufig gestellte Fragen zur Er­werbs­­unf­ähig­keits­­ver­sicherung
+			101 button (collapsed) Welche Kosten deckt die Erwerbs­unfähigkeits­versicherung von Pax?, Secondary Actions: Expand
+			102 button (collapsed) Kann die Versicherung ohne Gesundheitsprüfung abgeschlossen werden?, Secondary Actions: Expand
+			103 button (collapsed) Für wen ist eine Erwerbs­unfähigkeits­versicherung nötig?, Secondary Actions: Expand
+			104 button (collapsed) Warum gibt es günstige Einsteigerkonditionen?, Secondary Actions: Expand
+			105 button (collapsed) Was ist der Unterschied zwischen Arbeits­un­fähig­keit und Erwerbs­un­fähig­keit?, Secondary Actions: Expand
+	106 container
+		107 container Breadcrumb
+			108 content list
+				109 link Description: Home, Value: pax.ch/de
+				110 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				111 text Pax Erwerbsunfähigkeitsversicherung
+		112 container Hilfe
+			113 heading Hilfe, Value: 2, ID: footer-hilfe
+				114 text Hilfe
+			115 content list
+				116 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				117 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				118 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				119 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				120 link Description: Download-Center, Value: pax.ch/de/download-center
+				121 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		122 container Produkte
+			123 heading Produkte, Value: 2, ID: footer-produkte
+				124 text Produkte
+			125 content list
+				126 container
+					127 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					128 text Neu
+				129 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				130 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				131 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				132 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				133 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				134 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				135 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				136 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		137 container Bereiche
+			138 heading Bereiche, Value: 2, ID: footer-bereiche
+				139 text Bereiche
+			140 content list
+				141 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				142 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				143 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				144 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				145 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		146 container Über Pax
+			147 heading Über Pax, Value: 2, ID: footer-ber-pax
+				148 text Über Pax
+			149 content list
+				150 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				151 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				152 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				153 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				154 container
+					155 link Description: Karriere, Value: pax.ch/de/karriere
+					156 text Offene Stellen
+				157 link Description: News & Medien, Value: pax.ch/de/medien
+				158 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				159 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		160 container Sprache
+			161 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		162 container Kontakt
+			163 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				164 text Kontakt
+			165 content list
+				166 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				167 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		168 container Soziale Medien
+			169 content list
+				170 link Description: Facebook, Value: facebook.com/paxvorsorge
+				171 link Description: Instagram, Value: instagram.com/paxvorsorge
+				172 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				173 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		174 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		175 container Footer-Links
+			176 content list
+				177 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				178 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				179 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				180 link Description: Cookie-Einstellungen, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung#
+		181 image Pax Logo
+
+The focused UI element is 1 AXWebArea Erwerbsunfähigkeitsversicherung günstig für Einsteiger | Pax - Pax, URL: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung

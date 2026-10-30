@@ -1,0 +1,22 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/grundstueckgewinn-zusatzfelder",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getAdditionalEstateGainFields",
+  "http_status": 200,
+  "request": {
+    "TaxLocationID": 400100000
+  },
+  "response": {
+    "response": {
+      "Confession": false,
+      "Revenues": true,
+      "FirstCost": false,
+      "BuildingInvest": true,
+      "HasBuilding": false,
+      "SelfInhabitated": true,
+      "SelfInhabYears": false,
+      "HasDiscount": false
+    }
+  }
+}

@@ -1,0 +1,72 @@
+Browser tab: 5, Title: "Challenge · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/de/challenge".
+1 AXWebArea Challenge · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/de/challenge
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/de
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/de/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/de/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/de/tools
+		8 link Description: EN, Value: pax-hackathon-2026.vercel.app/challenge
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/de
+	10 container
+		11 text Challenge
+		12 heading Pax Digital Advisor — KI, die Lebensversicherung einfach macht, Value: 1
+			13 text Pax Digital Advisor — KI, die Lebensversicherung einfach macht
+		14 text Baut einen KI-gestützten Self-Service-Beratungs-Prototyp für Pax, der die ganze Lebenssituation der Kundin ins Zentrum stellt — nicht die Produkte. Bedarf erfassen, die drei Vorsorgesäulen verbinden, Lebensszenarien simulieren (Familie, Eigenheim, Pensionierung) und erst dann passende Pax-Lösungen empfehlen und durch die gesamte End-to-End-Reise führen: Beratung → Empfehlung → Abschluss → Police im Kundenportal.
+		15 definition list
+			16 container Sponsor
+				17 text Sponsor
+			18 text Pax
+			19 container Preisgeld
+				20 text Preisgeld
+			21 text CHF 1’500
+			22 container Veröffentlicht
+				23 text Veröffentlicht
+			24 text 09.09.2026
+		25 heading Problemstellung, Value: 2
+			26 text Problemstellung
+		27 text Kundinnen und Kunden in der Schweiz fehlt ein digitaler Self-Service-Beratungskanal für Lebensversicherungen. Pax — ein etablierter Schweizer Lebensversicherer mit schnell wachsendem Portfolio — berät heute ausschliesslich über klassische Beraterinnen und Berater. Versicherung ist komplex, und oft weiss man nicht, welche Risiken man absichern soll, wie viel man vorsorgen muss, welche Produkte zur eigenen Situation passen oder worin sich die Lösungen unterscheiden. Gleichzeitig verändert KI, wie Menschen sich informieren, entscheiden und mit Unternehmen interagieren. Die Aufgabe: Baut einen funktionierenden Prototyp eines KI-Versicherungsberaters, der eine Kundin durch ihre persönliche Vorsorgesituation führt und nachvollziehbare Empfehlungen für passende Pax-Produkte ableitet. Wir suchen keinen gewöhnlichen Chatbot, sondern die Idee, wie ein richtig guter digitaler Vorsorgeberater aussähe.
+		28 heading Kontext, Value: 2
+			29 text Kontext
+		30 text Ein «digitaler Berater der Zukunft» stellt die ganzheitliche Lebenssituation ins Zentrum, nicht die Produkte:
+		31 content list
+			32 text Verknüpfung der 1., 2. und 3. Säule (Staat / Beruf / privat)
+			33 text Berücksichtigung individueller Lebensziele (z. B. Familiengründung, Wohneigentum, Frühpensionierung, Kinderversicherung)
+			34 text Verständnis der persönlichen finanziellen Ausgangslage
+			35 text Produkte bleiben bewusst im Hintergrund und werden erst sekundär als passende Lösung im Gesamtbild positioniert
+		36 heading Zielgruppe, Value: 2
+			37 text Zielgruppe
+		38 text Privatkundinnen und -kunden von Pax in der Schweiz — Einzelpersonen (oder Paare/Familien) mit einer persönlichen finanziellen Situation und Lebenszielen, die sich zur Lebensversicherung / Vorsorge über alle drei Säulen selbst beraten lassen möchten.
+		39 heading Must-haves, Value: 2
+			40 text Must-haves
+		41 content list
+			42 text Bedarf erfassen, Lebenssituation verstehen (inkl. Finanzsituation) und Entwicklungsziele ableiten
+			43 text Eine ganzheitliche Vorsorgelogik über alle drei Säulen modellieren
+			44 text Individuelle Lebenssimulationen ermöglichen (Szenarien: Familie, Wohneigentum, Pensionierung)
+			45 text Situativ passende Pax-Lösungen empfehlen (als zweiter Schritt)
+			46 text Den kompletten End-to-End-Flow abdecken: Beratung → Empfehlung → Abschluss → Police im Kundenportal
+			47 text Der Berater versteht die Situation, stellt intelligente Rückfragen, erkennt relevante Risiken, strukturiert den Vorsorgebedarf, schlägt Lösungen vor, erklärt seine Empfehlungen und zeigt nächste Schritte — und erkennt, wann ein Mensch nötig ist.
+		48 heading Nice-to-haves, Value: 2
+			49 text Nice-to-haves
+		50 text Bonuspunkte gibt es für Mehrsprachigkeit (DE/FR/IT/EN), Sprachsteuerung, einen Avatar, die Simulation künftiger denkbarer Lebenssituationen, NPS-Feedback und Insights ans Produktmanagement zu Abbrüchen (Drop-offs).
+		51 heading Ressourcen, Value: 2
+			52 text Ressourcen
+		53 text Ihr erhaltet echte Pax-Produktdaten (z. B. pax.ch/de/private-vorsorge) und Dokumentation wie das Beratungskonzept, Zugang zur Logismata-API (Swagger UI) für Berechnungsfunktionen wie Vorsorgesituation und Steuern (siehe Seite «Tools»), einen konkreten Study-Case anhand eines realen Beispiels sowie einen Pax-Domänenexperten vor Ort — Cem und Claude, am Freitag und Sonntag.
+		54 heading No-Gos, Value: 2
+			55 text No-Gos
+		56 text Produkt-first-Verkauf ist tabu — Empfehlungen dürfen das Gespräch nie treiben, bevor die Lebenssituation verstanden ist. Eine der drei Säulen oder das vollständige Finanzbild zu ignorieren ist nicht erlaubt, und alles, was kein funktionierender Prototyp ist, qualifiziert nicht. Datenschutz- und Privacy-Anforderungen (DSG/revDSG) dürfen nie verletzt werden.
+		57 heading Follow-Up, Value: 2
+			58 text Follow-Up
+		59 text Das Siegerteam entwickelt den Proof of Concept gemeinsam mit dem Pax-Innovationsteam weiter — nach Absprache und Machbarkeit. Mögliche nächste Schritte: Werkstudierenden-Positionen sowie Bachelor- oder Masterarbeiten.
+		60 heading Rechtlicher Rahmen, Value: 2
+			61 text Rechtlicher Rahmen
+		62 text Kunden-, Finanz- und Gesundheitsdaten müssen transparent und mit vorgängiger Information verarbeitet und nie unkontrolliert an externe KI-Modelle oder Cloud-Dienste gesendet werden. Jede KI-Empfehlung muss erklärbar, dokumentiert und anhand nachvollziehbarer Kriterien prüfbar sein. In komplexen oder folgenreichen Fällen muss eine menschliche Prüfung möglich bleiben. Die Umsetzung muss von Tag eins sicher sein (Zugriffsschutz, Logging, Verschlüsselung) und Versicherungsrecht, vertragliche Pflichten und Geldwäscherei-Regeln einhalten.
+		63 link Description: Originale Challenge auf baselhack.ch, Value: baselhack.ch/challenges/placeholder-pax
+	64 container Breadcrumb
+		65 content list
+			66 link Description: Start, Value: pax-hackathon-2026.vercel.app/de
+			67 text Challenge
+	68 container
+		69 text Interner Wissens-Hub für die Pax Challenge am BaselHack 2026. Demodaten · keine Steuer- oder Vorsorgeberatung.
+
+The focused UI element is 1 AXWebArea Challenge · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/de/challenge

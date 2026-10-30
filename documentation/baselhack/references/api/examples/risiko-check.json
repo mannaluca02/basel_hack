@@ -1,0 +1,84 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/risiko-check",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateRisk",
+  "http_status": 200,
+  "request": {
+    "Relationship": 1,
+    "RelationshipSinceYear": 2015,
+    "Person1": {
+      "Sex": 1,
+      "BirthYear": 1985,
+      "GrossIncome": 120000,
+      "NumberOfChildren": 0,
+      "WithBVG": true,
+      "Pillar2Pensions": {
+        "Disability": 40000,
+        "DisabilityChildren": 8000,
+        "Widow": 30000,
+        "Orphan": 8000
+      }
+    },
+    "NumberOfChildren": 0,
+    "WithChildren": false
+  },
+  "response": {
+    "response": {
+      "RiskScenarioSummaries": [
+        {
+          "Scenario": 1,
+          "ErrorCode": 0,
+          "GrossIncome": 120000,
+          "IncomeNeed": 0,
+          "IncomeGap": 0,
+          "IncomeSurplus": 69268,
+          "IncomeTotal": 69268,
+          "IncomePillar1": 29268,
+          "IncomePillar2": 40000,
+          "IncomePartner": 0,
+          "CapitalGap": 0
+        },
+        {
+          "Scenario": 2,
+          "ErrorCode": 0,
+          "GrossIncome": 120000,
+          "IncomeNeed": 0,
+          "IncomeGap": 0,
+          "IncomeSurplus": 108000,
+          "IncomeTotal": 108000,
+          "IncomePillar1": 29268,
+          "IncomePillar2": 78732,
+          "IncomePartner": 0,
+          "CapitalGap": 0
+        },
+        {
+          "Scenario": 3,
+          "ErrorCode": 0,
+          "GrossIncome": 120000,
+          "IncomeNeed": 0,
+          "IncomeGap": 0,
+          "IncomeSurplus": 0,
+          "IncomeTotal": 0,
+          "IncomePillar1": 0,
+          "IncomePillar2": 0,
+          "IncomePartner": 0,
+          "CapitalGap": 0
+        },
+        {
+          "Scenario": 4,
+          "ErrorCode": 0,
+          "GrossIncome": 120000,
+          "IncomeNeed": 0,
+          "IncomeGap": 0,
+          "IncomeSurplus": 0,
+          "IncomeTotal": 0,
+          "IncomePillar1": 0,
+          "IncomePillar2": 0,
+          "IncomePartner": 0,
+          "CapitalGap": 0
+        }
+      ]
+    }
+  }
+}

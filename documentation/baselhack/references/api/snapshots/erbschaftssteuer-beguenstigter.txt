@@ -1,0 +1,87 @@
+Browser tab: 5, Title: "Inheritance tax – beneficiary · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-beguenstigter".
+1 AXWebArea Inheritance tax – beneficiary · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-beguenstigter
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Inheritance tax – beneficiary, Value: 1
+			12 text Inheritance tax – beneficiary
+		13 text The tax for a specifically named beneficiary.
+		14 text APICalc_calculateBeneficiaryInheritanceDonationTax API-Key calc.tax.inheritance
+		15 container
+			16 text Tax location *
+			17 container
+				18 text field (settable) Tax location *, Value: 4001 Basel (BS), ID: pax-input-thqp84v0f
+				19 image
+			20 text Amount CHF
+			21 text field (settable) 100’000
+			22 text Beneficiary *
+			23 combo box (collapsed) Value: Children, ID: pax-select-1u4nhblba, Secondary Actions: Expand
+				24 text Children
+				25 image
+			26 button Calculate
+				27 text Calculate
+				28 image
+			29 button Load example
+			30 button Reset
+		31 heading Result, Value: 3
+			32 text Result
+		33 definition list
+			34 container Relationship group
+				35 text Relationship group
+			36 text 300
+			37 container Beneficiary
+				38 text Beneficiary
+			39 text 301
+			40 container Inheritance Taxes
+				41 text Inheritance Taxes
+			42 text CHF 0
+			43 container Inheritance Exemption
+				44 text Inheritance Exemption
+			45 text 0
+			46 container Inheritance Deduction
+				47 text Inheritance Deduction
+			48 text 0
+			49 container Donation Taxes
+				50 text Donation Taxes
+			51 text CHF 0
+			52 container Donation Exemption
+				53 text Donation Exemption
+			54 text 0
+			55 container Donation Deduction
+				56 text Donation Deduction
+			57 text 0
+		68 container
+			69 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				70 text Raw data (request & response)
+			71 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateBeneficiaryInheritanceDonationTax {
+  "TaxLocationID": 400100000,
+  "Amount": 100000,
+  "Beneficiary": 301
+} Response (HTTP 200) {
+  "response": {
+    "Group": 300,
+    "Beneficiary": 301,
+    "InheritanceTaxes": 0,
+    "InheritanceExemption": 0,
+    "InheritanceDeduction": 0,
+    "DonationTaxes": 0,
+    "DonationExemption": 0,
+    "DonationDeduction": 0
+  }
+}
+	60 container Breadcrumb
+		61 content list
+			62 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			63 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			64 text Inheritance & gift
+			65 text Inheritance tax – beneficiary
+	66 container
+		67 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 69 button (expanded) Raw data (request & response), Secondary Actions: Collapse

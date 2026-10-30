@@ -1,0 +1,224 @@
+Browser tab: 5, Title: "Savings calculator · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/sparen".
+1 AXWebArea Savings calculator · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/sparen
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Savings calculator, Value: 1
+			12 text Savings calculator
+		13 text How an initial capital grows with regular deposits and interest.
+		14 text APICalc_calculateSaving API-Key calc.saving
+		15 container
+			16 text Target variable *
+			17 combo box (collapsed) Value: Final capital, ID: pax-select-yh9ndqlja, Secondary Actions: Expand
+				18 text Final capital
+				19 image
+			20 text Term (years)
+			21 text field (settable) Term (years), Value: 20, ID: pax-input-mspy263vb
+			22 text Saving period in years (SavingGoal != Duration) Initial capital CHF
+			23 text field (settable) 10’000
+			24 switch Description: Monthly contribution, Value: 0, ID: pax-switch-olwwjl8uy
+			25 text Monthly contribution
+			26 text Regular deposit CHF
+			27 text field (settable) 6’000
+			28 text Interest rate (%)
+			29 text field (settable) Interest rate (%), Value: 2.5, ID: pax-input-8hjoyq4ah
+			30 text Zinssatz (SavingGoal != InterestRate) Final capital CHF
+			31 text field (settable)
+			32 button Calculate
+				33 text Calculate
+				34 image
+			35 button Load example
+			36 button Reset
+		37 heading Capital growth over the years, Value: 3
+			38 text Capital growth over the years
+		39 image
+			40 text 0
+			41 text 46k
+			42 text 91k
+			43 text 137k
+			44 text 182k
+			45 text 1
+			46 text 5
+			47 text 9
+			48 text 12
+			49 text 16
+			50 text 20
+		51 text Year
+		52 content list
+			53 text Deposits
+			54 text Interest
+		55 heading Result, Value: 3
+			56 text Result
+		57 definition list
+			58 container Deposits
+				59 text Deposits
+			60 text CHF 130’000
+			61 container Interest
+				62 text Interest
+			63 text CHF 43’485
+			64 container Gross capital
+				65 text Gross capital
+			66 text CHF 173’485
+			67 container Regular deposit
+				68 text Regular deposit
+			69 text 6’000
+			70 container Term (years)
+				71 text Term (years)
+			72 text 20
+			73 container Term (months)
+				74 text Term (months)
+			75 text 0
+			76 container Interest rate (%)
+				77 text Interest rate (%)
+			78 text 2,5 %
+			79 text Deposits over time
+			80 container Periods
+				81 text Periods
+			82 text 20
+			83 container Start of year
+				84 text Start of year
+			85 text 10’000, 16’000, 22’000, 28’000, 34’000, 40’000, 46’000, 52’000, 58’000, 64’000, 70’000, 76’000 … (+8)
+			86 container End of year
+				87 text End of year
+			88 text 16’000, 22’000, 28’000, 34’000, 40’000, 46’000, 52’000, 58’000, 64’000, 70’000, 76’000, 82’000 … (+8)
+			89 text Interest over time
+			90 container Periods
+				91 text Periods
+			92 text 20
+			93 container Start of year
+				94 text Start of year
+			95 text 0, 400, 960, 1’684, 2’576, 3’640, 4’881, 6’303, 7’911, 9’708, 11’701, 13’894 … (+8)
+			96 container End of year
+				97 text End of year
+			98 text 400, 960, 1’684, 2’576, 3’640, 4’881, 6’303, 7’911, 9’708, 11’701, 13’894, 16’291 … (+8)
+		109 container
+			110 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				111 text Raw data (request & response)
+			112 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateSaving {
+  "SavingGoal": 1,
+  "Duration": 20,
+  "InitialInvestment": 10000,
+  "InvestmentMonthly": false,
+  "PeriodicInvestment": 6000,
+  "InterestRate": 2.5
+} Response (HTTP 200) {
+  "response": {
+    "Deposits": 130000,
+    "Interest": 43485,
+    "GrossCapital": 173485,
+    "PeriodicInvestment": 6000,
+    "DurationYears": 20,
+    "DurationMonths": 0,
+    "InterestRate": 2.5,
+    "DetailsDeposits": {
+      "Periods": 20,
+      "Data1": [
+        10000,
+        16000,
+        22000,
+        28000,
+        34000,
+        40000,
+        46000,
+        52000,
+        58000,
+        64000,
+        70000,
+        76000,
+        82000,
+        88000,
+        94000,
+        100000,
+        106000,
+        112000,
+        118000,
+        124000
+      ],
+      "Data2": [
+        16000,
+        22000,
+        28000,
+        34000,
+        40000,
+        46000,
+        52000,
+        58000,
+        64000,
+        70000,
+        76000,
+        82000,
+        88000,
+        94000,
+        100000,
+        106000,
+        112000,
+        118000,
+        124000,
+        130000
+      ]
+    },
+    "DetailsInterest": {
+      "Periods": 20,
+      "Data1": [
+        0,
+        400,
+        960,
+        1684,
+        2576,
+        3640,
+        4881,
+        6303,
+        7911,
+        9708,
+        11701,
+        13894,
+        16291,
+        18898,
+        21721,
+        24764,
+        28033,
+        31534,
+        35272,
+        39254
+      ],
+      "Data2": [
+        400,
+        960,
+        1684,
+        2576,
+        3640,
+        4881,
+        6303,
+        7911,
+        9708,
+        11701,
+        13894,
+        16291,
+        18898,
+        21721,
+        24764,
+        28033,
+        31534,
+        35272,
+        39254,
+        43485
+      ]
+    }
+  }
+}
+	101 container Breadcrumb
+		102 content list
+			103 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			104 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			105 text Saving & investing
+			106 text Savings calculator
+	107 container
+		108 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 110 button (expanded) Raw data (request & response), Secondary Actions: Collapse

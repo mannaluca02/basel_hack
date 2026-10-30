@@ -1,0 +1,121 @@
+Browser tab: 5, Title: "Lump-sum benefit tax · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/kapitalleistungssteuer".
+1 AXWebArea Lump-sum benefit tax · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/kapitalleistungssteuer
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Lump-sum benefit tax, Value: 1
+			12 text Lump-sum benefit tax
+		13 text The separate tax on a lump-sum payout from pension savings.
+		14 text APICalc_calculateCapitalTax API-Key calc.tax.capital
+		15 container
+			16 text Lump-sum payout * CHF
+			17 text field (settable) 250’000
+			18 text Age at payout *
+			19 text field (settable) Age at payout *, Value: 65, ID: pax-input-n3jlsgm2c
+			20 text Tax location *
+			21 container
+				22 text field (settable) Tax location *, Value: 4001 Basel (BS), ID: pax-input-vv1bxtao7
+				23 image
+			24 text Marital status *
+			25 combo box (collapsed) Value: Single, ID: pax-select-qgszvm5zj, Secondary Actions: Expand
+				26 text Single
+				27 image
+			28 text Religious denomination *
+			29 combo box (collapsed) Value: None, ID: pax-select-rv92e63p7, Secondary Actions: Expand
+				30 text None
+				31 image
+			32 text Religious denomination (partner)
+			33 combo box (collapsed) Value: None, ID: pax-select-wqrhd2q46, Secondary Actions: Expand
+				34 text None
+				35 image
+			36 text Denomination share (%)
+			37 text field (settable) Denomination share (%), ID: pax-input-htpd57cfj
+			38 text Denomination 1 share (what percentage of the family has this denomination, 0 = automatic) Number of children *
+			39 text field (settable) Number of children *, Value: 0, ID: pax-input-zi2zk50hv
+			40 text dependent children Sex *
+			41 combo box (collapsed) Value: Male, ID: pax-select-q33p4gna5, Secondary Actions: Expand
+				42 text Male
+				43 image
+			44 text Birth year *
+			45 text field (settable) Birth year *, Value: 1960, ID: pax-input-p5tncf91v
+			46 button Calculate
+				47 text Calculate
+				48 image
+			49 button Load example
+			50 button Reset
+		51 heading What the capital tax is made up of, Value: 3
+			52 text What the capital tax is made up of
+		53 image
+			54 text 21k
+			55 text Capital tax
+		56 content list
+			57 container
+				58 text Municipal tax CHF 8’375
+			59 container
+				60 text Cantonal/state tax CHF 8’375
+			61 container
+				62 text Federal tax CHF 3’903
+		63 heading Result, Value: 3
+			64 text Result
+		65 definition list
+			66 container Total capital tax
+				67 text Total capital tax
+			68 text CHF 20’653
+			69 container Municipal tax
+				70 text Municipal tax
+			71 text CHF 8’375
+			72 container Church tax
+				73 text Church tax
+			74 text CHF 0
+			75 container Cantonal/state tax
+				76 text Cantonal/state tax
+			77 text CHF 8’375
+			78 container Federal tax
+				79 text Federal tax
+			80 text CHF 3’903
+			81 container Capital after taxes
+				82 text Capital after taxes
+			83 text CHF 229’347
+			84 container Tax rate (%)
+				85 text Tax rate (%)
+			86 text 8,26 %
+		97 container
+			98 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				99 text Raw data (request & response)
+			100 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateCapitalTax {
+  "CapitalPayment": 250000,
+  "PaymentAge": 65,
+  "TaxLocationID": 400100000,
+  "Relationship": 1,
+  "Confession1": 4,
+  "Confession2": 4,
+  "NumberOfChildren": 0,
+  "Sex": 1,
+  "BirthYear": 1960
+} Response (HTTP 200) {
+  "response": {
+    "CapitalTaxes": 20653,
+    "CommunityTax": 8375,
+    "ChurchTax": 0,
+    "StateTax": 8375,
+    "FederalTax": 3903,
+    "NetCapital": 229347,
+    "TaxPercentage": 8.26
+  }
+}
+	89 container Breadcrumb
+		90 content list
+			91 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			92 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			93 text Taxes
+			94 text Lump-sum benefit tax
+	95 container
+		96 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 98 button (expanded) Raw data (request & response), Secondary Actions: Collapse

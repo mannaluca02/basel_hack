@@ -1,0 +1,177 @@
+Browser tab: 8, Title: "Typography - Design - Pax Brand Guidelines", URL: "https://brand.pax.ch/document/3#/basics/typography".
+0 AXWebArea Typography - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/basics/typography
+	1 container
+		2 link Description: Zum Hauptinhalt springen, Value: brand.pax.ch/document/3#main
+		3 container
+			4 link Description: Zur Anmeldeseite, Value: brand.pax.ch/auth?referer=%2Fdocument%2F3%23%2Fbasics%2Ftypography
+			5 pop up button (collapsed) Description: Anmelde-Button verschieben, ID: radix-:r0:, Secondary Actions: Expand
+			6 container classic-theme
+				7 container
+					8 button Suchen
+					9 container Main
+						10 content list
+							11 link Description: Marke, Value: brand.pax.ch/document/1
+							12 link Description: Aktuelle Seite: Design, Value: brand.pax.ch/document/3
+							13 pop up button (collapsed) Downloads, ID: radix-:isolated-1-r5:, Secondary Actions: Expand
+								14 text Downloads
+								15 image
+							16 link Description: Login externer Link, Value: brand.pax.ch/auth?referer=%2Fhub%2F1
+					17 link Description: Go to Pax Brand Guidelines, Value: brand.pax.ch/hub/1
+				18 container
+					19 container Dokument
+						20 content list
+							21 container
+								22 button Basics, ID: category-15-header
+								23 content list
+									24 link Description: Logo, Value: brand.pax.ch/document/3#/basics/logo-1
+									238 link Description: Farben, Value: brand.pax.ch/document/3#/basics/farben
+									239 container
+										240 link Description: Aktuelle Seite: Typography, Value: brand.pax.ch/document/3#/basics/typography
+										241 content list
+											242 link Description: Pax Civil (aktiv), Value: brand.pax.ch/document/3#/basics/typography/pax-civil-1
+											243 link Description: Download, Value: brand.pax.ch/document/3#/basics/typography/download
+											244 link Description: Anwendungsbeispiel, Value: brand.pax.ch/document/3#/basics/typography/anwendungsbeispiel
+											245 link Description: Fallbackschrift, Value: brand.pax.ch/document/3#/basics/typography/fallbackschrift
+									36 link Description: Icons, Value: brand.pax.ch/document/3#/basics/icons
+							37 container
+								38 button Bildwelt, ID: category-16-header
+								39 content list
+									40 link Description: Bildsprache, Value: brand.pax.ch/document/3#/bildwelt/bildsprache
+									41 link Description: Freisteller, Value: brand.pax.ch/document/3#/bildwelt/freisteller
+									42 link Description: Flächenbilder, Value: brand.pax.ch/document/3#/bildwelt/flaechenbilder
+							43 container
+								44 button Digital, ID: category-11-header
+								45 content list
+									46 link Description: UI Design, Value: brand.pax.ch/document/3#/digital/ui-design
+									47 link Description: Digitale Werbung, Value: brand.pax.ch/document/3#/digital/digitale-werbung
+									48 link Description: Video, Value: brand.pax.ch/document/3#/digital/video
+									49 link Description: Powerpoint, Value: brand.pax.ch/document/3#/digital/powerpoint
+							50 container
+								51 button Print, ID: category-10-header
+								52 content list
+									53 link Description: Inserate & Plakate, Value: brand.pax.ch/document/3#/print/inserate-plakate
+									54 link Description: Broschüren, Value: brand.pax.ch/document/3#/print/broschueren
+									55 link Description: Grusskarten, Value: brand.pax.ch/document/3#/print/grusskarten
+					56 heading Typography, Value: 1
+						57 text Typography
+					246 container
+						247 container content-manager
+							248 container
+								249 heading Pax Civil, Value: 2
+									250 text Pax Civil
+								251 container
+									252 text Unsere Schrift heisst  Pax Civil . Wir verwenden drei Schriftschnitte:  Regular, Bold und Medium:
+									253 content list
+										254 container
+											306 text • Für Überschriften, Titel und Hervorhebungen verwenden wir Pax Civil Bold. 
+											256 text ﻿
+										257 container
+											307 text • Für Fliesstext kommt Pax Civil Regular zum Einsatz.
+										259 container
+											308 text • Für CTA und Buttons die Pax Civil Medium.
+								261 container
+									262 text Achtung:  Momentan sind nur die Schriftschnitte Bold, Medium und Regular im Einsatz! 
+									263 text ﻿Bitte  nicht  die Semi-Bold und Italic verwenden! Und  keine  Uppercase (Grossbuchstaben) verwenden!
+								264 container
+									265 text Für alle die nicht wissen, welche Formate wo eingesetzt werden, hier eine kleine Erklärung:
+									266 text ﻿
+									267 link Description: Otf, ttf, woff, wtf?!, Value: do.team/blog/otf-ttf-woff-wtf
+									268 text  :)
+							269 container
+								270 heading Download, Value: 2
+									271 text Download
+								272 text Die Schrift "Pax Civil" ist nur mit Login zum Download verfügbar. 
+							309 container
+								310 container
+									311 heading PaxCivil-Medium  DESKTOP, Value: 3
+										312 text PaxCivil-Medium  DESKTOP
+									313 heading PaxCivil-Medium, font weight: 400, font style: normal, Value: 4
+										314 text PaxCivil-Medium, font weight: 400, font style: normal
+									315 heading PaxCivil-Regular  DESKTOP, Value: 3
+										316 text PaxCivil-Regular  DESKTOP
+									317 heading PaxCivil-Regular, font weight: 400, font style: normal, Value: 4
+										318 text PaxCivil-Regular, font weight: 400, font style: normal
+									319 heading PaxCivil-RegularItalic  DESKTOP, Value: 3
+										320 text PaxCivil-RegularItalic  DESKTOP
+									321 heading PaxCivil-RegularItalic, font weight: 400, font style: italic, Value: 4
+										322 text PaxCivil-RegularItalic, font weight: 400, font style: italic
+									323 heading PaxCivil-SemiBold  DESKTOP, Value: 3
+										324 text PaxCivil-SemiBold  DESKTOP
+									325 heading PaxCivil-SemiBold, font weight: 600, font style: normal, Value: 4
+										326 text PaxCivil-SemiBold, font weight: 600, font style: normal
+									327 heading PaxCivil-SemiBoldItalic  DESKTOP, Value: 3
+										328 text PaxCivil-SemiBoldItalic  DESKTOP
+									329 heading PaxCivil-SemiBoldItalic, font weight: 600, font style: italic, Value: 4
+										330 text PaxCivil-SemiBoldItalic, font weight: 600, font style: italic
+									331 heading PaxCivil-Bold  DESKTOP, Value: 3
+										332 text PaxCivil-Bold  DESKTOP
+									333 heading PaxCivil-Bold, font weight: 700, font style: normal, Value: 4
+										334 text PaxCivil-Bold, font weight: 700, font style: normal
+									335 heading PaxCivil-BoldItalic  DESKTOP, Value: 3
+										336 text PaxCivil-BoldItalic  DESKTOP
+									337 heading PaxCivil-BoldItalic, font weight: 700, font style: italic, Value: 4
+										338 text PaxCivil-BoldItalic, font weight: 700, font style: italic
+							273 container
+								274 container
+									275 heading Schriftfarben, Value: 3
+										276 text Schriftfarben
+									277 text Primär wird schwarze Schrift auf Weiss verwendet. Auf dunklem (meist Pax Purple) Hintergrund weisse Schrift. Für Headlines wird Pax Green verwendet. 
+									339 content list
+										340 container
+											341 text Black
+											342 content list color-block-item-list-colorspaces-27
+												343 text #121212
+												344 container 18, 18, 18
+													345 text 18 ,  18 ,  18
+										346 container
+											347 text White
+											348 content list color-block-item-list-colorspaces-26
+												349 text #FFFFFF
+												350 container 255, 255, 255
+													351 text 255 ,  255 ,  255
+										352 container
+											353 text Pax Green
+											354 content list color-block-item-list-colorspaces-24
+												355 text #8CCD0F
+												356 container 140, 205, 15
+													357 text 140 ,  205 ,  15
+										358 container
+											359 text Contrast Green
+											360 content list color-block-item-list-colorspaces-67
+												361 text #579E00
+												362 container 87, 158, 0
+													363 text 87 ,  158 ,  0
+								278 container
+									279 text Achtung:  Die Schriftfarbe  Contrast Green  ist ausschließlich für digitale Anwendungen auf hellem Hintergrund vorgesehen. Da Pax Green die Anforderungen an Barrierefreiheit im digitalen Raum (Kontrast-Test) nicht erfüllt, wurde hierfür ein eigenes Contrast Green definiert. (Für Printmedien ist diese Unterscheidung nicht relevant.)
+									280 text ﻿
+									281 text ﻿Hier ein Beispiel: 
+								282 container
+									283 button Screenshot 2025-03-24 141435
+										284 image Screenshot 2025-03-24 141435
+								285 heading Anwendungsbeispiel, Value: 2
+									286 text Anwendungsbeispiel
+								287 content list
+									288 container
+										364 text • Für Überschriften, Titel und Hervorhebungen verwenden wir Pax Civil Bold. 
+										290 text ﻿
+									291 container
+										365 text • Für Fliesstext kommt Pax Civil Regular zum Einsatz.
+									293 container
+										366 text • Für CTA und Buttons die Pax Civil Medium.
+									295 container
+										367 text • Wegen einer besseren Lesbarkeit werden keine Headlines in Grossbuchstaben mehr verwendet!
+								297 container
+									298 button Screenshot 2025-03-24 144308
+										299 image Screenshot 2025-03-24 144308
+							300 container
+								301 heading Fallbackschrift, Value: 2
+									302 text Fallbackschrift
+								303 text Arial kommt der Civil als Fallbackschrift am nächsten und wird daher in Mails, Newslettern und anderen Programmen als kompatible Systemschrift eingesetzt.
+								304 container
+									305 button
+					234 container Pagination of the current page
+						235 link Description: Basics Farben Previous page, Value: brand.pax.ch/document/3#/basics/farben
+						236 link Description: Basics Icons Next page, Value: brand.pax.ch/document/3#/basics/icons
+					237 text Zuletzt geändert am 4. September 2026 um 10:26
+
+The focused UI element is 0 AXWebArea Typography - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/basics/typography

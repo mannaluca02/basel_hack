@@ -1,0 +1,19 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/standort",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getLocation",
+  "http_status": 200,
+  "request": {
+    "TaxLocationID": 400100000
+  },
+  "response": {
+    "response": {
+      "LocationID": 400100000,
+      "ZipCode": "4001",
+      "City": "Basel",
+      "Canton": "BS",
+      "Location": "4001 Basel"
+    }
+  }
+}

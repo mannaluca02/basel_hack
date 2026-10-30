@@ -1,0 +1,177 @@
+Browser tab: 6, Title: "QuickSale", URL: "https://portal.pax.ch/quicksale/edu/".
+0 AXWebArea QuickSale, URL: portal.pax.ch/quicksale/edu/
+	1 container
+		2 content list
+			3 link Description: Produktübersicht, Value: portal.pax.ch/quicksale/edu/produkte
+			4 link Description: Vorschlagsrechner, Value: portal.pax.ch/quicksale/edu/vorschlag
+		5 link Description: Link Lernvideo, Help: Klicken Sie hier, wenn Sie Hilfe benötigen, Value: pax.ch/de/vertriebspartner/aktuelles/digitalantrag
+		6 link pax.ch/datenschutz
+		7 container sprachauswahl
+			8 radio button (settable, integer) Description: DE, Value: 0
+			9 radio button (settable, integer) Description: FR, Value: 0
+			10 radio button (settable, integer) Description: IT, Value: 0
+		11 image Description: QuickSale, ID: product-name
+		12 image Pax Company Logo
+	13 content list
+		14 button Alle Produkte
+		15 button Gebundene Vorsorge (Säule 3a)
+		16 button Freie Vorsorge (Säule 3b)
+		17 button Fondsanlage mit individueller Garantie
+		18 button Fondsanlage
+		19 button Kinderversicherung
+		20 button Erwerbsunfähigkeitsversicherung
+		21 button Todesfallversicherung
+		22 button Auszahlungsplan
+	23 container
+		24 container
+			25 heading FONDSANLAGE MIT INDIVIDUELLER GARANTIE, Value: 4
+				26 text FONDSANLAGE MIT INDIVIDUELLER GARANTIE
+			27 heading KLASSISCHE ANLAGE MIT GARANTIERTEM ZINS UND FONDSANLAGE, Value: 5
+				28 text KLASSISCHE ANLAGE MIT GARANTIERTEM ZINS UND FONDSANLAGE
+			29 container
+				30 heading Periodische Prämie, Value: 5
+					31 text Periodische Prämie
+				32 container
+					33 text 3a 3b
+				34 content list
+					35 container
+						36 button Klassische Anlage und Fondsanlage
+						37 link Description: factsheet, Value: assets.pax.ch/x/3fabb313b8/private-vorsorge-technische-tarifbestimmungen-lifestar.pdf
+				38 text NEU
+			39 container
+				40 heading Einmalprämie, Value: 5
+					41 text Einmalprämie
+				42 container
+					43 text 3a 3b
+				44 content list
+					45 container
+						46 button Klassische Anlage und Fondsanlage
+						47 link Description: factsheet, Value: assets.pax.ch/x/3fabb313b8/private-vorsorge-technische-tarifbestimmungen-lifestar.pdf
+				48 text NEU
+			49 container
+				50 heading Periodische Prämie + Einmalprämie, Value: 5
+					51 text Periodische Prämie + Einmalprämie
+				52 container
+					53 text 3a 3b
+				54 content list
+					55 button Klassische Anlage und Fondsanlage
+				56 text NEU
+			57 container
+				58 heading Privilegierte Einmalprämie, Value: 5
+					59 text Privilegierte Einmalprämie
+				60 container
+					61 text 3a 3b
+				62 content list
+					63 button Zuzahlung als Fondsanlage mit individueller Garantie
+				64 text NEU
+			65 heading FONDSANLAGE, Value: 4
+				66 text FONDSANLAGE
+			67 heading INVESTITION IN FONDS, Value: 5
+				68 text INVESTITION IN FONDS
+			69 container
+				70 heading Periodische Prämie, Value: 5
+					71 text Periodische Prämie
+				72 container
+					73 text 3a 3b
+				74 content list
+					75 container
+						76 button Investition in Fonds
+						77 link Description: factsheet, Value: assets.pax.ch/x/cf132b49cc/private-vorsorge-technische-tarifbestimmungen-fondsstar.pdf
+				78 text NEUE FONDS
+			79 container
+				80 heading Einmalprämie, Value: 5
+					81 text Einmalprämie
+				82 container
+					83 text 3a 3b
+				84 content list
+					85 container
+						86 button Investition in Fonds
+						87 link Description: factsheet, Value: assets.pax.ch/x/cf132b49cc/private-vorsorge-technische-tarifbestimmungen-fondsstar.pdf
+				88 text NEUE FONDS
+			89 container
+				90 heading Periodische Prämie + Einmalprämie, Value: 5
+					91 text Periodische Prämie + Einmalprämie
+				92 container
+					93 text 3a 3b
+				94 content list
+					95 button Investition in Fonds
+				96 text NEUE FONDS
+			97 container
+				98 heading Privilegierte Einmalprämie, Value: 5
+					99 text Privilegierte Einmalprämie
+				100 container
+					101 text 3a 3b
+				102 content list
+					103 button Zuzahlung als Fondsanlage
+				104 text NEUE FONDS
+			105 heading KINDERVERSICHERUNG, Value: 4
+				106 text KINDERVERSICHERUNG
+			107 heading Value: 5, SPARVERSICHERUNG MIT INVALIDENSCHUTZ DES KINDES SOWIE FINANZIELLE ABSICHERUNG BEI AUSFALL DES VERSORGERS
+				108 text SPARVERSICHERUNG MIT INVALIDENSCHUTZ DES KINDES SOWIE FINANZIELLE ABSICHERUNG BEI AUSFALL DES VERSORGERS
+			109 container
+				110 heading Periodische Prämie, Value: 5
+					111 text Periodische Prämie
+				112 container
+					113 text 3a 3b
+				114 content list
+					115 container
+						116 button Kinderversicherung
+						117 link Description: factsheet, Value: assets.pax.ch/x/8db67e7c5f/private-vorsorge-technische-tarifbestimmungen-firststep.pdf
+					118 container
+						119 button Kinderversicherung Paket Basic
+						120 link Description: factsheet, Value: assets.pax.ch/x/8db67e7c5f/private-vorsorge-technische-tarifbestimmungen-firststep.pdf
+					121 container
+						122 button Kinderversicherung Paket Medium
+						123 link Description: factsheet, Value: assets.pax.ch/x/8db67e7c5f/private-vorsorge-technische-tarifbestimmungen-firststep.pdf
+					124 container
+						125 button Kinderversicherung Paket Premium
+						126 link Description: factsheet, Value: assets.pax.ch/x/8db67e7c5f/private-vorsorge-technische-tarifbestimmungen-firststep.pdf
+				127 text NEUE FONDS
+			128 heading ERWERBSUNFÄHIGKEITSVERSICHERUNG, Value: 4
+				129 text ERWERBSUNFÄHIGKEITSVERSICHERUNG
+			130 heading EINKOMMENSSCHUTZ BEI ERWERBSAUSFALL, Value: 5
+				131 text EINKOMMENSSCHUTZ BEI ERWERBSAUSFALL
+			132 container
+				133 heading Periodische Prämie, Value: 5
+					134 text Periodische Prämie
+				135 container
+					136 text 3a 3b
+				137 content list
+					138 container
+						139 button Einkommensschutz bei Erwerbsausfall
+						140 link Description: factsheet, Value: assets.pax.ch/x/12fee4331c/private-vorsorge-technische-tarifbestimmungen-sirjl-sir.pdf
+			141 heading TODESFALLVERSICHERUNG, Value: 4
+				142 text TODESFALLVERSICHERUNG
+			143 heading HINTERBLIEBENENSCHUTZ IM TODESFALL, Value: 5
+				144 text HINTERBLIEBENENSCHUTZ IM TODESFALL
+			145 container
+				146 heading Periodische Prämie, Value: 5
+					147 text Periodische Prämie
+				148 container
+					149 text 3a 3b
+				150 content list
+					151 container
+						152 button Hinterbliebenenschutz im Todesfall (Rente)
+						153 link Description: factsheet, Value: assets.pax.ch/x/7eb5852589/private-vorsorge-technische-tarifbestimmungen-fk-fkf-fk2-fkf2-fr.pdf
+					154 container
+						155 button Hinterbliebenenschutz im Todesfall (fallend)
+						156 link Description: factsheet, Value: assets.pax.ch/x/7eb5852589/private-vorsorge-technische-tarifbestimmungen-fk-fkf-fk2-fkf2-fr.pdf
+					157 container
+						158 button Hinterbliebenenschutz im Todesfall (konstant)
+						159 link Description: factsheet, Value: assets.pax.ch/x/7eb5852589/private-vorsorge-technische-tarifbestimmungen-fk-fkf-fk2-fkf2-fr.pdf
+			160 heading AUSZAHLUNGSPLAN, Value: 4
+				161 text AUSZAHLUNGSPLAN
+			162 heading KLASSISCHE ANLAGE MIT GARANTIERTEM ZINS UND FONDSANLAGE, Value: 5
+				163 text KLASSISCHE ANLAGE MIT GARANTIERTEM ZINS UND FONDSANLAGE
+			164 container
+				165 heading Einmalprämie, Value: 5
+					166 text Einmalprämie
+				167 container
+					168 text 3a 3b
+				169 content list
+					170 container
+						171 button Klassische Anlage und Fondsanlage
+						172 link Description: factsheet, Value: assets.pax.ch/x/348092e417/private-vorsorge-technische-tarifbestimmungen-auszahlungsplan.pdf
+				173 text NEUE FONDS
+
+The focused UI element is 0 AXWebArea QuickSale, URL: portal.pax.ch/quicksale/edu/

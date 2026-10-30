@@ -1,0 +1,105 @@
+Browser tab: 8, Title: "UI Design - Design - Pax Brand Guidelines", URL: "https://brand.pax.ch/document/3#/digital/ui-design".
+0 AXWebArea UI Design - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/digital/ui-design
+	1 container
+		2 link Description: Zum Hauptinhalt springen, Value: brand.pax.ch/document/3#main
+		3 container
+			4 link Description: Zur Anmeldeseite, Value: brand.pax.ch/auth?referer=%2Fdocument%2F3%23%2Fdigital%2Fui-design
+			5 pop up button (collapsed) Description: Anmelde-Button verschieben, ID: radix-:r0:, Secondary Actions: Expand
+			6 container classic-theme
+				7 container
+					8 button Suchen
+					9 container Main
+						10 content list
+							11 link Description: Marke, Value: brand.pax.ch/document/1
+							12 link Description: Aktuelle Seite: Design, Value: brand.pax.ch/document/3
+							13 pop up button (collapsed) Downloads, ID: radix-:isolated-1-r5:, Secondary Actions: Expand
+								14 text Downloads
+								15 image
+							16 link Description: Login externer Link, Value: brand.pax.ch/auth?referer=%2Fhub%2F1
+					17 link Description: Go to Pax Brand Guidelines, Value: brand.pax.ch/hub/1
+				18 container
+					19 container Dokument
+						20 content list
+							21 container
+								22 button Basics, ID: category-15-header
+								23 content list
+									24 link Description: Logo, Value: brand.pax.ch/document/3#/basics/logo-1
+									238 link Description: Farben, Value: brand.pax.ch/document/3#/basics/farben
+									239 link Description: Typography, Value: brand.pax.ch/document/3#/basics/typography
+									240 link Description: Icons, Value: brand.pax.ch/document/3#/basics/icons
+							37 container
+								38 button Bildwelt, ID: category-16-header
+								39 content list
+									40 link Description: Bildsprache, Value: brand.pax.ch/document/3#/bildwelt/bildsprache
+									41 link Description: Freisteller, Value: brand.pax.ch/document/3#/bildwelt/freisteller
+									42 link Description: Flächenbilder, Value: brand.pax.ch/document/3#/bildwelt/flaechenbilder
+							43 container
+								44 button Digital, ID: category-11-header
+								45 content list
+									241 container
+										242 link Description: Aktuelle Seite: UI Design, Value: brand.pax.ch/document/3#/digital/ui-design
+										243 content list
+											244 link Description: UI Library (aktiv), Value: brand.pax.ch/document/3#/digital/ui-design/ui-library
+											245 link Description: Storybook, Value: brand.pax.ch/document/3#/digital/ui-design/storybook-1
+											246 link Description: Website, Value: brand.pax.ch/document/3#/digital/ui-design/website
+											247 link Description: Weitere Produkte, Value: brand.pax.ch/document/3#/digital/ui-design/weitere-produkte
+											248 link Description: Favicon, Value: brand.pax.ch/document/3#/digital/ui-design/favicon
+									47 link Description: Digitale Werbung, Value: brand.pax.ch/document/3#/digital/digitale-werbung
+									48 link Description: Video, Value: brand.pax.ch/document/3#/digital/video
+									49 link Description: Powerpoint, Value: brand.pax.ch/document/3#/digital/powerpoint
+							50 container
+								51 button Print, ID: category-10-header
+								52 content list
+									53 link Description: Inserate & Plakate, Value: brand.pax.ch/document/3#/print/inserate-plakate
+									54 link Description: Broschüren, Value: brand.pax.ch/document/3#/print/broschueren
+									55 link Description: Grusskarten, Value: brand.pax.ch/document/3#/print/grusskarten
+					56 heading UI Design, Value: 1
+						57 text UI Design
+					249 container
+						250 container content-manager
+							251 container
+								252 container
+									253 text Was ist UI Design?
+									254 text ﻿UI Design (User Interface Design) befasst sich mit der Gestaltung der visuellen und interaktiven Elemente einer digitalen Benutzeroberfläche, damit diese für Nutzer ansprechend und leicht bedienbar ist. Dazu gehören die Farben, Buttons, Bilder, Texte und das Layout einer Website oder App. Ziel ist es, eine intuitive und angenehme Benutzererfahrung zu ermöglichen, indem das Design den Fokus auf Ästhetik, Funktionalität und intuitive Bedienung legt. 
+								255 heading UI Library, Value: 2
+									256 text UI Library
+								257 container
+									258 text Die Figma UI Library dient als zentrale und gesicherte Sammlung von Gestaltungselementen, um einheitliches Design und konsistente Benutzeroberflächen sicherzustellen. Sie stellt Design-Tokens, Styles und Komponenten bereit, die in anderen Projekten und Dateien wiederverwendet werden können. ﻿ Jede Instanz einer Komponente bleibt mit dem Master in der Library verknüpft. Sobald in der Library etwas geändert wird – etwa die Höhe eines Buttons oder ein Farbwert – wird diese Änderung automatisch in allen Design-Files reflektiert, die diese Komponente nutzen. Das ermöglicht konsistentes Design, spart Zeit und minimiert Fehler. Gleichzeitig kann unser Code über Tokens und das 
+									259 link Description: Storybook, Value: brand.pax.ch/r/Q91fZE8zfWfz2inzFK_Ed_4F7YSwUtHuEUz3odB197c
+									260 text  auf dieselben Werte zugreifen, was eine enge Verbindung zwischen Design und Entwicklung sicherstellt.
+								261 container
+									262 button
+								263 text Hier eine Präsentation mit Einblick in die Figma-UI-Library:
+								264 content list
+									265 link Description: Pax UI Library & Design Files.pdf 8 MB - pdf, Value: brand.pax.ch/api/attachment/download/eyJibG9ja19yZWZlcmVuY2UiOm51bGwsImlkIjo2LCJ0aW1lc3RhbXAiOjE3OTMzOTE5NjJ9:pax-versicherung:Ba905Is9WYQP5dI_5zJ60An7dCY7Qx99Gkwo0lCbY7k
+								266 heading Storybook, Value: 2
+									267 text Storybook
+								268 container
+									269 text Das Pax Storybook ist ein Tool, mit dem Entwickler die UI-Komponenten (z. B. Buttons, Formulare, Karten) isoliert darstellen, testen und dokumentieren können. Statt die Komponenten direkt in der eigentlichen Anwendung zu sehen, kann man sie im Storybook anschauen, in verschiedenen Zuständen ausprobieren und deren Verhalten nachvollziehen. Das Storybook ist eine Bibliothek für UI-Bausteine, die sowohl Entwicklern als auch Designern hilft, Übersicht zu behalten, Komponenten wiederzuverwenden und ihre Qualität zu sichern. ﻿ Hier der Link zum Pax Storybook, die UI-Library für Entwickler: 
+									270 link Description: ui.pax.ch, Value: ui.pax.ch/
+									271 text ﻿
+								272 container
+									273 button
+							274 container
+								275 heading Website, Value: 2
+									276 text Website
+								277 container
+									278 text Noch ist die Website (
+									279 link Description: pax.ch, Value: pax.ch/de/
+									280 text ) am entstehen. Aber es gibt schon viele Designs von Seiten, Elementen, Navigation und Sections. Hier der Link zur 
+									281 link Description: Website-Figma-File, Value: figma.com/design/Tqa79JgMNedHifLCXUTk1J/Pax---Website?node-id=1669-20467&t=k940emOAC1dcJSyG-1
+									282 text . 
+									283 text ﻿
+								284 container
+									285 button
+								286 heading Weitere Produkte, Value: 2
+									287 text Weitere Produkte
+							288 container
+								289 heading Favicon, Value: 2
+									290 text Favicon
+					234 container Pagination of the current page
+						235 link Description: Bildwelt Flächenbilder Previous page, Value: brand.pax.ch/document/3#/bildwelt/flaechenbilder
+						236 link Description: Digital Digitale Werbung Next page, Value: brand.pax.ch/document/3#/digital/digitale-werbung
+					237 text Zuletzt geändert am 4. September 2026 um 10:28
+
+The focused UI element is 0 AXWebArea UI Design - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/digital/ui-design

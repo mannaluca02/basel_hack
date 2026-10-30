@@ -1,0 +1,28 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/pensionierung-grunddaten",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateRetirementBase",
+  "http_status": 200,
+  "request": {
+    "Relationship": 1,
+    "RelationshipSinceYear": 2015,
+    "Person1": {
+      "Sex": 1,
+      "BirthYear": 1985,
+      "GrossIncome": 120000,
+      "WithBVG": true,
+      "RetirementPillar2": {
+        "Pension": 40000
+      }
+    }
+  },
+  "response": {
+    "response": {
+      "Person1": {
+        "Pension": 26931,
+        "CurrentCapital": 80359
+      }
+    }
+  }
+}

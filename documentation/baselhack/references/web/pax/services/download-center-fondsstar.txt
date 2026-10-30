@@ -1,0 +1,159 @@
+Browser tab: 7, Title: "Download Center - Pax", URL: "https://www.pax.ch/de/download-center".
+1 AXWebArea Download Center - Pax, URL: pax.ch/de/download-center
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/download-center#maincontent
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Download-Center, Value: 1
+				28 text Download-Center
+			29 text Formulare und Dokumente
+		30 container Inhalts-Suche
+			31 container Suchformular
+				110 text SEARCH.TITLE
+				32 container
+					33 image
+					34 text field (settable) Value: FondsStar, ID: pax-search-input
+				111 text Geben Sie einen Suchbegriff ein. Ergebnisse erscheinen unten.
+				112 text 20 Ergebnisse gefunden
+			113 container Nach Kategorien filtern
+				114 heading Nach Kategorien filtern, Value: 2, ID: tag-filter-heading
+					115 text Nach Kategorien filtern
+				116 content list Kategorie Optionen
+					117 checkbox Description: Bericht (3 Treffer), Value: 0
+						118 text Bericht
+					119 checkbox Description: Fondsinformation (3 Treffer), Value: 0
+						120 text Fondsinformation
+					121 checkbox Description: Formular (2 Treffer), Value: 0
+						122 text Formular
+					123 checkbox Description: Information (10 Treffer), Value: 0
+						124 text Information
+					125 checkbox Description: Nachhaltigkeit (2 Treffer), Value: 0
+						126 text Nachhaltigkeit
+					127 checkbox Description: Private Vorsorge (13 Treffer), Value: 0
+						128 text Private Vorsorge
+					129 checkbox Description: Über Pax (3 Treffer), Value: 0
+						130 text Über Pax
+			145 container Description: Suchergebnisse, ID: search-results
+				146 container
+					148 content list
+						149 link Description: Basisinformationsblatt UBS MSCI World Selection, Value: assets.pax.ch/x/d1b50d9a6d/ubs-fondsinformation-etf-msci-world-selection-ucits-etf.pdf
+						150 link Description: Basisinformationsblatt: FondsStar, TerzaFondsStar, FondsStarInvest, TerzaFondsStarInvest, Value: assets.pax.ch/x/9c26c5ee3e/private-vorsorge-information-basisinformationsblatt-fondsstar-terzafondsstar-fondsstarinvest.pdf
+						151 link Description: Basisinformationsblatt: FondsStarPlanInvest und TerzaFondsStarPlanInvest, Value: assets.pax.ch/x/4f7ac0b38b/private-vorsorge-information-basisinformationsblatt-fondsstarplaninvest-terzafondsstarplaninvest.pdf
+						152 link Description: Basisinformationsblatt: LifeStar, TerzaLifeStar, LifeStarInvest und TerzaLifeStarInvest, Value: assets.pax.ch/x/0adfa6348a/private-vorsorge-information-basisinformationsblatt-lifestar-terzalifestar-lifestarinvest-terzalifestarinvest.pdf
+						153 link Description: Basisinformationsblatt: LifeStarPlanInvest und TerzaLifeStarPlanInvest, Value: assets.pax.ch/x/655e987c43/private-vorsorge-information-basisinformationsblatt-lifestarplaninvest-terzalifestarplaninvest.pdf
+						154 link Description: Basisinformationsblatt: Pax 3a, Value: assets.pax.ch/x/a21ab764b2/private-vorsorge-information-basisinformationsblatt-pax-3a.pdf
+						155 link Description: Basisinformationsblatt: Pax Auszahlungsplan, Value: assets.pax.ch/x/6449970f9e/private-vorsorge-information-basisinformationsblatt-auszahlungsplan.pdf
+						156 link Description: Basisinformationsblatt: UBS MSCI World Selection UCITS ETF, Value: assets.pax.ch/x/674e1ed1ed/private-vorsorge-ubs-msci-world-selection-ucits-etf-d.pdf
+						157 link Description: Bericht über die Finanzlage - Public Disclosure 2025, Value: assets.pax.ch/x/33b2912083/pax-public-disclosure-bericht-ueber-die-finanzlage-2025.pdf
+						158 link Description: Broschüre Produkte der Privaten Vorsorge, Value: assets.pax.ch/x/b7cefa330c/pax-private-vorsorge-information-produktbroschuere-private-vorsorge.pdf
+						159 link Description: Flyer Übersicht PAM-Fonds, Value: assets.pax.ch/x/2cdc10b578/private-vorsorge-information-pax-flyer-pam-fonds.pdf
+						160 link Description: Fondsfactsheet Swisscanto (CH) Real Estate Fund Responsible IFCA FA CHF, Value: assets.pax.ch/x/dbd5e8830c/swisscanto-fondsinformation-real-estate-fund-responsible-ifca-fa-chf-de.pdf
+						161 link Description: Fondsinformation Swisscanto Real Estate Fund, Value: assets.pax.ch/x/cfdf9e1d99/private-vorsorge-fondsinformation-swisscanto-real-estate-fund-responsible-ifca-fa-de-de.pdf
+						162 link Description: Fondsliste - Private Vorsorge, Value: assets.pax.ch/x/9611aef893/private-vorsorge-fondsinformation-fondsliste.pdf
+						163 link Description: Geschäftsbericht 2021, Value: assets.pax.ch/x/82d72f4928/pax-geschaeftsbericht-2021.pdf
+						164 link Description: Geschäftsbericht 2025, Value: assets.pax.ch/x/2f5a49cd7c/pax-geschaeftsbericht-2025.pdf
+						165 link Description: Kapitalmarktbericht, Value: assets.pax.ch/x/37c780a49e/pax-fondsinformation-kapitalmarktbericht.pdf
+						166 link Description: Nachhaltigkeit bei Pax 2024, Value: assets.pax.ch/x/c871e88613/nachhaltigkeit-bei-pax-2024.pdf
+						167 link Description: Nachhaltigkeit bei Pax 2025, Value: assets.pax.ch/x/42b50e4167/nachhaltigkeit-bei-pax-2025.pdf
+						168 link Description: Pax Fondsanlagen - Produktbroschüre, Value: assets.pax.ch/x/3962a35a9e/private-vorsorge-produktbroschuere-pax-fondsanlagen.pdf
+					169 button Mehr anzeigen
+						170 image
+						171 text Mehr anzeigen
+	35 container
+		36 container Breadcrumb
+			37 content list
+				38 link Description: Home, Value: pax.ch/de
+				39 text Download Center
+		40 container Hilfe
+			41 heading Hilfe, Value: 2, ID: footer-hilfe
+				42 text Hilfe
+			43 content list
+				44 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				45 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				46 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				47 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				48 link Description: Download-Center, Value: pax.ch/de/download-center
+				49 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		50 container Produkte
+			51 heading Produkte, Value: 2, ID: footer-produkte
+				52 text Produkte
+			53 content list
+				54 container
+					55 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					56 text Neu
+				57 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				58 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				59 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				60 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				61 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				62 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				63 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				64 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		65 container Bereiche
+			66 heading Bereiche, Value: 2, ID: footer-bereiche
+				67 text Bereiche
+			68 content list
+				69 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				70 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				71 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				72 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				73 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		74 container Über Pax
+			75 heading Über Pax, Value: 2, ID: footer-ber-pax
+				76 text Über Pax
+			77 content list
+				78 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				79 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				80 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				81 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				82 container
+					83 link Description: Karriere, Value: pax.ch/de/karriere
+					84 text Offene Stellen
+				85 link Description: News & Medien, Value: pax.ch/de/medien
+				86 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				87 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		88 container Sprache
+			89 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		90 container Kontakt
+			91 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				92 text Kontakt
+			93 content list
+				94 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				95 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		96 container Soziale Medien
+			97 content list
+				98 link Description: Facebook, Value: facebook.com/paxvorsorge
+				99 link Description: Instagram, Value: instagram.com/paxvorsorge
+				100 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				101 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		102 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		103 container Footer-Links
+			104 content list
+				105 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				106 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				107 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				108 link Description: Cookie-Einstellungen, Value: pax.ch/de/download-center#
+		109 image Pax Logo
+
+The focused UI element is 34 text field (settable) Value: FondsStar, ID: pax-search-input

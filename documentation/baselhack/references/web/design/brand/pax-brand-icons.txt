@@ -1,0 +1,108 @@
+Browser tab: 8, Title: "Icons - Design - Pax Brand Guidelines", URL: "https://brand.pax.ch/document/3#/basics/icons".
+0 AXWebArea Icons - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/basics/icons
+	1 container
+		2 link Description: Zum Hauptinhalt springen, Value: brand.pax.ch/document/3#main
+		3 container
+			4 link Description: Zur Anmeldeseite, Value: brand.pax.ch/auth?referer=%2Fdocument%2F3%23%2Fbasics%2Ficons
+			5 pop up button (collapsed) Description: Anmelde-Button verschieben, ID: radix-:r0:, Secondary Actions: Expand
+			6 container classic-theme
+				7 container
+					8 button Suchen
+					9 container Main
+						10 content list
+							11 link Description: Marke, Value: brand.pax.ch/document/1
+							12 link Description: Aktuelle Seite: Design, Value: brand.pax.ch/document/3
+							13 pop up button (collapsed) Downloads, ID: radix-:isolated-1-r5:, Secondary Actions: Expand
+								14 text Downloads
+								15 image
+							16 link Description: Login externer Link, Value: brand.pax.ch/auth?referer=%2Fhub%2F1
+					17 link Description: Go to Pax Brand Guidelines, Value: brand.pax.ch/hub/1
+				18 container
+					19 container Dokument
+						20 content list
+							21 container
+								22 button Basics, ID: category-15-header
+								23 content list
+									24 link Description: Logo, Value: brand.pax.ch/document/3#/basics/logo-1
+									238 link Description: Farben, Value: brand.pax.ch/document/3#/basics/farben
+									239 link Description: Typography, Value: brand.pax.ch/document/3#/basics/typography
+									240 container
+										241 link Description: Aktuelle Seite: Icons, Value: brand.pax.ch/document/3#/basics/icons
+										242 content list
+											243 link Description: Lucide Icons (aktiv), Value: brand.pax.ch/document/3#/basics/icons/lucide-icons
+											244 link Description: Anwendungsbeispiele, Value: brand.pax.ch/document/3#/basics/icons/anwendungsbeispiele
+							37 container
+								38 button Bildwelt, ID: category-16-header
+								39 content list
+									40 link Description: Bildsprache, Value: brand.pax.ch/document/3#/bildwelt/bildsprache
+									41 link Description: Freisteller, Value: brand.pax.ch/document/3#/bildwelt/freisteller
+									42 link Description: Flächenbilder, Value: brand.pax.ch/document/3#/bildwelt/flaechenbilder
+							43 container
+								44 button Digital, ID: category-11-header
+								45 content list
+									46 link Description: UI Design, Value: brand.pax.ch/document/3#/digital/ui-design
+									47 link Description: Digitale Werbung, Value: brand.pax.ch/document/3#/digital/digitale-werbung
+									48 link Description: Video, Value: brand.pax.ch/document/3#/digital/video
+									49 link Description: Powerpoint, Value: brand.pax.ch/document/3#/digital/powerpoint
+							50 container
+								51 button Print, ID: category-10-header
+								52 content list
+									53 link Description: Inserate & Plakate, Value: brand.pax.ch/document/3#/print/inserate-plakate
+									54 link Description: Broschüren, Value: brand.pax.ch/document/3#/print/broschueren
+									55 link Description: Grusskarten, Value: brand.pax.ch/document/3#/print/grusskarten
+					56 heading Icons, Value: 1
+						57 text Icons
+					245 container
+						246 container content-manager
+							247 container
+								248 container
+									249 button Screenshot 2025-02-20 143126
+										250 image Screenshot 2025-02-20 143126
+									251 text Lucide Icons
+								252 heading Lucide Icons, Value: 2
+									253 text Lucide Icons
+								254 container
+									266 text Wir verwenden die 
+									255 link Description: Lucide Icon Library, Value: lucide.dev/icons/
+									267 text . Auf der Website von
+									256 link Description:  Lucide Icon, Value: lucide.dev/icons/
+									268 text ﻿
+									257 link Description: s, Value: lucide.dev/icons/
+									269 text  lassen sich die gewünschten Icons problemlos suchen und anpassen. 
+									270 text ﻿ ﻿ Die Standard-Konfigurationen sind:
+									271 content list
+										272 container
+											273 text • Color: #121212 (black)
+										274 container
+											275 text • Stroke: 2px
+										276 container
+											277 text • Size: 24px
+								258 container
+									259 button
+								260 container
+									278 text Hier in frontify stehen die Icons auch in den Standardeinstellungen zur Verfügung: 
+									261 link Description: Icon Library, Value: brand.pax.ch/r/6dnAed33AXWoUvn0ZFxEAaGnKFrFZyeFV5d-8qL8sOs
+									279 text ﻿
+								280 container
+									281 text Vorteile von Lucide Icons:
+									282 content list
+										283 container
+											284 text • über 1500 Icons
+										285 container
+											286 text • Grössenoptionen
+										287 container
+											288 text • Open Source
+										289 container
+											290 text • lizenz- und kostenfrei
+										291 container
+											292 text • SVG-Format
+								262 heading Anwendungsbeispiele, Value: 2
+									263 text Anwendungsbeispiele
+								264 container
+									265 button
+					234 container Pagination of the current page
+						235 link Description: Basics Typography Previous page, Value: brand.pax.ch/document/3#/basics/typography
+						236 link Description: Bildwelt Bildsprache Next page, Value: brand.pax.ch/document/3#/bildwelt/bildsprache
+					237 text Zuletzt geändert am 4. September 2026 um 10:26
+
+The focused UI element is 0 AXWebArea Icons - Design - Pax Brand Guidelines, URL: brand.pax.ch/document/3#/basics/icons

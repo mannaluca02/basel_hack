@@ -1,0 +1,297 @@
+Browser tab: 7, Title: "Private Vorsorge | Sichern Sie Ihre Zukunft mit Pax - Pax", URL: "https://www.pax.ch/de/private-vorsorge".
+1 AXWebArea Private Vorsorge | Sichern Sie Ihre Zukunft mit Pax - Pax, URL: pax.ch/de/private-vorsorge
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge#maincontent
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Private Vorsorge, Value: 1
+				28 text Private Vorsorge
+			29 text Packen Sie Ihre Zukunft an
+			30 text Das Glück liegt auch in Ihrer Hand: Möchten Sie fürs Alter sparen? Für ein Eigenheim? Oder wollen Sie Ihre Liebsten finanziell absichern? So oder so lohnt sich die private Vorsorge. Besonders, wenn der Versicherungsschutz von Pax kommt. Und genau auf Ihre Bedürfnisse zugeschnitten ist. Luft holen und los geht’s!
+			31 link Description: Vorsorgeanalyse starten, Value: pax.ch/de/private-vorsorge/vorsorgeanalyse
+			32 link Description: Kostenlose Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+			33 image Adiletten
+		34 container
+			35 heading Finden Sie, was Ihre Zukunft braucht, Value: 2
+				36 text Finden Sie, was Ihre Zukunft braucht
+			37 text Zu jeder Lebensvorstellung passt eine andere Vorsorgelösung. Bei Pax erhalten Sie flexible Produkte, die sich auf Ihre wechselnden Lebensphasen zuschneiden lassen. Los geht’s! 
+		38 container
+			39 heading Unsere Vorsorgelösungen, Value: 2
+				40 text Unsere Vorsorgelösungen
+			41 container carousel-wYfz6NoLLw
+				42 container swiper-wrapper-116410ba104c14a366
+					43 container 1 / 8
+						44 heading Pax Care, Value: 3
+							45 text Pax Care
+						46 text Diese digitale Lösung unterstützt Sie und Ihre Angehörigen im Todesfall organisatorisch und finanziell. Sie eignet sich als einfacher und kostenloser Einstieg in die Vorsorge.
+						47 content list
+							48 container
+								49 image
+								50 text Soforthilfe von CHF 2’000 im Todesfall.
+							51 container
+								52 image
+								53 text Bis zu 2 Stunden persönliche Unterstützung durch Fachpersonen.
+							54 container
+								55 image
+								56 text Einfach und bequem online aktivierbar.
+							57 container
+								58 image
+								59 text 100 % kostenlos – keine Prämien, keine Verpflichtungen.
+						60 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					61 container 2 / 8
+						62 heading Pax Todesfallversicherung, Value: 3
+							63 text Pax Todesfallversicherung
+						64 text Diese Lösung schützt die Familie oder den eigenen Betrieb vor finanziellen Risiken im Todesfall.
+						65 content list
+							66 container
+								67 image
+								68 text Absicherung der Hinterbliebenen oder Geschäftspartner im Todesfall.
+							69 container
+								70 image
+								71 text Steuern sparen.
+							72 container
+								73 image
+								74 text Beerdigungskosten (zusätzlich versicherbar).
+						75 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+					76 container 3 / 8
+						77 heading Pax Erwerbsunfähigkeitsversicherung, Value: 3
+							78 text Pax Erwerbsunfähigkeitsversicherung
+						79 text Diese Lösung ergänzt die Leistungen der 1. und der 2. Säule - und sichert das notwendige Einkommen bei Erwerbsunfähigkeit.
+						80 content list
+							81 container
+								82 image
+								83 text Steuern sparen.
+							84 container
+								85 image
+								86 text Gewohnten Lebensstandard bei Invaliditat bzw Erwerbsunfähigkeit absichern.
+						87 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+					88 container 4 / 8
+						89 heading Pax 3a, Value: 3
+							90 text Pax 3a
+						91 text Diese Online-Lösung kombiniert Sicherheit mit Renditechancen – und schützt gleichzeitig bei Erwerbsunfähigkeit. Ideal für alle, die langfristig vorsorgen und dabei Steuern sparen möchten.
+						92 content list
+							93 container
+								94 image
+								95 text Mit der 3. Säule fürs Alter sparen
+							96 container
+								97 image
+								98 text Doppelt sparen, dank Steuerabzug.
+							99 container
+								100 image
+								101 text 100 % digitaler Abschluss, schnell und bequem.
+							102 container
+								103 image
+								104 text Wahl zwischen Sicherheit & Renditechancen.
+							105 container
+								106 image
+								107 text Wir zahlen für Sie weiter bei Erwerbsunfähigkeit.
+						108 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+					109 container 5 / 8
+						110 heading Pax Lifestar, Value: 3
+							111 text Pax Lifestar
+						112 text Pax LifeStar bietet Ihnen grösstmögliche Vielseitigkeit. Sie geniessen variable Prämienaufteilung, flexible Finanzierung und automatische Fondsumschichtung. Dazu profitieren Sie vom Säulenwechsel, vom Endalter 70 und von unserer Ausbaugarantie.
+						113 content list
+							114 container
+								115 image
+								116 text Variable Prämienaufteilung
+							117 container
+								118 image
+								119 text Flexible Finanzierung
+							120 container
+								121 image
+								122 text Automatische Fondsumschichtung
+							123 container
+								124 image
+								125 text Ausbaugarantie
+						126 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-lifeStar
+					127 container 6 / 8
+						128 heading Pax FondsStar, Value: 3
+							129 text Pax FondsStar
+						130 text FondsStar ist die neue Generation der fondsgebundenen Lebensversicherung von Pax. Sie verbindet bewährte Leistungen mit modernen Innovationen und passt sich jeder Lebensphase an.
+						131 content list
+							132 container
+								133 image
+								134 text Prämienbefreiung bei Familienzuwachs
+							135 container
+								136 image
+								137 text Anlagemanagement mit Weitsicht
+							138 container
+								139 image
+								140 text Kostenlose Fondswechsel
+							141 container
+								142 image
+								143 text Privilegierter Vorbezug für Wohneigentum
+							144 container
+								145 image
+								146 text Einfacher Säulenwechsel
+							147 container
+								148 image
+								149 text Optimaler Risikoschutz
+						150 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-fondsstar
+					151 container 7 / 8
+						152 heading Pax Kinderversicherung, Value: 3
+							153 text Pax Kinderversicherung
+						154 text Diese Lösung eignet sich für Eltern, Paten und Grosseltern, die dem Nachwuchs eine finanziell sichere Zukunft garantieren möchten.
+						155 content list
+							156 container
+								157 image
+								158 text Anlegen und Sparen speziell für Kinder
+							159 container
+								160 image
+								161 text Minimale Gesundheitsprüfung
+							162 container
+								163 image
+								164 text Absicherung bei Invalidität
+							165 container
+								166 image
+								167 text Risikoabsicherung ab CHF 7.50 pro Monat
+						168 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+					169 container 8 / 8
+						170 heading Pax Auszahlungsplan, Value: 3
+							171 text Pax Auszahlungsplan
+						172 text Diese Lösung dient der finanziellen Absicherung für die Zeit nach der Pensionierung. Sie eignet sich für alle, die von regelmässigen Auszahlungen aus ihrem Vermögen profitieren wollen.
+						173 content list
+							174 container
+								175 image
+								176 text Gewohnten Lebensstandard bei Pensionierung aufrechterhalten.
+							177 container
+								178 image
+								179 text Aktiv gemanagte Anlagefondsportfolios.
+							180 container
+								181 image
+								182 text Individuell wählbare Balance aus Garantie und Anlage.
+							183 container
+								184 image
+								185 text Steuerliche Vorteile: Der Investitionsbetrag untersteht nicht der Stempelsteuer.
+						186 link Description: Mehr erfahren, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+			187 button Go to slide 1
+			188 button Go to slide 2
+			189 button Go to slide 3
+			190 button Go to slide 4
+			191 button Go to slide 5
+			192 button Go to slide 6
+			193 button (disabled) Previous slide
+			194 button Next slide
+		195 container
+			196 image Karin Ramseyer, Vorsorgeberaterin.
+			197 heading Persönliche Beratung, Value: 2
+				198 text Persönliche Beratung
+			199 text Haben Sie Fragen zu Ihrer persönlichen Vorsorgesituation oder zu unseren Produkten?
+			200 text Zögern Sie nicht und profitieren Sie von einer kostenlosen Vorsorgeberatung. Karin und Team freuen sich auf Sie.
+			201 link Description: Beratungsgespräch vereinbaren, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+		202 container
+			203 text Pax Vorsorgewelt
+			204 heading Vorsorge verstehen und aktiv gestalten., Value: 2
+				205 text Vorsorge verstehen und aktiv gestalten.
+			206 text Vorsorge ohne Papierkram? Geht! Unsere digitale Vorsorgewelt bringt Ordnung ins Vorsorgechaos.
+			207 link Description: Origami Säulen Vorsorge verstehen, Value: pax.ch/de/vorsorgewelt/vorsorgesystem-schweiz
+			208 link Description: Origami Baum Pensionierung planen, Value: pax.ch/de/vorsorgewelt/planung-der-altersvorsorge
+			209 link Description: Origami Tulpe Risiken absichern, Value: pax.ch/de/vorsorgewelt/finanzielle-absicherung-bei-tod-invaliditaet
+			210 link Description: Origami Leuchtturm Vermögen aufbauen, Value: pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau
+			211 link Description: Origami Haus Eigenheim finanzieren, Value: pax.ch/de/vorsorgewelt/finanzierung-von-wohneigentum-mit-vorsorgegeldern
+			212 link Description: Origami Box Nachlass regeln, Value: pax.ch/de/vorsorgewelt/erbschaft-testament-vorsorgeauftrag
+			213 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+		214 container
+			215 heading Ratgeber zum Thema, Value: 2
+				216 text Ratgeber zum Thema
+			217 link Value: pax.ch/de/ratgeber/berufliche-vorsorge-verstehen/koordinationsabzug, Description: todo Koordiniert in die Pensionierung Altersvorsorge in der Schweiz? Das sind doch die drei Säulen – also alles ganz einfach! Aber der Teufel steckt im Detail, sagt man. Zum Glück geht bei der Altersvorsorge alles mit guten Dingen zu. Ordentlich und koordiniert. Auch dank dem Koordinationsabzug.
+			218 link Value: pax.ch/de/ratgeber/vorsorge/praemienbefreiung-bei-der-saeule-3a, Description: todo Wir zahlen Ihre Prämie, wenn Sie nicht arbeiten können Ob kaputtes Knie oder psychische Erschöpfung: Wer zahlt Ihre Prämie für die Säule 3a, wenn Sie nicht arbeiten können? Für diesen Fall können Sie sich absichern: Bei Erwerbsunfähigkeit befreien wir Sie von der Säule-3a-Prämie. Die Zusatzprämie dafür lohnt sich auch für Sie.
+			219 link Value: pax.ch/de/ratgeber/vorsorge/pensionierung/saeule-3a-gestaffelt-beziehen, Description: todo Stück für Stück 3a zurück Immer brav in die Säule 3a einzahlen, check! Mit dem Erreichen des Referenzalters können Sie sich das Geld endlich auszahlen lassen. Aber Moment: Mit der Auszahlung aus der 2. Säule und der Säule 3a fallen Steuern an. Was tun? Wir zeigen Ihnen, warum ein gestaffelter Bezug der Säule 3a sinnvoll ist.
+	220 container
+		221 container Breadcrumb
+			222 content list
+				223 link Description: Home, Value: pax.ch/de
+				224 text Private Vorsorge
+		225 container Hilfe
+			226 heading Hilfe, Value: 2, ID: footer-hilfe
+				227 text Hilfe
+			228 content list
+				229 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				230 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				231 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				232 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				233 link Description: Download-Center, Value: pax.ch/de/download-center
+				234 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		235 container Produkte
+			236 heading Produkte, Value: 2, ID: footer-produkte
+				237 text Produkte
+			238 content list
+				239 container
+					240 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					241 text Neu
+				242 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				243 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				244 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				245 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				246 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				247 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				248 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				249 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		250 container Bereiche
+			251 heading Bereiche, Value: 2, ID: footer-bereiche
+				252 text Bereiche
+			253 content list
+				254 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				255 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				256 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				257 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				258 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		259 container Über Pax
+			260 heading Über Pax, Value: 2, ID: footer-ber-pax
+				261 text Über Pax
+			262 content list
+				263 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				264 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				265 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				266 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				267 container
+					268 link Description: Karriere, Value: pax.ch/de/karriere
+					269 text Offene Stellen
+				270 link Description: News & Medien, Value: pax.ch/de/medien
+				271 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				272 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		273 container Sprache
+			274 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		275 container Kontakt
+			276 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				277 text Kontakt
+			278 content list
+				279 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				280 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		281 container Soziale Medien
+			282 content list
+				283 link Description: Facebook, Value: facebook.com/paxvorsorge
+				284 link Description: Instagram, Value: instagram.com/paxvorsorge
+				285 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				286 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		287 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		288 container Footer-Links
+			289 content list
+				290 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				291 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				292 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				293 link Description: Cookie-Einstellungen, Value: pax.ch/de/private-vorsorge#
+		294 image Pax Logo
+
+The focused UI element is 1 AXWebArea Private Vorsorge | Sichern Sie Ihre Zukunft mit Pax - Pax, URL: pax.ch/de/private-vorsorge

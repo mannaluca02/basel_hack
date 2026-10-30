@@ -1,0 +1,23 @@
+Browser tab: 5, Title: "Pax Challenge · Wissens-Hub · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/de".
+1 AXWebArea Pax Challenge · Wissens-Hub · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/de
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/de
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/de/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/de/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/de/tools
+		8 link Description: EN, Value: pax-hackathon-2026.vercel.app/
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/de
+	10 container
+		11 text Pax × BaselHack 2026
+		12 heading Pax Digital Advisor, Value: 1
+			13 text Pax Digital Advisor
+		14 text Alles, was ihr für die Pax Challenge braucht: die Aufgabenstellung, das Material und der Zugang zur Logismata-API mit ihren Vorsorge- und Steuerrechnern.
+		15 link Description: Zur Original-Challenge, Value: baselhack.ch/challenges/placeholder-pax
+		16 link Description: Challenge Aufgabenstellung, Kontext, Must-haves und Bewertung der Pax Challenge. Öffnen, Value: pax-hackathon-2026.vercel.app/de/challenge
+		17 link Description: Material Produktdaten, Beratungskonzept und weitere Unterlagen (folgt laufend). Öffnen, Value: pax-hackathon-2026.vercel.app/de/material
+		18 link Value: pax-hackathon-2026.vercel.app/de/tools, Description: Tools Quicksale, die Logismata-Rechner, API-Endpunkt, Swagger, Token und das Pax-Design-System. Öffnen
+	19 container
+		20 text Interner Wissens-Hub für die Pax Challenge am BaselHack 2026. Demodaten · keine Steuer- oder Vorsorgeberatung.
+
+The focused UI element is 1 AXWebArea Pax Challenge · Wissens-Hub · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/de

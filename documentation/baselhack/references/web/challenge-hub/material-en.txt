@@ -1,0 +1,46 @@
+Browser tab: 5, Title: "Material · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/material".
+1 AXWebArea Material · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/material
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/material
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 text Material
+		12 heading Material & documents, Value: 1
+			13 text Material & documents
+		14 text Advisory documents, example personas, real sample offers and the legal guardrails for the Pax Challenge — all ready to download.
+		15 text This material is inspiration and context. Using it is optional and not required to take part. All documents are in German only.
+		16 link Description: Download all documents ZIP · 10 PDFs · ~5 MB, Value: pax-hackathon-2026.vercel.app/material/pax-challenge-material.zip
+		17 heading Documents, Value: 2
+			18 text Documents
+		19 heading Challenge & context, Value: 3
+			20 text Challenge & context
+		21 content list
+			22 link Value: pax-hackathon-2026.vercel.app/material/personas.pdf, Description: Personas PDF · 3 pages Example customers (single person, couple with baby, affluent couple) with marital status, assets, income and workload — a starting point for advisory scenarios.
+			23 link Value: pax-hackathon-2026.vercel.app/material/legal-framework.pdf, Description: Legal framework PDF · 3 pages Non-exhaustive overview of the legal guardrails: data protection, traceability of AI recommendations, human review, secure implementation.
+		24 heading Advisory documents, Value: 3
+			25 text Advisory documents
+		26 content list
+			27 link Value: pax-hackathon-2026.vercel.app/material/pax-vorsorgeanalyse-einzelperson.pdf, Description: Personal pension analysis — single person PDF · 12 pages A completed pension check (Vorsorgecheck) for a single person as an example analysis.
+			28 link Value: pax-hackathon-2026.vercel.app/material/pax-vorsorgeanalyse-paar.pdf, Description: Personal pension analysis — couple with child PDF · 20 pages A completed pension check for a married couple with a child, across all three pillars.
+			29 link Value: pax-hackathon-2026.vercel.app/material/pax-angemessenheitspruefung.pdf, Description: Suitability assessment PDF · 7 pages The appropriateness-check form for qualified life insurance (investment profile, risk capacity).
+		30 heading Sample offers, Value: 3
+			31 text Sample offers
+		32 content list
+			33 link Value: pax-hackathon-2026.vercel.app/material/offerten/pax-lifestar.pdf, Description: Savings life insurance — LifeStar PDF · 64 pages Sample offer: Pax savings life insurance (TerzaLifeStarPlanInvest).
+			34 link Value: pax-hackathon-2026.vercel.app/material/offerten/pax-fondsstar.pdf, Description: Savings life insurance — FondsStar PDF · 63 pages Sample offer: Pax savings life insurance (TerzaFondsStarPlanInvest).
+			35 link Value: pax-hackathon-2026.vercel.app/material/offerten/pax-auszahlungsplan.pdf, Description: Payout plan (AZP) PDF · 34 pages Sample offer: Pax payout plan (Auszahlungsplan) with a defined payout phase.
+			36 link Value: pax-hackathon-2026.vercel.app/material/offerten/pax-erwerbsunfaehigkeit.pdf, Description: Disability income (EU pension) PDF · 33 pages Sample offer: Pax risk insurance — disability income (Erwerbsunfähigkeit).
+			37 link Description: Term life insurance PDF · 29 pages Sample offer: Pax risk insurance — death benefit (Todesfall)., Value: pax-hackathon-2026.vercel.app/material/offerten/pax-todesfall.pdf
+	38 container Breadcrumb
+		39 content list
+			40 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			41 text Material
+	42 container
+		43 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 1 AXWebArea Material · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/material

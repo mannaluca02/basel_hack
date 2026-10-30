@@ -1,4 +1,16 @@
-# Projects
+# Pax Digital Advisor – BaselHack 2026
+
+Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Quellen und Bauplan; eine eigene Advisor-App ist noch nicht implementiert.
+
+- [Gesamtplan und Quellen](documentation/baselhack/plans/advisor-plan.md)
+- [Aufteilung für fünf Personen](documentation/baselhack/plans/team-plan.md)
+- [Materialübersicht und Archivaufbau](documentation/baselhack/README.md)
+- [Vollständiges Quellenverzeichnis](documentation/baselhack/references/README.md)
+- [Bereits vorhandene Challenge-Unterlagen](documentation/challenge_material/)
+
+Die lokalen API-Zugangsdaten liegen ausschließlich unter `documentation/baselhack/private/` und sind von Git ausgeschlossen. Eine Vorlage ohne Token steht unter `documentation/baselhack/logismata.env.example`.
+
+## Projektvorlage zum Ausfüllen
 
 ## [Project Name]
 [Download Link]
@@ -44,7 +56,7 @@ mannaluca02/basel_hack
 [Any other notable achievements or recognition]
 
 ### Contributors
-[Contributor 1], [Contributor 2], [Contributor 3], [Contributor 4]
+[Contributor 1], [Contributor 2], [Contributor 3], [Contributor 4], [Contributor 5]
 
 ### Additional Notes
 [Any additional information, future plans, or special considerations]

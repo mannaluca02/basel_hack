@@ -1,0 +1,364 @@
+Browser tab: 5, Title: "Budget proposal · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/budget".
+1 AXWebArea Budget proposal · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/budget
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Budget proposal, Value: 1
+			12 text Budget proposal
+		13 text A household budget from income and life situation.
+		14 text APICalc_calculateBudgetProposal API-Key calc.saving
+		15 container
+			16 switch Description: Monthly budget, Value: 1, ID: pax-switch-f6lt67yxl
+			17 text Monthly budget
+			18 text Type of income *
+			19 combo box (collapsed) Value: Gross income, ID: pax-select-djcs39qbe, Secondary Actions: Expand
+				20 text Gross income
+				21 image
+			22 text Income * CHF
+			23 text field (settable) 120’000
+			24 text Marital status *
+			25 combo box (collapsed) Value: Single, ID: pax-select-8wrcmlns3, Secondary Actions: Expand
+				26 text Single
+				27 image
+			28 text Number of children
+			29 text field (settable) Number of children, Value: 0, ID: pax-input-6bvbnz63u
+			30 text dependent children
+			31 switch Description: Use effective taxes, Value: 0, ID: pax-switch-yp8mcfg2q
+			32 text Use effective taxes
+			33 text Effective taxes CHF
+			34 text field (settable)
+			35 text Language
+			36 combo box (collapsed) Value: German, ID: pax-select-xjkm8foto, Secondary Actions: Expand
+				37 text German
+				38 image
+			39 text Output language of the budget items, default DE
+			40 button Calculate
+				41 text Calculate
+				42 image
+			43 button Load example
+			44 button Reset
+		57 heading The budget by category, Value: 3
+			58 text The budget by category
+		59 image
+			60 text 85k
+			61 text Total
+		62 content list
+			63 container
+				64 text Steuern CHF 15’265
+			65 container
+				66 text Wohnen CHF 17’081
+			67 container
+				68 text Versichern und Vorsorgen CHF 5’548
+			69 container
+				70 text Gesundheitskosten CHF 6’256
+			71 container
+				72 text Mobilität und Kommunikation CHF 10’367
+			73 container
+				74 text Konsum und Freizeit CHF 30’775
+		75 heading Result, Value: 3
+			76 text Result
+		77 definition list
+			78 text Categories
+			79 container Description
+				80 text Description
+			81 text Steuern
+			82 container Amount
+				83 text Amount
+			84 text CHF 15’265
+			85 container Details
+				86 text Details
+			87 container Description
+				88 text Description
+			89 text Wohnen
+			90 container Amount
+				91 text Amount
+			92 text CHF 17’081
+			93 text Details
+			94 container Description
+				95 text Description
+			96 text Miete
+			97 container Amount
+				98 text Amount
+			99 text CHF 11’949
+			100 container Description
+				101 text Description
+			102 text Hypothekarzinsen
+			103 container Amount
+				104 text Amount
+			105 text CHF 0
+			106 container Description
+				107 text Description
+			108 text Neben- und Unterhaltskosten
+			109 container Amount
+				110 text Amount
+			111 text CHF 5’132
+			112 container Description
+				113 text Description
+			114 text Versichern und Vorsorgen
+			115 container Amount
+				116 text Amount
+			117 text CHF 5’548
+			118 text Details
+			119 container Description
+				120 text Description
+			121 text Haftpflicht und Hausrat
+			122 container Amount
+				123 text Amount
+			124 text CHF 427
+			125 container Description
+				126 text Description
+			127 text Beiträge an private Vorsorge
+			128 container Amount
+				129 text Amount
+			130 text CHF 4’322
+			131 container Description
+				132 text Description
+			133 text Weitere Versicherungen und Gebühren
+			134 container Amount
+				135 text Amount
+			136 text CHF 799
+			137 container Description
+				138 text Description
+			139 text Gesundheitskosten
+			140 container Amount
+				141 text Amount
+			142 text CHF 6’256
+			143 text Details
+			144 container Description
+				145 text Description
+			146 text Krankenkasse inkl. Zusatz
+			147 container Amount
+				148 text Amount
+			149 text CHF 4’670
+			150 container Description
+				151 text Description
+			152 text Medikamente, Brillen, Franchise
+			153 container Amount
+				154 text Amount
+			155 text CHF 491
+			156 container Description
+				157 text Description
+			158 text Ärzte, Spitäler, Therapie
+			159 container Amount
+				160 text Amount
+			161 text CHF 1’095
+			162 container Description
+				163 text Description
+			164 text Mobilität und Kommunikation
+			165 container Amount
+				166 text Amount
+			167 text CHF 10’367
+			168 text Details
+			169 container Description
+				170 text Description
+			171 text Fahrzeug/Leasing
+			172 container Amount
+				173 text Amount
+			174 text CHF 3’698
+			175 container Description
+				176 text Description
+			177 text Fahrzeugversicherung
+			178 container Amount
+				179 text Amount
+			180 text CHF 869
+			181 container Description
+				182 text Description
+			183 text Treibstoff und Unterhalt
+			184 container Amount
+				185 text Amount
+			186 text CHF 1’904
+			187 container Description
+				188 text Description
+			189 text Öffentlicher Verkehr
+			190 container Amount
+				191 text Amount
+			192 text CHF 2’129
+			193 container Description
+				194 text Description
+			195 text Tel/TV/Radio und Internet
+			196 container Amount
+				197 text Amount
+			198 text CHF 1’767
+			199 container Description
+				200 text Description
+			201 text Konsum und Freizeit
+			202 container Amount
+				203 text Amount
+			204 text CHF 30’775
+			205 text Details
+			206 container Description
+				207 text Description
+			208 text Nahrung und Genussmittel
+			209 container Amount
+				210 text Amount
+			211 text CHF 5’412
+			212 container Description
+				213 text Description
+			214 text Kleider und Schuhe
+			215 container Amount
+				216 text Amount
+			217 text CHF 2’131
+			218 container Description
+				219 text Description
+			220 text Ferien, Hobbys und Kultur
+			221 container Amount
+				222 text Amount
+			223 text CHF 12’790
+			224 container Description
+				225 text Description
+			226 text Weitere Ausgaben
+			227 container Amount
+				228 text Amount
+			229 text CHF 10’442
+			230 container Sum Expenses
+				231 text Sum Expenses
+			232 text CHF 85’292
+			233 container Income Net
+				234 text Income Net
+			235 text CHF 103’997
+			236 container Saving Quote
+				237 text Saving Quote
+			238 text CHF 18’705
+		239 container
+			240 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				241 text Raw data (request & response)
+			242 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateBudgetProposal {
+  "BudgetMonthly": true,
+  "IncomeType": 1,
+  "Income": 120000,
+  "Relationship": 1,
+  "NumberOfChildren": 0,
+  "UseEffectiveTax": false,
+  "Language": 1
+} Response (HTTP 200) {
+  "response": {
+    "Categories": [
+      {
+        "Description": "Steuern",
+        "Amount": 15265,
+        "Details": []
+      },
+      {
+        "Description": "Wohnen",
+        "Amount": 17081,
+        "Details": [
+          {
+            "Description": "Miete",
+            "Amount": 11949
+          },
+          {
+            "Description": "Hypothekarzinsen",
+            "Amount": 0
+          },
+          {
+            "Description": "Neben- und Unterhaltskosten",
+            "Amount": 5132
+          }
+        ]
+      },
+      {
+        "Description": "Versichern und Vorsorgen",
+        "Amount": 5548,
+        "Details": [
+          {
+            "Description": "Haftpflicht und Hausrat",
+            "Amount": 427
+          },
+          {
+            "Description": "Beiträge an private Vorsorge",
+            "Amount": 4322
+          },
+          {
+            "Description": "Weitere Versicherungen und Gebühren",
+            "Amount": 799
+          }
+        ]
+      },
+      {
+        "Description": "Gesundheitskosten",
+        "Amount": 6256,
+        "Details": [
+          {
+            "Description": "Krankenkasse inkl. Zusatz",
+            "Amount": 4670
+          },
+          {
+            "Description": "Medikamente, Brillen, Franchise",
+            "Amount": 491
+          },
+          {
+            "Description": "Ärzte, Spitäler, Therapie",
+            "Amount": 1095
+          }
+        ]
+      },
+      {
+        "Description": "Mobilität und Kommunikation",
+        "Amount": 10367,
+        "Details": [
+          {
+            "Description": "Fahrzeug/Leasing",
+            "Amount": 3698
+          },
+          {
+            "Description": "Fahrzeugversicherung",
+            "Amount": 869
+          },
+          {
+            "Description": "Treibstoff und Unterhalt",
+            "Amount": 1904
+          },
+          {
+            "Description": "Öffentlicher Verkehr",
+            "Amount": 2129
+          },
+          {
+            "Description": "Tel/TV/Radio und Internet",
+            "Amount": 1767
+          }
+        ]
+      },
+      {
+        "Description": "Konsum und Freizeit",
+        "Amount": 30775,
+        "Details": [
+          {
+            "Description": "Nahrung und Genussmittel",
+            "Amount": 5412
+          },
+          {
+            "Description": "Kleider und Schuhe",
+            "Amount": 2131
+          },
+          {
+            "Description": "Ferien, Hobbys und Kultur",
+            "Amount": 12790
+          },
+          {
+            "Description": "Weitere Ausgaben",
+            "Amount": 10442
+          }
+        ]
+      }
+    ],
+    "SumExpenses": 85292,
+    "IncomeNet": 103997,
+    "SavingQuote": 18705
+  }
+}
+	49 container Breadcrumb
+		50 content list
+			51 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			52 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			53 text Saving & investing
+			54 text Budget proposal
+	55 container
+		56 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 240 button (expanded) Raw data (request & response), Secondary Actions: Collapse

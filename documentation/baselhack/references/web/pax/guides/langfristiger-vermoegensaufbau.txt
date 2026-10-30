@@ -1,0 +1,236 @@
+Browser tab: 7, Title: "Langfristiger Vermögensaufbau - Pax", URL: "https://www.pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau".
+1 AXWebArea Langfristiger Vermögensaufbau - Pax, URL: pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Vermögen aufbauen, Value: 1
+				28 text Vermögen aufbauen
+			29 text Heute starten, morgen profitieren
+			30 container
+				31 text Langfristiger Vermögensaufbau lohnt sich doppelt. Sie profitieren vom Zinseszinseffekt und schaffen gleichzeitig finanzielle Spielräume für Ihre Zukunft: sei es für eine Reise, eine Weiterbildung oder Ihre Frühpensionierung. Mit einem klaren Plan, passenden Anlagen und steueroptimiertem Sparen lässt sich Ihr Geld gezielt für Sie arbeiten.
+			32 link Description: Zurück zur Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+			33 image Origami Leuchtturm
+		34 container
+			35 heading Langfristiger Vermögensaufbau, Value: 2
+				36 text Langfristiger Vermögensaufbau
+			37 text Vermögensaufbau – ein Begriff, der oft mit grossen Zahlen und langen Zeiträumen in Verbindung gebracht wird. Doch der wahre Zauber des Vermögensaufbaus beginnt oft schon mit kleinen Beträgen. Wer frühzeitig mit dem Sparen und Investieren beginnt, nutzt den kraftvollen Wachstumseffekt von Zinsen und Renditen. Und was vielleicht zu Beginn wie ein Tropfen auf den heissen Stein erscheint, kann sich über Jahre zu einer beachtlichen Summe entwickeln. Es geht darum, Freiräume zu schaffen – für das, was im Leben wirklich zählt. Denn je mehr finanzielle Sicherheit Sie haben, desto mehr Freiheit gewinnen Sie, um Ihre eigenen Ziele zu verfolgen. Wichtig dabei ist, dass der Weg zum Vermögensaufbau so individuell ist wie Sie selbst. Es geht nicht nur darum, Ihr Geld zu vermehren, sondern auch darum, das passende Gleichgewicht zwischen Sicherheit und Ertrag zu finden – abgestimmt auf Ihre Lebenssituation, Ihre Ziele und Ihre Risikobereitschaft. Tipps, wie Sie Ihr Vorsorgevermögen ausgewogen zwischen Sicherheit und Ertrag anlegen können, finden Sie in 
+			38 link Description: unserem Ratgeber, Value: pax.ch/de/ratgeber/vorsorge/pensionierung/geld-im-alter-sicher-anlegen
+			39 text .
+			40 container
+				41 button VIDEO.PLAY_VIDEO Langfristiger Vermögensaufbau 
+		42 container
+			43 heading Wege zum nachhaltigen Vermögensaufbau, Value: 2
+				44 text Wege zum nachhaltigen Vermögensaufbau
+			45 container carousel-WxO1DFLtg2
+				46 container swiper-wrapper-1a86e61cba770029
+					47 container 1 / 3
+						48 text Produkte mit gleichbleibendem Zins Diese Anlagen bieten hohe Sicherheit: Das Kapital wächst stetig, die Verzinsung ist garantiert, und der Ertrag ist von Anfang an planbar. Für kurzfristige Ziele (1–2 Jahre) eignen sich Sparkonten oder Tagesgeldkonten als Notgroschen von 2–3 Monatslöhnen – sie bieten Stabilität, schnellen Zugriff und kein Kursrisiko.
+					49 container 2 / 3
+						50 text Mischprodukte Mischprodukte kombinieren sichere Verzinsung mit chancenreichen Anlagen wie Aktienfonds, sodass Sie von Stabilität und Wachstumspotenzial profitieren. Sie bieten moderates Risiko und höhere Ertragschancen als reine Sicherheitsanlagen. Für mittelfristige Ziele (2–8 Jahre) eignen sich breit gestreute Fonds oder Obligationenfonds, die Flexibilität bei der Kapitalverfügbarkeit bieten und steuerliche Aspekte je nach Produktklasse berücksichtigen.
+					51 container 3 / 3
+						52 text Dynamische Produkte Dynamische Produkte setzen stärker auf chancenreiche Anlagen, um langfristig Vermögen aufzubauen, und passen sich dabei flexibel wechselnden Lebenssituationen an. Sie bringen höhere Wertschwankungen und ein grösseres Risiko, bieten dafür aber entsprechend höhere Chancen. Für langfristige Ziele (8+ Jahre) eignen sich Aktienfonds, ETFs oder gemischte Strategien, steueroptimierte Vorsorge in der Säule 3a/3b und eine regelmässige Überprüfung der Strategie.
+		53 container
+			54 image Fröhliche, reife Frau nippt in einer modernen Küche an ihrem Kaffee, lächelt beim Blick aus dem Fenster, genießt die friedliche Morgenstimmung.
+			55 heading Eine Einführung in die Welt des Vermögensaufbaus, Value: 2
+				56 text Eine Einführung in die Welt des Vermögensaufbaus
+			57 text Vermögensaufbau ist nicht einfach nur eine Frage des „Sparens“. Es geht um eine durchdachte Strategie, die Ihre Bedürfnisse und Wünsche berücksichtigt. Dabei spielt der 
+			58 text Zeitpunkt
+			59 text , zu dem Sie mit dem Sparen beginnen, eine zentrale Rolle. Der Zinseszinseffekt ist ein mächtiger Verbündeter, der gerade bei langfristigem Sparen gewaltige Effekte entfaltet. Je länger Sie investieren, desto mehr wächst Ihr Vermögen von selbst – dank Zinsen und Renditen. Es gibt verschiedene Wege, wie Sie Ihr Kapital anlegen können. Die Wahl der richtigen Strategie hängt dabei immer von Ihrer Lebensphase, Ihren Zielen und Ihrer Risikobereitschaft ab.
+		60 container
+			61 text Sparziel erreichen und den Lebensabend geniessen. Legen Sie Ihr Vermögen in unsere Fonds-Produkte an, damit Sie im Alter Ihr Leben geniessen können. Was ist ihr Sparziel in 10 Jahren?
+			62 slider Description: Slider, Value: 50000
+			63 text 0
+			64 text 300000
+			65 text CHF 50'000 Pro Monat sollten Sie diesen Betrag sparen CHF 0
+			66 link Description: Im Detail berechnen, Value: pax.ch/de/private-vorsorge/vorsorgerechner/sparen-fuer-die-pensionierung
+		67 container
+			68 image todo
+			69 heading Produkte mit gleichbleibendem Zins, Value: 2
+				70 text Produkte mit gleichbleibendem Zins
+			71 text Manchmal ist es Ihnen einfach wichtig, Sicherheit zu haben. Wenn Sie zum Beispiel für kurzfristige Ziele wie eine grössere Anschaffung oder eine Notreserve sparen möchten, bieten sich Produkte mit gleichbleibendem Zins an. Diese Anlagen garantieren Ihnen eine feste Verzinsung und damit 
+			72 text Planungssicherheit
+			73 text . Das bedeutet zwar in der Regel, dass die Erträge eher gering ausfallen, aber dafür wissen Sie genau, was Sie am Ende erhalten. Solche Anlagen sind ideal, wenn Sie in den nächsten 
+			74 text ein bis zwei Jahren
+			75 text  auf das Kapital zugreifen müssen – etwa für einen Notgroschen oder als Reserve. Das Kapital wächst zwar langsam, aber es wächst sicher.
+			76 text Ein Beispiel:
+			77 text Wenn Sie auf einem Tagesgeldkonto oder Sparkonto 2-3 Monatslöhne ansparen, haben Sie jederzeit schnellen Zugriff auf das Geld, ohne dass es zu Kursverlusten kommen kann. Diese Stabilität kann die Grundlage für Ihre weiteren finanziellen Schritte bilden.
+		78 container
+			79 image Vogelperspektive auf eine anonyme Afroamerikanerin, die an einem Restauranttisch sitzt, Geschäftsgrafiken auf einem Laptop analysiert und sich Notizen macht.
+			80 heading Mischprodukte, Value: 2
+				81 text Mischprodukte
+			82 text Nicht jeder möchte sich entweder nur für Sicherheit oder nur für hohe Renditen entscheiden. Mischprodukte bieten eine interessante Möglichkeit, beides miteinander zu 
+			83 text kombinieren
+			84 text . Hierbei wird ein Teil des Kapitals sicher angelegt, während der andere Teil in chancenreiche Anlagen wie Aktienfonds investiert wird. So profitieren Sie von einer stabilen Basis und gleichzeitig von den Wachstumsmöglichkeiten des Marktes. Das Risiko ist zwar höher als bei reinen Sicherheitsanlagen, aber die Ertragschancen sind dafür auch deutlich grösser. Für mittelfristige Ziele, wie etwa die Finanzierung eines Urlaubs in den nächsten 
+			85 text fünf Jahren
+			86 text  oder das Ansparen für eine grössere Anschaffung, bieten sich solche Mischprodukte an. Sie sind flexibel und bieten Ihnen je nach Marktentwicklung Potenzial für höhere Erträge. Wie der Auszahlungsplan von Pax als solches Mischprodukt funktioniert, erfahren Sie in 
+			87 link Description: unserem Ratgeber, Value: pax-website-dynamic.aks-tst-01.pax.ch/de/ratgeber/vorsorge/pensionierung/so-funktioniert-der-auszahlungsplan-von-pax
+			88 text .
+		89 container
+			90 image Eine unkenntliche Frau kauft mit einem Smartphone Kryptowährung in einem Café – Blockchain-Investition, Dezentralisierung und Börsenkonzept.
+			91 heading Dynamische Produkte, Value: 2
+				92 text Dynamische Produkte
+			93 text Wer langfristig auf Vermögensaufbau setzt und bereit ist, auch höhere Risiken in Kauf zu nehmen, für den sind dynamische Produkte wie Aktienfonds oder ETFs eine spannende Möglichkeit. Diese Anlagen passen sich flexibel an Ihre Lebenssituation und Ziele an. Ein grösserer Teil des Kapitals wird in chancenreiche, aber auch schwankungsanfällige Anlagen investiert. Langfristig gesehen bieten diese Produkte das Potenzial für eine hohe Rendite, aber Sie müssen auch bereit sein, die Schwankungen des Marktes auszuhalten. Wenn Ihr Ziel also darin besteht, über einen Zeitraum von 
+			94 text mehr als acht Jahren
+			95 text  für die Altersvorsorge oder für die finanzielle Unabhängigkeit zu sparen, können solche dynamischen Produkte äusserst lohnenswert sein. Eine regelmässige Überprüfung Ihrer Strategie ist dabei unerlässlich – die Finanzmärkte sind stets in Bewegung, und Ihre Anlagestrategie sollte sich daran anpassen.
+		96 container
+			97 image todo
+			98 heading Warum jetzt der beste Zeitpunkt zum Starten ist, Value: 2
+				99 text Warum jetzt der beste Zeitpunkt zum Starten ist
+			100 text Der Zinseszinseffekt wirkt umso stärker, je länger Sie investieren. Wer früh beginnt, kann also über Jahre hinweg von diesem Effekt profitieren. Je eher Sie also anfangen, desto mehr wird sich Ihr Vermögen von selbst vermehren. Aber nicht nur der Zinseszinseffekt spricht für einen frühen Beginn. Wer jetzt mit dem Sparen startet, schafft sich nicht nur finanzielle Sicherheit, sondern auch grössere Handlungsspielräume für die Zukunft. Ein weiterer Vorteil: Die Wahl der richtigen Vorsorgelösung. Wie zum Beispiel eine steueroptimierte 3. Säule, die ermöglicht es Ihnen, auch steuerliche Vorteile zu nutzen. Sie können also nicht nur von der Rendite Ihrer Anlagen profitieren, sondern auch von steuerlichen Vergünstigungen, die sich positiv auf Ihr gesamtes Finanzbild auswirken.
+		101 container
+			102 text Mit der Säule 3a Ihre Vorsorge verbessern und Steuern sparen Durch regelmässige Einzahlungen in die Säule 3a haben Sie mehr Vermögen im Alter und sparen gleichzeitig Steuern. Berechnen Sie jetzt Ihren Steuervorteil durch Einzahlungen in die Säule 3a. Wieviel planen Sie jährlich in die Säule 3a einzuzahlen?
+			103 slider Description: Slider, Value: 7258
+			104 text 0
+			105 text 7258
+			106 text CHF 7'258 Jährliche Steuerersparnis von
+			107 link Description: Im Detail berechnen, Value: pax.ch/de/private-vorsorge/vorsorgerechner/einzahlung-saeule-3a
+		108 container
+			109 heading Fazit: Vermögensaufbau ist mehr als nur Zahlen, Value: 2
+				110 text Fazit: Vermögensaufbau ist mehr als nur Zahlen
+			111 text Vermögensaufbau ist kein Schnellball, den man einmal rollt und dann vergisst. Es ist ein langfristiger Prozess, der nicht nur finanzielle Sicherheit bringt, sondern auch die Freiheit, das Leben nach eigenen Vorstellungen zu gestalten. Wer frühzeitig beginnt, kann sich nicht nur eine bessere Zukunft aufbauen, sondern auch die Unabhängigkeit erlangen, die für ein selbstbestimmtes Leben so wichtig ist. Die 
+			112 text richtige Strategie
+			113 text  ist dabei so individuell wie Sie selbst. Ob Sie auf Sicherheit setzen oder das Wachstumspotenzial des Marktes nutzen möchten – es gibt eine Vielzahl von Wegen, die für Sie passend sind. Wichtig ist, dass Sie heute beginnen, und nicht warten, bis der Moment „perfekt“ ist. Denn der perfekte Zeitpunkt, um mit dem Vermögensaufbau zu starten, war gestern. Aber der zweitbeste Zeitpunkt ist heute.
+		114 container
+			115 heading Weiterführende Informationen zum Vermögensaufbau, Value: 2
+				116 text Weiterführende Informationen zum Vermögensaufbau
+			117 link Value: pax.ch/de/ratgeber/vorsorge/praemienbefreiung-bei-der-saeule-3a, Description: todo Wir zahlen Ihre Prämie, wenn Sie nicht arbeiten können Ob kaputtes Knie oder psychische Erschöpfung: Wer zahlt Ihre Prämie für die Säule 3a, wenn Sie nicht arbeiten können? Für diesen Fall können Sie sich absichern: Bei Erwerbsunfähigkeit befreien wir Sie von der Säule-3a-Prämie. Die Zusatzprämie dafür lohnt sich auch für Sie.
+			118 link Value: pax.ch/de/ratgeber/vorsorge/steuerersparnis-saeule-3a, Description: todo Wie sparen Sie Steuern mit der Säule 3a? Senken Sie Ihre Steuern und sichern Sie Ihre Altersvorsorge durch die clevere Nutzung der Säule 3a. Entdecken Sie jetzt, wie es funktioniert.
+			119 link Value: pax.ch/de/ratgeber/anlegen-und-sparen, Description: todo Sparen ist Silber, Anlegen ist Gold Möchten Sie Tipps zum Geld? Dann empfehlen wir Ihnen, Ihr Geld anzulegen, um eine Rendite zu erzielen. Manche Möglichkeiten zum Geld anlegen sind aber steuerlich attraktiver als andere. In der privaten Vorsorge können Sie die Einzahlungen in die Säule 3a vom steuerbaren Einkommen abziehen. Möchten Sie noch mehr Tipps?
+		120 container
+			121 heading Die 10 häufigsten Fragen zu diesem Thema, Value: 2
+				122 text Die 10 häufigsten Fragen zu diesem Thema
+			123 button (collapsed) 1. Was bedeutet „langfristiger Vermögensaufbau“?, Secondary Actions: Expand
+			124 button (collapsed) 2. Warum lohnt sich langfristiges Sparen?, Secondary Actions: Expand
+			125 button (collapsed) 3. Wann sollten Sie mit dem Vermögensaufbau beginnen?, Secondary Actions: Expand
+			126 button (collapsed) 4. Brauchen Sie viel Startkapital für den Vermögensaufbau?, Secondary Actions: Expand
+			127 button (collapsed) 5. Welche Anlageformen eignen sich für den Vermögensaufbau?, Secondary Actions: Expand
+			128 button (collapsed) 6. Welche Rolle spielt die Säule 3a beim Vermögensaufbau?, Secondary Actions: Expand
+			129 button (collapsed) 7. Wie wichtig sind Steuern beim Vermögensaufbau?, Secondary Actions: Expand
+			130 button (collapsed) 9. Wie finden Sie den passenden Anlageplan?, Secondary Actions: Expand
+			131 button (collapsed) 10. Was ist der grösste Vorteil eines langfristigen Plans?, Secondary Actions: Expand
+		132 container
+			133 heading Versicherungslexikon, Value: 2
+				134 text Versicherungslexikon
+			135 text Vorsorge-ABC
+			136 text Versicherungen haben ihre eigene Sprache. Manche Fachbegriffe lassen sich nicht vermeiden – aber sie lassen sich erklären. In unserem Vorsorge-ABC finden Sie die wichtigsten Begriffe rund um die Vorsorge, übersichtlich von A bis Z erklärt.
+			137 link Description: Zum Lexikon, Value: pax.ch/de/vorsorgelexikon
+			138 image Vorsorge ABC - Lebensversicherung Lexikon | Pax
+		139 container
+			140 text Pax Vorsorgewelt
+			141 heading Weitere Themen der Vorsorgewelt, welche Sie interessieren könnten, Value: 2
+				142 text Weitere Themen der Vorsorgewelt, welche Sie interessieren könnten
+			143 text Der Zeitpunkt war nie besser, setzen Sie sich mit Ihrer Vorsorgesituation auseinander. Es lohnt sich!
+			144 link Description: Origami Säulen Vorsorge verstehen, Value: pax.ch/de/vorsorgewelt/vorsorgesystem-schweiz
+			145 link Description: Origami Baum Pensionierung planen, Value: pax.ch/de/vorsorgewelt/planung-der-altersvorsorge
+			146 link Description: Origami Tasse Im Berufsleben vorsorgen, Value: pax.ch/de/vorsorgewelt/vorsorge-im-berufsleben
+			147 link Description: Origami Tulpe Risiken absichern, Value: pax.ch/de/vorsorgewelt/finanzielle-absicherung-bei-tod-invaliditaet
+			148 link Description: Origami Haus Eigenheim finanzieren, Value: pax.ch/de/vorsorgewelt/finanzierung-von-wohneigentum-mit-vorsorgegeldern
+			149 link Description: Origami Box Nachlass regeln, Value: pax.ch/de/vorsorgewelt/finanzielle-absicherung-bei-tod-invaliditaet
+			150 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+		151 container
+			152 heading Wir beraten Sie gerne persönlich., Value: 2
+				153 text Wir beraten Sie gerne persönlich.
+			154 text Gemeinsam die passende Lösung finden 
+			155 text Jede Lebenssituation ist anders – genauso wie die Anforderungen an die Vorsorge. Unsere Beraterinnen und Berater unterstützen Sie dabei, die für Sie passende Lösung zu finden.  
+			156 link Description: Beratung anfordern, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+			157 image Origami Telefon
+	158 container
+		159 container Breadcrumb
+			160 content list
+				161 link Description: Home, Value: pax.ch/de
+				162 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				163 text Langfristiger Vermögensaufbau
+		164 container Hilfe
+			165 heading Hilfe, Value: 2, ID: footer-hilfe
+				166 text Hilfe
+			167 content list
+				168 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				169 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				170 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				171 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				172 link Description: Download-Center, Value: pax.ch/de/download-center
+				173 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		174 container Produkte
+			175 heading Produkte, Value: 2, ID: footer-produkte
+				176 text Produkte
+			177 content list
+				178 container
+					179 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					180 text Neu
+				181 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				182 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				183 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				184 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				185 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				186 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				187 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				188 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		189 container Bereiche
+			190 heading Bereiche, Value: 2, ID: footer-bereiche
+				191 text Bereiche
+			192 content list
+				193 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				194 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				195 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				196 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				197 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		198 container Über Pax
+			199 heading Über Pax, Value: 2, ID: footer-ber-pax
+				200 text Über Pax
+			201 content list
+				202 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				203 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				204 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				205 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				206 container
+					207 link Description: Karriere, Value: pax.ch/de/karriere
+					208 text Offene Stellen
+				209 link Description: News & Medien, Value: pax.ch/de/medien
+				210 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				211 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		212 container Sprache
+			213 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		214 container Kontakt
+			215 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				216 text Kontakt
+			217 content list
+				218 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				219 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		220 container Soziale Medien
+			221 content list
+				222 link Description: Facebook, Value: facebook.com/paxvorsorge
+				223 link Description: Instagram, Value: instagram.com/paxvorsorge
+				224 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				225 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		226 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		227 container Footer-Links
+			228 content list
+				229 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				230 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				231 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				232 link Description: Cookie-Einstellungen, Value: pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau
+		233 image Pax Logo
+
+The focused UI element is 1 AXWebArea Langfristiger Vermögensaufbau - Pax, URL: pax.ch/de/vorsorgewelt/langfristiger-vermoegensaufbau

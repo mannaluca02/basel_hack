@@ -1,0 +1,29 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/kapitalleistungssteuer",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateCapitalTax",
+  "http_status": 200,
+  "request": {
+    "CapitalPayment": 250000,
+    "PaymentAge": 65,
+    "TaxLocationID": 400100000,
+    "Relationship": 1,
+    "Confession1": 4,
+    "Confession2": 4,
+    "NumberOfChildren": 0,
+    "Sex": 1,
+    "BirthYear": 1960
+  },
+  "response": {
+    "response": {
+      "CapitalTaxes": 20653,
+      "CommunityTax": 8375,
+      "ChurchTax": 0,
+      "StateTax": 8375,
+      "FederalTax": 3903,
+      "NetCapital": 229347,
+      "TaxPercentage": 8.26
+    }
+  }
+}

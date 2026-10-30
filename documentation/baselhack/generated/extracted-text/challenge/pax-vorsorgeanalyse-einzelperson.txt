@@ -1,0 +1,665 @@
+===== SEITE 1 =====
+V
+or
+sor
+gecheck
+
+
+===== SEITE 2 =====
+P
+ersonenangaben
+Name  
+Geburtsdatum 15.07.1967
+Zivilstand ledig
+Erwerbsart angestellt
+Bruttoeinkommen pro Jahr CHF 89'700
+Grundlagen
+Seit
+e 
+2
+
+
+===== SEITE 3 =====
+dur
+ch Krankheit
+Heute
+bei Krankheit
+0
+50'000
+89'700
+R
+ent
+eneinnahmen im 3. J
+ahr
+�
+Heutiges Eink
+ommen
+89'700
+�
+V
+or
+sor
+gebedar
+f
+71'760
+Einnahmen
+64'560
+�
+Lück
+e
+7'200
+�
+R
+ent
+en 2. Säule
+37'944
+�
+R
+ent
+en 1. Säule
+26'616
+�
+Übrige Einnahmen
+0
+Einnahmen
+64'560
+dur
+ch Unfall
+Heute
+bei Unfall
+0
+50'000
+89'700
+R
+ent
+eneinnahmen im 3. J
+ahr
+�
+Heutiges Eink
+ommen
+89'700
+�
+V
+or
+sor
+gebedar
+f
+71'760
+Einnahmen
+80'730
+�
+Lück
+e
+0
+�
+R
+ent
+en 2. Säule
+54'114
+�
+R
+ent
+en 1. Säule
+26'616
+�
+Übrige Einnahmen
+0
+Einnahmen
+80'730
+E
+rwerbsunfähigkeit
+Seit
+e 
+3
+
+
+===== SEITE 4 =====
+dur
+ch Krankheit
+T
+ag 1
+T
+ag 361
+T
+ag 721
+0
+26'616
+64'560
+71'760
+89'700
+EU kurzfristig
+Erwerbsunfähigkeit langfristig
+Renten jährlich
+ab
+bis
+T
+ag 1
+T
+ag 1
+T
+ag 2
+T
+ag 360
+T
+ag 361
+T
+ag 720
+T
+ag 721
+Alter 65
+�
+Renten 1. Säule
+26'616
+26'616
+IV
+, Invalidenrente
+26'616
+26'616
+�
+Renten 2. Säule
+89'700
+71'760
+45'144
+37'944
+LFZ, 
+T
+aggeld
+89'700
+71'760
+45'144
+BVG, Futura V
+orsorge, 9701
+1,
+SS, Invalidenrente
+37'944
+T
+otal V
+orsorgeleistungen
+89'700
+71'760
+71'760
+64'560
+�
+V
+orsorgebedarf
+89'700
+89'700
+89'700
+71'760
+�
+V
+orsorgelücke-/überschuss
+-17'940
+-17'940
+-7'200
+E
+rwerbsunfähigkeit
+Seit
+e 
+4
+
+
+===== SEITE 5 =====
+dur
+ch Unfall
+T
+ag 1
+T
+ag 361
+T
+ag 721
+0
+26'616
+71'760
+80'730
+89'700
+EU kurzfristig
+Erwerbsunfähigkeit langfristig
+Renten jährlich
+ab
+bis
+T
+ag 1
+T
+ag 1
+T
+ag 2
+T
+ag 2
+T
+ag 3
+T
+ag 360
+T
+ag 361
+T
+ag 720
+T
+ag 721
+Alter 65
+�
+Renten 1. Säule
+26'616
+26'616
+IV
+, Invalidenrente
+26'616
+26'616
+�
+Renten 2. Säule
+89'700
+71'760
+71'760
+54'1
+14
+54'1
+14
+LFZ, 
+T
+aggeld
+89'700
+71'760
+UVG, Invalidenrente
+54'1
+14
+54'1
+14
+UVG, 
+T
+aggeld
+71'760
+T
+otal V
+orsorgeleistungen
+89'700
+71'760
+71'760
+80'730
+80'730
+�
+V
+orsorgebedarf
+89'700
+89'700
+89'700
+89'700
+71'760
+�
+V
+orsorgelücke-/überschuss
+-17'940
+-17'940
+-8'970
+8'970
+E
+rwerbsunfähigkeit
+Seit
+e 
+5
+
+
+===== SEITE 6 =====
+dur
+ch Krankheit
+Heute
+bei Krankheit
+0
+50'000
+89'700
+Dies sind Ihr
+e langfristigen
+R
+ent
+eneinnahmen nach dem Er
+eignis
+�
+Heutiges Eink
+ommen
+89'700
+�
+V
+or
+sor
+gebedar
+f
+0
+Einnahmen
+0
+�
+Lück
+e
+0
+�
+R
+ent
+en 2. Säule
+0
+�
+R
+ent
+en 1. Säule
+0
+�
+Übrige Einnahmen
+0
+Einnahmen
+0
+dur
+ch Unfall
+Heute
+bei Unfall
+0
+50'000
+89'700
+Dies sind Ihr
+e langfristigen
+R
+ent
+eneinnahmen nach dem Er
+eignis
+�
+Heutiges Eink
+ommen
+89'700
+�
+V
+or
+sor
+gebedar
+f
+0
+Einnahmen
+0
+�
+Lück
+e
+0
+�
+R
+ent
+en 2. Säule
+0
+�
+R
+ent
+en 1. Säule
+0
+�
+Übrige Einnahmen
+0
+Einnahmen
+0
+T
+od
+Seit
+e 
+6
+
+
+===== SEITE 7 =====
+dur
+ch Krankheit
+T
+ag 1
+0
+89'700
+nach dem 
+T
+odesfall
+Renten jährlich
+ab
+bis
+T
+ag 1
+Jahr 10
+T
+otal V
+orsorgeleistungen
+T
+od
+Seit
+e 
+7
+
+
+===== SEITE 8 =====
+dur
+ch Unfall
+T
+ag 1
+0
+89'700
+nach dem 
+T
+odesfall
+Renten jährlich
+ab
+bis
+T
+ag 1
+Jahr 10
+T
+otal V
+orsorgeleistungen
+T
+od
+Seit
+e 
+8
+
+
+===== SEITE 9 =====
+Heute
+Pension
+0
+50'000
+89'700
+�
+Heutiges Eink
+ommen
+89'700
+�
+V
+or
+sor
+gebedar
+f
+71'760
+Einnahmen
+48'119
+�
+Lück
+e
+23'641
+�
+R
+ent
+en 2. Säule
+18'765
+�
+R
+ent
+en 1. Säule
+29'354
+�
+Übrige Einnahmen
+0
+Einnahmen
+48'119
+E
+rleben
+Seit
+e 
+9
+
+
+===== SEITE 10 =====
+Alter 65
+0
+29'354
+48'1
+19
+71'760
+89'700
+Pension
+Renten jährlich
+ab
+bis
+Alter 65
+lebenslang
+�
+Renten 1. Säule
+29'354
+AHV
+, 
+Altersrente
+29'354
+�
+Renten 2. Säule
+18'765
+BVG, Futura V
+orsorge, 9701
+1,
+SS, Erlebensfallrente
+18'765
+T
+otal V
+orsorgeleistungen
+48'1
+19
+�
+V
+orsorgebedarf
+71'760
+�
+V
+orsorgelücke-/überschuss
+-23'641
+E
+rleben
+Seit
+e 
+10
+
+
+===== SEITE 11 =====
+Annahmen für
+Ber
+echnungen (in %)
+V
+orsorgeverträge
+Zinssatz
+BV
+G, Futura V
+or
+sor
+ge, 97011, SS
+1.00 %
+Annahmen
+Seit
+e 
+11
+
+
+===== SEITE 12 =====
+R
+echtliche 
+Bestimmungen
+Das 
+v
+orliegende 
+Dokument 
+b
+asier
+t 
+auf 
+den 
+v
+on 
+Ihnen 
+erhalt
+enen 
+Angaben 
+und 
+Unt
+erlagen 
+sowie 
+auf 
+den 
+ak
+tuellen 
+gesetzlichen 
+Grundlagen 
+und 
+Ausführungsbestimmungen. 
+Hierbei 
+handelt 
+es 
+sich 
+um 
+ein 
+Planungsinstrument 
+und 
+die 
+Analysen 
+sind 
+zukunf
+tsorientier
+t 
+und 
+b
+asier
+en 
+somit 
+auf 
+ak
+tuell 
+gültigen 
+Grundsätzen. 
+Da 
+tr
+otz 
+der 
+sor
+gfältigen 
+Erarbeitung 
+Er
+fassungs- 
+oder 
+V
+er
+ständnisfehler 
+nicht 
+ausgeschlossen 
+w
+er
+den 
+k
+önnen, 
+bitt
+en 
+wir 
+Sie 
+um 
+Überprüfung 
+der 
+Basisdat
+en. 
+Daraus 
+entst
+ehen 
+w
+eder 
+für 
+Sie 
+noch 
+für 
+uns 
+r
+echtliche 
+V
+erp
+flichtungen 
+oder 
+Haf
+tungsansprüche.

@@ -1,0 +1,361 @@
+Browser tab: 5, Title: "Inheritance tax – by group · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-gruppe".
+1 AXWebArea Inheritance tax – by group · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/erbschaftssteuer-gruppe
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Inheritance tax – by group, Value: 1
+			12 text Inheritance tax – by group
+		13 text The tax for a relationship group – such as children or siblings.
+		14 text APICalc_calculateGroupInheritanceDonationTaxes API-Key calc.tax.inheritance
+		15 container
+			16 text Tax location *
+			17 container
+				18 text field (settable) Tax location *, Value: 4001 Basel (BS), ID: pax-input-xuy93839k
+				19 image
+			20 text Amount CHF
+			21 text field (settable) 100’000
+			22 text Relationship group *
+			23 combo box (collapsed) Value: Children, ID: pax-select-qkzv5xnqj, Secondary Actions: Expand
+				24 text Children
+				25 image
+			26 button Calculate
+				27 text Calculate
+				28 image
+			29 button Load example
+			30 button Reset
+		31 heading Inheritance and gift tax per beneficiary, Value: 3
+			32 text Inheritance and gift tax per beneficiary
+		33 image
+			34 text Children
+			35 text CHF 0
+			36 text CHF 0
+			37 text Descendants of chil…
+			38 text CHF 0
+			39 text CHF 0
+			40 text Full orphans
+			41 text CHF 0
+			42 text CHF 0
+			43 text Foster children
+			44 text CHF 0
+			45 text CHF 0
+			46 text Descendants of fost…
+			47 text CHF 22’050
+			48 text CHF 22’500
+			49 text Stepchildren
+			50 text CHF 22’050
+			51 text CHF 22’500
+			52 text Descendants of step…
+			53 text CHF 7’350
+			54 text CHF 7’500
+			55 text Godchildren
+			56 text CHF 22’050
+			57 text CHF 22’500
+			58 text 0
+			59 text 7’500
+			60 text 15k
+			61 text 23k
+		62 content list
+			63 text Inheritance tax
+			64 text Gift tax
+		65 heading Result, Value: 3
+			66 text Result
+		67 definition list
+			68 container Relationship group
+				69 text Relationship group
+			70 text 300
+			71 container Beneficiary
+				72 text Beneficiary
+			73 text 301
+			74 container Inheritance Taxes
+				75 text Inheritance Taxes
+			76 text CHF 0
+			77 container Inheritance Exemption
+				78 text Inheritance Exemption
+			79 text 0
+			80 container Inheritance Deduction
+				81 text Inheritance Deduction
+			82 text 0
+			83 container Donation Taxes
+				84 text Donation Taxes
+			85 text CHF 0
+			86 container Donation Exemption
+				87 text Donation Exemption
+			88 text 0
+			89 container Donation Deduction
+				90 text Donation Deduction
+			91 text 0
+			92 container Relationship group
+				93 text Relationship group
+			94 text 300
+			95 container Beneficiary
+				96 text Beneficiary
+			97 text 302
+			98 container Inheritance Taxes
+				99 text Inheritance Taxes
+			100 text CHF 0
+			101 container Inheritance Exemption
+				102 text Inheritance Exemption
+			103 text 0
+			104 container Inheritance Deduction
+				105 text Inheritance Deduction
+			106 text 0
+			107 container Donation Taxes
+				108 text Donation Taxes
+			109 text CHF 0
+			110 container Donation Exemption
+				111 text Donation Exemption
+			112 text 0
+			113 container Donation Deduction
+				114 text Donation Deduction
+			115 text 0
+			116 container Relationship group
+				117 text Relationship group
+			118 text 300
+			119 container Beneficiary
+				120 text Beneficiary
+			121 text 303
+			122 container Inheritance Taxes
+				123 text Inheritance Taxes
+			124 text CHF 0
+			125 container Inheritance Exemption
+				126 text Inheritance Exemption
+			127 text 0
+			128 container Inheritance Deduction
+				129 text Inheritance Deduction
+			130 text 0
+			131 container Donation Taxes
+				132 text Donation Taxes
+			133 text CHF 0
+			134 container Donation Exemption
+				135 text Donation Exemption
+			136 text 0
+			137 container Donation Deduction
+				138 text Donation Deduction
+			139 text 0
+			140 container Relationship group
+				141 text Relationship group
+			142 text 300
+			143 container Beneficiary
+				144 text Beneficiary
+			145 text 304
+			146 container Inheritance Taxes
+				147 text Inheritance Taxes
+			148 text CHF 0
+			149 container Inheritance Exemption
+				150 text Inheritance Exemption
+			151 text 0
+			152 container Inheritance Deduction
+				153 text Inheritance Deduction
+			154 text 0
+			155 container Donation Taxes
+				156 text Donation Taxes
+			157 text CHF 0
+			158 container Donation Exemption
+				159 text Donation Exemption
+			160 text 0
+			161 container Donation Deduction
+				162 text Donation Deduction
+			163 text 0
+			164 container Relationship group
+				165 text Relationship group
+			166 text 300
+			167 container Beneficiary
+				168 text Beneficiary
+			169 text 305
+			170 container Inheritance Taxes
+				171 text Inheritance Taxes
+			172 text CHF 22’050
+			173 container Inheritance Exemption
+				174 text Inheritance Exemption
+			175 text 0
+			176 container Inheritance Deduction
+				177 text Inheritance Deduction
+			178 text CHF 2’000
+			179 container Donation Taxes
+				180 text Donation Taxes
+			181 text CHF 22’500
+			182 container Donation Exemption
+				183 text Donation Exemption
+			184 text CHF 10’000
+			185 container Donation Deduction
+				186 text Donation Deduction
+			187 text 0
+			188 container Relationship group
+				189 text Relationship group
+			190 text 300
+			191 container Beneficiary
+				192 text Beneficiary
+			193 text 306
+			194 container Inheritance Taxes
+				195 text Inheritance Taxes
+			196 text CHF 22’050
+			197 container Inheritance Exemption
+				198 text Inheritance Exemption
+			199 text 0
+			200 container Inheritance Deduction
+				201 text Inheritance Deduction
+			202 text CHF 2’000
+			203 container Donation Taxes
+				204 text Donation Taxes
+			205 text CHF 22’500
+			206 container Donation Exemption
+				207 text Donation Exemption
+			208 text CHF 10’000
+			209 container Donation Deduction
+				210 text Donation Deduction
+			211 text 0
+			212 container Relationship group
+				213 text Relationship group
+			214 text 300
+			215 container Beneficiary
+				216 text Beneficiary
+			217 text 307
+			218 container Inheritance Taxes
+				219 text Inheritance Taxes
+			220 text CHF 7’350
+			221 container Inheritance Exemption
+				222 text Inheritance Exemption
+			223 text 0
+			224 container Inheritance Deduction
+				225 text Inheritance Deduction
+			226 text CHF 2’000
+			227 container Donation Taxes
+				228 text Donation Taxes
+			229 text CHF 7’500
+			230 container Donation Exemption
+				231 text Donation Exemption
+			232 text CHF 10’000
+			233 container Donation Deduction
+				234 text Donation Deduction
+			235 text 0
+			236 container Relationship group
+				237 text Relationship group
+			238 text 300
+			239 container Beneficiary
+				240 text Beneficiary
+			241 text 308
+			242 container Inheritance Taxes
+				243 text Inheritance Taxes
+			244 text CHF 22’050
+			245 container Inheritance Exemption
+				246 text Inheritance Exemption
+			247 text 0
+			248 container Inheritance Deduction
+				249 text Inheritance Deduction
+			250 text CHF 2’000
+			251 container Donation Taxes
+				252 text Donation Taxes
+			253 text CHF 22’500
+			254 container Donation Exemption
+				255 text Donation Exemption
+			256 text CHF 10’000
+			257 container Donation Deduction
+				258 text Donation Deduction
+			259 text 0
+		270 container
+			271 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				272 text Raw data (request & response)
+			273 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateGroupInheritanceDonationTaxes {
+  "TaxLocationID": 400100000,
+  "Amount": 100000,
+  "Group": 300
+} Response (HTTP 200) {
+  "response": [
+    {
+      "Group": 300,
+      "Beneficiary": 301,
+      "InheritanceTaxes": 0,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 0,
+      "DonationTaxes": 0,
+      "DonationExemption": 0,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 302,
+      "InheritanceTaxes": 0,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 0,
+      "DonationTaxes": 0,
+      "DonationExemption": 0,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 303,
+      "InheritanceTaxes": 0,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 0,
+      "DonationTaxes": 0,
+      "DonationExemption": 0,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 304,
+      "InheritanceTaxes": 0,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 0,
+      "DonationTaxes": 0,
+      "DonationExemption": 0,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 305,
+      "InheritanceTaxes": 22050,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 2000,
+      "DonationTaxes": 22500,
+      "DonationExemption": 10000,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 306,
+      "InheritanceTaxes": 22050,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 2000,
+      "DonationTaxes": 22500,
+      "DonationExemption": 10000,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 307,
+      "InheritanceTaxes": 7350,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 2000,
+      "DonationTaxes": 7500,
+      "DonationExemption": 10000,
+      "DonationDeduction": 0
+    },
+    {
+      "Group": 300,
+      "Beneficiary": 308,
+      "InheritanceTaxes": 22050,
+      "InheritanceExemption": 0,
+      "InheritanceDeduction": 2000,
+      "DonationTaxes": 22500,
+      "DonationExemption": 10000,
+      "DonationDeduction": 0
+    }
+  ]
+}
+	262 container Breadcrumb
+		263 content list
+			264 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			265 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			266 text Inheritance & gift
+			267 text Inheritance tax – by group
+	268 container
+		269 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 271 button (expanded) Raw data (request & response), Secondary Actions: Collapse

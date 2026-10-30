@@ -13,3 +13,13 @@ AGENTS.md
 node_modules/
 __pycache__/
 .DS_Store
+
+# Pax research: local credentials and generated exports
+/documentation/baselhack/private/
+/documentation/baselhack/exports/
+/documentation/baselhack/.venv/
+/documentation/baselhack/**/__pycache__/
+
+# Incomplete media downloads
+/assets/pax/videos/**/*.part
+/assets/pax/videos/**/*.ytdl

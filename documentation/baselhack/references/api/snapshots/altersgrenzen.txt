@@ -1,0 +1,118 @@
+Browser tab: 5, Title: "Age limits · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/altersgrenzen".
+1 AXWebArea Age limits · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/altersgrenzen
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Age limits, Value: 1
+			12 text Age limits
+		13 text The relevant age limits by sex and birth year.
+		14 text APICalc_getAgeLimits API-Key calc.*
+		15 container
+			16 text Sex *
+			17 combo box (collapsed) Value: Male, ID: pax-select-k0u5s7djc, Secondary Actions: Expand
+				18 text Male
+				19 image
+			20 text Birth year *
+			21 text field (settable) Birth year *, Value: 1985, ID: pax-input-rlzs07tfa
+			22 button Calculate
+				23 text Calculate
+				24 image
+			25 button Load example
+			26 button Reset
+		27 heading Result, Value: 3
+			28 text Result
+		29 definition list
+			30 container Birth year
+				31 text Birth year
+			32 text 1’985
+			33 container Current Age
+				34 text Current Age
+			35 text 41
+			36 container Minimum Age
+				37 text Minimum Age
+			38 text 18
+			39 container Maximum Age
+				40 text Maximum Age
+			41 text 100
+			42 container Regular Pension Age
+				43 text Regular Pension Age
+			44 text 65
+			45 container Minimum AHV Age
+				46 text Minimum AHV Age
+			47 text 63
+			48 container Maximum AHV Age
+				49 text Maximum AHV Age
+			50 text 70
+			51 container Minimum Pension Age
+				52 text Minimum Pension Age
+			53 text 58
+			54 container Maximum Pension Age
+				55 text Maximum Pension Age
+			56 text 70
+			57 container Minimum Saving3a Age
+				58 text Minimum Saving3a Age
+			59 text 18
+			60 container Maximum Saving3a Age
+				61 text Maximum Saving3a Age
+			62 text 65
+			63 container Maximum Purchase P2Age
+				64 text Maximum Purchase P2Age
+			65 text 62
+			66 container Years To Regular Pension Age
+				67 text Years To Regular Pension Age
+			68 text 24
+			69 container Maximum Saving3a Duration
+				70 text Maximum Saving3a Duration
+			71 text CHF 24
+			72 container Allowed For Saving3a
+				73 text Allowed For Saving3a
+			74 text ja
+			75 container Maximum Purchase P2Duration
+				76 text Maximum Purchase P2Duration
+			77 text 21
+			78 container Allowed For Purchase P2
+				79 text Allowed For Purchase P2
+			80 text ja
+		91 container
+			92 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				93 text Raw data (request & response)
+			94 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getAgeLimits {
+  "Sex": 1,
+  "BirthYear": 1985
+} Response (HTTP 200) {
+  "response": {
+    "BirthYear": 1985,
+    "CurrentAge": 41,
+    "MinimumAge": 18,
+    "MaximumAge": 100,
+    "RegularPensionAge": 65,
+    "MinimumAHVAge": 63,
+    "MaximumAHVAge": 70,
+    "MinimumPensionAge": 58,
+    "MaximumPensionAge": 70,
+    "MinimumSaving3aAge": 18,
+    "MaximumSaving3aAge": 65,
+    "MaximumPurchaseP2Age": 62,
+    "YearsToRegularPensionAge": 24,
+    "MaximumSaving3aDuration": 24,
+    "AllowedForSaving3a": true,
+    "MaximumPurchaseP2Duration": 21,
+    "AllowedForPurchaseP2": true
+  }
+}
+	83 container Breadcrumb
+		84 content list
+			85 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			86 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			87 text Basics & lookup
+			88 text Age limits
+	89 container
+		90 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 92 button (expanded) Raw data (request & response), Secondary Actions: Collapse

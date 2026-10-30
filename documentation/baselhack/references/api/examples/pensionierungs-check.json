@@ -1,0 +1,41 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/pensionierungs-check",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateRetirement",
+  "http_status": 200,
+  "request": {
+    "Relationship": 1,
+    "RelationshipSinceYear": 2015,
+    "Person1": {
+      "Sex": 1,
+      "BirthYear": 1985,
+      "GrossIncome": 120000,
+      "WithBVG": true,
+      "RetirementPillar2": {
+        "Pension": 40000
+      }
+    },
+    "CurrentFortune": 150000,
+    "InterestRate": 2,
+    "Saving": 10000,
+    "NeedInPcRetirement": true,
+    "NeedRetirement": 80,
+    "LiveSpan": 88
+  },
+  "response": {
+    "response": {
+      "ErrorCode": 1,
+      "GrossIncome": 120000,
+      "IncomeNeed": 96000,
+      "IncomeGap": 0,
+      "IncomeTotal": 96000,
+      "IncomePillar1": 32760,
+      "IncomePillar2": 40000,
+      "IncomeWithdrawal": 23240,
+      "AvailableFortune": 567975,
+      "CapitalNeed": 349955,
+      "CapitalGap": 0
+    }
+  }
+}

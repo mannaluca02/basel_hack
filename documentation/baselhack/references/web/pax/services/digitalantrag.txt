@@ -1,0 +1,128 @@
+Browser tab: 7, Title: "Digitalantrag - Pax", URL: "https://www.pax.ch/de/vertriebspartner/aktuelles/digitalantrag".
+1 AXWebArea Digitalantrag - Pax, URL: pax.ch/de/vertriebspartner/aktuelles/digitalantrag
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/vertriebspartner/aktuelles/digitalantrag#maincontent
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Der Digitalantrag von Pax, Value: 1
+				28 text Der Digitalantrag von Pax
+			29 text Je unkomplizierter, desto besser Vom Vorschlag bis zur Signatur: ab sofort können Vertriebspartnerinnen und Vertriebspartner von Pax Anträge auf QuickSale vollkommen digital ausfüllen. Dieser ermöglicht Ihnen eine schnelle und effiziente Bearbeitung der Versicherungsanträge – von A bis Z. Dabei ist die Navigation unkompliziert, übersichtlich und intuitiv gestaltet.
+			30 link Description: Zum Portal Login, Value: pax.ch/de/portal
+		31 container
+			32 container
+				33 button VIDEO.PLAY_VIDEO 
+			34 heading Wie fülle ich den Digitalantrag aus?, Value: 2
+				35 text Wie fülle ich den Digitalantrag aus?
+			36 text In diesem Video zeigen wir Ihnen, wie Sie zum Digitalantrag gelangen, wie dieser aufgebaut ist und wie Sie ihn ausfüllen. 
+		37 container
+			38 container
+				39 button VIDEO.PLAY_VIDEO 
+			40 heading Wie funktioniert das mit der digitalen Unterschrift?, Value: 2
+				41 text Wie funktioniert das mit der digitalen Unterschrift?
+			42 text In diesem Video sehen Sie, wie die digitale Unterschrift funktioniert und wie Sie vorgehen sollten, damit der Antrag vollständig abgeschlossen wird.
+		43 container
+			44 container
+				45 button VIDEO.PLAY_VIDEO 
+			46 heading Wie kann ich abgespeicherte Anträge im QuickSale wieder finden?, Value: 2
+				47 text Wie kann ich abgespeicherte Anträge im QuickSale wieder finden?
+			48 text Haben Sie einen Antrag abgespeichert, weil noch Angaben von der Kundin oder vom Kunden fehlten? Hier erfahren Sie, wie Sie den Antrag im QuickSale wieder aufrufen können. Haben Sie noch keinen Zugang zu QuickSale? Dann kontaktieren Sie Ihren Account Manager.
+	49 container
+		50 container Breadcrumb
+			51 content list
+				52 link Description: Home, Value: pax.ch/de
+				53 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				54 link Description: Aktuelles, Value: pax.ch/de/vertriebspartner/aktuelles
+				55 text Digitalantrag
+		56 container Hilfe
+			57 heading Hilfe, Value: 2, ID: footer-hilfe
+				58 text Hilfe
+			59 content list
+				60 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				61 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				62 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				63 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				64 link Description: Download-Center, Value: pax.ch/de/download-center
+				65 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		66 container Produkte
+			67 heading Produkte, Value: 2, ID: footer-produkte
+				68 text Produkte
+			69 content list
+				70 container
+					71 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					72 text Neu
+				73 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				74 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				75 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				76 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				77 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				78 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				79 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				80 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		81 container Bereiche
+			82 heading Bereiche, Value: 2, ID: footer-bereiche
+				83 text Bereiche
+			84 content list
+				85 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				86 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				87 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				88 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				89 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		90 container Über Pax
+			91 heading Über Pax, Value: 2, ID: footer-ber-pax
+				92 text Über Pax
+			93 content list
+				94 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				95 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				96 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				97 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				98 container
+					99 link Description: Karriere, Value: pax.ch/de/karriere
+					100 text Offene Stellen
+				101 link Description: News & Medien, Value: pax.ch/de/medien
+				102 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				103 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		104 container Sprache
+			105 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		106 container Kontakt
+			107 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				108 text Kontakt
+			109 content list
+				110 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				111 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		112 container Soziale Medien
+			113 content list
+				114 link Description: Facebook, Value: facebook.com/paxvorsorge
+				115 link Description: Instagram, Value: instagram.com/paxvorsorge
+				116 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				117 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		118 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		119 container Footer-Links
+			120 content list
+				121 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				122 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				123 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				124 link Description: Cookie-Einstellungen, Value: pax.ch/de/vertriebspartner/aktuelles/digitalantrag#
+		125 image Pax Logo
+
+The focused UI element is 1 AXWebArea Digitalantrag - Pax, URL: pax.ch/de/vertriebspartner/aktuelles/digitalantrag

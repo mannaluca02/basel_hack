@@ -1,0 +1,14 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/3a-limiten",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getSaving3aLimits",
+  "http_status": 200,
+  "request": {},
+  "response": {
+    "response": {
+      "Max3aSaving": 7258,
+      "Max3aSavingWithoutP2": 36288
+    }
+  }
+}

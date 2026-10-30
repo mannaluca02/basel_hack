@@ -1,0 +1,269 @@
+Browser tab: 7, Title: "Pax 3a – Säule 3a online berechnen & abschliessen, Steuern sparen - Pax", URL: "https://www.pax.ch/de/private-vorsorge/produkte/pax-3a".
+1 AXWebArea Pax 3a – Säule 3a online berechnen & abschliessen, Steuern sparen - Pax, URL: pax.ch/de/private-vorsorge/produkte/pax-3a
+	2 container
+		3 image
+		4 heading Helfen Sie uns, Ihr Erlebnis zu verbessern, Value: 3
+			5 text Helfen Sie uns, Ihr Erlebnis zu verbessern
+		6 text Wir verwenden Cookies, um Ihnen ein optimales Webseiten-Erlebnis zu bieten. Dazu zählen Cookies, die für den Betrieb der Seite notwendig sind, sowie solche, die für Statistikzwecke und zur Anzeige personalisierter Inhalte genutzt werden.
+		7 button Anpassen
+		8 button Alle akzeptieren
+	9 link Description: Zum Hauptinhalt springen, Value: pax.ch/de/private-vorsorge/produkte/pax-3a#maincontent
+	10 link Description: -, Value: pax.ch/de/150-jahre, ID: anniversary-label
+	11 container
+		12 container Hauptnavigation
+			13 menu bar
+				14 (collapsed) Privatpersonen, ID: privatpersonen, Secondary Actions: Expand
+					15 text Privatpersonen
+				16 (collapsed) Unternehmen, ID: unternehmen, Secondary Actions: Expand
+					17 text Unternehmen
+				18 (collapsed) Über Pax, ID: Über-pax, Secondary Actions: Expand
+					19 text Über Pax
+				20 (collapsed) Kontakt & Services, ID: kontakt-&-services, Secondary Actions: Expand
+				21 (collapsed) Suche, ID: suche, Secondary Actions: Expand
+				22 (collapsed) Login, ID: login, Secondary Actions: Expand
+					23 text Login
+		24 link Description: Pax Logo, Value: pax.ch/de
+	25 container maincontent
+		26 container
+			27 heading Pax 3a, Value: 1
+				28 text Pax 3a
+			29 text Ihre Zukunft. Unsere Verantwortung.
+			30 content list
+				31 container
+					32 image
+					33 text 100 % digitaler Abschluss, schnell und bequem
+				34 container
+					35 image
+					36 text Steuern sparen mit der Säule 3a
+				37 container
+					38 image
+					39 text Kombination aus Sicherheit & Renditechancen
+				40 container
+					41 image
+					42 text Pax – Genossenschaftsversicherung seit 1876
+			43 link Description: Jetzt Pax 3a berechnen, Value: checkout.pax.ch/de/pillar-3a
+			44 link Description: Beratung anfordern, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern?param=3a
+			45 image Mit Pax 3a sparen Sie heute Steuern und gleichzeitig für ein sicheres Renteneinkommen.
+			46 container ab CHF 50 pro Monat
+		47 container
+			48 image todo
+			49 heading Die 3.Säule für alle Fälle, Value: 2
+				50 text Die 3.Säule für alle Fälle
+			51 text Mit Pax vorsorgen heisst: heute clever sparen, morgen sorgenfrei leben – selbst wenn das Leben anders spielt als geplant.
+		52 container
+			53 heading Warum Pax 3a?, Value: 2
+				54 text Warum Pax 3a?
+			55 heading Sie sparen Steuern, Value: 3
+				56 text Sie sparen Steuern
+			57 text Mit Pax 3a sparen Sie heute Steuern und gleichzeitig für ein sicheres Renteneinkommen.
+			58 heading Vorsorge auch bei Erwerbsunfähigkeit, Value: 3
+				59 text Vorsorge auch bei Erwerbsunfähigkeit
+			60 text Wir zahlen weiter, wenn Sie wegen Erwerbsunfähigkeit nicht mehr einzahlen können.
+			61 heading Sie haben die Wahl, Value: 3
+				62 text Sie haben die Wahl
+			63 text Sie wählen die Anlagestrategie zwischen Sicherheit und Renditechancen, wie es zu Ihnen passt.
+			64 heading Am Erfolg beteiligt, Value: 3
+				65 text Am Erfolg beteiligt
+			66 text Sie werden Teil der Pax Genossenschaft und profitieren von unserem Erfolg.
+			67 heading Flexibel und einfach verwalten, Value: 3
+				68 text Flexibel und einfach verwalten
+			69 text Sie haben die Kontrolle: flexible und einfache Verwaltung im Kundenportal.
+			70 heading Faire Konditionen, klare Transparenz, Value: 3
+				71 text Faire Konditionen, klare Transparenz
+			72 text Transparente Gebühren ohne versteckte Kosten. Eine Partnerschaft auf Augenhöhe.
+		73 container
+			74 image Pax 3a - Für alle, die Rendite wollen, aber Sicherheit schätzen
+			75 text Für alle, die Rendite wollen, aber Sicherheit schätzen: Unsere Vorsorgelösung macht beides möglich.
+			76 heading Ihre clevere Vorsorgelösung, Value: 2
+				77 text Ihre clevere Vorsorgelösung
+			78 heading So funktioniert’s:, Value: 3, ID: so-funktionierts
+				79 text So funktioniert’s:
+			80 text Mit Pax 3a zahlen Sie monatlich oder jährlich einen festen Betrag (Prämie) in Ihre 3. Säule ein. Dieser Betrag ist vollständig steuerlich abzugsfähig. Ein kleiner Teil davon fliesst in die Absicherung, der Rest wird für Ihr zukünftiges Alterseinkommen angespart. Im Detail:
+			81 text ● ● 
+			82 text Der Sparanteil
+			83 text  besteht anteilig aus garantiert verzinstem Kapital und dem Fondsanteil, der in Aktien investiert wird. Das Verhältnis können Sie wählen.
+			84 text ● 
+			85 text Der Versicherungsanteil
+			86 text  sichert Sie gegenüber Erwerbsunfähigkeit ab. Damit stellen Sie sicher, dass Sie trotz Krankheit oder Unfall Ihr gewünschtes Renteneinkommen erreichen.
+			87 link Description: Berechnen Sie jetzt Ihre individuelle Pax 3a, Value: checkout.pax.ch/de/pillar-3a/
+		88 container
+			89 image Mit Pax 3a bleibt Ihre Vorsorge auch bei Erwerbsunfähigkeit gesichert
+			90 heading Was Pax 3a besonders macht, Value: 2
+				91 text Was Pax 3a besonders macht
+			92 text Mit Pax 3a bleibt Ihre Vorsorge auch bei  Erwerbsunfähigkeit  gesichert  –  im Unterschied zu klassischen Banklösungen. Beispiel:
+			93 text Die nebenstehende Grafik zeigt die Wertentwicklung des Altersguthabens einer 
+			94 text 30 Jahre alten Person
+			95 text , die 
+			96 text CHF 2’500 pro Jahr
+			97 text  in ihre Säule 3a einzahlt.
+			98 text Wird die Person mit 35 Jahren erwerbsunfähig, übernimmt Pax ihre Einzahlungen vollständig
+			99 text  – insgesamt CHF 71’781 bis zur Pensionierung. Das Vorsorgeziel wird mit Sicherheit erreicht.
+			100 text Der Beitrag für diese Sicherheit beträgt 
+			101 text nur CHF 8.90 pro Monat
+			102 text .
+			103 link Description: Berechnen Sie jetzt Ihre individuelle Pax 3a, Value: checkout.pax.ch/de/pillar-3a/
+		104 container
+			105 heading So legen wir Ihr Geld nach Ihren individuellen Bedürfnissen sicher an, Value: 2
+				106 text So legen wir Ihr Geld nach Ihren individuellen Bedürfnissen sicher an
+			107 text Drei clevere Anlagepakete – für Sicherheitsliebende, Chancennutzer und alle dazwischen.
+			108 text Sicherheit
+			109 text Ausgewogen
+			110 text Chance
+			111 container
+				112 image Pax 3a Anlagestrategie
+				113 heading Anlagestrategie «Sicherheit», Value: 3
+					114 text Anlagestrategie «Sicherheit»
+				115 heading Für alle, die Sicherheit wollen – und Chancen nutzen möchten., Value: 4, ID: fr-alle-die-sicherheit-wollen-und-chancen-nutzen-mchten
+					116 text Für alle, die Sicherheit wollen – und Chancen nutzen möchten.
+				117 text ●
+				118 text 90 % sicher angelegt
+				119 text  – mit einem garantierten Zinssatz von 0.35% plus Überschusszins bei wirtschaftlichem Erfolg von Pax.
+				120 text ● 
+				121 text 10 % nachhaltig investiert
+				122 text  – in den Fonds UBS MSCI World Selection , der von UBS gemanagt wird und gezielt auf ESG-Kriterien achtet.
+			123 image Pax 3a Anlagestrategie
+			124 heading Anlagestrategie «Ausgewogen», Value: 3
+				125 text Anlagestrategie «Ausgewogen»
+			126 heading Für alle, die Sicherheit wollen – und Chancen nutzen möchten., Value: 4, ID: fr-alle-die-sicherheit-wollen-und-chancen-nutzen-mchten
+				127 text Für alle, die Sicherheit wollen – und Chancen nutzen möchten.
+			128 container
+				129 text ●  70 % sicher angelegt  - mit einem garantierten Zinssatz von 0.35% plus Überschusszins bei wirtschaftlichem Erfolg von Pax.
+			130 container
+				131 text ● 30 % nachhaltig investiert  - in den Fonds UBS MSCI World Selection, der von UBS gemanagt wird und gezielt auf ESG-Kriterien achtet.
+			132 image Pax 3a Anlagestrategie
+			133 heading Anlagestrategie «Chance», Value: 3
+				134 text Anlagestrategie «Chance»
+			135 heading Für alle, die Sicherheit wollen – und Chancen nutzen möchten., Value: 4, ID: fr-alle-die-sicherheit-wollen-und-chancen-nutzen-mchten
+				136 text Für alle, die Sicherheit wollen – und Chancen nutzen möchten.
+			137 container
+				138 text ●  50 % sicher angelegt  – mit einem garantierten Zinssatz von 0.35% plus Überschusszins bei wirtschaftlichem Erfolg von Pax.
+			139 container
+				140 text ●  50 % nachhaltig investiert  – in den Fonds UBS MSCI World Selection, der von UBS gemanagt wird und gezielt auf ESG-Kriterien achtet.
+		141 container
+			142 heading Mit Pax investieren heisst: in sich selbst investieren., Value: 2
+				143 text Mit Pax investieren heisst: in sich selbst investieren.
+			144 text Mehr Informationen zu unserem Anlagefonds der UBS im Fonds-Factsheet. Mehr Informationen zu Nachhaltigkeit bei Pax.
+			145 heading Garantierter Zins und genossenschaftliche Teilhabe, Value: 3
+				146 text Garantierter Zins und genossenschaftliche Teilhabe
+			147 text Das gib es bei keiner Bank: Pax garantiert einen festen Zins. Erzielt Pax Gewinne, fliessen diese als Überschussbeteiligung an Sie zurück.
+			148 heading Gebühren, die sich sehen lassen können, Value: 3
+				149 text Gebühren, die sich sehen lassen können
+			150 text Mit 0.15% Gesamtkostenquote (TER) auf dem Fondsanteil und maximal 0.5% Verwaltungsgebühren bleibt mehr Geld für Sie übrig.
+			151 heading Ausschliesslich nachhaltige Anlagen. Aus Überzeugung., Value: 3
+				152 text Ausschliesslich nachhaltige Anlagen. Aus Überzeugung.
+			153 text Pax investiert ausschliesslich in zertifiziert nachhaltige Anlagen und trägt damit aktiv zur Sicherung unserer gemeinsamen Zukunft bei.
+		154 container
+			155 image Pax 3a - In wenigen Minuten Altersguthaben berechnen
+			156 text Versicherungen sind kompliziert? Müssen sie nicht sein.
+			157 heading Einfach, verständlich, digital, Value: 2
+				158 text Einfach, verständlich, digital
+			159 text Unsere digitale Antragsstrecke führt Sie einfach und verständlich durch jeden Schritt. Legen Sie jetzt los.
+			160 link Description: Jetzt Pax 3a berechnen, Value: checkout.pax.ch/de/pillar-3a
+		161 container
+			162 heading So einfach geht’s, Value: 2
+				163 text So einfach geht’s
+			164 text 1
+			165 heading Prämie und Anlagestrategie wählen, Value: 3
+				166 text Prämie und Anlagestrategie wählen
+			167 text Wir begleiten Sie bei der Bestimmung der Prämie und ermitteln die für Sie passende Anlagestrategie. 2
+			168 heading Wertentwicklung berechnen, Value: 3
+				169 text Wertentwicklung berechnen
+			170 text Aufgrund Ihrer Angaben berechnen wir die mögliche Wertentwicklung bis zur ordentlichen Pensionierung. 3
+			171 heading Einfach online abschliessen, Value: 3
+				172 text Einfach online abschliessen
+			173 text Wenn Sie sich für Pax 3a entscheiden, können Sie Ihre Vorsorgeversicherung einfach und sicher online abschliessen.
+		174 container
+			175 heading Häufige Fragen zu Pax 3a, Value: 2
+				176 text Häufige Fragen zu Pax 3a
+			177 button (collapsed) Was bringt mir Pax 3a mehr als ein Bankkonto?, Secondary Actions: Expand
+			178 button (collapsed) Wie günstig ist Pax 3a im Vergleich?, Secondary Actions: Expand
+			179 button (collapsed) Wie funktioniert die Absicherung bei Erwerbsunfähigkeit?, Secondary Actions: Expand
+			180 button (collapsed) Kann ich monatlich einzahlen?, Secondary Actions: Expand
+			181 button (collapsed) Kann ich mein Geld aus der Säule 3a beziehen?, Secondary Actions: Expand
+			182 button (collapsed) Wie viel Steuern kann ich sparen?, Secondary Actions: Expand
+			183 button (collapsed) Gibt es eine Mindesteinzahlung? Und kann ich auch monatlich oder jährlich zahlen?, Secondary Actions: Expand
+			184 button (collapsed) Was ist der Unterschied zwischen Erwerbsunfähigkeit und Arbeitslosigkeit?, Secondary Actions: Expand
+		185 container
+			186 heading Themen, die Sie interessieren könnten, Value: 2
+				187 text Themen, die Sie interessieren könnten
+			188 link Value: pax.ch/de/ratgeber/berufliche-vorsorge-verstehen/koordinationsabzug, Description: todo Koordiniert in die Pensionierung Altersvorsorge in der Schweiz? Das sind doch die drei Säulen – also alles ganz einfach! Aber der Teufel steckt im Detail, sagt man. Zum Glück geht bei der Altersvorsorge alles mit guten Dingen zu. Ordentlich und koordiniert. Auch dank dem Koordinationsabzug.
+			189 link Value: pax.ch/de/ratgeber/vorsorge/praemienbefreiung-bei-der-saeule-3a, Description: todo Wir zahlen Ihre Prämie, wenn Sie nicht arbeiten können Ob kaputtes Knie oder psychische Erschöpfung: Wer zahlt Ihre Prämie für die Säule 3a, wenn Sie nicht arbeiten können? Für diesen Fall können Sie sich absichern: Bei Erwerbsunfähigkeit befreien wir Sie von der Säule-3a-Prämie. Die Zusatzprämie dafür lohnt sich auch für Sie.
+			190 link Value: pax.ch/de/ratgeber/vorsorge/pensionierung/saeule-3a-gestaffelt-beziehen, Description: todo Stück für Stück 3a zurück Immer brav in die Säule 3a einzahlen, check! Mit dem Erreichen des Referenzalters können Sie sich das Geld endlich auszahlen lassen. Aber Moment: Mit der Auszahlung aus der 2. Säule und der Säule 3a fallen Steuern an. Was tun? Wir zeigen Ihnen, warum ein gestaffelter Bezug der Säule 3a sinnvoll ist.
+	191 container
+		192 container Breadcrumb
+			193 content list
+				194 link Description: Home, Value: pax.ch/de
+				195 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				196 text Pax 3a
+		197 container Hilfe
+			198 heading Hilfe, Value: 2, ID: footer-hilfe
+				199 text Hilfe
+			200 content list
+				201 link Description: Persönliche Beratung, Value: pax.ch/de/private-vorsorge/services/beratung-anfordern
+				202 link Description: Fonds-Informationen, Value: pax.ch/de/private-vorsorge/fondsservice
+				203 link Description: Portale & Login, Value: pax.ch/de/kontakt-und-services/portale-und-login
+				204 link Description: Lob und Kritik, Value: pax.ch/de/kontakt-und-services/lob-und-kritik
+				205 link Description: Download-Center, Value: pax.ch/de/download-center
+				206 link Description: Kontakt & Services, Value: pax.ch/de/kontakt-und-services
+		207 container Produkte
+			208 heading Produkte, Value: 2, ID: footer-produkte
+				209 text Produkte
+			210 content list
+				211 container
+					212 link Description: Pax Care, Value: pax.ch/de/private-vorsorge/produkte/pax-care
+					213 text Neu
+				214 link Description: Pax 3a, Value: pax.ch/de/private-vorsorge/produkte/pax-3a
+				215 link Description: Todesfallversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung
+				216 link Description: Kinderversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-kinderversicherung
+				217 link Description: Erwerbsunfähigkeitsversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung
+				218 link Description: Spar-Lebensversicherung, Value: pax.ch/de/private-vorsorge/produkte/pax-spar-lebensversicherung
+				219 link Description: Auszahlungsplan, Value: pax.ch/de/private-vorsorge/produkte/pax-auszahlungsplan
+				220 link Description: BVG Vollversicherung, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-bvg-vollversicherung
+				221 link Description: BVG DuoStar, Value: pax.ch/de/berufliche-vorsorge/produkte/pax-duostar
+		222 container Bereiche
+			223 heading Bereiche, Value: 2, ID: footer-bereiche
+				224 text Bereiche
+			225 content list
+				226 link Description: Private Vorsorge, Value: pax.ch/de/private-vorsorge
+				227 link Description: Berufliche Vorsorge, Value: pax.ch/de/berufliche-vorsorge
+				228 link Description: Vertriebspartner, Value: pax.ch/de/vertriebspartner
+				229 link Description: Vorsorgewelt, Value: pax.ch/de/vorsorgewelt
+				230 link Description: Ratgeber, Value: pax.ch/de/ratgeber
+		231 container Über Pax
+			232 heading Über Pax, Value: 2, ID: footer-ber-pax
+				233 text Über Pax
+			234 content list
+				235 link Description: Unternehmen, Value: pax.ch/de/ueber-pax
+				236 link Description: Genossenschaft, Value: pax.ch/de/ueber-pax/pax-holding
+				237 link Description: Nachhaltigkeit, Value: pax.ch/de/ueber-pax/nachhaltigkeit
+				238 link Description: Engagement & Sponsoring, Value: pax.ch/de/ueber-pax/engagement-und-sponsoring
+				239 container
+					240 link Description: Karriere, Value: pax.ch/de/karriere
+					241 text Offene Stellen
+				242 link Description: News & Medien, Value: pax.ch/de/medien
+				243 link Description: Newsletter, Value: pax.ch/de/kontakt-und-services/newsletter/newsletter-anmeldung
+				244 link Description: 150 Jahre Pax, Value: pax.ch/de/150-jahre
+		245 container Sprache
+			246 pop up button (collapsed) Description: Sprache ändern, aktuelle Auswahl: undefined, Secondary Actions: Expand
+		247 container Kontakt
+			248 heading Kontakt, Value: 3, ID: contact-heading-desktop
+				249 text Kontakt
+			250 content list
+				251 link Description: E-Mail: info@pax.ch, Value: mailto:info@pax.ch
+				252 link Description: GENERAL.TELEPHONE +41 61 277 66 66, Value: tel:+41612776666
+		253 container Soziale Medien
+			254 content list
+				255 link Description: Facebook, Value: facebook.com/paxvorsorge
+				256 link Description: Instagram, Value: instagram.com/paxvorsorge
+				257 link Description: Youtube, Value: youtube.com/channel/UCjlAVCArItBJHfUE7qN3FBQ
+				258 link Description: Linkedin, Value: linkedin.com/company/pax-schweizerische-lebensversicherungs-gesellschaft-ag
+		259 text © 2026 Pax, Schweizerische Lebensversicherungs-Gesellschaft AG
+		260 container Footer-Links
+			261 content list
+				262 link Description: Datenschutz, Value: pax.ch/de/meta/datenschutz
+				263 link Description: Impressum, Value: pax.ch/de/meta/impressum
+				264 link Description: Rechtliche Hinweise, Value: pax.ch/de/meta/rechtliche-hinweise
+				265 link Description: Cookie-Einstellungen, Value: pax.ch/de/private-vorsorge/produkte/pax-3a#
+		266 image Pax Logo
+
+The focused UI element is 1 AXWebArea Pax 3a – Säule 3a online berechnen & abschliessen, Steuern sparen - Pax, URL: pax.ch/de/private-vorsorge/produkte/pax-3a

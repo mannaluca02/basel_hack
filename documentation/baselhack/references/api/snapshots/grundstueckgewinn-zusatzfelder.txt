@@ -1,0 +1,79 @@
+Browser tab: 5, Title: "Real-estate capital gain – extra fields · BaselHack 2026", URL: "https://pax-hackathon-2026.vercel.app/rechner/grundstueckgewinn-zusatzfelder".
+1 AXWebArea Real-estate capital gain – extra fields · BaselHack 2026, URL: pax-hackathon-2026.vercel.app/rechner/grundstueckgewinn-zusatzfelder
+	2 container
+		3 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+		4 container Navigation
+			5 link Description: Challenge, Value: pax-hackathon-2026.vercel.app/challenge
+			6 link Description: Material, Value: pax-hackathon-2026.vercel.app/material
+			7 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+		8 link Description: DE, Value: pax-hackathon-2026.vercel.app/de/tools
+		9 link Description: BaselHack 2026, Value: pax-hackathon-2026.vercel.app/
+	10 container
+		11 heading Real-estate capital gain – extra fields, Value: 1
+			12 text Real-estate capital gain – extra fields
+		13 text Which cantonal extra fields a location has for the real-estate capital gains tax.
+		14 text APICalc_getAdditionalEstateGainFields API-Key calc.tax.estategain
+		15 container
+			16 text Tax location *
+			17 container
+				18 text field (settable) Tax location *, Value: 4001 Basel (BS), ID: pax-input-6jc1wqp17
+				19 image
+			20 button Calculate
+				21 text Calculate
+				22 image
+			23 button Load example
+			24 button Reset
+		25 heading Result, Value: 3
+			26 text Result
+		27 definition list
+			28 container Confession
+				29 text Confession
+			30 text nein
+			31 container Sale proceeds
+				32 text Sale proceeds
+			33 text ja
+			34 container First Cost
+				35 text First Cost
+			36 text nein
+			37 container Building investments
+				38 text Building investments
+			39 text ja
+			40 container Built on
+				41 text Built on
+			42 text nein
+			43 container Self Inhabitated
+				44 text Self Inhabitated
+			45 text ja
+			46 container Owner-occupied since (years)
+				47 text Owner-occupied since (years)
+			48 text nein
+			49 container Ownership discount
+				50 text Ownership discount
+			51 text nein
+		62 container
+			63 button (expanded) Raw data (request & response), Secondary Actions: Collapse
+				64 text Raw data (request & response)
+			65 text POST https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getAdditionalEstateGainFields {
+  "TaxLocationID": 400100000
+} Response (HTTP 200) {
+  "response": {
+    "Confession": false,
+    "Revenues": true,
+    "FirstCost": false,
+    "BuildingInvest": true,
+    "HasBuilding": false,
+    "SelfInhabitated": true,
+    "SelfInhabYears": false,
+    "HasDiscount": false
+  }
+}
+	54 container Breadcrumb
+		55 content list
+			56 link Description: Home, Value: pax-hackathon-2026.vercel.app/
+			57 link Description: Tools, Value: pax-hackathon-2026.vercel.app/tools
+			58 text Basics & lookup
+			59 text Real-estate capital gain – extra fields
+	60 container
+		61 text Internal knowledge hub for the Pax Challenge at BaselHack 2026. Demo data · not tax or pension advice.
+
+The focused UI element is 63 button (expanded) Raw data (request & response), Secondary Actions: Collapse

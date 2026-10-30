@@ -1,0 +1,3 @@
+# Keep original Pax logo bytes and whitespace unchanged.
+logos/** -text -whitespace
+videos/** -text

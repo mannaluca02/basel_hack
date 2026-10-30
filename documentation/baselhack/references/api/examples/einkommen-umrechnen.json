@@ -1,0 +1,19 @@
+{
+  "source_url": "https://pax-hackathon-2026.vercel.app/rechner/einkommen-umrechnen",
+  "capture_date": "2026-10-30",
+  "dataset": "synthetic hub example, not production customer data",
+  "endpoint": "https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_calculateIncome",
+  "http_status": 200,
+  "request": {
+    "TaxLocationID": 400100000,
+    "Relationship": 1,
+    "NumberOfChildren": 0,
+    "BirthYear": 1985,
+    "Income": 120000,
+    "IncomeType": 1,
+    "CalculateIncomeType": 2
+  },
+  "response": {
+    "response": 78982
+  }
+}
