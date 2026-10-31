@@ -219,3 +219,18 @@
   width: var(--dock-size);
   height: var(--dock-size);
 }
+
+// The human-advisor button sits with the tabs; pressed while help is requested.
+.human {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+
+  &[aria-pressed='true'] {
+    color: var(--text-info);
+    background: var(--bg-info);
+  }
+}
