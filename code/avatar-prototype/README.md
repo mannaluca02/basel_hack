@@ -1,6 +1,6 @@
 # Avatar prototype (throwaway)
 
-Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via eyes and body, speech via squash & stretch.
+Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via eyes and blush; the body stays at a fixed height and size.
 
 **Voice integration: read [AVATAR-INTERFACE.md](AVATAR-INTERFACE.md).**
 
@@ -13,6 +13,14 @@ Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via ey
 | `server.mjs` | Dario | Dev server: static files + `POST /session` exchanges SDP with the Live API |
 | `index.html` | — | Design demo: face buttons, fake speech, mic, scripted conversation as AvatarEvents |
 | `realtime.html` | — | Live test against GPT-Live |
+
+## Expressions and listening
+
+`empathetic` uses open, softly angled eyes. `concerned` is more serious. `reassuring` is a small calm smile, `curious` uses a questioning gaze and wider eyes, and `unsure` uses an asymmetric squint. The Live trigger choices distinguish personal distress, concrete risk, reassurance, and clarification.
+
+The body never bobs, nods, rotates, or stretches vertically, including during speech, emotion transitions, and celebration. A gentle horizontal sway accompanies eye movement and blinking, including while listening. Reduced-motion preferences suppress the decorative drift. Input emotion decisions still prepare the upcoming reply.
+
+The microphone demo explicitly enters listening mode. Audio levels remain available to the UI but do not move or resize the body.
 
 ## Run
 

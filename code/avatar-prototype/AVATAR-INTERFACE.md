@@ -30,7 +30,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts) and [`pax-avatar-controller.d.ts`](p
 | `{ type: "playback", event: "cancelled", playbackId }` | Audio was cut off (barge-in, stop, new turn) | `output_audio_buffer.cleared` |
 | `{ type: "playback", event: "error", playbackId }` | Playback failed | — |
 
-`emotion` values: `neutral`, `happy`, `empathetic`, `concerned`, `surprised`, `celebrating`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
+`emotion` values: `neutral`, `happy`, `empathetic`, `concerned`, `surprised`, `celebrating`, `reassuring`, `curious`, `unsure`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
 
 ## What the avatar guarantees
 
@@ -39,7 +39,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts) and [`pax-avatar-controller.d.ts`](p
 - **Early emotions wait for the reply.** An `emotion` that arrives while the user speaks or the advisor thinks (e.g. from the input transcript trigger) is queued and shown when playback starts. Otherwise it is shown right away.
 - **No flicker from classifiers.** While the advisor has the turn, `neutral` never replaces a stronger emotion, and other changes apply at most every 2 s (the latest one wins). Send every answer; the avatar filters.
 - **Relax after the reply.** The emotion is held ~1.5 s after playback ends, then the face relaxes to neutral. A new user turn starts from neutral.
-- **Body motion = loudness** of the attached audio. No timing needed from the voice side.
+- **Fixed body height and size.** Audio does not move or stretch the body. Eye expressions, blinking, and gentle horizontal sway remain.
 
 
 ## GPT-Live prototype mapping

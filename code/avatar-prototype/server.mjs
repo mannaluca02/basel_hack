@@ -22,12 +22,15 @@ const HOST = process.env.HOST || "127.0.0.1";   // expose via `tailscale serve`,
 const MODEL = "gpt-live-1";
 const VOICE = process.env.OPENAI_REALTIME_VOICE || "marin";
 const EMOTION_CHOICES = [
-  { value: "neutral", description: "Sachliche Information und ruhige Vorsorgeberatung." },
-  { value: "happy", description: "Begrüssung, gute Nachricht oder Zustimmung." },
-  { value: "empathetic", description: "Tod, Krankheit, Erwerbsunfähigkeit oder Trennung: mitfühlend reagieren." },
-  { value: "concerned", description: "Ein erkanntes Risiko oder eine mögliche Vorsorgelücke." },
-  { value: "surprised", description: "Eine unerwartete oder neue Information." },
-  { value: "celebrating", description: "Ein Ziel wurde erreicht oder ein Vertrag abgeschlossen." },
+  { value: "neutral", description: "Sachliche Erklärung ohne besonderen emotionalen Anlass. Im Zweifel neutral." },
+  { value: "happy", description: "Freundliche Begrüssung oder eine gute Nachricht, keine ernsten oder belastenden Themen." },
+  { value: "empathetic", description: "Der Kunde schildert einen persönlichen Verlust, Krankheit oder Belastung: ruhig mitfühlen, nicht lächeln oder feiern." },
+  { value: "concerned", description: "Ein konkretes erkanntes Risiko oder eine Vorsorgelücke, nicht allein die Erwähnung von Tod oder Krankheit." },
+  { value: "surprised", description: "Eine wirklich unerwartete Wendung; nicht jede neue Information." },
+  { value: "reassuring", description: "Der Berater gibt nach einer Sorge ruhige Zuversicht und erklärt einen hilfreichen nächsten Schritt. Kein Erfolg wird gefeiert." },
+  { value: "curious", description: "Eine offene Rückfrage zeigt Interesse an Wünschen oder Lebenssituation des Kunden." },
+  { value: "unsure", description: "Der Berater sagt ausdrücklich, dass Angaben fehlen oder etwas unklar ist und geklärt werden muss." },
+  { value: "celebrating", description: "Ein ausdrücklich erreichtes Ziel oder Erfolg des Kunden, keine blosse Zustimmung." },
 ];
 
 const INSTRUCTIONS = `Du bist Pax, ein KI-Vorsorgeberater der Pax Versicherung (klar als KI erkennbar).

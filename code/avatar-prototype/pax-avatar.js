@@ -3,7 +3,7 @@
 //
 //   const rig = mountPaxAvatar(document.getElementById("host"));
 //   rig.setEmotion("happy");
-//   rig.attachStream(remoteAudioStream);   // body squashes with the voice
+//   rig.attachStream(remoteAudioStream);   // audio level remains available to the UI
 //   rig.setLevelSource(() => 0.4);         // or any custom 0..1 level
 const SVG = `
 <svg viewBox="0 0 200 200" aria-label="Pax Beratercharakter" style="width:100%;height:auto;overflow:visible">
@@ -44,17 +44,20 @@ const EYE = { w: 8.5, h: 13, rx: 8.5 };
 // ---------- Emotions: target values for the rig ----------
 // gx/gy gaze (-1..1), open (eye height), size (eye scale), lidA (deg, + = droopy/sad outer corners),
 // lidD (upper lid drop 0..1), smile (lower lid push → ^^ eyes), squint (extra lid on right eye),
-// sx/sy body scale, rot body tilt, ty body lift, hop (bounce amount), blush, dots, sparkles
-const BASE = { gx:0, gy:0, open:1, size:1, lidA:0, lidD:0, smile:0, squint:0, sx:1, sy:1, rot:0, ty:0, hop:0, blush:0, dots:0, sparkles:0 };
+// blush, dots, sparkles
+const BASE = { gx:0, gy:0, open:1, size:1, lidA:0, lidD:0, smile:0, squint:0, blush:0, dots:0, sparkles:0 };
 export const EMOTIONS = {
   neutral:     { label: "Neutral" },
-  listening:   { label: "Zuhören",      gy:-.1, open:1.06, size:1.08, rot:5, ty:-2 },
-  thinking:    { label: "Nachdenken",   gx:.75, gy:-.8, open:.92, lidD:.12, squint:.35, rot:-5, dots:1 },
-  happy:       { label: "Freude",       smile:.85, sy:1.02, hop:.5, blush:.6 },
-  empathetic:  { label: "Mitgefühl",    gy:.4, lidA:22, lidD:.38, smile:.2, size:.95, sx:1.03, sy:.96, ty:3, blush:.25 },
-  concerned:   { label: "Besorgt",      gx:-.25, gy:.1, lidA:26, lidD:.2, open:1.1, sx:.98, sy:.97, rot:-3 },
-  surprised:   { label: "Überrascht",   open:1.3, size:1.22, sx:.95, sy:1.08, ty:-6 },
-  celebrating: { label: "Abschluss 🎉", smile:1, size:1.08, hop:1.4, blush:.8, sparkles:1 },
+  listening:   { label: "Zuhören",      gy:-.08, open:1.04, size:1.04 },
+  thinking:    { label: "Nachdenken",   gx:.75, gy:-.8, open:.92, lidD:.12, squint:.35, dots:1 },
+  happy:       { label: "Freude",       smile:.85, blush:.6 },
+  empathetic:  { label: "Mitgefühl",    gy:.05, lidA:8, lidD:.08, open:1.03 },
+  reassuring:  { label: "Beruhigend",   smile:.48, open:.94, blush:.12 },
+  curious:     { label: "Neugierig",    gx:.2, gy:-.2, open:1.12, size:1.06, squint:.08 },
+  unsure:      { label: "Unsicher",     gx:-.35, gy:-.15, lidD:.1, squint:.28 },
+  concerned:   { label: "Besorgt",      gy:.08, lidA:17, lidD:.14, open:1.08 },
+  surprised:   { label: "Überrascht",   open:1.3, size:1.22 },
+  celebrating: { label: "Abschluss 🎉", smile:1, size:1.08, blush:.8, sparkles:1 },
 };
 
 const set = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
@@ -70,12 +73,13 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
   let level = 0, levelSource = () => 0;
   let analyser = null, audioCtx = null, buf = null;
   let blinkT = 0, nextBlink = 2, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
-  let pop = 0, popV = 0;   // spring impulse on emotion change
+  const gaze = { x: 0, y: 0 };
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const sparkles = [];
 
   function setEmotion(key) {
     if (!EMOTIONS[key] || key === emotion) return false;
-    emotion = key; popV += 2.2;
+    emotion = key;
     return true;
   }
   function setLevelSource(fn) { levelSource = fn || (() => 0); }
@@ -120,9 +124,6 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     const raw = levelSource(dt);
     level += (raw - level) * (1 - Math.exp(-dt * (raw > level ? 30 : 10)));
 
-    // emotion-change pop (damped spring)
-    popV += (-pop * 120 - popV * 12) * dt; pop += popV * dt;
-
     // blink
     blinkT += dt; let blink = 1;
     if (blinkT > nextBlink) { const p = (blinkT - nextBlink) / .14; blink = p < 1 ? Math.abs(1 - 2 * p) : 1;
@@ -131,21 +132,18 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     nextSaccade -= dt;
     if (nextSaccade < 0) { saccade = { x: (Math.random() - .5) * .5, y: (Math.random() - .5) * .3 }; nextSaccade = 1 + Math.random() * 2.5; }
     const idleGaze = emotion === "thinking" || emotion === "surprised" ? 0 : 1;
+    gaze.x += (saccade.x * idleGaze - gaze.x) * (1 - Math.exp(-dt * 8));
+    gaze.y += (saccade.y * idleGaze - gaze.y) * (1 - Math.exp(-dt * 8));
 
-    // body
-    const breathe = Math.sin(t * 2.1) * .012;
-    const hop = cur.hop * Math.max(0, Math.sin(t * 7)) * 7;
-    const sway = Math.sin(t * 1.3) * 1.2;
-    const sy = cur.sy + breathe + level * .09 + pop * .06;
-    const sx = cur.sx - breathe * .6 - level * .045 - pop * .03;
-    const ty = cur.ty - hop - level * 4;
-    const rot = cur.rot + sway + (emotion === "celebrating" ? Math.sin(t * 9) * 4 : 0);
-    P.char.setAttribute("transform", `translate(100 ${160 + ty}) rotate(${rot}) scale(${sx} ${sy}) translate(-100 -160)`);
-    set(P.shadow, { rx: 48 * (1 - (-ty) / 60) * sx, opacity: 1 - Math.min(.6, -ty / 30) });
+    const motion = reducedMotion.matches ? 0 : 1;
+
+    // Keep the body at a fixed height and size in every emotion and audio state.
+    const tx = motion * Math.sin(t * .45) * 1.2;
+    P.char.setAttribute("transform", `translate(${tx} 0)`);
     P.blushL.setAttribute("opacity", cur.blush * .55); P.blushR.setAttribute("opacity", cur.blush * .55);
 
     // eyes
-    const gx = (cur.gx + saccade.x * idleGaze) * 9, gy = (cur.gy + saccade.y * idleGaze) * 7 - level * 1.5;
+    const gx = (cur.gx + gaze.x * motion) * 9, gy = (cur.gy + gaze.y * motion) * 7;
     for (const side of ["L", "R"]) {
       const sign = side === "L" ? -1 : 1;
       const cx = 100 + sign * 22 + gx, cy = 98 + gy;
@@ -161,7 +159,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
 
     // thinking dots
     const dots = P.dots.children;
-    for (let i = 0; i < 3; i++) set(dots[i], { cx: 160 + i * 11, cy: 42 - i * 10 + Math.sin(t * 4 + i) * 2, opacity: cur.dots * (.5 + .5 * Math.sin(t * 5 - i)) });
+    for (let i = 0; i < 3; i++) set(dots[i], { cx: 160 + i * 11, cy: 42 - i * 10, opacity: cur.dots * (.5 + .5 * Math.sin(t * 5 - i)) });
 
     // sparkles
     if (cur.sparkles > .5 && Math.random() < dt * 9) spawnSparkle();
@@ -171,7 +169,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
       if (s.life <= 0) { s.el.remove(); sparkles.splice(i, 1); }
     }
 
-    onFrame?.({ emotion, level, cur, body: { sx, sy, rot, ty } });
+    onFrame?.({ emotion, level, cur, body: { sx: 1, sy: 1, rot: 0, ty: 0 } });
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);

@@ -23,7 +23,7 @@
   <h3>Gesicht direkt setzen</h3>
   <div class="grid" id="emotions"></div>
 
-  <h3>Sprechen (Audio → Squash & Stretch)</h3>
+  <h3>Audio testen</h3>
   <div class="grid">
     <button id="btnSim">Sprache simulieren</button>
     <button id="btnMic">Mikrofon nutzen</button>
@@ -81,6 +81,7 @@ function simLevel(dt) {
   return phrase * (0.35 + 0.65 * syll) * (0.75 + 0.25 * Math.random());
 }
 function setSource(next) {
+  if (source === "mic" && next !== "mic") avatar.handle({ type: "activity", state: "idle" });
   source = next;
   if (next !== "mic") avatar.setLevelSource(next === "sim" ? simLevel : null);
   $("btnSim").classList.toggle("on", source === "sim"); $("btnMic").classList.toggle("on", source === "mic");
@@ -89,6 +90,9 @@ $("btnSim").onclick = () => setSource(source === "sim" ? "none" : "sim");
 $("btnMic").onclick = async () => {
   if (source === "mic") return setSource("none");
   avatar.attachAudio(await navigator.mediaDevices.getUserMedia({ audio: true }));
+  timers.forEach(clearTimeout); timers = [];
+  avatar.reset();
+  avatar.handle({ type: "activity", state: "listening" });
   setSource("mic");
 };
 

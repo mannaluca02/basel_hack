@@ -1,6 +1,6 @@
 // PROTOTYPE — GPT-Live (WebRTC) → the existing AvatarEvents contract.
 // sessionUrl exchanges SDP on the backend; the API key stays there.
-const MODEL_EMOTIONS = ["neutral", "happy", "empathetic", "concerned", "surprised", "celebrating"];
+import { REPLY_EMOTIONS as MODEL_EMOTIONS } from "./pax-avatar-controller.js";
 
 export async function connectOpenAIRealtime({ sessionUrl, audioElement, onAudioStream, onAvatarEvent, onTranscript, onLog = () => {} }) {
   const logged = new Set();

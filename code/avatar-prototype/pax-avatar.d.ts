@@ -1,7 +1,7 @@
 // PROTOTYPE — types for pax-avatar.js (rig + shared types). Controller: pax-avatar-controller.d.ts.
 // Contract: see AVATAR-INTERFACE.md.
 
-export type ReplyEmotion = "neutral" | "happy" | "empathetic" | "concerned" | "surprised" | "celebrating";
+export type ReplyEmotion = "neutral" | "happy" | "empathetic" | "concerned" | "surprised" | "celebrating" | "reassuring" | "curious" | "unsure";
 export type Face = ReplyEmotion | "listening" | "thinking";
 
 export type AvatarEvent =
