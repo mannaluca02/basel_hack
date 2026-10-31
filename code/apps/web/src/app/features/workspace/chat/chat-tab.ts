@@ -128,7 +128,7 @@ interface ChatLine {
     }
 
     .speaker {
-      font-weight: 600;
+      font-weight: var(--font-weight-bold);
     }
 
     .bubble {
@@ -226,7 +226,7 @@ interface ChatLine {
       color: var(--text-on-brand);
       background: var(--bg-brand);
       font: inherit;
-      font-weight: 600;
+      font-weight: var(--font-weight-bold);
       cursor: pointer;
     }
 

@@ -1,5 +1,12 @@
 <header class="bar">
-  <span class="brand">{{ 'app.name' | transloco }}</span>
+  <!-- Pax logo: positive on the light page, negative (white dot) in the dark theme. -->
+  <span class="brand">
+    <picture>
+      <source srcset="brand/pax-logo-negative.svg" media="(prefers-color-scheme: dark)" />
+      <img class="logo" src="brand/pax-logo-positive.svg" alt="Pax" width="62" height="20" />
+    </picture>
+    <span class="product">{{ 'app.product' | transloco }}</span>
+  </span>
   <span class="demo">
     <span aria-hidden="true">{{ 'demo.badge' | transloco }}</span>
     <span class="visually-hidden">{{ 'demo.label' | transloco }}</span>

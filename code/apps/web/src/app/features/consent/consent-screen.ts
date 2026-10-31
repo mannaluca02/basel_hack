@@ -104,6 +104,7 @@ interface NoticeSection {
       color: var(--text-on-brand);
       background: var(--bg-brand);
       font: inherit;
+      font-weight: var(--font-weight-medium);
       font-weight: 700;
       cursor: pointer;
 

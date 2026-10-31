@@ -81,8 +81,13 @@
   --stroke-border: 0.075rem;
   --stroke-focusring: 0.125rem;
 
-  /* Font. Pax uses "Civil Premium", which is licensed; add it in front once the team has access. */
-  --font-family: system-ui, -apple-system, sans-serif;
+  /* Font. Pax uses "Civil Premium" (Pax Civil), which is licensed: it applies where installed,
+     otherwise the system font, as on ui.pax.ch. Pax Brand allows only three weights: Bold for
+     headings and highlights, Medium for CTAs and buttons, Regular for text. No Semi-Bold. */
+  --font-family: 'Civil Premium', 'Pax Civil', system-ui, -apple-system, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
 
   /* Semantic: light */
   --bg-default: var(--color-neutral-white);

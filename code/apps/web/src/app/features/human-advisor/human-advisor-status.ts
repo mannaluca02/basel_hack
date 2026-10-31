@@ -85,6 +85,7 @@ import { HumanAdvisor } from '../../core/advisor/api/human-advisor';
       color: inherit;
       background: none;
       font: inherit;
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
     }
 

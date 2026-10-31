@@ -55,6 +55,14 @@ describe('App', () => {
     return { fixture, root, navigate };
   }
 
+  it('shows the Pax logo in the header, the dark variant in the dark theme', async () => {
+    const { root } = await renderShell();
+
+    expect(root.querySelector('.bar img.logo')?.getAttribute('src')).toBe('brand/pax-logo-positive.svg');
+    expect(root.querySelector('.bar img.logo')?.getAttribute('alt')).toBe('Pax');
+    expect(root.querySelector('.bar source')?.getAttribute('media')).toBe('(prefers-color-scheme: dark)');
+  });
+
   it('renders one link per workspace tab in the rail, Graphics first', async () => {
     const { root } = await renderShell();
     const links = root.querySelectorAll('.rail nav a');
