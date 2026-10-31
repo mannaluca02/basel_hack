@@ -125,6 +125,12 @@ const callbacks = {
     const active = state === "connecting" || state === "connected" || state === "switching";
     $("avatar").disabled = active;
     $("stop").hidden = !active;
+    $("show-visual").hidden = !active;
+    if (!active) {
+      $("visual").hidden = true;
+      $("show-visual").textContent = "Grafik zeigen (Test)";
+      demoChart = -1;
+    }
     $("hint").textContent = active ? "" : inactive ? "Tippe auf Paxi, um weiterzumachen." : "Tippe auf Paxi, um das Gespräch zu starten.";
     if (paxi?.logUrl) {
       $("download").href = paxi.logUrl;
@@ -133,7 +139,42 @@ const callbacks = {
   },
 };
 
+const tellAppRaw = (message) => {
+  if (appOrigin && window.opener && !window.opener.closed) window.opener.postMessage(message, appOrigin);
+};
+
+// VOICE-08: the app makes the backend calls (presented, answer, cancel) with the customer session.
+callbacks.onConfirmation = (event) => {
+  console.info("Paxi confirmation", JSON.stringify(event));
+  tellAppRaw({ type: "pax.confirmation", ...event });
+};
+
+// VOICE-10: the voice server restarted during the call. A linked call asks the app for a fresh
+// case link; an unlinked one comes back from its log file right away.
+callbacks.onServerLost = async ({ conversationId, linked }) => {
+  $("status").textContent = linked ? "Verbindung zum Fall unterbrochen – wird wiederhergestellt…" : "Verbindung zum Server unterbrochen – wird wiederhergestellt…";
+  if (linked && appOrigin && window.opener && !window.opener.closed) {
+    tellAppRaw({ type: "pax.relink", conversationId });
+    return;
+  }
+  await reattach({});
+};
+
+async function reattach({ link }) {
+  try {
+    const result = await paxi.reattach({ link });
+    $("status").textContent = result?.case_linked || !caseLink ? statusText.connected : "Nicht mehr mit dem Fall verbunden – Angaben bleiben nur hier.";
+    tellAppRaw({ type: "pax.status", state: "connected", caseLinked: Boolean(result?.case_linked) });
+  } catch (error) {
+    console.error("Reattach failed", error);
+    // Retried on the next lost poll; the person can keep talking meanwhile.
+    setTimeout(() => reattach({ link }), 3000);
+  }
+}
+
 const paxi = createPaxiVoice({ ...callbacks, caseLink });
+// For tests from the browser console (demo page only).
+window.paxi = paxi;
 
 // Call controls of the customer app that opened this window (FE-10). Only that window may steer
 // the call, and only with these actions.
@@ -145,6 +186,17 @@ window.addEventListener("message", (event) => {
   else if (action === "mute") paxi.setMuted(true);
   else if (action === "unmute") paxi.setMuted(false);
   else if (action === "stop_speaking") paxi.stopSpeaking();
+  // Steering from the app: topics, visuals (shown, updated, hidden), priorities, ending.
+  else if (action === "steer") paxi.steer(event.data.command).catch((error) => console.error("Steering failed", error));
+  else if (action === "visual") paxi.steer({ ...event.data.visual, type: "visual" }).catch((error) => console.error("Visual failed", error));
+  else if (action === "confirm") {
+    try {
+      paxi.confirm(event.data.confirmation);
+    } catch (error) {
+      console.error("Confirmation failed", error);
+    }
+  } else if (action === "cancel_confirmation") paxi.cancelConfirmation();
+  else if (action === "relink" && typeof event.data.link === "string") reattach({ link: event.data.link });
   else if (action === "language" && ["de", "fr", "it", "en"].includes(event.data.language)) paxi.setLanguage(event.data.language);
 });
 
@@ -176,3 +228,34 @@ $("avatar").addEventListener("click", () => {
   paxi.start({ resume, priorities: [...priorities] }).catch(() => {});
 });
 $("stop").addEventListener("click", () => paxi.stop());
+
+// Simulates a chart from the calculation appearing mid-conversation: Paxi finishes the
+// current exchange, then describes and comments on it.
+// The second tap changes the chart, like a recalculation after a new answer.
+const demoCharts = [
+  { today: 85_000, retired: 52_000 },
+  { today: 85_000, retired: 61_000 },
+];
+let demoChart = -1;
+function demoChartData({ today, retired }) {
+  const gap = today - retired;
+  const bars = $("visual").querySelectorAll(".bar span:last-child");
+  const chf = (value) => value.toLocaleString("de-CH");
+  bars[1].textContent = chf(retired);
+  bars[1].style.width = `${Math.round((retired / today) * 100)}%`;
+  bars[2].textContent = chf(gap);
+  bars[2].style.width = `${Math.round((gap / today) * 100)}%`;
+  return {
+    id: "demo_income_gap",
+    title: "Einkommen heute und ab der Pension",
+    revision: demoChart + 1,
+    description: `Example values for the demo, not the person's own numbers: today's income is CHF ${chf(today)} a year; from retirement, AHV and pension fund together pay about CHF ${chf(retired)} a year. That leaves a gap of about CHF ${chf(gap)} a year, roughly ${Math.round((gap / today) * 100)} percent.`,
+  };
+}
+$("show-visual").addEventListener("click", async () => {
+  demoChart = Math.min(demoChart + 1, demoCharts.length - 1);
+  const visual = demoChartData(demoCharts[demoChart]);
+  $("visual").hidden = false;
+  $("show-visual").textContent = "Grafik ändern (Test)";
+  await (demoChart === 0 ? paxi.showVisual(visual) : paxi.updateVisual(visual)).catch((error) => console.error("Visual failed", error));
+});

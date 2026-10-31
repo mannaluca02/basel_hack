@@ -45,7 +45,9 @@ export function addSession(log, { sessionId, voice, language, offsetMs }) {
 }
 
 // Transcript deltas carry no turn IDs, so turns are grouped by speaker and timing.
-export function addTranscriptFragment(log, { speaker, text, start_ms, end_ms }) {
+// reply_id marks the turn with a message ID given from outside (a confirmation question the
+// customer app created); such a turn is never merged with the turn before it.
+export function addTranscriptFragment(log, { speaker, text, start_ms, end_ms, reply_id }) {
   let turn = null;
   for (let i = log.transcript.length - 1; i >= 0; i--) {
     if (log.transcript[i].speaker === speaker) {
@@ -53,12 +55,12 @@ export function addTranscriptFragment(log, { speaker, text, start_ms, end_ms }) 
       break;
     }
   }
-  if (turn && start_ms - turn.end_ms <= TURN_GAP_MS) {
+  if (turn && start_ms - turn.end_ms <= TURN_GAP_MS && turn.replyId === reply_id) {
     turn.text += text;
     turn.end_ms = Math.max(turn.end_ms, end_ms);
     return;
   }
-  log.transcript.push({ speaker, text, start_ms, end_ms });
+  log.transcript.push({ speaker, text, start_ms, end_ms, ...(reply_id ? { replyId: reply_id } : {}) });
   log.transcript.sort((a, b) => a.start_ms - b.start_ms);
 }
 
