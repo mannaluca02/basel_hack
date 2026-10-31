@@ -11,8 +11,9 @@ export interface AppEnvironment {
   readonly apiBaseUrl: string;
   readonly dataSource: DataSourceMode;
   /**
-   * Origin of the separate voice agent (Paxi) the customer can hand the case to; absent when the
-   * build has no voice agent. Must be `localhost` so the browser grants the microphone.
+   * Origin of the separate voice agent (Paxi) the customer can hand the case to; only the `paxi`
+   * configuration sets it, the others talk through the live voice in the app. Must be `localhost`
+   * so the browser grants the microphone.
    */
   readonly voiceAgentUrl?: string;
   /**

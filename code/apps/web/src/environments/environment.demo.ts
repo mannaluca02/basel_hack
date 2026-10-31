@@ -6,5 +6,4 @@ export const environment: AppEnvironment = {
   apiBaseUrl: '/api',
   dataSource: 'api',
   demoStart: true,
-  voiceAgentUrl: 'http://localhost:3100',
 };

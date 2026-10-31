@@ -119,6 +119,12 @@ export class App {
 
   /** The live voice needs the case service; the scripted mock has no voice sessions. */
   protected readonly liveVoice = inject(APP_ENVIRONMENT).dataSource === 'api';
+  /**
+   * The call bar drives the scripted call (mock) or Paxi's window (`paxi` configuration); with the
+   * backend otherwise, the live voice's microphone button is the call control.
+   */
+  protected readonly callControls =
+    inject(APP_ENVIRONMENT).dataSource === 'mock' || !!inject(APP_ENVIRONMENT).voiceAgentUrl;
   /** Link to the Voice Lab, only in the debug configurations. */
   protected readonly debugVoice = inject(APP_ENVIRONMENT).debugVoice === true;
 

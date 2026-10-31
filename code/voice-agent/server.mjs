@@ -27,8 +27,9 @@ try {
   // No .env at the repo root; rely on the process environment.
 }
 
-// 3100, so it runs next to the case backend on 3000.
-const port = Number(process.env.PORT ?? 3100);
+// 3100, so it runs next to the case backend on 3000. Inside the backend process (see
+// apps/api/src/main.ts) PAX_VOICE_AGENT_PORT sets it, so the backend's PORT does not apply.
+const port = Number(process.env.PAX_VOICE_AGENT_PORT ?? process.env.PORT ?? 3100);
 const origin = `http://localhost:${port}`;
 const liveModel = process.env.LIVE_MODEL ?? "gpt-live-1";
 const backendModel = process.env.LIVE_BACKEND_MODEL ?? "gpt-6-luna";
@@ -708,4 +709,16 @@ function historyItems(log) {
   );
 }
 
-app.listen(port, "127.0.0.1", () => console.log(`Voice agent: open ${origin}`));
+/** Starts listening; the case backend calls this to run Paxi in its own process. */
+export function startVoiceAgent() {
+  return new Promise((resolveStart, rejectStart) => {
+    const server = app.listen(port, "127.0.0.1", (error) => {
+      if (error) return rejectStart(error);
+      console.log(`Voice agent: open ${origin}`);
+      resolveStart(server);
+    });
+  });
+}
+
+// Run on its own: npm start in this folder.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await startVoiceAgent();
