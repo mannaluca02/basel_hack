@@ -207,18 +207,6 @@
         <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
       }
     </section>
-
-    @if (caseId(); as id) {
-      @for (stage of npsStage() ? [npsStage()!] : []; track stage) {
-        <app-nps-card [caseId]="id" [stage]="stage" />
-      }
-    }
-
-    @if (demoStart) {
-      <p class="pm">
-        <a class="link" routerLink="/insights">{{ 'journey.insightsLink' | transloco }}</a>
-      </p>
-    }
   }
 </section>
 

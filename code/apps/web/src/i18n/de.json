@@ -551,7 +551,6 @@
     "dossierNote": "Alle Angaben, Annahmen, Begründungen und Quellen deiner Beratung, zum Ausdrucken.",
     "working": "Wird bearbeitet …",
     "error": "Das hat nicht geklappt.",
-    "insightsLink": "Für Pax: Produktmanagement-Einblicke (Demo)",
     "document": {
       "terms": "Versicherungsbedingungen",
       "brochure": "Broschüre",
@@ -631,13 +630,6 @@
         }
       }
     },
-    "nps": {
-      "question": "Wie wahrscheinlich ist es, dass du Pax einer Freundin oder einem Kollegen empfiehlst?",
-      "low": "0 = gar nicht",
-      "high": "10 = sehr wahrscheinlich",
-      "thanks": "Danke für deine Rückmeldung!",
-      "score": "{{score}} von 10"
-    },
     "errors": {
       "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "Für diese Person gibt es kein eigenes Einkommen oder Vermögen, das die Prämie tragen kann. Wähle die Lösungen für die andere Person oder sprich mit einer Pax-Fachperson.",
       "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "Für diese Person ist noch kein Betrag erfasst, den sie selbst für Prämien aufwenden möchte.",
@@ -666,7 +658,6 @@
     "handover": "Wünsche nach einer Pax-Fachperson",
     "reasons": "Häufigste Prüfgründe",
     "unavailable": "Diese Ansicht gibt es nur im Demo-Start.",
-    "back": "Zurück zum Abschluss",
     "stage": {
       "intake": "Aufnahme",
       "profile_confirmed": "Profil bestätigt",

@@ -551,7 +551,6 @@
     "dossierNote": "Toutes les données, hypothèses, justifications et sources de ton conseil, prêtes à imprimer.",
     "working": "En cours …",
     "error": "Cela n’a pas fonctionné.",
-    "insightsLink": "Pour Pax : aperçus pour la gestion des produits (démo)",
     "document": {
       "terms": "Conditions d’assurance",
       "brochure": "Brochure",
@@ -631,13 +630,6 @@
         }
       }
     },
-    "nps": {
-      "question": "Quelle est la probabilité que tu recommandes Pax à une amie ou à un collègue ?",
-      "low": "0 = pas du tout",
-      "high": "10 = très probable",
-      "thanks": "Merci pour ton avis !",
-      "score": "{{score}} sur 10"
-    },
     "errors": {
       "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "Cette personne n’a ni revenu ni fortune propres pour payer la prime. Choisis les solutions pour l’autre personne ou parle à un ou une spécialiste Pax.",
       "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "Aucun montant n’est encore saisi que cette personne souhaite consacrer elle-même aux primes.",
@@ -666,7 +658,6 @@
     "handover": "Demandes d’un ou une spécialiste Pax",
     "reasons": "Motifs d’examen les plus fréquents",
     "unavailable": "Cette vue n’existe que dans le démarrage démo.",
-    "back": "Retour au contrat",
     "stage": {
       "intake": "Saisie",
       "profile_confirmed": "Profil confirmé",

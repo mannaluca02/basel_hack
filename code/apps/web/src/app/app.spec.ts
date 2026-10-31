@@ -371,12 +371,14 @@ describe('App voice per configuration', () => {
     const root = await renderWith({ dataSource: 'api', demoStart: true });
 
     expect(root.querySelector('.rail a[href="/voice-lab"]')).toBeNull();
+    expect(root.querySelector('.rail a[href="/insights"]')).toBeNull();
   });
 
   it('adds the Voice Lab tab to the rail with debugVoice', async () => {
     const root = await renderWith({ dataSource: 'api', demoStart: true, debugVoice: true });
 
     expect(root.querySelector('.rail a[href="/voice-lab"]')).not.toBeNull();
+    expect(root.querySelector('.rail a[href="/insights"]')).not.toBeNull();
   });
 });
 

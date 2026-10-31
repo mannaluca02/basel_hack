@@ -296,7 +296,7 @@ describe('JourneyView', () => {
       'Demo – kein Versicherungsschutz',
     );
     expect(element().querySelector('.policy')?.textContent).toContain('Demo-Police Pax');
-    expect(element().querySelector('app-nps-card')).not.toBeNull();
+    expect(element().querySelector('app-nps-card')).toBeNull();
 
     // The advice dossier opens in a dialog on the same page, loaded with the app's session.
     const open = button('dossier')!;

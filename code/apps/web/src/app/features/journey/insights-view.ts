@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Insights, JourneyApi } from '../../core/advisor/api/journey-api';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
@@ -17,11 +16,12 @@ const STAGES = [
 /**
  * Product management insights (Nice-to-have): where cases are, where they may drop off, NPS and
  * requests for a human advisor, over all demo cases. Aggregates only: no amounts, no free text,
- * no person. In the demo start the backend reads them with the demo reviewer account.
+ * no person. In the demo start the backend reads them with the demo reviewer account. Only in the
+ * debug configurations (debug-routes.voice.ts), next to the Voice Lab.
  */
 @Component({
   selector: 'app-insights-view',
-  imports: [TranslocoPipe, RouterLink],
+  imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="insights" aria-labelledby="insights-title">
@@ -84,10 +84,6 @@ const STAGES = [
           </ul>
         }
       }
-
-      <p>
-        <a class="link" routerLink="/journey">{{ 'insights.back' | transloco }}</a>
-      </p>
     </section>
   `,
   styles: `

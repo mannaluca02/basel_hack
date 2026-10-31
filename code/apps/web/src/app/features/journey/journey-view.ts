@@ -9,16 +9,14 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { CustomerSummary, PortalDto, SuitabilityCheck, SuitabilityView } from '@pax/contracts';
 import { CustomerApi } from '../../core/advisor/api/customer-api';
-import { FeedbackStage, JourneyApi, Recommendation } from '../../core/advisor/api/journey-api';
+import { JourneyApi, Recommendation } from '../../core/advisor/api/journey-api';
 import { CaseStore } from '../../core/advisor/store/case-store';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { LocaleFormat } from '../../core/i18n/locale-format';
 import { DossierDialog } from './dossier-dialog';
-import { NpsCard } from './nps-card';
 import { SuitabilityForm } from './suitability-form';
 
 type Step =
@@ -94,12 +92,11 @@ const DOCUMENT_KIND: Readonly<Record<string, string>> = {
  * and the policy never claims cover. In the demo start the Pax specialist's steps are simulated
  * by the backend (demo-review) and labelled as such; elsewhere the case waits for a real reviewer.
  *
- * Also the customer's documentation: product documents to acknowledge, the advice dossier, and an
- * NPS question for the reached stage.
+ * Also the customer's documentation: product documents to acknowledge and the advice dossier.
  */
 @Component({
   selector: 'app-journey-view',
-  imports: [TranslocoPipe, RouterLink, NgTemplateOutlet, NpsCard, SuitabilityForm, DossierDialog],
+  imports: [TranslocoPipe, NgTemplateOutlet, SuitabilityForm, DossierDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './journey-view.html',
   styleUrl: './journey-view.scss',
@@ -197,13 +194,6 @@ export class JourneyView {
         );
       return check?.result !== 'suitable';
     });
-  });
-
-  /** The NPS question fits the furthest stage reached. */
-  protected readonly npsStage = computed<FeedbackStage | null>(() => {
-    if (this.currentPolicy()) return 'portal';
-    if (this.recommendation()) return 'recommendation';
-    return this.summary()?.profileVersion ? 'advice' : null;
   });
 
   protected readonly firstPerson = computed(
