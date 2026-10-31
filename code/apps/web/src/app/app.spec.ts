@@ -462,10 +462,17 @@ describe('App before consent', () => {
 });
 
 describe('App during the scripted mock call', () => {
+  beforeAll(async () => {
+    // Lazy tab chunks load on the real clock; the fake one below would run out before they arrive (FE-27).
+    await Promise.all(routes.map((route) => route.loadComponent?.()));
+  });
+
   beforeEach(async () => {
     localStorage.clear();
     sessionStorage.clear();
     sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
+    // jsdom does not scroll; the Graphics tab scrolls to each new chart.
+    Element.prototype.scrollTo = vi.fn() as Element['scrollTo'];
     vi.useFakeTimers();
     TestBed.configureTestingModule({
       imports: [App],
@@ -485,7 +492,10 @@ describe('App during the scripted mock call', () => {
     await TestBed.compileComponents();
   });
 
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (Element.prototype as Partial<Element>).scrollTo;
+  });
 
   it('never switches the tab and clears each dot when its tab is shown', async () => {
     const fixture = TestBed.createComponent(App);
