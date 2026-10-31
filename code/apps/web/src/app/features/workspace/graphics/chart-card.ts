@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ResultStatus } from '../../../core/advisor/contracts';
-import { ChartResult, EventImpactScenario } from '../../../core/advisor/ui-models';
+import { ChartResult, EventImpactScenario, ImpactEventKind } from '../../../core/advisor/ui-models';
 import { AppLanguage } from '../../../core/i18n/language';
 import { LocaleFormat } from '../../../core/i18n/locale-format';
 import { ColorScheme } from '../../../core/theme/color-scheme';
@@ -22,6 +22,8 @@ import { LifeTimeline } from './life-timeline';
 
 /** How long the "updated" marker stays after a new revision arrived. */
 export const UPDATED_MARKER_MS = 4000;
+/** How long a card stays highlighted after another tab pointed to it. */
+export const TARGET_MARKER_MS = 2400;
 
 type Tone = 'success' | 'info' | 'warning' | 'error' | 'muted';
 
@@ -58,8 +60,13 @@ function impactKey(scenario: EventImpactScenario): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[attr.data-chart-id]': 'chart().chartId' },
   template: `
-    <!-- Focus target when the feed's "New chart" pill scrolls here. -->
-    <article class="card" tabindex="-1" [attr.aria-labelledby]="titleId">
+    <!-- Focus target when the feed's "New chart" pill or "Show in Graphics" scrolls here. -->
+    <article
+      class="card"
+      tabindex="-1"
+      [class.targeted]="targeted()"
+      [attr.aria-labelledby]="titleId"
+    >
       <header class="head">
         <h2 class="title" [id]="titleId">{{ titleKey() | transloco }}</h2>
         <span class="badges">
@@ -180,6 +187,8 @@ export class ChartCard {
   protected readonly tableId = `chart-card-table-${nextId++}`;
   protected readonly tableOpen = signal(false);
   protected readonly updated = signal(false);
+  protected readonly targeted = signal(false);
+  private targetTimer: ReturnType<typeof setTimeout> | undefined;
 
   protected readonly titleKey = computed(() => TITLE_KEYS[this.chart().type]);
   protected readonly statusKey = computed(() => STATUS_KEYS[this.chart().status]);
@@ -225,6 +234,20 @@ export class ChartCard {
     this.scenarioKey.set(impactKey(chart.scenarios[index]));
   }
 
+  /**
+   * Another tab pointed here (FE-16): selects the first scenario of `event` on an event-impact
+   * chart, if there is one, and highlights the card for a moment.
+   */
+  highlight(event?: ImpactEventKind): void {
+    const chart = this.chart();
+    const scenario =
+      chart.type === 'event_impact' ? chart.scenarios.find((s) => s.event === event) : undefined;
+    if (scenario) this.scenarioKey.set(impactKey(scenario));
+    this.targeted.set(true);
+    clearTimeout(this.targetTimer);
+    this.targetTimer = setTimeout(() => this.targeted.set(false), TARGET_MARKER_MS);
+  }
+
   constructor() {
     let lastRevision: number | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -239,6 +262,9 @@ export class ChartCard {
         lastRevision = revision;
       });
     });
-    inject(DestroyRef).onDestroy(() => clearTimeout(timer));
+    inject(DestroyRef).onDestroy(() => {
+      clearTimeout(timer);
+      clearTimeout(this.targetTimer);
+    });
   }
 }

@@ -8,10 +8,12 @@ import {
   inject,
   signal,
   untracked,
+  viewChildren,
 } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CaseStore } from '../../../core/advisor/store/case-store';
 import { ChartResult } from '../../../core/advisor/ui-models';
+import { ChartJump } from '../../../core/layout/chart-jump';
 import { ViewScroller } from '../../../core/layout/view-scroller';
 import { MotionPreference } from '../../../core/theme/motion-preference';
 import { ChartCard } from './chart-card';
@@ -135,7 +137,9 @@ export class GraphicsTab {
   private readonly scroller = inject(ViewScroller);
   private readonly motion = inject(MotionPreference);
   private readonly transloco = inject(TranslocoService);
+  private readonly jump = inject(ChartJump);
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
+  private readonly cards = viewChildren(ChartCard);
   /**
    * Not the component injector: a hook registered with that during this view's refresh waits for
    * the view's next refresh, so the follow-scroll fired one event late (seen in the browser).
@@ -164,6 +168,12 @@ export class GraphicsTab {
     effect(() => {
       if (this.scroller.settled() && this.scroller.atBottom()) untracked(() => this.unseen.set([]));
     });
+
+    // "Show in Graphics" from another tab. Wait until the shell has restored this tab's scroll
+    // offset, or the restore would undo the jump.
+    effect(() => {
+      if (this.jump.pending() && this.scroller.settled()) untracked(() => this.showTarget());
+    });
   }
 
   /** Scrolls to the first card that arrived while the user was reading further up. */
@@ -175,6 +185,29 @@ export class GraphicsTab {
     this.scroller.reveal(card, !this.motion.reduced());
     // The pill is gone; continue from the card instead of losing focus to <body>.
     card.querySelector<HTMLElement>('article')?.focus({ preventScroll: true });
+  }
+
+  /** Scrolls to the card another tab pointed to, moves focus there and highlights it. */
+  private showTarget(): void {
+    // Detached while another tab is shown: the next tab switch runs this again.
+    if (!this.host.isConnected) return;
+    const target = this.jump.take();
+    if (!target) return;
+    afterNextRender(
+      {
+        write: () => {
+          const card = this.cardElement(target.chartId);
+          if (!card) return;
+          this.cards()
+            .find((c) => c.chart().chartId === target.chartId)
+            ?.highlight(target.event);
+          this.unseen.update((ids) => ids.filter((id) => id !== target.chartId));
+          this.scroller.reveal(card, !this.motion.reduced());
+          card.querySelector<HTMLElement>('article')?.focus({ preventScroll: true });
+        },
+      },
+      { injector: this.injector },
+    );
   }
 
   /**

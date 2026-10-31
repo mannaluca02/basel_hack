@@ -90,7 +90,31 @@
     "payout": "Paid out at retirement ({{year}})"
   },
   "risks": {
-    "title": "Risks"
+    "title": "Risks",
+    "empty": "Risks appear here as soon as the conversation reveals one.",
+    "open": "Open",
+    "addressed": "Addressed",
+    "pillars": "Affected pillars",
+    "gapAmount": {
+      "month": "{{amount}} per month",
+      "year": "{{amount}} per year",
+      "once": "{{amount}} one-off"
+    },
+    "showInGraphics": "Show in Graphics",
+    "severity": {
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk"
+    },
+    "status": {
+      "needs_data": "Needs data",
+      "addressed": "Addressed"
+    },
+    "announce": {
+      "new": "New risk: {{title}}",
+      "updated": "Risk updated: {{title}}"
+    },
+    "estimatedNote": "≈ estimated"
   },
   "chat": {
     "title": "Chat"

@@ -90,7 +90,31 @@
     "payout": "Auszahlung bei Pensionierung ({{year}})"
   },
   "risks": {
-    "title": "Risiken"
+    "title": "Risiken",
+    "empty": "Sobald im Gespräch ein Risiko erkennbar wird, erscheint es hier.",
+    "open": "Offen",
+    "addressed": "Abgedeckt",
+    "pillars": "Betroffene Säulen",
+    "gapAmount": {
+      "month": "{{amount}} pro Monat",
+      "year": "{{amount}} pro Jahr",
+      "once": "{{amount}} einmalig"
+    },
+    "showInGraphics": "In Grafiken zeigen",
+    "severity": {
+      "high": "Hohes Risiko",
+      "medium": "Mittleres Risiko",
+      "low": "Geringes Risiko"
+    },
+    "status": {
+      "needs_data": "Daten fehlen",
+      "addressed": "Abgedeckt"
+    },
+    "announce": {
+      "new": "Neues Risiko: {{title}}",
+      "updated": "Risiko aktualisiert: {{title}}"
+    },
+    "estimatedNote": "≈ geschätzt"
   },
   "chat": {
     "title": "Chat"
