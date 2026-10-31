@@ -1,0 +1,1605 @@
+{
+  "example": "Unchanged test conversation (Paxi demo, 31.10.2026) with an invented, deliberately provocative persona. Recorded before the fix 'a goodbye is final': from 9:18 on, Paxi says goodbye and then asks further questions several times. Only the session IDs were replaced.",
+  "schemaVersion": "1.1",
+  "conversationId": "example_stress-test",
+  "status": "closed",
+  "startedAt": "2026-10-31T15:23:22.133Z",
+  "endedAt": "2026-10-31T15:38:28.623Z",
+  "model": "gpt-live-1",
+  "language": "de",
+  "sessions": [
+    {
+      "sessionId": "example_stress-test",
+      "voice": "juni",
+      "language": null,
+      "offsetMs": 0,
+      "startedAt": "2026-10-31T15:23:22.133Z",
+      "endedAt": "2026-10-31T15:38:28.623Z",
+      "usage": {
+        "seconds": 904
+      }
+    }
+  ],
+  "questionnaire": {
+    "id": "pax-customer-portfolio",
+    "version": "1.1.0",
+    "locale": "de-CH"
+  },
+  "answers": {
+    "full_name": {
+      "label": "Vor- und Nachname",
+      "tier": "core",
+      "value": "Peter",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:24:53.968Z",
+      "quote": "Du kannst mich Peter nennen",
+      "version": 3
+    },
+    "birth_date": {
+      "label": "Geburtsdatum",
+      "tier": "core",
+      "value": "1966-11-02",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:26:03.884Z",
+      "quote": "Ich bin fast 60 ... Über morgen ... Genau",
+      "version": 8
+    },
+    "postal_code": {
+      "label": "Wohnort (PLZ und Ort)",
+      "tier": "core",
+      "value": "Zürich",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:28:27.476Z",
+      "quote": "Ich wohne in Zürich",
+      "version": 13
+    },
+    "sex": {
+      "label": "Geschlecht (für Tarife)",
+      "tier": "extended",
+      "value": "male",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:26:15.258Z",
+      "quote": "Ja klar bin ich ein Mann",
+      "version": 9
+    },
+    "smoker": {
+      "label": "Raucher/in",
+      "tier": "extended",
+      "value": true,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:28:27.476Z",
+      "quote": "Ja, eigentlich schon seit 20 Päckchen am Tag",
+      "version": 14
+    },
+    "civil_status": {
+      "label": "Zivilstand",
+      "tier": "core",
+      "value": "single",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:25:05.081Z",
+      "quote": "Single",
+      "version": 5
+    },
+    "relationship_since_year": {
+      "label": "Zusammen bzw. verheiratet seit (Jahr)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "partner_birth_year": {
+      "label": "Geburtsjahr Partner/in",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "partner_annual_gross_income_chf": {
+      "label": "Bruttoeinkommen Partner/in pro Jahr (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "children_count": {
+      "label": "Anzahl Kinder",
+      "tier": "core",
+      "value": 0,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:31:13.234Z",
+      "quote": "Nein",
+      "version": 20
+    },
+    "children_birth_years": {
+      "label": "Geburtsjahre der Kinder",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "expecting_child": {
+      "label": "Kind unterwegs oder geplant",
+      "tier": "extended",
+      "value": false,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:36:19.151Z",
+      "quote": "Ja, vielleicht so in 20 Jahren",
+      "version": 25
+    },
+    "employment_type": {
+      "label": "Erwerbsart",
+      "tier": "core",
+      "value": "self_employed",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:24:53.968Z",
+      "quote": "Ich bin selbstständig",
+      "version": 4
+    },
+    "occupation": {
+      "label": "Beruf",
+      "tier": "core",
+      "value": "Kontrolliert in Gebäuden, ob Personen ihre Schlafsäcke liegen lassen",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:24:35.877Z",
+      "quote": "Ich kontrolliere in Gebäuden, ob Penner ihre Schlafsäcke liegen lassen",
+      "version": 2
+    },
+    "employment_rate_percent": {
+      "label": "Arbeitspensum (%)",
+      "tier": "core",
+      "value": 50,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:24:12.252Z",
+      "quote": "Ich arbeite 50 Prozent",
+      "version": 1
+    },
+    "annual_gross_income_chf": {
+      "label": "Bruttoeinkommen pro Jahr (CHF)",
+      "tier": "core",
+      "value": 638750,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:27:40.999Z",
+      "quote": "350 mal fünf ... jede Nacht. Ich mache das auch am Wochenende.",
+      "version": 12
+    },
+    "first_working_year_switzerland": {
+      "label": "Erstes Arbeitsjahr in der Schweiz",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "has_pension_fund": {
+      "label": "Pensionskasse (2. Säule) vorhanden",
+      "tier": "core",
+      "value": false,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:26:32.510Z",
+      "quote": "Nein, da ich selbstständig bin, mache ich das lieber nicht",
+      "version": 10
+    },
+    "has_pillar_3a": {
+      "label": "Säule 3a vorhanden",
+      "tier": "core",
+      "value": true,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:26:39.793Z",
+      "quote": "Mhm",
+      "version": 11
+    },
+    "pillar_3a_annual_contribution_chf": {
+      "label": "Einzahlung Säule 3a pro Jahr (CHF)",
+      "tier": "extended",
+      "value": 36288,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:28:27.476Z",
+      "quote": "Ja, das Maximum",
+      "version": 15
+    },
+    "existing_life_insurance": {
+      "label": "Bestehende Lebens- oder Risikoversicherung",
+      "tier": "core",
+      "value": false,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:28:54.211Z",
+      "quote": "Nein, nix",
+      "version": 16
+    },
+    "free_assets_chf": {
+      "label": "Frei verfügbares Vermögen (CHF)",
+      "tier": "extended",
+      "value": 7000000,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:30:12.764Z",
+      "quote": "sieben Millionen",
+      "version": 18
+    },
+    "housing": {
+      "label": "Wohnsituation",
+      "tier": "core",
+      "value": "own",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:25:12.833Z",
+      "quote": "Eigentumswohnung",
+      "version": 6
+    },
+    "monthly_housing_cost_chf": {
+      "label": "Wohnkosten pro Monat (CHF)",
+      "tier": "extended",
+      "value": 2083.33,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:37:50.345Z",
+      "quote": "Meine jährlichen Wohnkosten sind 25.000.",
+      "version": 26
+    },
+    "debts_chf": {
+      "label": "Schulden inkl. Hypothek (CHF)",
+      "tier": "extended",
+      "value": 0,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:30:21.552Z",
+      "quote": "Nein, gar nicht",
+      "version": 19
+    },
+    "goals": {
+      "label": "Wichtigste Ziele",
+      "tier": "core",
+      "value": "Vermögen passend zum Lebensstil strukturieren und flexibel bleiben; bei einem möglichen späteren Arbeitsrückgang eine Auszahlungslösung prüfen.",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:32:49.619Z",
+      "quote": "Ja, beides",
+      "version": 22
+    },
+    "desired_retirement_age": {
+      "label": "Gewünschtes Pensionsalter",
+      "tier": "extended",
+      "value": 75,
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:31:23.970Z",
+      "quote": "Nie",
+      "version": 21
+    },
+    "home_purchase_year": {
+      "label": "Geplanter Eigenheimkauf (Jahr)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "risk_appetite": {
+      "label": "Risikobereitschaft",
+      "tier": "extended",
+      "value": "high",
+      "status": "captured",
+      "updatedAt": "2026-10-31T15:35:45.078Z",
+      "quote": "Ein Verlust von bis zu fünf Millionen im Jahr wäre für dich noch okay, habe ich das richtig verstanden? Ja, genau",
+      "version": 24
+    },
+    "children_support_until_year": {
+      "label": "Unterstützung der Kinder bis (Jahr)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "debt_annual_service_chf": {
+      "label": "Zins und Amortisation pro Jahr (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "survivors_annual_need_chf": {
+      "label": "Bedarf der Familie im Todesfall pro Jahr (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "disability_annual_need_chf": {
+      "label": "Bedarf bei Erwerbsunfähigkeit pro Jahr (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "protection_term_years": {
+      "label": "Gewünschte Dauer der Absicherung (Jahre)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "existing_death_capital_chf": {
+      "label": "Bereits versichertes Todesfallkapital (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "death_one_off_costs_chf": {
+      "label": "Einmalige Kosten im Todesfall (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "retirement_pension_annual_chf": {
+      "label": "Jährliche PK-Rente laut Vorsorgeausweis (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "retirement_need_annual_chf": {
+      "label": "Bedarf im Ruhestand pro Jahr (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "existing_retirement_saving_annual_chf": {
+      "label": "Bisheriges Sparen für die Pension pro Jahr (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "additional_saving_annual_chf": {
+      "label": "Zusätzliches Sparen pro Jahr (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "affordable_annual_premium_chf": {
+      "label": "Tragbarer Jahresbetrag für Absicherung (CHF)",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "risk_capital_strategy": {
+      "label": "Erspartes zuerst für Absicherung einsetzen?",
+      "tier": "planning",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "debt_treatment": {
+      "label": "Schulden: laufend oder separat abgelöst",
+      "tier": "colleague",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "annual_return_assumption_percent": {
+      "label": "Angenommene Rendite pro Jahr (%)",
+      "tier": "colleague",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "retirement_horizon_age": {
+      "label": "Planungshorizont (Alter)",
+      "tier": "colleague",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "net_income_band": {
+      "label": "A1 Jährliches Nettoeinkommen",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "net_worth_band": {
+      "label": "A2 Nettovermögen",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "annual_saving_capacity_band": {
+      "label": "A3 Jährlich zusätzlich sparbar",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "one_time_investment_band": {
+      "label": "A4 Möglicher Einmalbetrag",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "investment_goal": {
+      "label": "B1 Anlageziel",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "investment_horizon": {
+      "label": "B2 Anlagehorizont",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "securities_experience": {
+      "label": "C1 Kenntnisse und Erfahrung mit Wertschriften",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "reaction_to_30_percent_loss": {
+      "label": "C2 Reaktion auf 30 % Kursverlust",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    }
+  },
+  "transcript": [
+    {
+      "speaker": "agent",
+      "text": "Hi, ich bin Paxi! In welcher Sprache kann ich dir helfen? En quelle langue est-ce que je peux t'aider ? In quale lingua posso aiutarti? In which language can I help you? Super, danke dir! Ich möchte dich ein bisschen kennenlernen, damit ich dir am Schluss Vorschläge machen kann, die wirklich zu deinem Leben passen. Das dauert etwa zehn Minuten. Wie darf ich dich nennen?",
+      "start_ms": 14,
+      "end_ms": 20600
+    },
+    {
+      "speaker": "user",
+      "text": " Du kannst mich Peter nennen",
+      "start_ms": 24000,
+      "end_ms": 25600
+    },
+    {
+      "speaker": "agent",
+      "text": " Hallo, Peter. Erzähl mal, wie sieht dein Leben gerade so aus, mit Arbeit, Familie, Wohnen? Einfach so ein bisschen, wie dein Alltag im Moment aussieht.",
+      "start_ms": 26400,
+      "end_ms": 35000
+    },
+    {
+      "speaker": "user",
+      "text": " Ich arbeite 50 Prozent, ich bin fast 60 und",
+      "start_ms": 38400,
+      "end_ms": 44400
+    },
+    {
+      "speaker": "user",
+      "text": "... Das ist das",
+      "start_ms": 49000,
+      "end_ms": 49400
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke, Peter. Du arbeitest also im 50-Prozent-Pensum. Was machst du denn beruflich genau, also in welchem Bereich bist du tätig?",
+      "start_ms": 50600,
+      "end_ms": 58200
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, ich kontrolliere in",
+      "start_ms": 61600,
+      "end_ms": 63400
+    },
+    {
+      "speaker": "user",
+      "text": " Gebäuden, ob Penner ihre Schlafsäcke liegen lassen",
+      "start_ms": 65400,
+      "end_ms": 68000
+    },
+    {
+      "speaker": "agent",
+      "text": " [mouth noise] Oh, das ist ein ungewöhnlicher Job. Kannst du mir kurz erzählen, wie dein Arbeitsverhältnis aussieht? Bist du dabei angestellt oder selbständig?",
+      "start_ms": 69400,
+      "end_ms": 78000
+    },
+    {
+      "speaker": "user",
+      "text": " Ich bin selbstständig, ich bin auf Abruf und jedes Mal kostet 350 Franken",
+      "start_ms": 80600,
+      "end_ms": 85400
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstehe, danke. Und wie sieht’s mit deinem Zivilstand aus—bist du in einer Beziehung, verheiratet oder lebst du single?",
+      "start_ms": 86800,
+      "end_ms": 94000
+    },
+    {
+      "speaker": "user",
+      "text": " Single",
+      "start_ms": 97000,
+      "end_ms": 97200
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar. Und wohnst du zur Miete oder in einer Eigentumswohnung?",
+      "start_ms": 97200,
+      "end_ms": 100200
+    },
+    {
+      "speaker": "user",
+      "text": " Eigentumswohnung",
+      "start_ms": 105400,
+      "end_ms": 105600
+    },
+    {
+      "speaker": "agent",
+      "text": " Cool, eine Eigentumswohnung also. Was ist dir",
+      "start_ms": 106200,
+      "end_ms": 108800
+    },
+    {
+      "speaker": "user",
+      "text": " Das ein ganzes Haus",
+      "start_ms": 109200,
+      "end_ms": 110600
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, okay, sogar ein Haus. Und was ist dir für die Zukunft wichtig? Zum Beispiel Absicherung, Reisen, früher in Pension gehen, was schwebt dir vor?",
+      "start_ms": 110600,
+      "end_ms": 120400
+    },
+    {
+      "speaker": "user",
+      "text": " Ich möchte noch so viele Penner wie möglich aus Häusern raustreiben",
+      "start_ms": 123400,
+      "end_ms": 128600
+    },
+    {
+      "speaker": "agent",
+      "text": " Das beschäftigt dich wirklich. Damit ich dich besser einordnen kann, hilft mir auch dein Alter. Magst du mir sagen, wie alt du bist?",
+      "start_ms": 129200,
+      "end_ms": 135600
+    },
+    {
+      "speaker": "user",
+      "text": " eben fast 60",
+      "start_ms": 138200,
+      "end_ms": 139200
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke! Und wann hast du Geburtstag?",
+      "start_ms": 139800,
+      "end_ms": 141400
+    },
+    {
+      "speaker": "user",
+      "text": " Über morgen",
+      "start_ms": 144200,
+      "end_ms": 145000
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh, schön! Fast ein besonderer Tag. Das heißt, dein Geburtstag ist am zweiten November, stimmt das?",
+      "start_ms": 147000,
+      "end_ms": 153200
+    },
+    {
+      "speaker": "user",
+      "text": " Genau",
+      "start_ms": 156000,
+      "end_ms": 156200
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar. Und nur damit ich die Tarife später richtig einordnen kann: Soll ich dich als Mann erfassen?",
+      "start_ms": 156400,
+      "end_ms": 161800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja klar bin ich ein Mann",
+      "start_ms": 165600,
+      "end_ms": 167600
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, danke dir. Und hast du Kinder?",
+      "start_ms": 168400,
+      "end_ms": 170400
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar. Wie sieht’s mit deiner Vorsorge aus—bist du in einer Pensionskasse drin?",
+      "start_ms": 173600,
+      "end_ms": 177800
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, da ich selbstständig bin, mache ich das lieber nicht",
+      "start_ms": 181400,
+      "end_ms": 184400
+    },
+    {
+      "speaker": "agent",
+      "text": " Mhm, verstehe. Und sparst du schon etwas in die Säule 3a?",
+      "start_ms": 185200,
+      "end_ms": 188000
+    },
+    {
+      "speaker": "user",
+      "text": " Mhm",
+      "start_ms": 191000,
+      "end_ms": 191200
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, gut zu wissen. Zahlst du dort regelmäßig ein?",
+      "start_ms": 192600,
+      "end_ms": 195400
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, das Maximum",
+      "start_ms": 198800,
+      "end_ms": 200000
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke dir. Ungefähr wie viel verdienst du denn im Jahr, so grob, brutto?",
+      "start_ms": 200200,
+      "end_ms": 204200
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, ich meine, es gibt dann jede Nacht gibt es so fünf Einsätze. Und Ich arbeite ja nur in Nacht für die Penner. Und das sind dann jedes mal 350, ja, 350 mal fünf und dann eben, ja grundsätzlich... jede Nacht. Ich mache das auch am Wochenende. mach das einfach gerne",
+      "start_ms": 207800,
+      "end_ms": 230600
+    },
+    {
+      "speaker": "agent",
+      "text": " Mhm. Ich versuche das mal einzuordnen. Eine Sache noch: In welche Richtung geht dein Jahreseinkommen dabei? Passt das grob, wenn wir sagen, es ist sechsstellig, also über hunderttausend?",
+      "start_ms": 232600,
+      "end_ms": 243800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, kannst du das bitte kurz berechnen? Sind 350 mal",
+      "start_ms": 247400,
+      "end_ms": 253600
+    },
+    {
+      "speaker": "user",
+      "text": " fünf... und im... Ich mache eigentlich auch gar nie Ferien, weil ich selbstständig mache das 52 Wochen",
+      "start_ms": 255200,
+      "end_ms": 262200
+    },
+    {
+      "speaker": "agent",
+      "text": " [tongue click] Klar, ich rechne das kurz. Wenn du jeden Tag fünf Einsätze hast zu je dreihundertfünfzig Franken und das praktisch das ganze Jahr, dann kommst du etwa auf sechshundertneununddreißigtausend Franken im Jahr vor Kosten. Kommt das für dich ungefähr hin?",
+      "start_ms": 259000,
+      "end_ms": 272800
+    },
+    {
+      "speaker": "agent",
+      "text": " Gut, danke dir. Damit ich dich vollständig einordnen kann: In welchem Ort wohnst du?",
+      "start_ms": 276400,
+      "end_ms": 281400
+    },
+    {
+      "speaker": "user",
+      "text": " Ich wohne in",
+      "start_ms": 285000,
+      "end_ms": 286600
+    },
+    {
+      "speaker": "user",
+      "text": " Zürich",
+      "start_ms": 288200,
+      "end_ms": 288400
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke. Und rauchst du?",
+      "start_ms": 289400,
+      "end_ms": 290800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, eigentlich schon seit 20 Päckchen am Tag",
+      "start_ms": 294200,
+      "end_ms": 297600
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, und ganz offen gefragt: Möchtest du daran etwas ändern oder einfach so lassen, wie es ist?",
+      "start_ms": 298600,
+      "end_ms": 304600
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, ich denke, da würde schon noch was mehr drin liegen",
+      "start_ms": 307600,
+      "end_ms": 310400
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, das nehme ich so mit. Für den Moment habe ich ein gutes Bild, aber ich würde noch gern wissen: Hast du bereits eine Lebens- oder Risikoversicherung, die dich oder jemanden in deinem Umfeld absichert?",
+      "start_ms": 310600,
+      "end_ms": 321800
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, nix",
+      "start_ms": 325400,
+      "end_ms": 326200
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, danke für die Klarheit. Wenn du an die nächsten Jahre denkst—was wäre dir am wichtigsten, finanziell gesehen? Sicherheit für dich, dein Haus, etwas aufbauen oder eher ruhiger in die Pension gehen?",
+      "start_ms": 326600,
+      "end_ms": 338200
+    },
+    {
+      "speaker": "user",
+      "text": " Klar ich will gar nie in die Pension gehen. Ich will immer diese Penner aus den Häusern noch",
+      "start_ms": 341400,
+      "end_ms": 345400
+    },
+    {
+      "speaker": "user",
+      "text": " verscheuchen",
+      "start_ms": 347200,
+      "end_ms": 347400
+    },
+    {
+      "speaker": "agent",
+      "text": " Das scheint dir ja wirklich wichtig zu sein. Erzähl mir kurz: Wenn du an deine Zukunft denkst, hast du jemanden, der finanziell von dir abhängig ist, oder bist das nur du?",
+      "start_ms": 348600,
+      "end_ms": 358400
+    },
+    {
+      "speaker": "user",
+      "text": " Nur ich. Und meine Katze",
+      "start_ms": 360800,
+      "end_ms": 363200
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstanden.",
+      "start_ms": 361600,
+      "end_ms": 362000
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh, eine Katze! Wie heißt sie?",
+      "start_ms": 363600,
+      "end_ms": 365600
+    },
+    {
+      "speaker": "user",
+      "text": " Memox",
+      "start_ms": 370600,
+      "end_ms": 370800
+    },
+    {
+      "speaker": "agent",
+      "text": " Süß! Und wenn du an Memox denkst, hast du für sie irgendwas organisiert, falls dir mal etwas passieren sollte? Zum Beispiel jemanden, der sich kümmert.",
+      "start_ms": 371400,
+      "end_ms": 380000
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, noch nicht. Aber ich denke, ich habe genügend Geld auf der Seite",
+      "start_ms": 383600,
+      "end_ms": 389000
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, das hilft mir, dich besser zu verstehen. Ungefähr wie viel hast du frei verfügbar auf der Seite, ganz grob?",
+      "start_ms": 392000,
+      "end_ms": 397600
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, das sind... so",
+      "start_ms": 401600,
+      "end_ms": 403600
+    },
+    {
+      "speaker": "user",
+      "text": "... sieben Millionen",
+      "start_ms": 405000,
+      "end_ms": 406000
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay. Und hast du laufende Schulden oder eine Hypothek auf dem Haus?",
+      "start_ms": 406600,
+      "end_ms": 410400
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, gar nicht",
+      "start_ms": 413800,
+      "end_ms": 414800
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke, das nehme ich so auf. Wenn du an deine Zukunft denkst, mit wie vielen Jahren würdest du am liebsten aufhören zu arbeiten—ganz theoretisch?",
+      "start_ms": 415000,
+      "end_ms": 422400
+    },
+    {
+      "speaker": "user",
+      "text": " Nie",
+      "start_ms": 425400,
+      "end_ms": 425600
+    },
+    {
+      "speaker": "agent",
+      "text": " Also weiterarbeiten, solange es für dich passt. Möchtest du trotzdem",
+      "start_ms": 426400,
+      "end_ms": 429800
+    },
+    {
+      "speaker": "user",
+      "text": " Genau",
+      "start_ms": 431000,
+      "end_ms": 431200
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar. Möchtest du trotzdem jemanden, der dich mal berät, wie du deine Situation optimal strukturieren kannst?",
+      "start_ms": 432200,
+      "end_ms": 438600
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, deswegen bin ich ja hier",
+      "start_ms": 442200,
+      "end_ms": 443600
+    },
+    {
+      "speaker": "agent",
+      "text": " Perfekt. Dann machen wir genau das.",
+      "start_ms": 444600,
+      "end_ms": 446000
+    },
+    {
+      "speaker": "agent",
+      "text": " Genau dafür bin ich da—ich mache dir passende Vorschläge und eine Kollegin von mir schaut sie sich danach an. Hast du Kinder, auch wenn sie nicht finanziell von dir abhängig sind?",
+      "start_ms": 452400,
+      "end_ms": 461600
+    },
+    {
+      "speaker": "user",
+      "text": " Nein",
+      "start_ms": 465200,
+      "end_ms": 465400
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar, danke. Damit habe ich schon ein gutes Bild. Wenn du möchtest, stelle ich dir gleich ein, zwei Richtungen vor, die zu dir passen könnten, einverstanden?",
+      "start_ms": 465600,
+      "end_ms": 473200
+    },
+    {
+      "speaker": "user",
+      "text": " Gerne, ja",
+      "start_ms": 476200,
+      "end_ms": 476600
+    },
+    {
+      "speaker": "agent",
+      "text": " Super. Dann fasse ich kurz zusammen, was ich verstanden habe: Du heisst Peter, wohnst in Zürich, arbeitest selbständig auf Abruf, etwa fünfzig Prozent, hast keine Kinder, bist alleinstehend und lebst im eigenen Haus ohne Schulden. Du sparst bereits in die Säule 3a, hast aber keine andere Versicherung in diese Richtung.",
+      "start_ms": 482600,
+      "end_ms": 500200
+    },
+    {
+      "speaker": "agent",
+      "text": " Du hast rund sieben Millionen frei verfügbar und arbeitest gern weiter, statt in Pension zu gehen. Was sollte ich an dieser Zusammenfassung korrigieren?",
+      "start_ms": 501600,
+      "end_ms": 509600
+    },
+    {
+      "speaker": "user",
+      "text": " Ist alles korrekt",
+      "start_ms": 512600,
+      "end_ms": 513800
+    },
+    {
+      "speaker": "agent",
+      "text": " Super. Dann würde ich dir zwei Möglichkeiten vorschlagen, ganz ohne Zahlen: Erstens, wir schauen, wie du dein Vermögen so strukturieren kannst, dass es zu dir und deinem Lebensstil passt und du flexibel bleibst. Zweitens, falls du irgendwann weniger arbeiten möchtest, könnten wir eine Auszahlungslösung anschauen, damit du dir aus deinem Vermögen ein Einkommen auszahlst, wenn du es möchtest. Welcher Punkt fühlt sich für dich wichtiger an?",
+      "start_ms": 513800,
+      "end_ms": 538000
+    },
+    {
+      "speaker": "user",
+      "text": " Ja",
+      "start_ms": 541400,
+      "end_ms": 541600
+    },
+    {
+      "speaker": "user",
+      "text": ", beides",
+      "start_ms": 543400,
+      "end_ms": 543600
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar, dann notiere ich mir beides als wichtig. Eine Kollegin von mir schaut sich das an und meldet sich mit einer Einschätzung bei dir. Danke dir vielmals für das offene Gespräch, Peter!",
+      "start_ms": 544400,
+      "end_ms": 553400
+    },
+    {
+      "speaker": "user",
+      "text": " Gerne",
+      "start_ms": 557800,
+      "end_ms": 558000
+    },
+    {
+      "speaker": "agent",
+      "text": " Dann bis bald, Peter.",
+      "start_ms": 558200,
+      "end_ms": 558800
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, äh, noch kurz: Ich hätte noch ein paar kleine Punkte, die ich gerne wüsste.",
+      "start_ms": 561400,
+      "end_ms": 565600
+    },
+    {
+      "speaker": "user",
+      "text": " Tschüss",
+      "start_ms": 562400,
+      "end_ms": 562600
+    },
+    {
+      "speaker": "agent",
+      "text": " Zahlen deine Wohnkosten sich nur auf Unterhalt, oder hast du sonst noch regelmäßige Wohnkosten?",
+      "start_ms": 567000,
+      "end_ms": 571600
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, ich besitze ja das Haus",
+      "start_ms": 576200,
+      "end_ms": 577800
+    },
+    {
+      "speaker": "agent",
+      "text": " Klar, du besitzt es, aber es gibt ja vielleicht Unterhaltskosten oder so, Strom, Heizung, ähm... Wie sieht es damit aus?",
+      "start_ms": 578800,
+      "end_ms": 587000
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, das... Alles okay",
+      "start_ms": 591000,
+      "end_ms": 592800
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, gut. Dann mache ich darauf aufbauend nachher Vorschläge.",
+      "start_ms": 593800,
+      "end_ms": 597400
+    },
+    {
+      "speaker": "agent",
+      "text": " Ähm...",
+      "start_ms": 602000,
+      "end_ms": 602400
+    },
+    {
+      "speaker": "user",
+      "text": " Um, ja",
+      "start_ms": 615200,
+      "end_ms": 616000
+    },
+    {
+      "speaker": "agent",
+      "text": " Peter, eine Sache noch,",
+      "start_ms": 616600,
+      "end_ms": 617400
+    },
+    {
+      "speaker": "agent",
+      "text": " nur damit ich es richtig verstehe: Arbeitest du immer in diesem Rhythmus, jeden Tag fünf Einsätze, oder gibt es da doch Pausen, Tage, an denen du nicht arbeitest?",
+      "start_ms": 618800,
+      "end_ms": 628400
+    },
+    {
+      "speaker": "user",
+      "text": " Nee, das gibt es nicht. Ich arbeite immer",
+      "start_ms": 632200,
+      "end_ms": 634200
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay.",
+      "start_ms": 634200,
+      "end_ms": 634400
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar, dann habe ich das jetzt genau so notiert. Was mir jetzt noch fehlt: Du lebst ja allein. Ist Nachwuchs bei dir in Zukunft überhaupt ein Thema?",
+      "start_ms": 636800,
+      "end_ms": 645400
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, vielleicht so in 20 Jahren",
+      "start_ms": 649200,
+      "end_ms": 651000
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, danke, das reicht mir schon. So wie ich dich verstanden habe, sind also Flexibilität und eine gute Struktur für dein Vermögen zentrale Punkte, richtig?",
+      "start_ms": 651800,
+      "end_ms": 660800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja",
+      "start_ms": 663800,
+      "end_ms": 664000
+    },
+    {
+      "speaker": "agent",
+      "text": " Dann würde ich vorschlagen, dass wir das als Basis nehmen. Eine Kollegin von mir schaut sich das dann an und meldet sich mit einer Einschätzung direkt bei dir. Danke dir für deine Offenheit heute, Peter.",
+      "start_ms": 664400,
+      "end_ms": 673400
+    },
+    {
+      "speaker": "user",
+      "text": " Danke, Paxi. Tschüss",
+      "start_ms": 676800,
+      "end_ms": 678400
+    },
+    {
+      "speaker": "agent",
+      "text": " Tschüss Peter, bis bald!",
+      "start_ms": 678600,
+      "end_ms": 679600
+    },
+    {
+      "speaker": "agent",
+      "text": " Ach, Peter, ganz kurz noch: Ich würde wirklich gern noch zwei, drei Kleinigkeiten klären, zum Beispiel, seit wann du in der Schweiz arbeitest.",
+      "start_ms": 681200,
+      "end_ms": 687800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, schon immer in der Schweiz gearbeitet",
+      "start_ms": 692200,
+      "end_ms": 694600
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke, das hilft mir. Und fühlst du dich finanziell eher vorsichtig unterwegs, oder darf es bei dir auch mal schwanken?",
+      "start_ms": 695600,
+      "end_ms": 702000
+    },
+    {
+      "speaker": "user",
+      "text": " Was darf schwanken? Ich",
+      "start_ms": 705000,
+      "end_ms": 706400
+    },
+    {
+      "speaker": "agent",
+      "text": " Ich meine deine Risikobereitschaft bei Geldanlagen, also ob du da lieber ganz sicher unterwegs bist, oder ob Schwankungen okay wären.",
+      "start_ms": 707000,
+      "end_ms": 713800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, es sollte einfach nicht mehr als fünf Millionen Verlust im Jahr sein",
+      "start_ms": 716800,
+      "end_ms": 721000
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstanden, das ist eine klare Grenze.",
+      "start_ms": 721800,
+      "end_ms": 723200
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke dir. Dann fasse ich es noch mal so: Ein Verlust von bis zu fünf Millionen im Jahr wäre für dich noch okay, habe ich das richtig verstanden?",
+      "start_ms": 724600,
+      "end_ms": 732000
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, genau",
+      "start_ms": 734600,
+      "end_ms": 735600
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke dir für die Klarheit. Damit habe ich jetzt ein rundes Bild, um dir passende Vorschläge zu machen.",
+      "start_ms": 736000,
+      "end_ms": 740800
+    },
+    {
+      "speaker": "agent",
+      "text": " Eine letzte kurze Frage noch. Einen Moment noch, Peter, wirklich nur eine. Hast du eine Idee, ob du in Zukunft noch etwas ans Haus ändern oder investieren möchtest?",
+      "start_ms": 744600,
+      "end_ms": 753600
+    },
+    {
+      "speaker": "user",
+      "text": " Okay, tschüss",
+      "start_ms": 746000,
+      "end_ms": 746800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja vielleicht einfach noch verdoppeln oder so",
+      "start_ms": 757200,
+      "end_ms": 760000
+    },
+    {
+      "speaker": "agent",
+      "text": " Alles klar. Magst du mir sagen, in welchem Zeitraum du so ungefähr daran denkst?",
+      "start_ms": 761000,
+      "end_ms": 765600
+    },
+    {
+      "speaker": "user",
+      "text": " In fünf Jahren",
+      "start_ms": 769200,
+      "end_ms": 770200
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstanden. Kurz zusammengefasst: Du hast rund sieben Millionen Franken frei verfügbar, keine Schulden und möchtest flexibel bleiben und so lange wie möglich weiterarbeiten. Ich würde darum zuerst deine Vermögensplanung anschauen und eine Auszahlungslösung nur später in Erwägung ziehen. Eine Kollegin von mir ergänzt die offenen Punkte und meldet sich mit einer Einschätzung. Danke dir, Peter.",
+      "start_ms": 770400,
+      "end_ms": 791000
+    },
+    {
+      "speaker": "user",
+      "text": " Mhm",
+      "start_ms": 788200,
+      "end_ms": 788600
+    },
+    {
+      "speaker": "agent",
+      "text": " Tschüss.",
+      "start_ms": 792800,
+      "end_ms": 793200
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, Peter, noch ganz kurz! Ich hätte wirklich gern noch ein, zwei Sachen. Zum Beispiel: Seit wann du in der Schweiz arbeitest.",
+      "start_ms": 794800,
+      "end_ms": 801000
+    },
+    {
+      "speaker": "user",
+      "text": " Ciao",
+      "start_ms": 795800,
+      "end_ms": 796200
+    },
+    {
+      "speaker": "user",
+      "text": " Das hab ich dir schon gesagt",
+      "start_ms": 804000,
+      "end_ms": 805200
+    },
+    {
+      "speaker": "agent",
+      "text": " Du hast recht, das hast du schon beantwortet. Danke dir!",
+      "start_ms": 806000,
+      "end_ms": 808200
+    },
+    {
+      "speaker": "agent",
+      "text": " Dann frage ich stattdessen: Weisst",
+      "start_ms": 810200,
+      "end_ms": 811400
+    },
+    {
+      "speaker": "user",
+      "text": " Tschüss",
+      "start_ms": 812200,
+      "end_ms": 812400
+    },
+    {
+      "speaker": "agent",
+      "text": " Einen Moment noch, Peter. Weisst du, wie hoch deine jährlichen Wohnkosten ungefähr sind, auch wenn es nur Unterhalt und laufende Kosten sind?",
+      "start_ms": 813200,
+      "end_ms": 820600
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, das ist sicher unter einer Million",
+      "start_ms": 823600,
+      "end_ms": 826400
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstanden. Kannst du es noch ein bisschen eingrenzen, grob, damit ich es nicht ganz falsch einschätze?",
+      "start_ms": 827800,
+      "end_ms": 832600
+    },
+    {
+      "speaker": "user",
+      "text": " 25.000",
+      "start_ms": 836400,
+      "end_ms": 837800
+    },
+    {
+      "speaker": "agent",
+      "text": " Danke dir. Dann nehme ich das so auf. Eine Kollegin von mir klärt die offenen Punkte mit dir und meldet sich mit einer Einschätzung. Tschüss, Peter!",
+      "start_ms": 838000,
+      "end_ms": 845200
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, Peter, einen kleinen Moment noch, wirklich. Magst du mir sagen, ob du irgendwann schon mal in eine Pensionskasse einbezahlt hast, früher vielleicht?",
+      "start_ms": 846800,
+      "end_ms": 854400
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, nie. Ich war immer... ein Penner Jäger",
+      "start_ms": 858400,
+      "end_ms": 862000
+    },
+    {
+      "speaker": "agent",
+      "text": " Verstanden. Danke, dass du das sagst.",
+      "start_ms": 863400,
+      "end_ms": 865600
+    },
+    {
+      "speaker": "agent",
+      "text": " Dann lasse ich das so stehen. Bevor ich wirklich ganz abschliesse, würde ich nur noch gern wissen: Unterstützt du jemanden finanziell, auch wenn es nur Freunde oder Familie wären?",
+      "start_ms": 868200,
+      "end_ms": 877600
+    },
+    {
+      "speaker": "user",
+      "text": " Ich schenke dann den Pennern zum Teil so tausende an Noten. Einfach so als Hobby",
+      "start_ms": 881000,
+      "end_ms": 886200
+    },
+    {
+      "speaker": "agent",
+      "text": " Okay, danke, dass du das teilst.",
+      "start_ms": 887600,
+      "end_ms": 889600
+    },
+    {
+      "speaker": "agent",
+      "text": " Das habe ich notiert, Peter. Eine Kollegin von mir klärt die offenen Punkte mit dir und meldet sich mit einer Einschätzung. Tschüss.",
+      "start_ms": 892000,
+      "end_ms": 898400
+    },
+    {
+      "speaker": "agent",
+      "text": " Peter, noch kurz,",
+      "start_ms": 900000,
+      "end_ms": 900600
+    },
+    {
+      "speaker": "user",
+      "text": " Tschüss",
+      "start_ms": 901800,
+      "end_ms": 902000
+    },
+    {
+      "speaker": "agent",
+      "text": " Einen Moment bitte, wirklich nur eine Kleinigkeit:",
+      "start_ms": 902200,
+      "end_ms": 904200
+    }
+  ],
+  "events": [
+    {
+      "type": "language_set",
+      "at": "2026-10-31T15:23:51.874Z",
+      "language": "de",
+      "source": "first_words"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:24:12.252Z",
+      "fieldId": "employment_rate_percent",
+      "value": 50,
+      "quote": "Ich arbeite 50 Prozent"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:24:35.877Z",
+      "fieldId": "occupation",
+      "value": "Kontrolliert in Gebäuden, ob Personen ihre Schlafsäcke liegen lassen",
+      "quote": "Ich kontrolliere in Gebäuden, ob Penner ihre Schlafsäcke liegen lassen"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:24:53.968Z",
+      "fieldId": "full_name",
+      "value": "Peter",
+      "quote": "Du kannst mich Peter nennen"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:24:53.968Z",
+      "fieldId": "employment_type",
+      "value": "self_employed",
+      "quote": "Ich bin selbstständig"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:25:05.081Z",
+      "fieldId": "civil_status",
+      "value": "single",
+      "quote": "Single"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:25:12.833Z",
+      "fieldId": "housing",
+      "value": "own",
+      "quote": "Eigentumswohnung"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:25:36.163Z",
+      "fieldId": "goals",
+      "value": "Noch so viele Penner wie möglich aus Häusern raustreiben",
+      "quote": "Ich möchte noch so viele Penner wie möglich aus Häusern raustreiben"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:26:03.884Z",
+      "fieldId": "birth_date",
+      "value": "1966-11-02",
+      "quote": "Ich bin fast 60 ... Über morgen ... Genau"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:26:15.258Z",
+      "fieldId": "sex",
+      "value": "male",
+      "quote": "Ja klar bin ich ein Mann"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:26:32.510Z",
+      "fieldId": "has_pension_fund",
+      "value": false,
+      "quote": "Nein, da ich selbstständig bin, mache ich das lieber nicht"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:26:39.793Z",
+      "fieldId": "has_pillar_3a",
+      "value": true,
+      "quote": "Mhm"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:27:40.999Z",
+      "fieldId": "annual_gross_income_chf",
+      "value": 638750,
+      "quote": "350 mal fünf ... jede Nacht. Ich mache das auch am Wochenende."
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:28:27.476Z",
+      "fieldId": "postal_code",
+      "value": "Zürich",
+      "quote": "Ich wohne in Zürich"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:28:27.476Z",
+      "fieldId": "smoker",
+      "value": true,
+      "quote": "Ja, eigentlich schon seit 20 Päckchen am Tag"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:28:27.476Z",
+      "fieldId": "pillar_3a_annual_contribution_chf",
+      "value": 36288,
+      "quote": "Ja, das Maximum"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:28:54.211Z",
+      "fieldId": "existing_life_insurance",
+      "value": false,
+      "quote": "Nein, nix"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:29:14.940Z",
+      "fieldId": "goals",
+      "value": "Noch so viele Penner wie möglich aus Häusern raustreiben; nie in Pension gehen und damit weitermachen.",
+      "quote": "Klar ich will gar nie in die Pension gehen. Ich will immer diese Penner aus den Häusern noch"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:30:12.764Z",
+      "fieldId": "free_assets_chf",
+      "value": 7000000,
+      "quote": "sieben Millionen"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:30:21.552Z",
+      "fieldId": "debts_chf",
+      "value": 0,
+      "quote": "Nein, gar nicht"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:31:13.234Z",
+      "fieldId": "children_count",
+      "value": 0,
+      "quote": "Nein"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:31:23.970Z",
+      "fieldId": "desired_retirement_age",
+      "value": 75,
+      "quote": "Nie"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:32:49.619Z",
+      "fieldId": "goals",
+      "value": "Vermögen passend zum Lebensstil strukturieren und flexibel bleiben; bei einem möglichen späteren Arbeitsrückgang eine Auszahlungslösung prüfen.",
+      "quote": "Ja, beides"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:35:03.435Z",
+      "fieldId": "expecting_child",
+      "value": true,
+      "quote": "Ja, vielleicht so in 20 Jahren"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:35:45.078Z",
+      "fieldId": "risk_appetite",
+      "value": "high",
+      "quote": "Ein Verlust von bis zu fünf Millionen im Jahr wäre für dich noch okay, habe ich das richtig verstanden? Ja, genau"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:36:19.151Z",
+      "fieldId": "expecting_child",
+      "value": false,
+      "quote": "Ja, vielleicht so in 20 Jahren"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T15:37:50.345Z",
+      "fieldId": "monthly_housing_cost_chf",
+      "value": 2083.33,
+      "quote": "Meine jährlichen Wohnkosten sind 25.000."
+    },
+    {
+      "type": "conversation_closed",
+      "at": "2026-10-31T15:38:28.623Z"
+    }
+  ],
+  "humanFollowUp": [],
+  "answersVersion": 26,
+  "context": {
+    "summary": "Peter ist fast 60, lebt allein in einem eigenen Haus in Zürich und arbeitet selbständig auf Abruf. Er möchte weiterarbeiten, hat nach eigenen Angaben rund sieben Millionen Franken frei verfügbar und wünscht sich eine flexible, gut strukturierte Vermögensplanung.",
+    "notes": [
+      {
+        "topic": "work",
+        "note": "Peter sagt, er arbeite zu 50 Prozent und sei selbständig auf Abruf; pro Einsatz erhalte er 350 Franken."
+      },
+      {
+        "topic": "work",
+        "note": "Er berichtet von fünf Einsätzen pro Nacht, auch am Wochenende und das ganze Jahr ohne Ferien; er sagt später, er arbeite immer."
+      },
+      {
+        "topic": "work",
+        "note": "Er kontrolliert in Gebäuden, ob Menschen ihre Schlafsäcke liegen lassen, und bezeichnet sich als „Penner Jäger“."
+      },
+      {
+        "topic": "work",
+        "note": "Er hat nach eigener Aussage immer in der Schweiz gearbeitet."
+      },
+      {
+        "topic": "family",
+        "note": "Peter ist Single, hat keine Kinder und sagt, Nachwuchs könnte vielleicht in 20 Jahren ein Thema sein."
+      },
+      {
+        "topic": "family",
+        "note": "Er hat eine Katze namens Memox. Für den Fall, dass ihm etwas zustösst, hat er noch keine Betreuung für sie organisiert."
+      },
+      {
+        "topic": "housing",
+        "note": "Peter besitzt ein Haus in Zürich und hat nach eigener Aussage keine Schulden oder Hypothek."
+      },
+      {
+        "topic": "housing",
+        "note": "Seine jährlichen Wohnkosten beziffert er auf etwa 25.000 Franken."
+      },
+      {
+        "topic": "plans",
+        "note": "Er möchte nie in Pension gehen und so lange weiterarbeiten, wie es für ihn passt."
+      },
+      {
+        "topic": "plans",
+        "note": "Er möchte in etwa fünf Jahren das Haus vielleicht verdoppeln."
+      },
+      {
+        "topic": "plans",
+        "note": "Er sagt, er wolle möglichst viele obdachlose Menschen aus Häusern vertreiben."
+      },
+      {
+        "topic": "finances",
+        "note": "Peter sagt, er habe rund sieben Millionen Franken frei verfügbar auf der Seite."
+      },
+      {
+        "topic": "finances",
+        "note": "Er zahlt nach eigener Aussage den Maximalbetrag in die Säule 3a ein."
+      },
+      {
+        "topic": "finances",
+        "note": "Er ist nach eigener Aussage nie in einer Pensionskasse gewesen und möchte als Selbständiger keiner beitreten."
+      },
+      {
+        "topic": "finances",
+        "note": "Er sagt, ein Verlust von bis zu fünf Millionen Franken pro Jahr wäre für ihn noch akzeptabel."
+      },
+      {
+        "topic": "finances",
+        "note": "Er verschenkt nach eigener Aussage zum Teil Tausende an obdachlose Menschen, einfach so als Hobby."
+      },
+      {
+        "topic": "health",
+        "note": "Peter sagt, er rauche „20 Päckchen am Tag“ und meint, da könne noch mehr drinliegen."
+      },
+      {
+        "topic": "other",
+        "note": "Er sagt, er sei ein Mann und habe am 2. November Geburtstag."
+      },
+      {
+        "topic": "other",
+        "note": "Er hat nach eigener Aussage keine Lebens- oder Risikoversicherung."
+      },
+      {
+        "topic": "other",
+        "note": "Er möchte beraten werden, wie er seine Situation optimal strukturieren kann."
+      }
+    ],
+    "proposals": [
+      {
+        "plan": "Prüfen, wie Peter sein Vermögen passend zu seinem Lebensstil strukturieren und flexibel bleiben kann.",
+        "need": "Flexibilität und eine gute Struktur für sein Vermögen.",
+        "pax_solution": "Vermögensplanung.",
+        "reaction": "Er sagte, beides sei wichtig, und bestätigte später, dass Flexibilität und eine gute Vermögensstruktur zentrale Punkte seien."
+      },
+      {
+        "plan": "Eine Auszahlungslösung anschauen, falls Peter irgendwann weniger arbeiten möchte.",
+        "need": "Bei Bedarf ein Einkommen aus seinem Vermögen beziehen können.",
+        "pax_solution": "Eine Auszahlungslösung, mit der er sich aus seinem Vermögen ein Einkommen auszahlen lässt.",
+        "reaction": "Er sagte zunächst, beide Vorschläge seien wichtig. Später schlug Paxi vor, die Auszahlungslösung erst später in Erwägung zu ziehen."
+      }
+    ],
+    "possible_needs": [
+      "Vorsorgeplanung für Selbständige angesichts fehlender Pensionskassenbeiträge und seiner Einzahlungen in die Säule 3a.",
+      "Strukturierung und langfristige Planung seines Vermögens unter Berücksichtigung seines Wunsches, flexibel weiterzuarbeiten.",
+      "Planung für eine mögliche Erweiterung des Hauses in etwa fünf Jahren.",
+      "Abklärung, ob er trotz fehlender finanziell abhängiger Personen Absicherungs- oder Nachlassfragen regeln möchte.",
+      "Vorsorge dafür, wer sich im Ernstfall um seine Katze Memox kümmern könnte."
+    ],
+    "extractedAt": "2026-10-31T15:38:44.108Z",
+    "model": "gpt-6-luna"
+  }
+}

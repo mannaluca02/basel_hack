@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paxi · Expression study</title>
+<style>
+:root { color:#360573; background:#fff; font-family:Arial, sans-serif; }
+* { box-sizing:border-box; }
+body { margin:0; }
+header { text-align:center; background:#360573; color:white; padding:32px 16px 24px; }
+h1 { font-size:clamp(30px,5vw,58px); color:#91cf00; margin:0 0 8px; letter-spacing:-2px; }
+header p { font-size:clamp(17px,2.8vw,29px); margin:0; }
+main { max-width:1200px; margin:28px auto 48px; display:grid; grid-template-columns:repeat(12,1fr); gap:30px 0; padding:0 20px; }
+article { grid-column:span 3; text-align:center; min-width:0; position:relative; }
+article:nth-child(n+9) { grid-column:span 4; }
+article a { display:block; color:inherit; text-decoration:none; border-radius:16px; }
+article a:hover { background:#f8f5fb; }
+.avatar { width:100%; max-width:280px; margin:auto; }
+.avatar svg { display:block; }
+h2 { font-size:25px; letter-spacing:-1px; margin:-4px 0 4px; }
+.subtitle { font-size:18px; min-height:23px; margin:0 0 9px; }
+code { display:inline-block; border-radius:9px; background:#eee5f5; font-size:17px; padding:6px 18px; font-weight:bold; }
+button { display:block; margin:10px auto 0; background:transparent; border:1px solid #dfd3ea; color:#360573; border-radius:20px; padding:5px 15px; cursor:pointer; }
+button:hover { background:#eee5f5; }
+a:focus-visible, button:focus-visible { outline:3px solid #80bd00; outline-offset:3px; }
+body.focused main { display:block; max-width:660px; }
+body.focused .avatar { max-width:560px; }
+.back { display:block; margin:22px auto; text-align:center; color:inherit; }
+@media(max-width:760px) { main { grid-template-columns:repeat(2,1fr); } article, article:nth-child(n+9) { grid-column:span 1; } h2 { font-size:22px; } .subtitle { font-size:16px; min-height:38px; } code { font-size:14px; padding:6px 9px; } }
+@media(max-width:420px) { main { display:block; } article { margin-bottom:32px; } .avatar { max-width:300px; } }
+</style>
+</head>
+<body>
+<header><h1>Paxi · Expression study</h1><p>One character. Eleven conversational expressions.</p></header>
+<main id="gallery" aria-label="Expression gallery"></main>
+<a class="back" href="index.html">Open interactive demo</a>
+<script type="module">
+import { createPaxAvatar, EMOTIONS } from './pax-avatar.js';
+const only = new URLSearchParams(location.search).get('only');
+const focused = Object.hasOwn(EMOTIONS, only);
+document.body.classList.toggle('focused', focused);
+for (const [name, expression] of Object.entries(EMOTIONS)) {
+  if (focused && name !== only) continue;
+  const tile = document.createElement('article');
+  tile.dataset.emotion = name;
+  tile.innerHTML = `<a href="index.html?emotion=${name}"><div class="avatar"></div><h2>${expression.label}</h2><p class="subtitle">${expression.subtitle}</p><code>${name}</code></a><button type="button" aria-label="Replay ${expression.label}">Replay</button>`;
+  document.getElementById('gallery').appendChild(tile);
+  const avatar = createPaxAvatar(tile.querySelector('.avatar'));
+  tile.querySelector('svg').setAttribute('viewBox', '25 15 150 170');
+  avatar.show(name);
+  tile.querySelector('button').onclick = () => avatar.show(name);
+}
+</script>
+</body>
+</html>

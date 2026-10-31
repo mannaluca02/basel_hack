@@ -1,0 +1,18 @@
+{
+  "name": "pax-voice-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GPT-Live-1 voice agent that fills the Pax questionnaire and logs the conversation as JSON",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "openai": "^7.46.0"
+  }
+}

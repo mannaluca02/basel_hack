@@ -1,0 +1,137 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Pax Beratercharakter: a square mascot, eyes only, no mouth.
+  Left buttons set the face directly (design check). "Beratung abspielen" sends the same AvatarEvents
+  a voice adapter sends (see AVATAR-INTERFACE.md), including a false barge-in that must not interrupt.
+  ?emotion=<key> sets the start face. Served by server.mjs (ES modules do not load from file://).
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PROTOTYPE · Pax Beratercharakter</title>
+<link rel="stylesheet" href="avatar-prototype.css" />
+</head>
+<body>
+<main id="stage">
+  <div id="caption">PROTOTYPE · Pax Beratercharakter</div>
+  <div id="avatar"></div>
+  <div id="say"></div>
+</main>
+
+<aside id="panel">
+  <p><a href="expressions.html">Expression study · alle 11 Ausdrücke</a></p>
+  <h3>Gesicht direkt setzen</h3>
+  <div class="grid" id="emotions"></div>
+
+  <h3>Audio testen</h3>
+  <div class="grid">
+    <button id="btnSim">Sprache simulieren</button>
+    <button id="btnMic">Mikrofon nutzen</button>
+  </div>
+  <div style="margin-top:8px" class="meter"><div id="meter"></div></div>
+
+  <h3>Gesprächs-Demo (AvatarEvents)</h3>
+  <div class="grid"><button class="wide" id="btnScript">▶ Beratung abspielen</button></div>
+
+  <h3>Zustand</h3>
+  <pre id="state"></pre>
+
+  <h3>AvatarEvents</h3>
+  <pre id="log"></pre>
+</aside>
+
+<script type="module">
+import { createPaxAvatar, EMOTIONS } from "./pax-avatar.js";
+
+const $ = (id) => document.getElementById(id);
+let source = "none";      // none | sim | mic
+
+const avatar = createPaxAvatar($("avatar"));
+setInterval(() => {
+  const s = avatar.state;
+  $("meter").style.width = (s.level * 100).toFixed(0) + "%";
+  $("state").textContent = `face      ${s.face}\nactivity  ${s.activity}\nplaying   ${s.playing ?? "–"}\nreply     ${s.replyEmotion}\naudio     ${source}  level ${s.level.toFixed(2)}`;
+  document.querySelectorAll("[data-emo]").forEach(b => b.classList.toggle("on", b.dataset.emo === s.face));
+}, 100);
+
+function log(line) {
+  $("log").textContent = `${line}\n` + $("log").textContent.slice(0, 4000);
+}
+
+// ---------- Direct face buttons (design check, bypasses the controller) ----------
+for (const key in EMOTIONS) {
+  const b = document.createElement("button");
+  b.textContent = EMOTIONS[key].label; b.dataset.emo = key;
+  b.onclick = () => avatar.show(key);
+  $("emotions").appendChild(b);
+}
+
+// ---------- Audio ----------
+// Fake speech: syllables at ~5 Hz, words, short pauses
+let simT = 0, simLast = performance.now();
+function simLevel() {
+  const now = performance.now();
+  simT += Math.min(.05, (now - simLast) / 1000); simLast = now;
+  const phrase = (Math.sin(simT * 0.9) + Math.sin(simT * 2.3 + 1)) > -0.9 ? 1 : 0;
+  const syll = Math.max(0, Math.sin(simT * 2 * Math.PI * 4.7)) ** 0.6;
+  return phrase * (0.35 + 0.65 * syll) * (0.75 + 0.25 * Math.random());
+}
+function setSource(next) {
+  if (source === "mic" && next !== "mic") avatar.handle({ type: "activity", state: "idle" });
+  source = next;
+  if (next !== "mic") avatar.attachAudio(next === "sim" ? simLevel : null);
+  $("btnSim").classList.toggle("on", source === "sim"); $("btnMic").classList.toggle("on", source === "mic");
+}
+$("btnSim").onclick = () => setSource(source === "sim" ? "none" : "sim");
+$("btnMic").onclick = async () => {
+  if (source === "mic") return setSource("none");
+  avatar.attachAudio(await navigator.mediaDevices.getUserMedia({ audio: true }));
+  timers.forEach(clearTimeout); timers = [];
+  avatar.reset();
+  avatar.handle({ type: "activity", state: "listening" });
+  setSource("mic");
+};
+
+// ---------- Scripted conversation: exactly what a voice adapter would send ----------
+const say = (text) => ({ say: text });
+const SCRIPT = [
+  [0,     { type: "emotion", emotion: "pleased", playbackId: "p1" }],
+  [100,   { type: "playback", event: "started", playbackId: "p1" }, say("Grüezi! Ich bin Pax, Ihr digitaler Vorsorge-Berater.")],
+  [1500,  { type: "activity", state: "listening" }, say("(Geräusch im Raum – Voice ignoriert es, kein Abbruch)")],
+  [3000,  { type: "playback", event: "ended", playbackId: "p1" }, say("")],
+  [3600,  { type: "activity", state: "listening" }, say("(Kunde erzählt von Familie und Job …)")],
+  [6400,  { type: "activity", state: "thinking" }, say("(Vorsorgebild wird berechnet …)")],
+  [8600,  { type: "emotion", emotion: "explaining", playbackId: "p2" }],
+  [8700,  { type: "playback", event: "started", playbackId: "p2" }, say("Bei Erwerbsunfähigkeit sehe ich eine Vorsorgelücke …")],
+  [10600, { type: "activity", state: "listening" }, say("(Kunde unterbricht wirklich)")],
+  [10700, { type: "playback", event: "cancelled", playbackId: "p2" }],
+  [10900, { type: "playback", event: "ended", playbackId: "p2" }, say("(verspätetes Event von p2 – wird ignoriert)")],
+  [13000, { type: "activity", state: "thinking" }, say("")],
+  [14500, { type: "emotion", emotion: "empathetic", playbackId: "p3" }],
+  [14600, { type: "playback", event: "started", playbackId: "p3" }, say("Ich verstehe, das Thema Tod ist nicht einfach.")],
+  [17600, { type: "playback", event: "ended", playbackId: "p3" }],
+  [19600, { type: "activity", state: "listening" }, say("(Kunde: «Dann machen wir das so.»)")],
+  [21400, { type: "activity", state: "thinking" }, say("")],
+  [22400, { type: "emotion", emotion: "presenting_offer", playbackId: "p4" }],
+  [22500, { type: "playback", event: "started", playbackId: "p4" }, say("Ihre Offerte ist bereit. Schauen wir sie gemeinsam an.")],
+  [25000, { type: "playback", event: "ended", playbackId: "p4" }],
+  [27500, { type: "activity", state: "idle" }, say("")],
+];
+let timers = [];
+$("btnScript").onclick = () => {
+  timers.forEach(clearTimeout); timers = []; $("log").textContent = "";
+  avatar.reset();
+  SCRIPT.forEach(([t, ev, extra]) => timers.push(setTimeout(() => {
+    const used = avatar.handle(ev);
+    log(`${(t / 1000).toFixed(1).padStart(5)}s ${used ? "" : "(ignored) "}${JSON.stringify(ev)}`);
+    if (extra) $("say").textContent = extra.say;
+    if (source !== "mic") setSource(avatar.state.playing ? "sim" : "none");
+  }, t)));
+};
+
+window.pax = { avatar };
+avatar.show(new URLSearchParams(location.search).get("emotion") || "neutral");
+</script>
+</body>
+</html>

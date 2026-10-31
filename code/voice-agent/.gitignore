@@ -1,0 +1,2 @@
+# Conversation logs contain personal data; never commit them.
+data/
