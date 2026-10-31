@@ -312,3 +312,25 @@ Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jede
 Der vollständige `InsuranceCaseDto` sowie `AdvisorContext`, Kontext-SSE, `SummaryBundle` und `PortalDto` werden aus `@pax/contracts` importiert. Eingaben und Ausgaben sind Zod-validiert; Code und generierte OpenAPI-/JSON-Schemas verwenden dieselben Definitionen. [Team-API-Leitfaden](team-api-guide.md) und [Persistenz-/DB-Entscheid](persistence-and-api.md) sind für den aktuellen ausführbaren Anschluss massgeblich. Die historischen Abschnitte oben zeigen die Herleitung aus dem Workshop.
 
 Neu bereitgestellt sind ausserdem die Team-Nachrichtenschemas `VoiceLogSchema`, `AgentReplySchema`, `VoicePlaybackEventSchema` und `GraphExplanationRequestSchema`. Der entsprechende Transport bzw. STT/LLM/TTS/Avatar wird dadurch nicht als implementiert behauptet. Der aktuelle kanonische Locale-Wert ist `de|fr|it|en`; regionale Speech-Codes werden im Anbieter-Adapter abgebildet. Finanzielle Antwortreferenzen und Kundenbestätigung bleiben Pflicht.
+
+## 12. Frontend-Modelle aus dem Backend (FE-06, Stand 31.10.2026)
+
+Die Frontend-Modelle aus `code/apps/web/src/app/core/advisor/{contracts,ui-models}.ts` bleiben der Vertrag der Ansichten. Der `ApiDataSource` füllt sie ausschliesslich aus Backend-Ausgaben; neu gerechnet wird nichts. Die Abbildung steht in `core/advisor/api/case-projection.ts` und `summary-projection.ts` und ist mit echter Backend-Ausgabe der Müller-Persona getestet.
+
+| Modell | Quelle im Backend | Abbildung |
+|---|---|---|
+| `IncomeTimelineChart` | `runs[].timeline` des aktuellen Ruhestandslaufs | Monate je Jahr annualisiert; Erwerb und Säulen über beide Personen; Lücke = Entnahme + ungedeckt; Ziel = Bedarf |
+| `EventImpactChart` | Baseline-Lauf: `riskNeeds`, `pillarPicture`, Kennzahl `incomeAnnual` | Je Person EU/Tod (Krankheit), dazu Pensionierung aus dem ersten vollen Rentenmonat; übriges Haushaltseinkommen = Providereinkommen − Säule 1 − Säule 2 |
+| `LifeEventsChart` | bestätigtes Profil | Heirat, Kinder, Eigenheim-Ziel, Pensionierung je Person, heute |
+| `Pillar3aGrowthChart` | neueste `saving3a`-Schätzung (`estimates`) aus den Standardanalysen | Heute bis zur ersten Pensionierung; `taxSaving` = `YearlyTaxSavings` |
+| `RiskItem` | Baseline-Lauf `riskNeeds`, Ruhestands-Zeitreihe | Grössere Lücke aus Krankheit/Unfall je Person und Ereignis; Schwere = Lücke/Bedarf (≥ 25 % hoch) |
+| `ProgressSnapshot` | `GET /advisor/context` → `progress` | Gruppen zusammengefasst; „Szenarien“ erledigt, sobald gerechnet |
+| `SummaryBundle` | `GET /summaries` (Kunden-Sicht) + Kontext + Risiken | Snapshot-/Lauf-Bindung, Kennzahlen, Ziele, drei Säulen, offene Lücken; Entwurf solange Prüfung offen; Produkt-Gate mit `suitabilityCheckDone` aus `investmentKnowledgeConfirmed` |
+| `InfoItem` | `GET /summaries` → `assumptions` | Lokalisierte Annahmen des aktuellen Laufs, Kategorie `assumption` |
+| `TranscriptEntry` | `GET /voice/agent-turns` (von Paxis Fall-Brücke aufgezeichnet) | Nur abgeschlossene Beiträge, `status: final` |
+
+Revision und Zeit eines Diagramms stammen aus seinem Lauf bzw. seiner Schätzung. Ein erneutes Laden unveränderter Daten ist damit ein Duplikat und markiert nichts als neu, auch wenn Paxi während eines Gesprächs laufend Kontext-Events auslöst.
+
+Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`).
+
+Noch ohne Quelle: freie Erklärungen und Antworten des Advisors (`AgentReply`, Info-Karten während des Gesprächs) und Live-Zwischenstände des Transkripts.

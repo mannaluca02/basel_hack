@@ -9,6 +9,7 @@ import { AdvisorDataSource, AdvisorEvent, ConnectionState } from '../advisor-dat
 import { provideAdvisorDataSource } from '../provide-advisor-data-source';
 import { ApiDataSource } from './api-data-source';
 import { CUSTOMER_SESSION_KEY, CustomerApi } from './customer-api';
+import mueller from './mueller-case.testing.json';
 import { FakeEventSource } from './review-testing';
 
 const CASE_ID = 'case_api';
@@ -132,6 +133,42 @@ describe('ApiDataSource', () => {
     expect(states.at(-1)).toBe('disconnected');
   });
 
+  it('pushes the current charts, risks, history and summary after a context event', async () => {
+    const { source, http } = setup();
+    const events: AdvisorEvent[] = [];
+    source.events.subscribe((event) => events.push(event));
+    source.connect();
+    FakeEventSource.instances[0].open();
+
+    FakeEventSource.instances[0].emit('advisor.context.updated', { contextRevision: 13 });
+    http.expectOne(`/api/cases/${CASE_ID}`).flush(mueller.case);
+    http.expectOne(`/api/cases/${CASE_ID}/advisor/context`).flush(mueller.context);
+    http.expectOne(`/api/cases/${CASE_ID}/summaries`).flush(mueller.summaries);
+    http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({ turns: [] });
+    await new Promise((resolve) => setTimeout(resolve));
+
+    const types = events.map((event) => event.type);
+    expect(types[0]).toBe('context');
+    expect(types.filter((type) => type === 'chart')).toHaveLength(4);
+    expect(types).toContain('risk');
+    expect(types).toContain('progress');
+    expect(types.at(-1)).toBe('summary');
+  });
+
+  it('starts the demo case again when the stored demo session was refused', async () => {
+    const { source, http } = setup({ csrfToken: 'csrf_old', caseId: 'case_old' }, true);
+    source.connect();
+    FakeEventSource.instances[0].fail({ closed: true });
+
+    http.expectOne('/api/demo/start').flush({ csrfToken: 'csrf_new', caseId: CASE_ID });
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(FakeEventSource.instances.map((stream) => stream.url)).toEqual([
+      '/api/cases/case_old/advisor/events',
+      `/api/cases/${CASE_ID}/advisor/events`,
+    ]);
+  });
+
   it('takes the snapshot from the current case', async () => {
     const { source, http } = setup();
 
@@ -142,14 +179,24 @@ describe('ApiDataSource', () => {
       draft: { financial: null, insurance: null, goals: [], reviewFlags: [] },
       confirmedVersions: [],
       runs: [],
+      estimates: [],
       activeRunId: null,
       proposalBatches: [],
     });
-    http
-      .expectOne(`/api/cases/${CASE_ID}/advisor/context`)
-      .flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    const missing = { status: 404, statusText: 'Not Found' };
+    http.expectOne(`/api/cases/${CASE_ID}/advisor/context`).flush({ code: 'NOT_FOUND' }, missing);
+    http.expectOne(`/api/cases/${CASE_ID}/summaries`).flush({ code: 'NOT_FOUND' }, missing);
+    http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({
+      turns: [{ messageId: 'conv_a0', conversationId: 'conv', speaker: 'agent', text: 'Hoi', at: '2026-10-31T12:00:00.000Z' }],
+    });
 
-    expect(await snapshot).toMatchObject({ caseId: CASE_ID, contextRevision: 12, charts: [] });
+    expect(await snapshot).toMatchObject({
+      caseId: CASE_ID,
+      contextRevision: 12,
+      charts: [],
+      summary: null,
+      transcript: [{ entryId: 'conv_a0', speaker: 'agent', text: 'Hoi', status: 'final' }],
+    });
   });
 });
 

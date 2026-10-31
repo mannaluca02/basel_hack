@@ -11,6 +11,7 @@ import {
   emptySnapshot,
 } from '../advisor-data-source';
 import { CaseProjection, projectCase } from './case-projection';
+import { projectInfo, projectSummary, projectTranscript } from './summary-projection';
 import { CustomerApi } from './customer-api';
 
 /**
@@ -18,9 +19,13 @@ import { CustomerApi } from './customer-api';
  * changed, reload it": this passes it on as a context event, reloads the case and pushes the
  * projected charts, risks and progress as upserts. `CustomerReview` does its own reloading.
  *
- * Transcript, replies and info stay empty: the voice agent keeps its transcript, and the backend
- * has no reply or info routes.
+ * Besides the case it loads the summaries of the current snapshot (summary sheet, Info tab) and
+ * the call history a linked voice agent recorded (Chat tab). Replies stay empty: the backend has
+ * no reply route.
  */
+type Projection = CaseProjection &
+  Pick<AdvisorSnapshot, 'transcript' | 'info' | 'summary'>;
+
 export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);
   private readonly language = inject(AppLanguage);
@@ -45,6 +50,9 @@ export class ApiDataSource extends AdvisorDataSource {
         charts: projection.charts,
         risks: projection.risks,
         progress: projection.progress,
+        transcript: projection.transcript,
+        info: projection.info,
+        summary: projection.summary,
       })),
     );
   }
@@ -107,12 +115,26 @@ export class ApiDataSource extends AdvisorDataSource {
       });
   }
 
-  private async project(caseId: string): Promise<{ contextRevision: number; projection: CaseProjection }> {
-    const [dto, context] = await Promise.all([
+  private async project(caseId: string): Promise<{ contextRevision: number; projection: Projection }> {
+    // Only the case is required; the rest may not exist yet (no analysis, no voice agent).
+    const [dto, context, summaries, turns] = await Promise.all([
       this.api.loadCase(caseId),
       this.api.loadContext(caseId).catch(() => null),
+      this.api.loadSummaries(caseId).catch(() => null),
+      this.api.loadAgentTurns(caseId).catch(() => []),
     ]);
-    return { contextRevision: dto.contextRevision, projection: projectCase(dto, context, this.language.language()) };
+    const language = this.language.language();
+    const at = new Date().toISOString();
+    const projection = projectCase(dto, context, language, at);
+    return {
+      contextRevision: dto.contextRevision,
+      projection: {
+        ...projection,
+        transcript: projectTranscript(turns),
+        info: projectInfo(dto, summaries, language),
+        summary: projectSummary(dto, context, summaries, projection.risks, language),
+      },
+    };
   }
 
   private async push(caseId: string): Promise<void> {
@@ -123,6 +145,9 @@ export class ApiDataSource extends AdvisorDataSource {
       if (projection.progress) this.eventStream.next({ type: 'progress', payload: projection.progress });
       for (const chart of projection.charts) this.eventStream.next({ type: 'chart', payload: chart });
       for (const risk of projection.risks) this.eventStream.next({ type: 'risk', payload: risk });
+      for (const entry of projection.transcript) this.eventStream.next({ type: 'transcript', payload: entry });
+      for (const item of projection.info) this.eventStream.next({ type: 'info', payload: item });
+      if (projection.summary) this.eventStream.next({ type: 'summary', payload: projection.summary });
     } catch (error) {
       // The next context event or reconnect loads again.
       console.error('ApiDataSource: reloading the case failed', error);
