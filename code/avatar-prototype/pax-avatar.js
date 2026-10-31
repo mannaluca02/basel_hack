@@ -26,7 +26,7 @@ const SVG = `
   <ellipse data-part="shadow" cx="100" cy="172" rx="48" ry="7" fill="rgba(54,5,115,.18)" />
   <g data-part="char">
     <rect x="40" y="40" width="120" height="120" rx="34" fill="url(#paxBody)" />
-    <ellipse cx="72" cy="62" rx="22" ry="11" fill="#fff" opacity=".35" transform="rotate(-20 72 62)" />
+    <ellipse data-part="highlight" cx="72" cy="62" rx="22" ry="11" fill="#fff" opacity=".35" transform="rotate(-20 72 62)" />
     <ellipse data-part="blushL" cx="66" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
     <ellipse data-part="blushR" cx="134" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
     <g fill="#360573">
@@ -42,13 +42,18 @@ const SVG = `
 const BASE = {
   gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0,
   wL:1, wR:1, hL:1, hR:1, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
-  tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, nod:0, glance:.08, pulse:0,
+  tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, glance:.08, pulse:0,
+  nod:0, nodFace:0, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:0, nodInterval:3, nodJitter:.25, nodDelay:.2,
   hop:0, shake:0, speech:0, blinkDuration:.18, blinkGap:4,
 };
 export const EMOTIONS = {
   neutral: { label:"Neutral", subtitle:"Calm and available" },
   listening: { label:"Listening", subtitle:"Focused attention", gx:-.18, tilt:-4, sway:.5, speed:.4, glance:.025, blinkDuration:.3, blinkGap:5.5 },
-  acknowledging: { label:"Acknowledging", subtitle:"I hear you", wL:1.05, wR:1.05, hL:.63, hR:.63, nod:2.2, speed:.55 },
+  acknowledging: {
+    label:"Acknowledging", subtitle:"I hear you", wL:1.05, wR:1.05, hL:.63, hR:.63, speed:.55,
+    nod:5.5, nodFace:3, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:.6,
+    nodInterval:4.5, nodJitter:.4, nodDelay:.2,
+  },
   curious: { label:"Curious", subtitle:"Tell me more", hL:1.24, hR:.9, wL:.96, wR:.93, yL:-4, yR:3, tilt:4, gx:.12, pulse:.025, glance:.12 },
   thinking: { label:"Thinking", subtitle:"Considering your question", gx:.25, gy:-.25, hL:1.2, hR:1.05, lidL:.23, lidR:.48, dots:1, glance:.035, speed:.4 },
   explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.9, wR:.9, hL:1.22, hR:1.22, glance:.17, speed:1.2, speech:.025 },
@@ -68,7 +73,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
   const part = (name) => host.querySelector(`[data-part="${name}"]`);
   const P = {};
-  for (const n of ["shadow", "char", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
+  for (const n of ["shadow", "char", "highlight", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
 
   let emotion = "neutral";
   const cur = { ...BASE };
@@ -80,6 +85,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const sparkles = [];
   let dotsEnteredAt = 0;
+  let nodClock = 0, nodInterval = BASE.nodInterval, nodPose = 0;
   const entries = [];
   const dotOpacity = [0, 0, 0];
   const pose = { sx:1, sy:1, rot:0, ty:0, tx:0, lift:0 };
@@ -103,6 +109,11 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
   function setEmotion(key) {
     if (!Object.hasOwn(EMOTIONS, key) || key === emotion) return false;
     emotion = key;
+    if (EMOTIONS[key].nod) {
+      const nodTarget = { ...BASE, ...EMOTIONS[key] };
+      nodClock = -Math.max(nodTarget.nodDelay, blinkDuration ? nextBlink + blinkDuration - blinkT + .04 : 0);
+      nodInterval = nodTarget.nodInterval + (Math.random() * 2 - 1) * nodTarget.nodJitter;
+    }
     if (key === "thinking") dotsEnteredAt = t;
     replay();
     return true;
@@ -152,12 +163,26 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
       if (e.kind === "hop") hop += e.amount * Math.sin(progress * Math.PI) ** 2;
       else shake += e.amount * Math.sin(progress * 5 * Math.PI) * Math.sin(progress * Math.PI) ** 2 * (1 - progress);
     }
-    const nod = Math.max(0, Math.sin(phase * 2)) ** 8 * cur.nod;
+    // An entry-relative clock keeps the gesture independent of the long-running sway phase.
+    if (cur.nod > .001 || target.nod) nodClock += dt;
+    if (cur.nod > .001 && nodClock >= nodInterval) {
+      nodClock -= nodInterval;
+      nodInterval = cur.nodInterval + (Math.random() * 2 - 1) * cur.nodJitter;
+    }
+    const nodDip = (age) => {
+      if (age < 0 || age >= cur.nodDown + cur.nodUp) return 0;
+      return age < cur.nodDown
+        ? (1 - Math.cos(Math.PI * age / cur.nodDown)) / 2
+        : (1 + Math.cos(Math.PI * (age - cur.nodDown) / cur.nodUp)) / 2;
+    };
+    const nodAmount = nodDip(nodClock) + cur.nodSecond * nodDip(nodClock - cur.nodDown - cur.nodUp - cur.nodGap);
+    const nod = nodAmount * cur.nod;
+    nodPose = motion ? nodPose + (nod - nodPose) * (1 - Math.exp(-dt * 16)) : 0;
     const lift = -hop;
     const breath = Math.sin(breathPhase) * cur.breathe;
     const body = {
-      sx:1 + motion * (-breath * .28 + hop * .003),
-      sy:1 + motion * (breath - hop * .003),
+      sx:1 + motion * (-breath * .28 + hop * .003 + nod * .01 / 5.5),
+      sy:1 + motion * (breath - hop * .003 - nod * .02 / 5.5),
       rot:motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2),
       ty:motion * (nod + lift),
     };
@@ -168,11 +193,18 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     for (const key in body) body[key] = pose[key];
     tx = pose.tx;
     set(P.char, { transform:`translate(${tx} ${body.ty}) translate(100 160) rotate(${body.rot} 0 -60) scale(${body.sx} ${body.sy}) translate(-100 -160)` });
-    set(P.shadow, { rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2, opacity:1 + pose.lift * .04 });
+    set(P.shadow, { rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2 + nodPose * .6, opacity:1 + pose.lift * .04, fill:`rgba(54,5,115,${.18 + nodPose * .006})` });
+    const faceDip = nodPose * cur.nodFace / 5.5;
+    set(P.highlight, { cy:62 + nodPose * 1.5 / 5.5 });
+    for (const side of ["L", "R"]) set(P["blush" + side], { cy:118 + faceDip });
     P.blushL.setAttribute("opacity", cur.blush * .8); P.blushR.setAttribute("opacity", cur.blush * .8);
 
     blinkT += dt; let blink = 1;
     if (!motion) { blinkT = 0; blinkDuration = 0; }
+    else if (!blinkDuration && cur.nod > .01 && (nodInterval - nodClock < cur.blinkDuration + .05 || nodClock < cur.nodDown + cur.nodUp + (cur.nodSecond > .01 ? cur.nodGap + cur.nodDown + cur.nodUp : 0) + .1)) {
+      // Keep a new blink out of the gesture; an existing blink finishes before the dip.
+      if (blinkT > nextBlink) nextBlink = blinkT + .1;
+    }
     else if (blinkT > nextBlink) {
       if (!blinkDuration) blinkDuration = cur.blinkDuration;
       const p = (blinkT - nextBlink) / blinkDuration;
@@ -190,10 +222,10 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     const gy = (cur.gy + motion * cur.glance * gaze.y) * 7;
     for (const side of ["L", "R"]) {
       const sign = side === "L" ? -1 : 1;
-      const cx = 100 + sign * 23 + gx, cy = 101 + gy + cur["y" + side];
+      const cx = 100 + sign * 23 + gx, cy = 101 + gy + cur["y" + side] + faceDip;
       const pulse = 1 + motion * (cur.pulse * Math.sin(phase * 2) + cur.speech * level);
       const w = 11 * cur.size * cur["w" + side];
-      const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (blink + (1 - blink) * cur.smile);
+      const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (1 - nodPose * .06 / 5.5) * (blink + (1 - blink) * cur.smile);
       set(P["eye" + side], { cx, cy, rx:w, ry:Math.max(.3,h) });
       const lidY = cy - h + cur["lid" + side] * 2 * h;
       set(P["lid" + side], { x:cx - 30, y:lidY - 40, width:60, height:40,
