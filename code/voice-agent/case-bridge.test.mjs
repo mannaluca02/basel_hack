@@ -150,3 +150,37 @@ test("a percentage spoken as words stays exact, an amount spoken as words is ask
     ["annual_gross_income_chf", "approximate"],
   ]);
 });
+
+test("the call history goes to the case once per turn, again only when a turn grew", async () => {
+  const posted = [];
+  const fetchImpl = async (url, init) => {
+    posted.push({ path: new URL(url).pathname, body: JSON.parse(init.body) });
+    return json({ recorded: 1 });
+  };
+  const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl, log: quiet, turnDebounceMs: 1 });
+  const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+  const log = {
+    conversationId: "conv_1",
+    startedAt: "2026-10-31T12:00:00.000Z",
+    answers: {},
+    transcript: [
+      { speaker: "agent", text: "Hoi, ich bin Paxi.", start_ms: 0, end_ms: 900 },
+      { speaker: "user", text: "Ich verdiene", start_ms: 1500, end_ms: 2000 },
+    ],
+  };
+  bridge.turnsChanged(linkId, log);
+  await settle();
+  log.transcript[1].text += " 105000 brutto.";
+  bridge.turnsChanged(linkId, log);
+  await settle();
+  bridge.turnsChanged(linkId, log);
+  await settle();
+
+  assert.equal(posted.length, 2);
+  assert.equal(posted[0].path, `/api/cases/${CASE_ID}/voice/agent-turns`);
+  assert.deepEqual(posted[0].body.turns, [
+    { messageId: "conv_1_a0", speaker: "agent", text: "Hoi, ich bin Paxi.", at: "2026-10-31T12:00:00.000Z" },
+    { messageId: "conv_1_c1500", speaker: "customer", text: "Ich verdiene", at: "2026-10-31T12:00:01.500Z" },
+  ]);
+  assert.deepEqual(posted[1].body.turns.map((t) => [t.messageId, t.text]), [["conv_1_c1500", "Ich verdiene 105000 brutto."]]);
+});
