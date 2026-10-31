@@ -55,6 +55,8 @@ export class ChartCanvas {
       const chart = this.chart();
       const option = this.option();
       if (!chart || chart.isDisposed()) return;
+      // ngx-echarts has just drawn this one; merging it again would only repeat the work.
+      if (option === this.initialOption()) return;
       // `replaceMerge` drops series the new option no longer has; the others merge by id.
       chart.setOption(option, { replaceMerge: ['series'] });
     });
