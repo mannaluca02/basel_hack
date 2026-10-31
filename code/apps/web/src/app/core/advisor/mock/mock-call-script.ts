@@ -315,6 +315,8 @@ const TIMELINE_YEARS = [2026, 2030, 2035, 2040, 2045, 2050, 2054, 2056, 2060, 20
 const WORKING = [0, 0, 0, 0, 0, 0];
 
 const PILLAR3A_YEARS = [2026, 2031, 2036, 2041, 2046, 2051, 2056];
+/** Paid out at the customer's retirement, the same year as in the life events. */
+const PILLAR3A_PAYOUT_YEAR = 2056;
 const PILLAR3A_WITH = [
   2_000_000, 4_730_700, 7_672_400, 10_841_500, 14_255_500, 17_933_400, 21_895_500,
 ];
@@ -470,6 +472,7 @@ function pillar3aChart(
           withoutContributions: { values: PILLAR3A_WITHOUT, status: 'valid' },
         },
         taxSaving,
+        payoutYear: PILLAR3A_PAYOUT_YEAR,
       },
     }),
   };

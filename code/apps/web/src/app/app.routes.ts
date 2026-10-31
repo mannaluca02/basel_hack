@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { provideEchartsCore } from 'ngx-echarts';
 import { KEEP_ALIVE } from './core/layout/keep-alive-route-reuse-strategy';
 
 /** Workspace tabs keep their state across tab switches (FE-07). */
@@ -10,6 +11,10 @@ export const routes: Routes = [
     path: 'graphics',
     title: 'nav.graphics',
     data: keepAlive,
+    // ECharts loads with the first chart, in its own chunk (FE-11).
+    providers: [
+      provideEchartsCore({ echarts: () => import('./features/workspace/graphics/echarts-setup') }),
+    ],
     loadComponent: () =>
       import('./features/workspace/graphics/graphics-tab').then((m) => m.GraphicsTab),
   },

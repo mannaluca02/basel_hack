@@ -40,6 +40,10 @@
   --color-neutral-gray-5: #8e8e8e;
   --color-neutral-gray-6: #6a6a6a;
   --color-neutral-gray-7: #282828;
+  /* Dark theme only, not in the Pax palette: a dark grey page instead of near black, and a line
+     colour for borders that does not glare on it. */
+  --color-dark-bg: #1c1c1c;
+  --color-dark-line: #3a3a3a;
 
   /* System */
   --color-system-success: #00be00;
@@ -139,33 +143,36 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Semantic: dark (Pax [data-theme=dark]) */
-    --bg-default: var(--color-neutral-black);
+    /* Semantic: dark, based on Pax [data-theme=dark] but softer for long reading: a dark grey
+       page instead of near black, off-white text instead of white, dim borders. */
+    --bg-default: var(--color-dark-bg);
     --bg-muted: var(--color-neutral-gray-7);
     --bg-success: var(--color-system-success-dark);
     --bg-warning: var(--color-system-warning-dark);
     --bg-error: var(--color-system-error-dark);
     --bg-info: var(--color-system-info-dark);
 
-    --text-default: var(--color-neutral-white);
-    --text-muted: var(--color-neutral-gray-2);
+    --text-default: var(--color-neutral-gray-3);
+    --text-muted: var(--color-neutral-gray-4);
     --text-brand: var(--color-brand-pax-green);
     --text-success: var(--color-system-success-light);
-    --text-warning: var(--color-neutral-white);
+    --text-warning: var(--color-neutral-gray-2);
     --text-error: var(--color-system-error-light);
     --text-info: var(--color-system-info-light);
 
-    --icon-default: var(--color-neutral-white);
-    --icon-muted: var(--color-neutral-gray-2);
+    --icon-default: var(--color-neutral-gray-3);
+    --icon-muted: var(--color-neutral-gray-4);
     --icon-brand-contrast: var(--color-brand-pax-green);
-    --icon-warning: var(--color-neutral-white);
+    --icon-warning: var(--color-neutral-gray-2);
     --icon-info: var(--color-system-info-light);
 
-    --border-default: var(--color-neutral-white);
-    --border-soft: var(--color-neutral-gray-4);
-    --border-subtle: var(--color-neutral-gray-3);
+    /* Strong enough for the focus ring and selected states, without the glare of white. */
+    --border-default: var(--color-neutral-gray-3);
+    /* Card outlines, dividers, chart grid lines: present, but quiet on the dark grey page. */
+    --border-soft: var(--color-dark-line);
+    --border-subtle: var(--color-neutral-gray-6);
     /* Pax Green on gray-4 is 1.16:1; on gray-7 it is 7.62:1. */
     --border-track: var(--color-neutral-gray-7);
-    --border-warning: var(--color-neutral-white);
+    --border-warning: var(--color-neutral-gray-2);
   }
 }

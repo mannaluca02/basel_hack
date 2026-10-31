@@ -15,7 +15,79 @@
     "openRisks": "{{count}} à traiter"
   },
   "graphics": {
-    "title": "Graphiques"
+    "title": "Graphiques",
+    "empty": "Les graphiques apparaissent ici dès que l’entretien fournit les informations nécessaires.",
+    "newChart": "Nouveau graphique",
+    "updated": "Mis à jour",
+    "legend": "Légende",
+    "unknown": "inconnu",
+    "announce": {
+      "new": "Nouveau graphique : {{title}}",
+      "updated": "Graphique mis à jour : {{title}}"
+    },
+    "chart": {
+      "income_timeline": "Revenu jusqu’à la retraite et après",
+      "event_impact": "Revenu après un événement",
+      "pillar3a_growth": "Évolution du pilier 3a",
+      "life_events": "Événements de vie"
+    },
+    "status": {
+      "valid": "Calculé",
+      "estimated": "Estimé",
+      "requires_review": "En cours de vérification",
+      "needs_input": "Informations manquantes",
+      "provider_error": "Échec du calcul",
+      "stale": "Obsolète"
+    },
+    "unit": {
+      "month": "CHF par mois",
+      "year": "CHF par an",
+      "once": "CHF"
+    },
+    "basis": {
+      "gross": "brut",
+      "net_before_income_tax": "net avant impôt sur le revenu",
+      "net_after_income_tax": "net après impôt sur le revenu",
+      "capital": "capital"
+    },
+    "series": {
+      "employment": "Revenu du travail",
+      "pillar1": "1er pilier (AVS/AI)",
+      "pillar2": "2e pilier (caisse de pension)",
+      "pillar3": "3e pilier",
+      "gap": "Lacune",
+      "target": "Revenu visé",
+      "before": "Revenu avant",
+      "needed": "Revenu nécessaire",
+      "withContributions": "Avec versements annuels",
+      "withoutContributions": "Sans autres versements"
+    },
+    "event": {
+      "disability": "Invalidité",
+      "death": "Décès",
+      "retirement": "Retraite"
+    },
+    "certainty": {
+      "past": "Passé",
+      "confirmed": "Confirmé",
+      "planned": "Prévu"
+    },
+    "table": {
+      "show": "Afficher les données sous forme de tableau",
+      "hide": "Masquer le tableau",
+      "year": "Année",
+      "scenario": "Événement",
+      "event": "Événement de vie",
+      "certainty": "État",
+      "status": "Statut"
+    },
+    "scenario": "Scénario",
+    "impact": {
+      "before": "Avant",
+      "after": "Après"
+    },
+    "neededLine": "Nécessaire : {{amount}}",
+    "payout": "Versement à la retraite ({{year}})"
   },
   "risks": {
     "title": "Risques"
