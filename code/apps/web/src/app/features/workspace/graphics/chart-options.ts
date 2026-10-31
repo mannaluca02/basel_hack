@@ -109,6 +109,8 @@ export interface ChartView {
   readonly table: ChartTable;
   /** e.g. "CHF per year · gross"; `null` for charts without amounts. */
   readonly unit: string | null;
+  /** A backend figure that belongs to the chart but not on an axis, e.g. the 3a tax saving. */
+  readonly annotation: string | null;
 }
 
 // Translation keys, written out in full for the i18n check.
@@ -414,6 +416,13 @@ function pillar3aGrowth(chart: Pillar3aGrowthChart, ctx: ChartContext): ChartVie
       })),
     },
     unit: unitLabel(chart.unit, ctx),
+    annotation:
+      chart.taxSaving === null
+        ? null
+        : ctx.t('graphics.taxSaving', {
+            amount: ctx.chf(chart.taxSaving.amount / 100),
+            period: ctx.t(PERIOD_KEYS[chart.taxSaving.period]),
+          }),
   };
 }
 
@@ -460,7 +469,7 @@ function lifeEvents(chart: LifeEventsChart, ctx: ChartContext): ChartView {
 
 // --- shared parts ------------------------------------------------------------------------------
 
-const noExtras = { timeline: null, scenarios: null, scenario: 0 } as const;
+const noExtras = { timeline: null, scenarios: null, scenario: 0, annotation: null } as const;
 
 /** Rappen to francs, for display only. `null` stays unknown; ECharts leaves a gap for it. */
 function francs(rappen: number | null): number | null {

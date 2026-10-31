@@ -88,7 +88,8 @@
     },
     "neededLine": "Needed: {{amount}}",
     "payout": "Paid out at retirement ({{year}})",
-    "showInInfo": "Show in Info"
+    "showInInfo": "Show in Info",
+    "taxSaving": "Tax saving according to the calculator: {{amount}} ({{period}})"
   },
   "risks": {
     "title": "Risks",

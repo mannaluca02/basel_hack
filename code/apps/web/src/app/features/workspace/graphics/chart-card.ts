@@ -113,6 +113,10 @@ function impactKey(scenario: EventImpactScenario): string {
         <app-life-timeline [entries]="entries" />
       }
 
+      @if (view().annotation; as annotation) {
+        <p class="annotation">{{ annotation }}</p>
+      }
+
       <ul class="legend" [attr.aria-label]="'graphics.legend' | transloco">
         @for (item of view().legend; track item.label) {
           <li>

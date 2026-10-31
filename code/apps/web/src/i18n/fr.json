@@ -88,7 +88,8 @@
     },
     "neededLine": "Nécessaire : {{amount}}",
     "payout": "Versement à la retraite ({{year}})",
-    "showInInfo": "Afficher dans Info"
+    "showInInfo": "Afficher dans Info",
+    "taxSaving": "Économie d’impôt selon le calculateur : {{amount}} ({{period}})"
   },
   "risks": {
     "title": "Risques",

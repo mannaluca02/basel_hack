@@ -222,6 +222,15 @@ describe('buildChartView', () => {
       });
     });
 
+    it('states the tax saving next to the chart when the backend sends one', () => {
+      const taxSaving = { currency: 'CHF', unit: 'cent', period: 'year', basis: 'net_after_income_tax', amount: 172_800 } as const;
+      expect(buildChartView(pillar3aChart({ taxSaving }), ctx).annotation).toBe(
+        'graphics.taxSaving{"amount":"CHF 1728","period":"graphics.unit.year"}',
+      );
+      expect(buildChartView(pillar3aChart(), ctx).annotation).toBeNull();
+      expect(buildChartView(incomeChart(), ctx).annotation).toBeNull();
+    });
+
     it('leaves the marker out without a payout year, or when that year is not sampled', () => {
       for (const payoutYear of [undefined, 2045]) {
         const view = buildChartView(pillar3aChart({ payoutYear }), ctx);
