@@ -83,6 +83,26 @@ describe('SummaryDialog', () => {
     expect(dialog.open).toBe(false);
   });
 
+  it('closes when the handle is swiped down far enough, not on a short drag', () => {
+    const { fixture, dialog } = render(bundle());
+    const handle = dialog.querySelector<HTMLElement>('.handle')!;
+    const pointer = (type: string, clientY: number) => {
+      const event = new Event(type) as Event & { clientY: number };
+      Object.defineProperty(event, 'clientY', { value: clientY });
+      handle.dispatchEvent(event);
+    };
+    pointer('pointerdown', 100);
+    pointer('pointerup', 150);
+    fixture.detectChanges();
+    expect(TestBed.inject(SummarySheet).isOpen()).toBe(true);
+    pointer('pointerup', 400);
+    expect(TestBed.inject(SummarySheet).isOpen()).toBe(true);
+    pointer('pointerdown', 100);
+    pointer('pointerup', 200);
+    fixture.detectChanges();
+    expect(TestBed.inject(SummarySheet).isOpen()).toBe(false);
+  });
+
   it('shows all three pillars, the gaps and the products once the gate is open', () => {
     const { dialog } = render(bundle());
     expect(dialog.querySelectorAll('.pillars li')).toHaveLength(3);

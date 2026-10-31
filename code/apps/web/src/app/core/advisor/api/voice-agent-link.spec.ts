@@ -98,4 +98,53 @@ describe('VoiceAgentLink', () => {
     await vi.advanceTimersByTimeAsync(2500);
     expect(link.state()).toBe('idle');
   });
+
+  it('reports a notice that cannot be loaded, and closes the notice on dismiss', async () => {
+    const { link, http } = setup();
+    const failing = link.showNotice();
+    http.expectOne((r) => r.url === '/api/voice/privacy').flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    await failing;
+    expect(link.state()).toBe('failed');
+
+    const loading = link.showNotice();
+    http.expectOne((r) => r.url === '/api/voice/privacy').flush({ version: 'voice-synthetic-v1', enabled: true, text: 'Hinweis' });
+    await loading;
+    expect(link.state()).toBe('notice');
+    link.dismiss();
+    expect(link.state()).toBe('idle');
+  });
+
+  it('closes the reserved window and reports a failed hand-over', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { link, http } = setup();
+    const paxi = { closed: false, location: { href: '' }, postMessage: vi.fn(), close: vi.fn() };
+    vi.spyOn(window, 'open').mockReturnValue(paxi as unknown as Window);
+    const notice = link.showNotice();
+    http.expectOne((r) => r.url === '/api/voice/privacy').flush({ version: 'voice-synthetic-v1', enabled: true, text: 'Hinweis' });
+    await notice;
+    const opened = link.open();
+    http.expectOne('/api/cases/case_1/agent-access').flush({ code: 'FORBIDDEN' }, { status: 403, statusText: 'Forbidden' });
+    await opened;
+    expect(paxi.close).toHaveBeenCalled();
+    expect(link.state()).toBe('failed');
+  });
+
+  it('is not available, and does nothing, without a configured voice agent', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideI18nTesting(),
+        provideAdvisorDataSource(),
+        { provide: APP_ENVIRONMENT, useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api' } },
+      ],
+    });
+    const link = TestBed.inject(VoiceAgentLink);
+    expect(link.available).toBe(false);
+    await link.open();
+    link.control('mute');
+    TestBed.inject(HttpTestingController).verify();
+    expect(link.state()).toBe('idle');
+  });
 });
+

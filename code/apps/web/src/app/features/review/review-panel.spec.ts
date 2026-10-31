@@ -33,7 +33,7 @@ describe('ReviewPanel', () => {
   const stable = () => settle(() => fixture.whenStable());
   const text = () => (root.textContent ?? '').replace(/\s+/g, ' ');
 
-  function setup(session: boolean) {
+  function setup(session: boolean, environment: Record<string, unknown> = {}) {
     sessionStorage.clear();
     sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
     if (session) {
@@ -51,7 +51,7 @@ describe('ReviewPanel', () => {
         { provide: AdvisorDataSource, useValue: source },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api' },
+          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', ...environment },
         },
       ],
     });
@@ -91,8 +91,8 @@ describe('ReviewPanel', () => {
     return presented.request.body;
   }
 
-  async function render(state: Parameters<typeof serve>[1] = {}) {
-    setup(true);
+  async function render(state: Parameters<typeof serve>[1] = {}, environment: Record<string, unknown> = {}) {
+    setup(true, environment);
     await fixture.whenStable();
     serve(http, state);
     await stable();
@@ -717,4 +717,58 @@ describe('ReviewPanel', () => {
       expect(root.querySelectorAll('.batch')).toHaveLength(1);
     });
   });
+
+  describe('demo shortcuts', () => {
+    it('loads the Mueller persona into an empty case at the current revision', async () => {
+      await render({
+        dto: reviewCase({
+          draft: { financial: null, insurance: null, goals: [], reviewFlags: [] } as never,
+          proposalBatches: [],
+          ambiguities: [],
+          confirmedVersions: [],
+        }),
+      });
+      expect(text()).toContain('Der Fall ist noch leer');
+      button('Familie Müller laden (Pax-Persona, erfunden)')!.click();
+      await stable();
+      http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase({ caseRevision: 9 } as never));
+      await stable();
+      const load = http.expectOne(`/api/cases/${CASE_ID}/demo-profile`);
+      expect(load.request.body).toEqual({ persona: 'mueller', expectedCaseRevision: 9 });
+      expect(load.request.headers.get('X-CSRF-Token')).toBe('csrf_1');
+      load.flush(reviewCase());
+    });
+
+    it('calculates the standard scenarios of a confirmed profile without analyses', async () => {
+      const confirmed = reviewCase({ proposalBatches: [], ambiguities: [], draftDirty: false, runs: [] });
+      await render({
+        dto: confirmed,
+        context: reviewContext({ ambiguities: [], pendingAcceptanceBatchIds: [], missingFields: [] } as never),
+      });
+      button('Szenarien berechnen')!.click();
+      await stable();
+      http.expectOne(`/api/cases/${CASE_ID}`).flush(confirmed);
+      await stable();
+      const run = http.expectOne(`/api/cases/${CASE_ID}/standard-analyses`);
+      expect(run.request.body).toEqual({ expectedProfileVersion: 1 });
+      run.flush({ runs: [] });
+    });
+
+    it('shows Paxi\'s voice notice and closes it again without opening a window', async () => {
+      await render({}, { voiceAgentUrl: 'http://localhost:3100' });
+      button('Mit Paxi sprechen')!.click();
+      await stable();
+      http
+        .expectOne((r) => r.url === '/api/voice/privacy')
+        .flush({ version: 'voice-synthetic-v1', text: 'Synthetic voice notice', enabled: false, providers: [] });
+      await stable();
+      expect(text()).toContain('Synthetic voice notice');
+      expect(text()).toContain('Sprachverarbeitung ausgeschaltet');
+      button('Abbrechen')!.click();
+      await stable();
+      expect(text()).not.toContain('Synthetic voice notice');
+      expect(button('Mit Paxi sprechen')).toBeDefined();
+    });
+  });
 });
+
