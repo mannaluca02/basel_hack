@@ -7,7 +7,7 @@ import {
   ConnectionState,
   emptySnapshot,
 } from '../advisor-data-source';
-import { AdvisorContextUpdate, AgentReply, AnalysisResult } from '../contracts';
+import { AdvisorContextUpdate, AgentReply, AnalysisResult, ProgressSnapshot } from '../contracts';
 import { InfoItem, LifeEventsChart, RiskItem, TranscriptEntry } from '../ui-models';
 
 /** Synthetic fixtures for the store specs. No persona data. */
@@ -125,6 +125,22 @@ export function contextUpdate(contextRevision: number): AdvisorContextUpdate {
     reason: 'confirmed_profile_changed',
     contextRef: `/api/cases/${CASE_ID}/advisor/context`,
     interruptPolicy: 'if_current_answer_invalid',
+  };
+}
+
+export function progress(overrides: Partial<ProgressSnapshot> = {}): ProgressSnapshot {
+  return {
+    ...header('message_progress'),
+    profileVersion: 1,
+    domain: 'data_capture',
+    percent: 60,
+    groups: [
+      { groupId: 'household', status: 'done' },
+      { groupId: 'pillar3', status: 'open' },
+    ],
+    openGroups: ['pillar3'],
+    reviewOpen: false,
+    ...overrides,
   };
 }
 

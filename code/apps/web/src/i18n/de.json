@@ -3,7 +3,8 @@
     "name": "Pax Digital Advisor"
   },
   "language": {
-    "label": "Sprache"
+    "label": "Sprache",
+    "current": "Sprache: {{language}}"
   },
   "nav": {
     "label": "Arbeitsbereich",
@@ -51,5 +52,18 @@
     "session": "Ihre Einwilligung gilt nur für diesen Browser-Tab und endet, wenn Sie ihn schliessen.",
     "agree": "Ich habe diesen Hinweis gelesen und bin einverstanden, dass meine Angaben wie beschrieben bearbeitet werden.",
     "start": "Beratung starten"
+  },
+  "dock": {
+    "open": "Zusammenfassung öffnen",
+    "progress": "{{percent}} der Angaben erfasst",
+    "complete": "Alle Angaben erfasst",
+    "unknown": "Stand der Angaben noch unbekannt",
+    "activity": {
+      "idle": "Assistent bereit",
+      "listening": "Assistent hört zu",
+      "thinking": "Assistent denkt nach",
+      "speaking": "Assistent spricht",
+      "error": "Störung beim Assistenten"
+    }
   }
 }
