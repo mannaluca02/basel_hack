@@ -108,8 +108,9 @@ import { TITLE_KEYS } from './chart-options';
       padding: 0 1rem;
       border: 0;
       border-radius: var(--radius-full);
-      color: var(--text-inverse);
-      background: var(--bg-brand-purple);
+      // Green, not purple: purple is the customer's colour in the Chat tab.
+      color: var(--text-on-brand);
+      background: var(--bg-brand);
       font: inherit;
       font-weight: 600;
       cursor: pointer;
