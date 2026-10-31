@@ -477,6 +477,157 @@
         "running"
       ]
     },
+    "ambiguities": {
+      "default": [],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "personId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "turnId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "required": [
+              "messageId",
+              "turnId",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "de",
+              "fr",
+              "it",
+              "en"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "resolvedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolvedByBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolutionSourceRef": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dialogueStatus": {
+            "type": "string",
+            "enum": [
+              "needs_answer",
+              "awaiting_customer_acceptance",
+              "resolved"
+            ]
+          },
+          "answerBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "question",
+          "source",
+          "id",
+          "locale",
+          "createdAt",
+          "status",
+          "resolvedAt",
+          "resolvedByBatchId",
+          "resolutionSourceRef",
+          "dialogueStatus",
+          "answerBatchId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "pendingAcceptanceBatchIds": {
+      "default": [],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+      }
+    },
     "approvedFacts": {
       "maxItems": 1000,
       "type": "array",
@@ -881,6 +1032,8 @@
     "selectedGraphFacts",
     "maySpeakSelectedAmounts",
     "calculationStatus",
+    "ambiguities",
+    "pendingAcceptanceBatchIds",
     "approvedFacts",
     "nextQuestion",
     "missingFields",

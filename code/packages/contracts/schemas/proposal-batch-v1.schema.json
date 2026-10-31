@@ -90,7 +90,8 @@
       "enum": [
         "proposed",
         "accepted",
-        "superseded"
+        "superseded",
+        "rejected"
       ]
     },
     "supersedesBatchIds": {

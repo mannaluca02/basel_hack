@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { ExtractorContextSchema,ProposalBatchInputSchema,AcceptProposalInputSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,ProposalAcceptanceSchema,
   type ProposalBatch } from '@pax/contracts';
+import { ambiguityDialogue } from './ambiguity-dialogue.js';
 import { LifeInsuranceEngine } from './engine.js';
-import { WorkflowError,type Actor,type InsuranceCase } from './types.js';
+import { WorkflowError,type Actor,type InsuranceCase,type Database } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
 import { applyChanges,at,personFor,writablePaths,permitted } from './draft-proposals.js';
 
@@ -19,7 +20,7 @@ export class ExtractionWorkflow {
         const money=path.match(/^(.*)\.(value|period)$/),container=money?at(c.draft,money[1]!):null;
         const proposed=container&&typeof container==='object'&&'confirmation'in container&&container.confirmation==='proposed';
         return {path,...(personId?{personId}:{}),value,confirmation:value!==null&&old!==undefined&&sha256Json(value)===sha256Json(old)&&!proposed?'confirmed':'proposed'};
-      }),proposals:c.proposals,proposalBatches:c.proposalBatches??[],ambiguities:c.ambiguities??[],writablePaths:paths,
+      }),proposals:c.proposals,proposalBatches:c.proposalBatches??[],ambiguities:ambiguityDialogue(c),writablePaths:paths,
       policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,customerConfirmationRequired:true}});
   }
   private assertAgent(actor:Actor,id:string){
@@ -70,18 +71,25 @@ export class ExtractionWorkflow {
   async acceptBatch(actor:Actor,id:string,batchId:string,input:unknown){
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const b=AcceptProposalInputSchema.parse(input);
     return this.engine.edit(actor,id,b.expectedCaseRevision,(c,db)=>{
-      const batch=c.proposalBatches.find(p=>p.id===batchId);if(!batch||batch.status!=='proposed')throw new WorkflowError('PROPOSAL_NOT_OPEN');
-      if(profile(c)!==batch.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
-      if(sha256Json(c.draft)!==batch.basisDraftHash)throw new WorkflowError('STALE_PROPOSAL');
-      if(!batch.changes.length)throw new WorkflowError('NO_CHANGES_TO_ACCEPT',422);
-      const draft=applyChanges(c.draft,batch.changes,id,batch.source.sourceRef);
-      for(const ambiguityId of batch.resolvesAmbiguityIds){const a=c.ambiguities.find(a=>a.id===ambiguityId);if(!a||a.status!=='open')throw new WorkflowError('AMBIGUITY_RESOLUTION_INVALID',422);}
-      c.draft=draft;c.draftDirty=true;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
-      batch.status='accepted';batch.acceptedAt=new Date().toISOString();
-      for(const a of c.ambiguities.filter(a=>batch.resolvesAmbiguityIds.includes(a.id))){a.status='resolved';a.resolvedAt=batch.acceptedAt;a.resolvedByBatchId=batch.id;a.resolutionSourceRef=batch.source.sourceRef;}
-      this.engine.touch(c,'draft_changed');this.engine.audit(db,actor,c,'agent_proposal_batch_accepted');
-      return ProposalAcceptanceSchema.parse({caseRevision:c.caseRevision,contextRevision:c.contextRevision,confirmationStillRequired:true,draft:c.draft});
+      return this.acceptBatchInTransaction(actor,c,db,batchId,b);
     });
+  }
+  /** Internal composition point: caller must hold the existing store transaction. */
+  acceptBatchInTransaction(actor:Actor,c:InsuranceCase,db:Database,batchId:string,input:unknown){
+    this.engine.sessions.assertActive(actor,db);this.engine.caseFor(actor,c.id);
+    if(actor.role!=='customer'||actor.id!==c.ownerId)throw new WorkflowError('FORBIDDEN',403);
+    const b=AcceptProposalInputSchema.parse(input);if(b.expectedCaseRevision!==c.caseRevision)throw new WorkflowError('VERSION_CONFLICT');
+    const batch=c.proposalBatches.find(p=>p.id===batchId);if(!batch||batch.status!=='proposed')throw new WorkflowError('PROPOSAL_NOT_OPEN');
+    if(profile(c)!==batch.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
+    if(sha256Json(c.draft)!==batch.basisDraftHash)throw new WorkflowError('STALE_PROPOSAL');
+    if(!batch.changes.length)throw new WorkflowError('NO_CHANGES_TO_ACCEPT',422);
+    const draft=applyChanges(c.draft,batch.changes,c.id,batch.source.sourceRef);
+    for(const ambiguityId of batch.resolvesAmbiguityIds){const a=c.ambiguities.find(a=>a.id===ambiguityId);if(!a||a.status!=='open')throw new WorkflowError('AMBIGUITY_RESOLUTION_INVALID',422);}
+    c.draft=draft;c.draftDirty=true;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
+    batch.status='accepted';batch.acceptedAt=new Date().toISOString();
+    for(const a of c.ambiguities.filter(a=>batch.resolvesAmbiguityIds.includes(a.id))){a.status='resolved';a.resolvedAt=batch.acceptedAt;a.resolvedByBatchId=batch.id;a.resolutionSourceRef=batch.source.sourceRef;}
+    this.engine.touch(c,'draft_changed');this.engine.audit(db,actor,c,'agent_proposal_batch_accepted');
+    return ProposalAcceptanceSchema.parse({caseRevision:c.caseRevision,contextRevision:c.contextRevision,confirmationStillRequired:true,draft:c.draft});
   }
   async resolveAmbiguity(actor:Actor,id:string,ambiguityId:string,input:unknown){
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const b=ResolveAmbiguityInputSchema.parse(input);

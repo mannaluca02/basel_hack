@@ -6,3 +6,4 @@ export * from './advisor-context.js';
 export * from './conversation.js';
 export * from './summary.js';
 export * from './proposal-workflow.js';
+export * from './customer-confirmation.js';

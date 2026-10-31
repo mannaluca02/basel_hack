@@ -1,4 +1,4 @@
-import type { InsuranceCaseState } from '@pax/contracts';
+import type { InsuranceCaseState,CustomerConfirmation } from '@pax/contracts';
 export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuote,DemoApplication,DemoPolicy,
   CaseEvent,ScenarioComparison,AgentProposal,LifeRun,RiskNeed } from '@pax/contracts';
 
@@ -6,7 +6,7 @@ export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuot
 export type Actor = { id:string;role:'customer'|'reviewer'|'advisor';caseId?:string;sessionHash:string;expiresAt:string;csrfHash?:string };
 export type AuditEvent = {id:string;at:string;actorId:string;action:string;caseId:string|null;profileVersion:number|null;outcome:string};
 export type InsuranceCase = InsuranceCaseState & {
-  ownerId:string;idempotency:Record<string,{fingerprint:string;result:unknown}>;
+  ownerId:string;confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
 };
 export type Database = {
   version:1;sessions:Record<string,Actor>;cases:Record<string,InsuranceCase>;audit:AuditEvent[];

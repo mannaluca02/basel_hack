@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "syntheticOnly": true,
+  "openAiCalled": false,
+  "realSpeechRecognitionCalled": false,
+  "providerMode": "test",
+  "changedField": "insurance.persons.0.grossAnnualIncomeCents",
+  "grossAnnualIncomeCents": 11900000,
+  "budgetNetUnchanged": true,
+  "dialogueBeforeAcceptance": "awaiting_customer_acceptance",
+  "questionRepeated": false,
+  "ambiguityAfterAcceptance": "resolved",
+  "profileAfterFirstYes": 1,
+  "profileAfterSecondYes": 2,
+  "calculatedProfile": 2
+}

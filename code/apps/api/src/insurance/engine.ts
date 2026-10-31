@@ -9,6 +9,7 @@ import type { CalculationProvider } from '../logismata/client.js';
 import type { NormalizedProviderResult } from '../logismata/normalize.js';
 import { buildProviderJobs,deriveRiskNeeds } from './provider-mapper.js';
 import { recommendLifeSolutions } from './products.js';
+import { ambiguityDialogue,pendingAcceptanceIds,waitingForAnswer } from './ambiguity-dialogue.js';
 import { selectedGraphFacts } from './graph.js';
 import { pillarPicture } from './pillars.js';
 import { questionText,presentRecommendation,presentRun,progressText,metricText,statusText } from './i18n.js';
@@ -38,6 +39,7 @@ export class LifeInsuranceEngine {
   }
   touch(c:InsuranceCase,reason:string):CaseEvent {
     c.caseRevision++;c.contextRevision++;c.updatedAt=now();
+    for(const request of c.confirmationRequests??[])if(['awaiting_presentation','awaiting_answer'].includes(request.status)){request.status='invalidated';request.invalidationReason='case_changed';}
     const event={id:randomUUID(),contextRevision:c.contextRevision,reason,at:c.updatedAt};
     c.events.push(event);c.events=c.events.slice(-100);return event;
   }
@@ -72,7 +74,7 @@ export class LifeInsuranceEngine {
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),
         locale:body.locale,timeBudgetMinutes:body.timeBudgetMinutes,caseRevision:1,contextRevision:1,
         draft:{financial:null,insurance:null,goals:[],reviewFlags:[]},draftDirty:true,confirmedVersions:[],latestAnalysisRequestId:null,activeRunId:null,
-        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
+        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],confirmationRequests:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
   }
@@ -97,36 +99,45 @@ export class LifeInsuranceEngine {
     });
   }
   questions(actor:Actor,id:string) {
-    const c=this.caseFor(actor,id,true),ambiguities=c.ambiguities.filter(a=>a.status==='open');
-    const fields=[...new Set([...ambiguities.map(a=>a.path),...intakeQuestions(c.draft)])];
+    const c=this.caseFor(actor,id,true),dialogue=ambiguityDialogue(c),ambiguities=dialogue.filter(a=>a.dialogueStatus==='needs_answer');
+    const questionDraft=DraftSchema.parse(c.draft),financial=questionDraft.financial;
+    if(financial)for(const field of [...financial.persons.map(p=>p.income),...financial.expenses.map(e=>e.amount),financial.safetyBuffer,...financial.assets.map(a=>a.amount),...financial.provisions.map(p=>p.amount)])if(field.value!==null)field.confirmation='confirmed';
+    const fields=[...new Set([...c.ambiguities.filter(a=>a.status==='open').map(a=>a.path),...intakeQuestions(questionDraft)])];
+    const askable=fields.filter(path=>waitingForAnswer(c,path,dialogue));
     return QuestionsResponseSchema.parse({profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
-      mandatoryFields:fields,questions:fields.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
+      mandatoryFields:fields,pendingAcceptanceBatchIds:pendingAcceptanceIds(dialogue),questions:askable.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
         text:ambiguities.find(a=>a.path===path&&a.locale===c.locale)?.question??questionText(c.locale,path)})),
       pace:c.timeBudgetMinutes<=10?'compact':'detailed'});
   }
   async confirm(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=ConfirmProfileSchema.parse(input);
     return this.edit(actor,id,body.expectedCaseRevision,(c,db)=>{
-      if(c.ambiguities?.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422,c.ambiguities.filter(a=>a.status==='open').map(a=>a.path));
-      const draft=DraftSchema.parse(c.draft);
-      const f=draft.financial;
-      if(f)for(const field of [...f.persons.map(p=>p.income),...f.expenses.map(e=>e.amount),f.safetyBuffer,...f.assets.map(a=>a.amount),...f.provisions.map(p=>p.amount)])if(field.value!==null)field.confirmation='confirmed';
-      const missing=intakeQuestions(draft);if(missing.length)throw new WorkflowError('NEEDS_INPUT',422,missing);
-      if(!c.draftDirty&&currentVersion(c))return c;
-      if(c.confirmedVersions.length>=20)throw new WorkflowError('PROFILE_VERSION_CAPACITY',429);
-      const financial=draft.financial!;
-      const budget=calculateBudget(financial),capital=calculateCapital(financial);
-      if(budget.status==='needs_input'||capital.status==='needs_input')throw new WorkflowError('NEEDS_INPUT',422,[...budget.issues,...capital.issues].map(i=>i.path));
-      const intake=draft.insurance!;
-      const actualDebt=intake.debts.reduce((sum,d)=>sum+d.annualServiceCents!,0);
-      const declaredDebt=financial.expenses.filter(e=>e.category==='debt').reduce((sum,e)=>sum+(e.amount.value??0)*(e.amount.period==='month'?12:1),0);
-      if(actualDebt!==declaredDebt)throw new WorkflowError('DEBT_SERVICE_MISMATCH',422,['insurance.debts','financial.expenses.debt']);
-      for(const debt of intake.debts)if(debt.ownerPersonIds.some(owner=>!financial.persons.some(p=>p.id===owner)))throw new WorkflowError('UNKNOWN_DEBT_OWNER',422);
-      const version=(currentVersion(c)?.version??0)+1;financial.profileVersion=version;financial.caseRevision=c.caseRevision+1;financial.caseId=c.id;
-      c.confirmedVersions.push({version,draft:structuredClone(draft),confirmedAt:now(),confirmedBy:actor.id,noticeVersion:body.noticeVersion,calculatorTransferAllowed:true});
-      c.draft=draft;c.draftDirty=false;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
-      this.touch(c,'confirmed_profile_changed');this.audit(db,actor,c,'profile_confirmed');return c;
+      return this.confirmInTransaction(actor,c,db,body);
     });
+  }
+  /** Internal composition point: caller must hold the existing store transaction. */
+  confirmInTransaction(actor:Actor,c:InsuranceCase,db:Database,input:unknown) {
+    this.sessions.assertActive(actor,db);this.authorize(actor,c);this.role(actor,'customer');
+    const body=ConfirmProfileSchema.parse(input);if(body.expectedCaseRevision!==c.caseRevision)throw new WorkflowError('VERSION_CONFLICT');
+    if(c.ambiguities?.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422,c.ambiguities.filter(a=>a.status==='open').map(a=>a.path));
+    const draft=DraftSchema.parse(c.draft);
+    const f=draft.financial;
+    if(f)for(const field of [...f.persons.map(p=>p.income),...f.expenses.map(e=>e.amount),f.safetyBuffer,...f.assets.map(a=>a.amount),...f.provisions.map(p=>p.amount)])if(field.value!==null)field.confirmation='confirmed';
+    const missing=intakeQuestions(draft);if(missing.length)throw new WorkflowError('NEEDS_INPUT',422,missing);
+    if(!c.draftDirty&&currentVersion(c))return c;
+    if(c.confirmedVersions.length>=20)throw new WorkflowError('PROFILE_VERSION_CAPACITY',429);
+    const financial=draft.financial!;
+    const budget=calculateBudget(financial),capital=calculateCapital(financial);
+    if(budget.status==='needs_input'||capital.status==='needs_input')throw new WorkflowError('NEEDS_INPUT',422,[...budget.issues,...capital.issues].map(i=>i.path));
+    const intake=draft.insurance!;
+    const actualDebt=intake.debts.reduce((sum,d)=>sum+d.annualServiceCents!,0);
+    const declaredDebt=financial.expenses.filter(e=>e.category==='debt').reduce((sum,e)=>sum+(e.amount.value??0)*(e.amount.period==='month'?12:1),0);
+    if(actualDebt!==declaredDebt)throw new WorkflowError('DEBT_SERVICE_MISMATCH',422,['insurance.debts','financial.expenses.debt']);
+    for(const debt of intake.debts)if(debt.ownerPersonIds.some(owner=>!financial.persons.some(p=>p.id===owner)))throw new WorkflowError('UNKNOWN_DEBT_OWNER',422);
+    const version=(currentVersion(c)?.version??0)+1;financial.profileVersion=version;financial.caseRevision=c.caseRevision+1;financial.caseId=c.id;
+    c.confirmedVersions.push({version,draft:structuredClone(draft),confirmedAt:now(),confirmedBy:actor.id,noticeVersion:body.noticeVersion,calculatorTransferAllowed:true});
+    c.draft=draft;c.draftDirty=false;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
+    this.touch(c,'confirmed_profile_changed');this.audit(db,actor,c,'profile_confirmed');return c;
   }
   async analyze(actor:Actor,id:string,input:unknown,signal?:AbortSignal) {
     this.role(actor,'customer');const body=RunAnalysisSchema.parse(input);
@@ -294,6 +305,7 @@ export class LifeInsuranceEngine {
         (!!selected&&(['valid','estimated'].includes(selected.metric.status)||approved))&&
         (c.graphContext.graphId!=='risk_coverage'||approved),
       calculationStatus:run?.status??(c.latestAnalysisRequestId&&!c.draftDirty?'running':'needs_input'),
+      ambiguities:ambiguityDialogue(c),pendingAcceptanceBatchIds:questions.pendingAcceptanceBatchIds,
       approvedFacts:facts.map(f=>({...f,label:metricText(c.locale,f.metricId),statusLabel:statusText(c.locale,f.status)})),nextQuestion:questions.questions[0]??null,missingFields:questions.mandatoryFields,
       scenarioComparisons:run?c.comparisons.filter(x=>x.variantRunId===run.id).slice(-1):[],
       reviewStatus:approved?'approved_for_demo':run?'open':'not_started',maySpeakAmounts:facts.length>0,

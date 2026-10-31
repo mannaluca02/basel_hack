@@ -1,5 +1,7 @@
 # Erni: Extraktion, Vorschlagspakete und Bestätigung
 
+Aktuelle Ergänzung für Dario und Erni: [Gebundene Voice-Bestätigung und Gesprächsstatus beantworteter Unklarheiten](voice-confirmation-and-dialogue.md).
+
 Stand: 31.10.2026. Implementierte gemeinsame Grundlage in `feature/life-insurance-live-backend`. Extraktion mit OpenAI sowie STT/TTS sind Aufgaben der jeweiligen Module und werden hier noch nicht aufgerufen.
 
 ## Die sieben Absprachen
@@ -62,7 +64,7 @@ Die API-Basis ist für den lokalen Start `http://127.0.0.1:3000/api`. Für Brows
 | Beratung/Erklärung lesen | `GET /advisor/context` | `engine.advisorContext(actor,id)` | autorisierter Kontextzugriff |
 | Änderungen abonnieren | `GET /advisor/events` | bestehender SSE-Controller | autorisierter Kontextzugriff |
 
-Ein Paket nur mit Unklarheiten ist erlaubt, aber nicht als Entwurfsänderung annehmbar (`NO_CHANGES_TO_ACCEPT`). Es dient dazu, Rückfragen sofort nachvollziehbar zu speichern. `questions` und `AdvisorContext.nextQuestion` priorisieren offene Unklarheiten. Bei einer anderen aktuellen Sprache verwendet die Frageprojektion eine vorhandene lokalisierte Feldfrage; der Originaltext mit seiner Locale bleibt gespeichert. Während Unklarheiten offen sind, sind neue Analysen, Empfehlungen und darauf aufbauende Vertragsaktionen gesperrt; der Gesprächskontext gibt keine Rechenbeträge zum Sprechen frei.
+Ein Paket nur mit Unklarheiten ist erlaubt, aber nicht als Entwurfsänderung annehmbar (`NO_CHANGES_TO_ACCEPT`). Es dient dazu, Rückfragen sofort nachvollziehbar zu speichern. `questions` und `AdvisorContext.nextQuestion` priorisieren Unklarheiten mit `dialogueStatus=needs_answer`. Ein gültiges Antwortpaket führt zu `awaiting_customer_acceptance` und wird über `pendingAcceptanceBatchIds` zur Annahme angeboten, ohne dieselbe Frage zu wiederholen. Bei einer anderen aktuellen Sprache verwendet die Frageprojektion eine vorhandene lokalisierte Feldfrage; der Originaltext mit seiner Locale bleibt gespeichert. Während Unklarheiten offen sind, sind neue Analysen, Empfehlungen und darauf aufbauende Vertragsaktionen gesperrt; der Gesprächskontext gibt keine Rechenbeträge zum Sprechen frei.
 
 ## Paketbeispiel
 
@@ -186,4 +188,4 @@ npm run demo:extraction
 
 Der Durchlauf verwendet absichtlich den synthetischen Testprovider, erzeugt temporäre verschlüsselte Speicherung und entfernt sie anschließend. Er benötigt keinen Logismata- oder OpenAI-Schlüssel. Er prüft Paketannahme → vorgeschlagene Beträge → Profilversion 2 → Berechnung auf Version 2. `npm run contracts:extraction-examples` exportiert sechs zusammengehörige Beispiel-JSONs; die IDs daraus existieren nicht im laufenden Server.
 
-Für den ersten gemeinsamen Test ersetzt Erni den simulierten Extraktionsoutput durch sein Modul: „Mein Jahreseinkommen netto ist 83'000 CHF, brutto 119'000 CHF“, danach eine Korrektur vor Annahme und eine Rückfrage zur Periodizität. Abnahme: richtige Person, zwei Beträge in Rappen, explizite Ersetzung, atomare Annahme, Rückfrage bis Kundenantwort offen, anschließende Profilbestätigung, neue Berechnung und aktualisierter Gesprächskontext. Zusätzlich zwei gleichzeitige Browseränderungen testen; keine stille Überschreibung.
+Für den ersten gemeinsamen Test ersetzt Erni den simulierten Extraktionsoutput durch sein Modul: „Mein Bruttojahreseinkommen ist 119'000 CHF“, danach eine Korrektur vor Annahme und eine Rückfrage zur Periodizität. Abnahme: richtige Person, ausschließlich jährliches Brutto in Rappen und unverändertes Budget-Netto, explizite Ersetzung, atomare Annahme, Rückfrage bis Kundenantwort offen, anschließende Profilbestätigung, neue Berechnung und aktualisierter Gesprächskontext. Zusätzlich zwei gleichzeitige Browseränderungen testen; keine stille Überschreibung.

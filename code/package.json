@@ -24,7 +24,9 @@
     "test:live": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-journey.mjs",
     "test:live:metadata": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-smoke.mjs",
     "demo:extraction": "npm run build && node scripts/demo-extraction.mjs",
-    "contracts:extraction-examples": "npm run build && node scripts/demo-extraction.mjs --export"
+    "contracts:extraction-examples": "npm run build && node scripts/demo-extraction.mjs --export",
+    "demo:voice-confirmation": "npm run build && node scripts/demo-voice-confirmation.mjs",
+    "contracts:voice-examples": "npm run build && node scripts/demo-voice-confirmation.mjs --export"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

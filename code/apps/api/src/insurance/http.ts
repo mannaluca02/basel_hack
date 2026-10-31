@@ -117,6 +117,12 @@ export class ProtectedLifeController {
   }
   @Post('cases/:caseId/agent-access') agent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});this.r.engine.caseFor(req.actor,uuid(id));return this.r.sessions.agentToken(req.actor,id);}
   @Get('cases/:caseId/advisor/context') context(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.advisorContext(req.actor,uuid(id));}
+  @Post('cases/:caseId/customer-confirmations') createConfirmation(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.confirmations.create(req.actor,uuid(id),body);}
+  @Get('cases/:caseId/customer-confirmations/current') currentConfirmation(@Req() req:Request,@Param('caseId') id:string){return this.r.confirmations.current(req.actor,uuid(id));}
+  @Get('cases/:caseId/customer-confirmations/:confirmationId') readConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string){return this.r.confirmations.get(req.actor,uuid(id),requestId);}
+  @Post('cases/:caseId/customer-confirmations/:confirmationId/presented') presentConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.presented(req.actor,uuid(id),requestId,body);}
+  @Post('cases/:caseId/customer-confirmations/:confirmationId/answer') answerConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.answer(req.actor,uuid(id),requestId,body);}
+  @Post('cases/:caseId/customer-confirmations/:confirmationId/cancel') cancelConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.cancel(req.actor,uuid(id),requestId,body);}
   @Get('cases/:caseId/advisor/extractor-context') extractorContext(@Req() req:Request,@Param('caseId') id:string){return this.r.extraction.context(req.actor,uuid(id));}
   @Post('cases/:caseId/advisor/proposal-batches') batch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.extraction.proposeBatch(req.actor,uuid(id),body);}
   @Post('cases/:caseId/advisor/proposal-batches/:batchId/accept') acceptBatch(@Req() req:Request,@Param('caseId') id:string,@Param('batchId') batchId:string,@Body() body:unknown){return this.r.extraction.acceptBatch(req.actor,uuid(id),batchId,body);}

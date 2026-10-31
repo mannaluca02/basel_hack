@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { Id,Month,StatusSchema,GraphContextSchema,ProgressSchema } from './financial.js';
 import { LocaleSchema } from './insurance.js';
+import { AmbiguityDialogueSchema } from './proposal-workflow.js';
 import { ScenarioComparisonSchema } from './insurance-case.js';
 
 const revision=z.number().int().positive();
 const hash=z.string().regex(/^[a-f0-9]{64}$/);
 export const FollowUpQuestionSchema=z.object({path:z.string().max(250),mandatory:z.literal(true),text:z.string().max(4000)}).strict();
 export const QuestionsResponseSchema=z.object({profileVersion:revision.nullable(),caseRevision:revision,contextRevision:revision,
-  mandatoryFields:z.array(z.string().max(250)),questions:z.array(FollowUpQuestionSchema).max(3),pace:z.enum(['compact','detailed'])}).strict();
+  mandatoryFields:z.array(z.string().max(250)),pendingAcceptanceBatchIds:z.array(Id).max(100).default([]),questions:z.array(FollowUpQuestionSchema).max(3),pace:z.enum(['compact','detailed'])}).strict();
 export const WholeLifeProgressSchema=ProgressSchema.extend({scope:z.literal('whole_life_intake'),
   groups:z.array(z.object({id:Id,complete:z.boolean(),missing:z.array(z.string()),label:z.string().max(4000)}).strict())}).strict();
 export const ApprovedFactSchema=z.object({metricId:z.string().max(160),value:z.number().int().safe(),currency:z.literal('CHF'),unit:z.literal('cent'),
@@ -24,6 +25,7 @@ export const AdvisorContextSchema=z.object({caseId:Id,caseRevision:revision,cont
   runId:Id.nullable(),scenarioVersionId:Id.nullable(),calculationInputHash:hash.nullable(),locale:LocaleSchema,tempo:z.enum(['compact','detailed']),
   graphContext:GraphContextSchema.nullable(),contextId:hash.nullable(),selectedGraphFacts:SelectedGraphFactsSchema.nullable(),
   maySpeakSelectedAmounts:z.boolean(),calculationStatus:z.enum(['current','stale','provider_error','needs_input','running']),
+  ambiguities:z.array(AmbiguityDialogueSchema).max(100).default([]),pendingAcceptanceBatchIds:z.array(Id).max(100).default([]),
   approvedFacts:z.array(ApprovedFactSchema).max(1000),nextQuestion:FollowUpQuestionSchema.nullable(),missingFields:z.array(z.string()),
   scenarioComparisons:z.array(ScenarioComparisonSchema).max(1),reviewStatus:z.enum(['approved_for_demo','open','not_started']),maySpeakAmounts:z.boolean(),
   progress:WholeLifeProgressSchema,allowedActions:z.array(z.enum(['read_context','propose_patch','update_draft','confirm_profile','calculate','request_human','record_review'])).max(10),

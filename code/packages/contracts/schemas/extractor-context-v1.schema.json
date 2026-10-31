@@ -1561,7 +1561,8 @@
             "enum": [
               "proposed",
               "accepted",
-              "superseded"
+              "superseded",
+              "rejected"
             ]
           },
           "supersedesBatchIds": {
@@ -1743,6 +1744,25 @@
                 "type": "null"
               }
             ]
+          },
+          "dialogueStatus": {
+            "type": "string",
+            "enum": [
+              "needs_answer",
+              "awaiting_customer_acceptance",
+              "resolved"
+            ]
+          },
+          "answerBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -1755,7 +1775,9 @@
           "status",
           "resolvedAt",
           "resolvedByBatchId",
-          "resolutionSourceRef"
+          "resolutionSourceRef",
+          "dialogueStatus",
+          "answerBatchId"
         ],
         "additionalProperties": false
       }

@@ -5,6 +5,7 @@ import { SessionService } from './auth.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { DemoJourneyService } from './journey.js';
 import { DossierService } from './dossier.js';
+import { CustomerConfirmations } from './customer-confirmations.js';
 import { ExtractionWorkflow } from './extraction.js';
 import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
@@ -27,7 +28,8 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
     const provider=options.provider??(mode==='live'?new LiveLogismataProvider({token:options.token!}):await ReplayProvider.load());
     const engine=new LifeInsuranceEngine(store,sessions,provider,mode);
     const documents=options.documents??await ProductDocuments.load();
-    const journey=new DemoJourneyService(engine,documents),dossier=new DossierService(engine,journey);
+    const journey=new DemoJourneyService(engine,documents),dossier=new DossierService(engine,journey),extraction=new ExtractionWorkflow(engine);
+    const confirmations=new CustomerConfirmations(engine,extraction);
     let closed=false;
     const cleanup=setInterval(()=>{
       if(closed)return;const instant=new Date().toISOString();
@@ -39,7 +41,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
         db.audit=db.audit.filter(a=>Date.parse(a.at)>Date.now()-86400_000);
       }).catch(()=>{});
     },60_000);cleanup.unref();
-    return {store,sessions,engine,documents,journey,dossier,extraction:new ExtractionWorkflow(engine),advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
+    return {store,sessions,engine,documents,journey,dossier,extraction,confirmations,advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);await store.close();}}};
   }catch(error){await store.close();throw error;}
 }

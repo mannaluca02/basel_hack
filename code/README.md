@@ -168,3 +168,5 @@ Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm r
 ## Dialogextraktion und Vorschlagspakete
 
 Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
+
+Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.

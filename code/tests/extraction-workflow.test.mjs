@@ -88,7 +88,7 @@ test('legacy open proposals can be replaced explicitly by a batch and become una
 test('ambiguities have stable identities and provenance, persist, block confirmation and resolve with customer-accepted answers',async t=>{
  const f=await fixture(t),path='financial.persons.0.income.value';
  await f.propose('question',[],{ambiguities:[{path,personId:'person_demo_1',question:'Ist dieses Einkommen pro Monat oder Jahr?',source:{messageId:'question',turnId:'turn_question',sourceRef:'synthetic:question'}}]});
- const ambiguity=f.get().ambiguities[0];assert.equal(f.r.engine.advisorContext(f.agent,f.id).nextQuestion.text,ambiguity.question);await f.restart();assert.deepEqual(f.ctx().ambiguities[0],ambiguity);
+ const ambiguity=f.get().ambiguities[0];assert.equal(f.r.engine.advisorContext(f.agent,f.id).nextQuestion.text,ambiguity.question);await f.restart();assert.deepEqual(f.ctx().ambiguities[0],{...ambiguity,dialogueStatus:'needs_answer',answerBatchId:null});
  await assert.rejects(f.confirm(),e=>e.code==='UNRESOLVED_AMBIGUITIES');
  const batch=await f.propose('answer',[f.change(path,8100000)],{resolvesAmbiguityIds:[ambiguity.id]});
  assert.equal(f.get().ambiguities[0].status,'open');await f.accept(batch);assert.equal(f.get().ambiguities[0].status,'resolved');assert.equal(f.get().ambiguities[0].resolvedByBatchId,batch.id);

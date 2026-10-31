@@ -9,6 +9,7 @@ export const ProposalChangeInputSchema=z.object({path:z.string().min(1).max(200)
 export const AmbiguityInputSchema=z.object({path:z.string().min(1).max(200),personId:Id.optional(),question:z.string().min(1).max(1000),source:ProposalSourceSchema}).strict();
 export const CaseAmbiguitySchema=AmbiguityInputSchema.extend({id:Id,locale:LocaleSchema,createdAt:z.iso.datetime(),status:z.enum(['open','resolved']),
   resolvedAt:z.iso.datetime().nullable(),resolvedByBatchId:Id.nullable(),resolutionSourceRef:z.string().min(1).max(240).nullable()}).strict();
+export const AmbiguityDialogueSchema=CaseAmbiguitySchema.extend({dialogueStatus:z.enum(['needs_answer','awaiting_customer_acceptance','resolved']),answerBatchId:Id.nullable()}).strict();
 export const ProposalBatchInputSchema=z.object({messageId:Id,source:ProposalSourceSchema,expectedCaseRevision:revision,
   expectedProfileVersion:revision.nullable(),basisDraftHash:hash,changes:z.array(ProposalChangeInputSchema).max(50),
   ambiguities:z.array(AmbiguityInputSchema).max(20).default([]),supersedesBatchIds:z.array(Id).max(20).default([]),supersedesProposalIds:z.array(Id).max(20).default([]),
@@ -20,7 +21,7 @@ export const ProposalBatchInputSchema=z.object({messageId:Id,source:ProposalSour
   });
 export const ProposalBatchSchema=z.object({id:Id,messageId:Id,source:ProposalSourceSchema,createdAt:z.iso.datetime(),requestHash:hash,
   expectedProfileVersion:revision.nullable(),basisDraftHash:hash,changes:z.array(ProposalChangeInputSchema).max(50),
-  status:z.enum(['proposed','accepted','superseded']),supersedesBatchIds:z.array(Id).max(20),supersedesProposalIds:z.array(Id).max(20),replacedByBatchId:Id.nullable(),
+  status:z.enum(['proposed','accepted','superseded','rejected']),supersedesBatchIds:z.array(Id).max(20),supersedesProposalIds:z.array(Id).max(20),replacedByBatchId:Id.nullable(),
   ambiguityIds:z.array(Id).max(20),resolvesAmbiguityIds:z.array(Id).max(20),acceptedAt:z.iso.datetime().nullable()}).strict();
 export const ResolveAmbiguityInputSchema=z.object({expectedCaseRevision:revision,resolutionSourceRef:z.string().min(1).max(240),resolved:z.literal(true)}).strict();
 export const AmbiguityResolutionSchema=z.object({caseRevision:revision,contextRevision:revision,ambiguity:CaseAmbiguitySchema}).strict();
@@ -29,7 +30,7 @@ export const ExtractorContextBaseSchema=z.object({schemaVersion:z.literal('1.0')
   profileVersion:revision.nullable(),draftHash:hash,draftDirty:z.boolean(),locale:LocaleSchema,dataClassification:z.literal('synthetic'),
   personIds:z.array(Id).max(2),draft:DraftSchema,
   fields:z.array(z.object({path:z.string().max(200),personId:Id.optional(),value:z.json(),confirmation:z.enum(['proposed','confirmed'])}).strict()).max(3000),
-  proposalBatches:z.array(ProposalBatchSchema).max(100),ambiguities:z.array(CaseAmbiguitySchema).max(100),
+  proposalBatches:z.array(ProposalBatchSchema).max(100),ambiguities:z.array(AmbiguityDialogueSchema).max(100),
   writablePaths:z.array(z.string().max(200)).max(3000),
   policy:z.object({noRawHealthData:z.literal(true),noProviderTokens:z.literal(true),noExternalAiTransferAuthorized:z.literal(true),customerConfirmationRequired:z.literal(true)}).strict(),
 }).strict();

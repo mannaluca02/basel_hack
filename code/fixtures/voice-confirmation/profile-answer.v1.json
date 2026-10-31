@@ -1,0 +1,21 @@
+{
+  "expectedCaseRevision": 8,
+  "questionId": "3a712710-29c4-4d4a-9d1c-8d6d83c72af5",
+  "questionHash": "865ac066b6c581ee1d54ead5a1fa5dfd21bf063ce3000bddc5a1197586a916ca",
+  "questionTurnId": "question_turn_2",
+  "questionReplyId": "question_reply_2",
+  "channel": "voice",
+  "voiceLog": {
+    "schemaVersion": "1.0",
+    "messageId": "voice_yes_2",
+    "caseId": "81508195-f8a0-488d-bfea-ff25ace56889",
+    "correlationId": "3a712710-29c4-4d4a-9d1c-8d6d83c72af5",
+    "turnId": "voice_answer_turn_2",
+    "source": "voice",
+    "locale": "de",
+    "text": "Ja.",
+    "transcriptStatus": "final",
+    "dataClassification": "synthetic",
+    "expectedCaseRevision": 8
+  }
+}

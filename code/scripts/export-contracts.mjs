@@ -1,12 +1,16 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {z} from 'zod';
 import {
+  CreateConfirmationInputSchema,CustomerConfirmationSchema,PresentConfirmationInputSchema,AnswerConfirmationInputSchema,CancelConfirmationInputSchema,ConfirmationOutcomeSchema,
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,AmbiguityResolutionSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,LifeAnalysisResponseSchema,
   VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,GraphExplanationRequestSchema,SummaryBundleSchema,PortalDtoSchema,
 } from '@pax/contracts';
 
 const documents={
+  'create-confirmation-v1':CreateConfirmationInputSchema,'customer-confirmation-v1':CustomerConfirmationSchema,
+  'present-confirmation-v1':PresentConfirmationInputSchema,'answer-confirmation-v1':AnswerConfirmationInputSchema,
+  'cancel-confirmation-v1':CancelConfirmationInputSchema,'confirmation-outcome-v1':ConfirmationOutcomeSchema,
   'ambiguity-resolution-v1':AmbiguityResolutionSchema,
   'extractor-context-v1':ExtractorContextSchema,'proposal-batch-input-v1':ProposalBatchInputSchema,'proposal-batch-v1':ProposalBatchSchema,'proposal-acceptance-v1':ProposalAcceptanceSchema,
   'insurance-case-v1':InsuranceCaseDtoSchema,'advisor-context-v1':AdvisorContextSchema,

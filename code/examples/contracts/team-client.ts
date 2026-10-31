@@ -1,5 +1,6 @@
 import {
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,type ExtractorContext,type ProposalBatchInput,type ProposalBatch,
+  CustomerConfirmationSchema,AnswerConfirmationInputSchema,ConfirmationOutcomeSchema,type CustomerConfirmation,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,ApiErrorSchema,
   VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,
   type InsuranceCaseDto,type AdvisorContext,type AdvisorContextUpdated,
@@ -41,3 +42,19 @@ export async function submitProposalBatch(baseUrl:string,caseId:string,agentToke
   const response=await fetch(`${baseUrl}/api/cases/${encodeURIComponent(caseId)}/advisor/proposal-batches`,{method:'POST',headers:{Authorization:`Bearer ${agentToken}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return ProposalBatchSchema.parse(data);
 }
+
+/** Dario/Luca: confirmation writes use the CUSTOMER browser session and CSRF, never the agent grant. */
+export async function customerConfirmationCommand(path:string,csrfToken:string,input:unknown):Promise<unknown>{
+  if(!/^\/api\/cases\/[A-Za-z0-9_-]+\/customer-confirmations(?:\/[A-Za-z0-9_-]+\/(?:presented|answer|cancel))?$/.test(path))throw new Error('Unexpected confirmation route');
+  const response=await fetch(path,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify(input)});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return data;
+}
+
+/** The caller has received the exact current question and waited for its presentation acknowledgement. */
+export async function answerSpokenConfirmation(question:CustomerConfirmation,voiceLog:VoiceLog,csrfToken:string){
+  const body=AnswerConfirmationInputSchema.parse({channel:'voice',expectedCaseRevision:question.basisCaseRevision,
+    questionId:question.questionId,questionHash:question.questionHash,questionTurnId:question.questionTurnId,questionReplyId:question.questionReplyId,voiceLog});
+  const data=await customerConfirmationCommand(`/api/cases/${encodeURIComponent(question.caseId)}/customer-confirmations/${encodeURIComponent(question.id)}/answer`,csrfToken,body);
+  return ConfirmationOutcomeSchema.parse(data);
+}
+export function parseCustomerConfirmation(input:unknown):CustomerConfirmation{return CustomerConfirmationSchema.parse(input);}
