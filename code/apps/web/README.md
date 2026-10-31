@@ -27,6 +27,9 @@ npm run check:i18n    # missing/empty/extra keys per language, unknown keys used
   - route `title`s are translation keys; specs use `provideI18nTesting()`
 - `src/app/core/config/app-environment.ts` – `APP_ENVIRONMENT` token; inject it instead of importing `environment`
 - `src/environments/` – `apiBaseUrl` and `dataSource` (`mock` | `api`); the development build swaps in `environment.development.ts`
+- `src/app/core/advisor/` – the only seam to the advisor backend:
+  - `contracts.ts` mirrors the planned contracts I04, I05, I08, I09, I10; `ui-models.ts` holds the UI types without a contract yet (`RiskItem`, `TranscriptEntry`, `InfoItem`, `ChartResult`, agent state), to be aligned in FE-06
+  - inject `AdvisorDataSource`: `events` (live upserts), `snapshot()`, `connection`, `connect()` / `disconnect()`. `dataSource: 'mock'` binds `MockDataSource`, which replays a ~3 min synthetic call (`mock/mock-call-script.ts`, DE/EN texts, FR/IT fall back to DE). All amounts are in Rappen and come from the source; the UI never calculates them
 - `public/` – manifest and icons rendered from `assets/pax/logos/online/colour-positive`
 
 Environment files ship in the public bundle. Never put the Logismata token or any other secret in them.
