@@ -1,0 +1,92 @@
+{
+  "handover": {
+    "status": "requested",
+    "revision": 1,
+    "wantsHumanAdvisor": true,
+    "leaveViewRequested": true,
+    "stopDigitalConversation": true,
+    "requestId": "72162e6f-1815-4f5b-bb6d-0fe9da9ece73",
+    "requestedAt": "2026-10-31T13:06:49.480Z",
+    "resumedAt": null,
+    "source": "ui"
+  },
+  "humanAdvisorContact": {
+    "organization": "Pax",
+    "kind": "public_general_contact",
+    "phone": "+41612776666",
+    "displayPhone": "+41 61 277 66 66",
+    "sourceUrl": "https://www.pax.ch/de/kontakt-und-services",
+    "verifiedAt": "2026-10-31",
+    "automaticDialing": false,
+    "advisorAssigned": false
+  },
+  "caseId": "c8f1e35c-7445-44db-94a0-711285d3a390",
+  "caseRevision": 2,
+  "contextRevision": 2,
+  "profileVersion": null,
+  "runId": null,
+  "scenarioVersionId": null,
+  "calculationInputHash": null,
+  "locale": "de",
+  "tempo": "compact",
+  "graphContext": null,
+  "contextId": null,
+  "selectedGraphFacts": null,
+  "maySpeakSelectedAmounts": false,
+  "calculationStatus": "needs_input",
+  "ambiguities": [],
+  "pendingAcceptanceBatchIds": [],
+  "approvedFacts": [],
+  "nextQuestion": null,
+  "missingFields": [
+    "goals",
+    "financial",
+    "insurance"
+  ],
+  "scenarioComparisons": [],
+  "reviewStatus": "not_started",
+  "maySpeakAmounts": false,
+  "progress": {
+    "domain": "data_capture",
+    "percent": 0,
+    "reviewOpen": true,
+    "groups": [
+      {
+        "id": "financial",
+        "complete": false,
+        "missing": [
+          "financial"
+        ],
+        "label": "Finanzielle Ausgangslage"
+      },
+      {
+        "id": "life_goals",
+        "complete": false,
+        "missing": [
+          "goals"
+        ],
+        "label": "Lebensziele"
+      },
+      {
+        "id": "insurance_parameters",
+        "complete": false,
+        "missing": [
+          "goals",
+          "financial",
+          "insurance"
+        ],
+        "label": "Versicherungsbedarf"
+      }
+    ],
+    "scope": "whole_life_intake"
+  },
+  "allowedActions": [
+    "read_context"
+  ],
+  "policy": {
+    "noRawHealthData": true,
+    "noProviderTokens": true,
+    "noExternalAiTransferAuthorized": true,
+    "productFirstSelling": false
+  }
+}

@@ -1,7 +1,8 @@
+import { DigitalTasks } from './digital-tasks.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { CaseSnapshotSchema,CreateInsuranceCaseSchema,DraftSchema,DraftPatchSchema,ConfirmProfileSchema,
-  RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft,type LifeScenario } from '@pax/contracts';
+  DEFAULT_HUMAN_HANDOVER,PAX_HUMAN_ADVISOR_CONTACT,RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft,type LifeScenario } from '@pax/contracts';
 import { calculateBudget,calculateCapital,intakeQuestions,retirementTimeline,simulateScenario,calculateProgress } from '@pax/domain';
 import { CalculationService,createAnalysisRequest } from '../calculation/calculation.service.js';
 import { sha256Json } from '../calculation/hash.js';
@@ -23,6 +24,12 @@ const currentVersion=(c:InsuranceCase)=>c.confirmedVersions.at(-1);
 
 
 export class LifeInsuranceEngine {
+  readonly digitalTasks=new DigitalTasks();
+  assertDigitalActive(c:InsuranceCase){if(c.handover.stopDigitalConversation)throw new WorkflowError('HUMAN_HANDOVER_ACTIVE');}
+  async runDigital<T>(actor:Actor,id:string,work:(signal:AbortSignal)=>Promise<T>,external?:AbortSignal):Promise<T>{
+    this.role(actor,'customer');this.assertDigitalActive(this.caseFor(actor,id));const task=this.digitalTasks.begin(id,external);
+    try{task.signal.throwIfAborted();const result=await work(task.signal);task.signal.throwIfAborted();return result;}catch(error){if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');throw error;}finally{task.finish();}
+  }
   constructor(readonly store:EncryptedCaseStore,readonly sessions:SessionService,readonly provider:CalculationProvider,
     readonly providerMode:'live'|'replay'|'test',private readonly calculation=new CalculationService()){}
   private authorize(actor:Actor,c:InsuranceCase,allowAdvisor=false) {
@@ -47,10 +54,11 @@ export class LifeInsuranceEngine {
     db.audit.push({id:randomUUID(),at:now(),actorId:actor.id,action,caseId:c?.id??null,profileVersion:c?currentVersion(c)?.version??null:null,outcome});
     db.audit=db.audit.slice(-2000);
   }
-  async edit<T>(actor:Actor,id:string,expected:number|undefined,fn:(c:InsuranceCase,db:Database)=>T):Promise<T> {
+  async edit<T>(actor:Actor,id:string,expected:number|undefined,fn:(c:InsuranceCase,db:Database)=>T,options:{allowDuringHandover?:boolean}={}):Promise<T> {
     return this.store.transaction(db=>{
       this.sessions.assertActive(actor,db);
       const c=Object.hasOwn(db.cases,id)?db.cases[id]:undefined;if(!c)throw new WorkflowError('NOT_FOUND',404);this.authorize(actor,c);
+      if(actor.role==='customer'&&!options.allowDuringHandover)this.assertDigitalActive(c);
       if(expected!==undefined&&c.caseRevision!==expected)throw new WorkflowError('VERSION_CONFLICT');
       return fn(c,db);
     });
@@ -74,7 +82,7 @@ export class LifeInsuranceEngine {
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),
         locale:body.locale,timeBudgetMinutes:body.timeBudgetMinutes,caseRevision:1,contextRevision:1,
         draft:{financial:null,insurance:null,goals:[],reviewFlags:[]},draftDirty:true,confirmedVersions:[],latestAnalysisRequestId:null,activeRunId:null,
-        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],confirmationRequests:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
+        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],handover:structuredClone(DEFAULT_HUMAN_HANDOVER),confirmationRequests:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
   }
@@ -105,7 +113,7 @@ export class LifeInsuranceEngine {
     const fields=[...new Set([...c.ambiguities.filter(a=>a.status==='open').map(a=>a.path),...intakeQuestions(questionDraft)])];
     const askable=fields.filter(path=>waitingForAnswer(c,path,dialogue));
     return QuestionsResponseSchema.parse({profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
-      mandatoryFields:fields,pendingAcceptanceBatchIds:pendingAcceptanceIds(dialogue),questions:askable.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
+      mandatoryFields:fields,pendingAcceptanceBatchIds:pendingAcceptanceIds(dialogue),questions:(c.handover.stopDigitalConversation?[]:askable).slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
         text:ambiguities.find(a=>a.path===path&&a.locale===c.locale)?.question??questionText(c.locale,path)})),
       pace:c.timeBudgetMinutes<=10?'compact':'detailed'});
   }
@@ -117,7 +125,7 @@ export class LifeInsuranceEngine {
   }
   /** Internal composition point: caller must hold the existing store transaction. */
   confirmInTransaction(actor:Actor,c:InsuranceCase,db:Database,input:unknown) {
-    this.sessions.assertActive(actor,db);this.authorize(actor,c);this.role(actor,'customer');
+    this.sessions.assertActive(actor,db);this.authorize(actor,c);this.role(actor,'customer');this.assertDigitalActive(c);
     const body=ConfirmProfileSchema.parse(input);if(body.expectedCaseRevision!==c.caseRevision)throw new WorkflowError('VERSION_CONFLICT');
     if(c.ambiguities?.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422,c.ambiguities.filter(a=>a.status==='open').map(a=>a.path));
     const draft=DraftSchema.parse(c.draft);
@@ -140,6 +148,16 @@ export class LifeInsuranceEngine {
     this.touch(c,'confirmed_profile_changed');this.audit(db,actor,c,'profile_confirmed');return c;
   }
   async analyze(actor:Actor,id:string,input:unknown,signal?:AbortSignal) {
+    let startedId:string|undefined;
+    try{return await this.runDigital(actor,id,linked=>this.analyzeDigital(actor,id,input,linked,requestId=>{startedId=requestId;}),signal);}
+    catch(error){
+      if(error instanceof WorkflowError&&error.code==='DIGITAL_TASK_CANCELLED'&&startedId)await this.edit(actor,id,undefined,(c,db)=>{
+        if(c.latestAnalysisRequestId===startedId){c.latestAnalysisRequestId=null;this.touch(c,'analysis_cancelled');this.audit(db,actor,c,'analysis_cancelled');}
+      },{allowDuringHandover:true}).catch(()=>{});
+      throw error;
+    }
+  }
+  private async analyzeDigital(actor:Actor,id:string,input:unknown,signal:AbortSignal,onStarted:(requestId:string)=>void) {
     this.role(actor,'customer');const body=RunAnalysisSchema.parse(input);
     const initial=this.caseFor(actor,id);if(initial.ambiguities.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422);const initialVersion=currentVersion(initial);
     if(initial.runs.length>=20)throw new WorkflowError('RUN_CAPACITY',429);
@@ -162,11 +180,13 @@ export class LifeInsuranceEngine {
       c.latestAnalysisRequestId=randomUUID();c.activeRunId=null;c.graphContext=null;this.touch(c,'analysis_started');this.audit(db,actor,c,'analysis_started');
       return {requestId:c.latestAnalysisRequestId,version:structuredClone(version),caseRevision:c.caseRevision};
     });
+    onStarted(started.requestId);
     const draft=started.version.draft;const financial=draft.financial!;
     const providerResults:NormalizedProviderResult[]=[];const failures:{operation:string;code:string}[]=[];
     try {
       const jobs=buildProviderJobs(draft,scenarioFinancial,body.scenario,this.providerMode==='live'?new Date().getUTCFullYear():Number(financial.valuationDate.slice(0,4)),initial.locale);
       for(const slice of Array.from({length:Math.ceil(jobs.length/2)},(_,i)=>jobs.slice(i*2,i*2+2))) {
+        signal.throwIfAborted();
         await Promise.all(slice.map(async job=>{
           try {const result=await this.provider.execute(job.operation,job.request,signal);
             if(job.personId)result.metadata={...result.metadata,personId:job.personId};providerResults.push(result);
@@ -175,6 +195,7 @@ export class LifeInsuranceEngine {
         }));
       }
     }catch(e){failures.push({operation:'scenario_or_mapping',code:e instanceof WorkflowError?e.code:'NEEDS_INPUT'});}
+    signal.throwIfAborted();
     const reviewReasons=new Set<string>(['LIFE_INSURANCE_DEMO_REVIEW_REQUIRED']);
     for(const flag of draft.reviewFlags)reviewReasons.add(flag.toUpperCase());
     for(const r of providerResults)for(const i of r.issues)reviewReasons.add(i.code);
@@ -256,12 +277,12 @@ export class LifeInsuranceEngine {
       const task={id:randomUUID(),runId:run?.id??'intake',profileVersion:currentVersion(c)?.version??0,reasons:[...new Set([...(run?.reviewReasons??[]),'USER_REQUESTED'])],status:'open' as const,decision:null};
       for(const rec of c.recommendations.filter(r=>r.runId===run?.id&&r.candidates.length)){rec.status='human_review_required';for(const p of rec.candidates)p.eligibility='human_review_required';}
       c.reviewTasks.push(task);this.touch(c,'review_state_changed');this.audit(db,actor,c,'human_review_requested');return task;
-    });
+    },{allowDuringHandover:true});
   }
   async preferences(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=CasePreferencesSchema.parse(input);
     return this.edit(actor,id,undefined,(c,db)=>{if(body.timeBudgetMinutes!==undefined)c.timeBudgetMinutes=body.timeBudgetMinutes;if(body.locale)c.locale=body.locale;
-      this.touch(c,'conversation_preference_changed');this.audit(db,actor,c,'preferences_changed');return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,locale:c.locale};});
+      this.touch(c,'conversation_preference_changed');this.audit(db,actor,c,'preferences_changed');return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,locale:c.locale};},{allowDuringHandover:true});
   }
   async selectAnalysis(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=z.object({runId:z.string().uuid()}).strict().parse(input);
@@ -285,7 +306,7 @@ export class LifeInsuranceEngine {
     });
   }
   advisorContext(actor:Actor,id:string) {
-    const c=this.caseFor(actor,id,true);const run=!c.draftDirty&&!c.ambiguities.some(a=>a.status==='open')?c.runs.find(r=>r.id===c.activeRunId&&r.status!=='stale'):null;
+    const c=this.caseFor(actor,id,true);const run=!c.handover.stopDigitalConversation&&!c.draftDirty&&!c.ambiguities.some(a=>a.status==='open')?c.runs.find(r=>r.id===c.activeRunId&&r.status!=='stale'):null;
     const questions=this.questions(actor,id);const approved=run?this.approved(c,run):false;
     const facts=run?.local.metrics.filter(m=>m.value!==null&&['valid','estimated'].includes(m.status)).map(m=>({metricId:m.id,value:m.value,
       currency:m.currency,unit:m.unit,period:m.period,status:m.status,runId:run.id,profileVersion:run.profileVersion,scenarioVersionId:run.scenarioVersionId,humanReviewedForDemo:approved}))??[];
@@ -296,7 +317,7 @@ export class LifeInsuranceEngine {
     const projected=selected&&selected.series.length>24?{...selected,series:[],rangeSummary:{points:selected.series.length,
       first:selected.series[0],last:selected.series.at(-1),minimumKnown:values.length?Math.min(...values):null,
       maximumKnown:values.length?Math.max(...values):null,unknownPoints:selected.series.length-values.length}}:selected;
-    return AdvisorContextSchema.parse({caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
+    return AdvisorContextSchema.parse({handover:c.handover,humanAdvisorContact:PAX_HUMAN_ADVISOR_CONTACT,caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
       runId:run?.id??null,scenarioVersionId:run?.scenarioVersionId??null,calculationInputHash:run?.inputHash??null,
       locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:run?c.graphContext:null,
       contextId:run&&c.graphContext?sha256Json(c.graphContext):null,
@@ -310,7 +331,7 @@ export class LifeInsuranceEngine {
       scenarioComparisons:run?c.comparisons.filter(x=>x.variantRunId===run.id).slice(-1):[],
       reviewStatus:approved?'approved_for_demo':run?'open':'not_started',maySpeakAmounts:facts.length>0,
       progress:{...this.progress(c),groups:progressText(c.locale,this.progress(c).groups)},
-      allowedActions:actor.role==='advisor'?['read_context','propose_patch']:actor.role==='reviewer'?['read_context','record_review']:['update_draft','confirm_profile','calculate','request_human'],
+      allowedActions:actor.role==='reviewer'?['read_context','record_review']:c.handover.stopDigitalConversation?actor.role==='advisor'?['read_context']:['resume_digital']:actor.role==='advisor'?['read_context','propose_patch']:['update_draft','confirm_profile','calculate','request_human'],
       policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,productFirstSelling:false}});
   }
   progress(c:InsuranceCase) {

@@ -1,4 +1,5 @@
 import {
+  HumanHandoverCommandSchema,HumanHandoverCommandResponseSchema,type HumanHandoverCommand,
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,type ExtractorContext,type ProposalBatchInput,type ProposalBatch,
   CustomerConfirmationSchema,AnswerConfirmationInputSchema,ConfirmationOutcomeSchema,type CustomerConfirmation,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,ApiErrorSchema,
@@ -58,3 +59,14 @@ export async function answerSpokenConfirmation(question:CustomerConfirmation,voi
   return ConfirmationOutcomeSchema.parse(data);
 }
 export function parseCustomerConfirmation(input:unknown):CustomerConfirmation{return CustomerConfirmationSchema.parse(input);}
+
+/** Luca: explicit customer intent only. Merely navigating between workspace tabs never sends this command. */
+export async function switchHumanHandover(caseId:string,csrfToken:string,input:HumanHandoverCommand){
+  const response=await fetch(`/api/cases/${encodeURIComponent(caseId)}/handover`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify(HumanHandoverCommandSchema.parse(input))});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return HumanHandoverCommandResponseSchema.parse(data);
+}
+/** Dario/Earnie/Lukas: this event is data only; the real modules own their playback/recording/model cancellation. */
+export function handleDigitalStop(event:AdvisorContextUpdated,previousHandoverRevision:number,stop:()=>void):number{
+  if(event.handover.stopDigitalConversation||event.handover.revision>previousHandoverRevision)stop();
+  return event.handover.revision;
+}

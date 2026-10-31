@@ -5,6 +5,7 @@ import { CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnal
   RecommendationPresentationSchema,CasePreferencesSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema,
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,
   CreateConfirmationInputSchema,CustomerConfirmationSchema,PresentConfirmationInputSchema,AnswerConfirmationInputSchema,CancelConfirmationInputSchema,ConfirmationOutcomeSchema,CurrentCustomerConfirmationSchema,
+  HumanHandoverCommandSchema,HumanHandoverViewSchema,HumanHandoverCommandResponseSchema,
   SessionResponseSchema,AgentAccessResponseSchema,ApiErrorSchema,SummaryBundleSchema,PortalDtoSchema } from '@pax/contracts';
 import { EstimateRequestSchema } from './estimates.js';
 import { AdditionalToolRequestSchema } from './tools.js';
@@ -47,6 +48,8 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['post','/api/cases/{caseId}/customer-confirmations/{confirmationId}/presented','Customer UI attests review display and completed voice playback',PresentConfirmationInputSchema],
   ['post','/api/cases/{caseId}/customer-confirmations/{confirmationId}/answer','Consume a final, bound voice/screen answer in the same transaction as its one authorized action',AnswerConfirmationInputSchema],
   ['post','/api/cases/{caseId}/customer-confirmations/{confirmationId}/cancel','Customer cancels an unanswered question, including on a new conversation question',CancelConfirmationInputSchema],
+  ['get','/api/cases/{caseId}/handover','Read persisted human-advisor intent, stop flag and contact data; does not dial or book',undefined],
+  ['post','/api/cases/{caseId}/handover','Customer requests human advice or explicitly resumes digital advice; revision guarded and idempotent',HumanHandoverCommandSchema],
   ['get','/api/cases/{caseId}/advisor/extractor-context','Read authorized current extraction state; no history, credentials or external-AI permission',undefined],
   ['post','/api/cases/{caseId}/advisor/proposal-batches','Propose a source-bound atomic change set and ambiguities; agent only',ProposalBatchInputSchema],
   ['post','/api/cases/{caseId}/advisor/proposal-batches/{batchId}/accept','Customer accepts all changes into draft; profile confirmation still required',AcceptProposalInputSchema],
@@ -77,6 +80,7 @@ export function lifeOpenApi() {
   const analysis=reference('LifeAnalysisResponse',LifeAnalysisResponseSchema),context=reference('AdvisorContext',AdvisorContextSchema);
   const extractor=reference('ExtractorContext',ExtractorContextSchema),batch=reference('ProposalBatch',ProposalBatchSchema),acceptance=reference('ProposalAcceptance',ProposalAcceptanceSchema),resolution=reference('AmbiguityResolution',AmbiguityResolutionSchema);
   const confirmation=reference('CustomerConfirmation',CustomerConfirmationSchema),currentConfirmation=reference('CurrentCustomerConfirmation',CurrentCustomerConfirmationSchema),outcome=reference('ConfirmationOutcome',ConfirmationOutcomeSchema);
+  const handover=reference('HumanHandoverView',HumanHandoverViewSchema),handoverCommand=reference('HumanHandoverCommandResponse',HumanHandoverCommandResponseSchema);
   const questions=reference('QuestionsResponse',QuestionsResponseSchema),recommendation=reference('RecommendationPresentation',RecommendationPresentationSchema);
   const event=reference('AdvisorContextUpdated',AdvisorContextUpdatedSchema),error=reference('ApiError',ApiErrorSchema);
   const session=reference('SessionResponse',SessionResponseSchema),agentAccess=reference('AgentAccessResponse',AgentAccessResponseSchema);
@@ -86,6 +90,7 @@ export function lifeOpenApi() {
     const parameters=[...path.matchAll(/\{(\w+)\}/g)].map(m=>({in:'path',name:m[1],required:true,schema:{type:'string'}}));
     const languageParameters=['/api/translations','/api/privacy'].includes(path)?[{in:'query',name:'locale',required:false,schema:{type:'string',enum:['de','fr','it','en']}}]:[];
     const responseSchema=(path==='/api/cases'&&method==='post')||path==='/api/cases/{caseId}'&&method==='get'||path.endsWith('/draft')||path.endsWith('/confirmations')?caseDto:
+      path.endsWith('/handover')?method==='post'?handoverCommand:handover:
       path.endsWith('/customer-confirmations/current')?currentConfirmation:path.endsWith('/answer')&&path.includes('/customer-confirmations/')?outcome:path.includes('/customer-confirmations')?confirmation:
       path.endsWith('/advisor/extractor-context')?extractor:path.endsWith('/advisor/proposal-batches')?batch:path.endsWith('/accept')?acceptance:path.endsWith('/resolve')?resolution:
       path.endsWith('/calculations')?analysis:path.endsWith('/advisor/context')?context:path.endsWith('/questions')?questions:

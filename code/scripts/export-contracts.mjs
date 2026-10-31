@@ -1,6 +1,7 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {z} from 'zod';
 import {
+  HumanHandoverSchema,HumanHandoverCommandSchema,HumanHandoverViewSchema,HumanHandoverCommandResponseSchema,
   CreateConfirmationInputSchema,CustomerConfirmationSchema,PresentConfirmationInputSchema,AnswerConfirmationInputSchema,CancelConfirmationInputSchema,ConfirmationOutcomeSchema,
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,AmbiguityResolutionSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,LifeAnalysisResponseSchema,
@@ -8,6 +9,8 @@ import {
 } from '@pax/contracts';
 
 const documents={
+  'human-handover-v1':HumanHandoverSchema,'human-handover-command-v1':HumanHandoverCommandSchema,
+  'human-handover-view-v1':HumanHandoverViewSchema,'human-handover-response-v1':HumanHandoverCommandResponseSchema,
   'create-confirmation-v1':CreateConfirmationInputSchema,'customer-confirmation-v1':CustomerConfirmationSchema,
   'present-confirmation-v1':PresentConfirmationInputSchema,'answer-confirmation-v1':AnswerConfirmationInputSchema,
   'cancel-confirmation-v1':CancelConfirmationInputSchema,'confirmation-outcome-v1':ConfirmationOutcomeSchema,

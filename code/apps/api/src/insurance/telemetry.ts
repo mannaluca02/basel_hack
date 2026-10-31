@@ -14,7 +14,7 @@ export class PrototypeInsights {
         throw new WorkflowError('FEEDBACK_STAGE_NOT_REACHED',422);
       if(db.feedback.some(f=>f.caseId===c.id&&f.stage===b.stage))throw new WorkflowError('FEEDBACK_ALREADY_RECORDED');
       db.feedback.push({caseId:c.id,at:new Date().toISOString(),stage:b.stage,score:b.score});this.engine.audit(db,actor,c,'nps_recorded');return {recorded:true};
-    });
+    },{allowDuringHandover:true});
   }
   aggregate(actor:Actor) {
     this.engine.sessions.assertActive(actor);if(actor.role!=='reviewer')throw new WorkflowError('FORBIDDEN',403);
@@ -29,6 +29,7 @@ export class PrototypeInsights {
       const scores=db.feedback.map(f=>f.score),promoters=scores.filter(s=>s>=9).length,detractors=scores.filter(s=>s<=6).length;
       return {dataMode:'synthetic_cases',caseCount:cases.length,currentStageCounts:stageCounts,
         potentialDropoffs,dropoffDefinition:'No policy and no case update for ten minutes; a signal, not confirmed abandonment.',blockingReasons,
+        humanHandover:{requested:cases.filter(c=>c.handover.wantsHumanAdvisor).length,automaticDialing:false},
         nps:{responses:scores.length,score:scores.length?Math.round(100*(promoters-detractors)/scores.length):null},
         containsFinancialAmounts:false,containsFreeText:false};
     });

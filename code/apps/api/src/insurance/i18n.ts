@@ -35,6 +35,7 @@ export const reviewText=(locale:Locale,code:string)=>{
   return key?translated(locale,`review.${key}`,'common.review'):t(locale,'common.review');
 };
 export const errorText=(locale:Locale,code:string)=>t(locale,
+  code==='HUMAN_HANDOVER_ACTIVE'?'error.handoverActive':code==='DIGITAL_TASK_CANCELLED'?'error.digitalCancelled':
   code==='UNAUTHORIZED'?'error.unauthorized':/FORBIDDEN|CSRF|ORIGIN/.test(code)?'error.forbidden':
   /NOT_FOUND/.test(code)?'error.notFound':/STALE|VERSION_CONFLICT/.test(code)?'error.stale':
   /UNAVAILABLE|TIMEOUT|INTERNAL|BUSY|RATE_LIMIT/.test(code)?'error.unavailable':

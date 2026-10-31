@@ -26,7 +26,9 @@
     "demo:extraction": "npm run build && node scripts/demo-extraction.mjs",
     "contracts:extraction-examples": "npm run build && node scripts/demo-extraction.mjs --export",
     "demo:voice-confirmation": "npm run build && node scripts/demo-voice-confirmation.mjs",
-    "contracts:voice-examples": "npm run build && node scripts/demo-voice-confirmation.mjs --export"
+    "contracts:voice-examples": "npm run build && node scripts/demo-voice-confirmation.mjs --export",
+    "demo:handover": "npm run build && node scripts/demo-human-handover.mjs",
+    "contracts:handover-examples": "npm run build && node scripts/demo-human-handover.mjs --export"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

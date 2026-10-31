@@ -31,6 +31,9 @@ export class AdditionalCalculatorTools {
   list(actor:Actor,id:string){this.engine.caseFor(actor,id);return AdditionalOperations.map(operation=>({operation,operationId:Operations[operation].id,
     requestUnits:'CHF_CENTS',moneyFields:AdditionalMoneyFields[operation],scope:'isolated_calculator_estimate',requiresSeparateDomainReview:!['taxBaseInfo','searchLocationGeo','estateGainFields'].includes(operation)}));}
   async execute(actor:Actor,id:string,input:unknown) {
+    return this.engine.runDigital(actor,id,signal=>this.executeDigital(actor,id,input,signal));
+  }
+  private async executeDigital(actor:Actor,id:string,input:unknown,signal:AbortSignal) {
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
     const b=AdditionalToolRequestSchema.parse(input),operation=b.operation as AdditionalOperation,c=this.engine.caseFor(actor,id);
     if(c.caseRevision!==b.expectedCaseRevision)throw new WorkflowError('VERSION_CONFLICT');
@@ -40,8 +43,9 @@ export class AdditionalCalculatorTools {
     if(operation==='searchLocationGeo')request.Language=languageNumber[c.locale];
     const validated=RequestSchemas[operation].parse(request);
     let result;
-    try{result=ProviderResultSchema.parse(await this.engine.provider.execute(operation,validated));}
+    try{result=ProviderResultSchema.parse(await this.engine.provider.execute(operation,validated,signal));}
     catch{throw new WorkflowError('PROVIDER_UNAVAILABLE',503);}
+    signal.throwIfAborted();
     return this.engine.edit(actor,id,undefined,(current,db)=>{
       if((current.toolRuns?.length??0)>=40)throw new WorkflowError('TOOL_CAPACITY',429);
       const record:CalculatorToolRun={id:randomUUID(),createdAt:new Date().toISOString(),operation,requestUnits:'CHF_CENTS',request:z.record(z.string(),z.json()).parse(b.request),

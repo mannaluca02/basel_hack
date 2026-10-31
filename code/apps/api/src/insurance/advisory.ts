@@ -16,10 +16,11 @@ export class AdvisoryTools {
   constructor(readonly engine:LifeInsuranceEngine){}
   async propose(actor:Actor,id:string,input:unknown) {
     this.engine.sessions.assertActive(actor);if(actor.role!=='advisor')throw new WorkflowError('FORBIDDEN',403);
-    this.engine.caseFor(actor,id,true);const p=ProposalSchema.parse(input);if(!permitted(p.path))throw new WorkflowError('PATCH_PATH_FORBIDDEN',422);
+    this.engine.assertDigitalActive(this.engine.caseFor(actor,id,true));const p=ProposalSchema.parse(input);if(!permitted(p.path))throw new WorkflowError('PATCH_PATH_FORBIDDEN',422);
     return this.engine.store.transaction(db=>{
       this.engine.sessions.assertActive(actor,db);const c=db.cases[id]!;
       if(c.ownerId!==actor.id||actor.caseId!==id)throw new WorkflowError('NOT_FOUND',404);
+      this.engine.assertDigitalActive(c);
       if((c.confirmedVersions.at(-1)?.version??null)!==p.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
       const previous=c.proposals.find(x=>x.messageId===p.messageId);
       if(previous){if(previous.path!==p.path||sha256Json(previous.value)!==sha256Json(p.value))throw new WorkflowError('IDEMPOTENCY_CONFLICT');return previous;}
@@ -32,6 +33,7 @@ export class AdvisoryTools {
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const body=AcceptSchema.parse(input);
     return this.engine.edit(actor,id,body.expectedCaseRevision,(c,db)=>{
       const p=c.proposals.find(x=>x.id===proposalId);if(!p||p.status!=='proposed')throw new WorkflowError('PROPOSAL_NOT_OPEN');
+      this.engine.assertDigitalActive(c);
       if((c.confirmedVersions.at(-1)?.version??null)!==p.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
       if(sha256Json(c.draft)!==p.basisDraftHash)throw new WorkflowError('STALE_PROPOSAL');
       c.draft=applyChanges(c.draft,[{path:p.path,value:p.value}],id,`conversation:${p.messageId}`,false);p.status='accepted';

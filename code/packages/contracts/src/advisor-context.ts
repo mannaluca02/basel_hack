@@ -1,3 +1,4 @@
+import { HumanHandoverSchema,DEFAULT_HUMAN_HANDOVER,HumanAdvisorContactSchema,PAX_HUMAN_ADVISOR_CONTACT } from './human-handover.js';
 import { z } from 'zod';
 import { Id,Month,StatusSchema,GraphContextSchema,ProgressSchema } from './financial.js';
 import { LocaleSchema } from './insurance.js';
@@ -21,19 +22,20 @@ export const SelectedGraphFactsSchema=z.object({metric:z.object({id:z.string().m
   series:z.array(graphPoint).max(24),sourceRefs:z.array(z.string()),
   rangeSummary:z.object({points:z.number().int().min(25).max(1200),first:graphPoint,last:graphPoint,
     minimumKnown:z.number().int().safe().nullable(),maximumKnown:z.number().int().safe().nullable(),unknownPoints:z.number().int().nonnegative()}).strict().optional()}).strict();
-export const AdvisorContextSchema=z.object({caseId:Id,caseRevision:revision,contextRevision:revision,profileVersion:revision.nullable(),
+export const AdvisorContextSchema=z.object({handover:HumanHandoverSchema.default(()=>structuredClone(DEFAULT_HUMAN_HANDOVER)),humanAdvisorContact:HumanAdvisorContactSchema.default(()=>structuredClone(PAX_HUMAN_ADVISOR_CONTACT)),caseId:Id,caseRevision:revision,contextRevision:revision,profileVersion:revision.nullable(),
   runId:Id.nullable(),scenarioVersionId:Id.nullable(),calculationInputHash:hash.nullable(),locale:LocaleSchema,tempo:z.enum(['compact','detailed']),
   graphContext:GraphContextSchema.nullable(),contextId:hash.nullable(),selectedGraphFacts:SelectedGraphFactsSchema.nullable(),
   maySpeakSelectedAmounts:z.boolean(),calculationStatus:z.enum(['current','stale','provider_error','needs_input','running']),
   ambiguities:z.array(AmbiguityDialogueSchema).max(100).default([]),pendingAcceptanceBatchIds:z.array(Id).max(100).default([]),
   approvedFacts:z.array(ApprovedFactSchema).max(1000),nextQuestion:FollowUpQuestionSchema.nullable(),missingFields:z.array(z.string()),
   scenarioComparisons:z.array(ScenarioComparisonSchema).max(1),reviewStatus:z.enum(['approved_for_demo','open','not_started']),maySpeakAmounts:z.boolean(),
-  progress:WholeLifeProgressSchema,allowedActions:z.array(z.enum(['read_context','propose_patch','update_draft','confirm_profile','calculate','request_human','record_review'])).max(10),
+  progress:WholeLifeProgressSchema,allowedActions:z.array(z.enum(['read_context','propose_patch','update_draft','confirm_profile','calculate','request_human','resume_digital','record_review'])).max(10),
   policy:z.object({noRawHealthData:z.literal(true),noProviderTokens:z.literal(true),noExternalAiTransferAuthorized:z.literal(true),productFirstSelling:z.literal(false)}).strict(),
 }).strict();
 export const AdvisorContextUpdatedSchema=z.object({schemaVersion:z.literal('1.0'),messageId:Id,caseId:Id,correlationId:Id,eventId:Id,
   contextRevision:revision,reason:z.string().max(100),contextRef:z.string().regex(/^\/api\/cases\/[A-Za-z0-9_-]+\/advisor\/context$/),
-  interruptPolicy:z.enum(['refresh_before_next_turn','if_current_answer_invalid'])}).strict()
+  handover:HumanHandoverSchema.default(()=>structuredClone(DEFAULT_HUMAN_HANDOVER)),
+  interruptPolicy:z.enum(['refresh_before_next_turn','if_current_answer_invalid','immediate'])}).strict()
   .refine(e=>e.contextRef===`/api/cases/${e.caseId}/advisor/context`,'Event context belongs to a different case');
 export const ApiErrorSchema=z.object({code:z.string().regex(/^[A-Z0-9_]{1,100}$/),fields:z.array(z.string()).optional(),locale:LocaleSchema,message:z.string().max(4000)}).strict();
 export const SessionResponseSchema=z.object({sessionToken:z.string().regex(/^[A-Za-z0-9_-]{40,100}$/),csrfToken:z.string().regex(/^[A-Za-z0-9_-]{40,100}$/),expiresAt:z.iso.datetime(),role:z.enum(['customer','reviewer']),actorId:Id}).strict();

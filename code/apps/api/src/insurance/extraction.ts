@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { ExtractorContextSchema,ProposalBatchInputSchema,AcceptProposalInputSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,ProposalAcceptanceSchema,
-  type ProposalBatch } from '@pax/contracts';
+  PAX_HUMAN_ADVISOR_CONTACT,type ProposalBatch } from '@pax/contracts';
 import { ambiguityDialogue } from './ambiguity-dialogue.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor,type InsuranceCase,type Database } from './types.js';
@@ -13,7 +13,7 @@ export class ExtractionWorkflow {
   context(actor:Actor,id:string){
     if(actor.role!=='advisor'&&actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
     const c=this.engine.caseFor(actor,id,true),confirmed=c.confirmedVersions.at(-1)?.draft,paths=writablePaths(c.draft);
-    return ExtractorContextSchema.parse({schemaVersion:'1.0',caseId:id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:profile(c),
+    return ExtractorContextSchema.parse({handover:c.handover,humanAdvisorContact:PAX_HUMAN_ADVISOR_CONTACT,schemaVersion:'1.0',caseId:id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:profile(c),
       draftHash:sha256Json(c.draft),draftDirty:c.draftDirty,locale:c.locale,dataClassification:'synthetic',personIds:c.draft.financial?.persons.map(p=>p.id)??[],draft:c.draft,
       fields:paths.filter(path=>!path.endsWith('_add')&&path!=='financial'&&path!=='insurance').map(path=>{
         const personId=personFor(c.draft,path),value=at(c.draft,path),old=confirmed?at(confirmed,path):undefined;
@@ -24,7 +24,7 @@ export class ExtractionWorkflow {
       policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,customerConfirmationRequired:true}});
   }
   private assertAgent(actor:Actor,id:string){
-    this.engine.sessions.assertActive(actor);if(actor.role!=='advisor')throw new WorkflowError('FORBIDDEN',403);this.engine.caseFor(actor,id,true);
+    this.engine.sessions.assertActive(actor);if(actor.role!=='advisor')throw new WorkflowError('FORBIDDEN',403);this.engine.assertDigitalActive(this.engine.caseFor(actor,id,true));
   }
   async proposeBatch(actor:Actor,id:string,input:unknown){
     this.assertAgent(actor,id);const b=ProposalBatchInputSchema.parse(input),requestHash=sha256Json(b);
@@ -32,6 +32,7 @@ export class ExtractionWorkflow {
       this.engine.sessions.assertActive(actor,db);const c=db.cases[id];
       if(!c||c.ownerId!==actor.id||actor.caseId!==id)throw new WorkflowError('NOT_FOUND',404);
       if(c.expiresAt<=new Date().toISOString())throw new WorkflowError('CASE_EXPIRED',410);
+      this.engine.assertDigitalActive(c);
       const previous=c.proposalBatches.find(p=>p.messageId===b.messageId);
       if(previous){if(previous.requestHash!==requestHash)throw new WorkflowError('IDEMPOTENCY_CONFLICT');return previous;}
       if(c.caseRevision!==b.expectedCaseRevision)throw new WorkflowError('VERSION_CONFLICT');
@@ -78,6 +79,7 @@ export class ExtractionWorkflow {
   acceptBatchInTransaction(actor:Actor,c:InsuranceCase,db:Database,batchId:string,input:unknown){
     this.engine.sessions.assertActive(actor,db);this.engine.caseFor(actor,c.id);
     if(actor.role!=='customer'||actor.id!==c.ownerId)throw new WorkflowError('FORBIDDEN',403);
+    this.engine.assertDigitalActive(c);
     const b=AcceptProposalInputSchema.parse(input);if(b.expectedCaseRevision!==c.caseRevision)throw new WorkflowError('VERSION_CONFLICT');
     const batch=c.proposalBatches.find(p=>p.id===batchId);if(!batch||batch.status!=='proposed')throw new WorkflowError('PROPOSAL_NOT_OPEN');
     if(profile(c)!==batch.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');

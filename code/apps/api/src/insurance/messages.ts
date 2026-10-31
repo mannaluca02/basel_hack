@@ -1,5 +1,7 @@
 // Customer-facing text. Stable protocol/financial codes are deliberately not translated.
 export const Messages = {
+  "error.handoverActive": {"de": "Die digitale Beratung ist für die gewünschte persönliche Beratung pausiert. Sie können sie ausdrücklich wieder aufnehmen.", "fr": "Le conseil numérique est en pause pour le conseil personnel demandé. Vous pouvez le reprendre explicitement.", "it": "La consulenza digitale è in pausa per la consulenza personale richiesta. Può riprenderla esplicitamente.", "en": "Digital advice is paused for the requested personal advice. You can explicitly resume it."},
+  "error.digitalCancelled": {"de": "Die digitale Verarbeitung wurde abgebrochen. Bitte starten Sie bei Bedarf eine neue Anfrage.", "fr": "Le traitement numérique a été annulé. Lancez une nouvelle demande si nécessaire.", "it": "L’elaborazione digitale è stata annullata. Se necessario avvii una nuova richiesta.", "en": "Digital processing was cancelled. Start a new request if needed."},
   "common.title": {
     "de": "Pax LifeMap – Vorsorgeübersicht",
     "fr": "Pax LifeMap – aperçu de la prévoyance",

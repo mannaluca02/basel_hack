@@ -18,6 +18,9 @@ export const EstimateRequestSchema=z.object({expectedCaseRevision:z.number().int
 export class DraftEstimateService {
   constructor(readonly engine:LifeInsuranceEngine){}
   async calculate(actor:Actor,id:string,input:unknown,signal?:AbortSignal) {
+    return this.engine.runDigital(actor,id,linked=>this.calculateDigital(actor,id,input,linked),signal);
+  }
+  private async calculateDigital(actor:Actor,id:string,input:unknown,signal:AbortSignal) {
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
     const body=EstimateRequestSchema.parse(input),c=this.engine.caseFor(actor,id);
     if(c.caseRevision!==body.expectedCaseRevision)throw new WorkflowError('VERSION_CONFLICT');
@@ -63,9 +66,10 @@ export class DraftEstimateService {
       }
     }
     const results:NormalizedProviderResult[]=[];const errors:{operation:string;code:string}[]=[];
-    for(const job of jobs)try{
+    for(const job of jobs){signal.throwIfAborted();try{
       const r=await this.engine.provider.execute(job.operation,job.request,signal);if(job.personId)r.metadata.personId=job.personId;results.push(r);
-    }catch(e){errors.push({operation:job.operation,code:typeof e==='object'&&e!==null&&'code'in e&&/^[A-Z_]{2,80}$/.test(String(e.code))?String(e.code):'PROVIDER_ERROR'});}
+    }catch(e){errors.push({operation:job.operation,code:typeof e==='object'&&e!==null&&'code'in e&&/^[A-Z_]{2,80}$/.test(String(e.code))?String(e.code):'PROVIDER_ERROR'});}}
+    signal.throwIfAborted();
     return this.engine.edit(actor,id,undefined,(current,db)=>{
       if(sha256Json(current.draft)!==sha256Json(d))throw new WorkflowError('STALE_CONTEXT');
       const estimate={id:randomUUID(),draftHash:sha256Json(d),at:new Date().toISOString(),results};current.estimates.push(estimate);current.estimates=current.estimates.slice(-10);

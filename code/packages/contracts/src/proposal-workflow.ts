@@ -1,3 +1,4 @@
+import { HumanHandoverSchema,DEFAULT_HUMAN_HANDOVER,HumanAdvisorContactSchema,PAX_HUMAN_ADVISOR_CONTACT } from './human-handover.js';
 import { z } from 'zod';
 import { Id } from './financial.js';
 import { DraftSchema,LocaleSchema } from './insurance.js';
@@ -26,7 +27,7 @@ export const ProposalBatchSchema=z.object({id:Id,messageId:Id,source:ProposalSou
 export const ResolveAmbiguityInputSchema=z.object({expectedCaseRevision:revision,resolutionSourceRef:z.string().min(1).max(240),resolved:z.literal(true)}).strict();
 export const AmbiguityResolutionSchema=z.object({caseRevision:revision,contextRevision:revision,ambiguity:CaseAmbiguitySchema}).strict();
 export const ProposalAcceptanceSchema=z.object({caseRevision:revision,contextRevision:revision,confirmationStillRequired:z.literal(true),draft:DraftSchema}).strict();
-export const ExtractorContextBaseSchema=z.object({schemaVersion:z.literal('1.0'),caseId:Id,caseRevision:revision,contextRevision:revision,
+export const ExtractorContextBaseSchema=z.object({handover:HumanHandoverSchema.default(()=>structuredClone(DEFAULT_HUMAN_HANDOVER)),humanAdvisorContact:HumanAdvisorContactSchema.default(()=>structuredClone(PAX_HUMAN_ADVISOR_CONTACT)),schemaVersion:z.literal('1.0'),caseId:Id,caseRevision:revision,contextRevision:revision,
   profileVersion:revision.nullable(),draftHash:hash,draftDirty:z.boolean(),locale:LocaleSchema,dataClassification:z.literal('synthetic'),
   personIds:z.array(Id).max(2),draft:DraftSchema,
   fields:z.array(z.object({path:z.string().max(200),personId:Id.optional(),value:z.json(),confirmation:z.enum(['proposed','confirmed'])}).strict()).max(3000),

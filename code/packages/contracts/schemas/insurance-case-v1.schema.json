@@ -2,6 +2,104 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
+    "handover": {
+      "default": {
+        "status": "digital",
+        "revision": 0,
+        "wantsHumanAdvisor": false,
+        "leaveViewRequested": false,
+        "stopDigitalConversation": false,
+        "requestId": null,
+        "requestedAt": null,
+        "resumedAt": null,
+        "source": null
+      },
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "digital",
+            "requested"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wantsHumanAdvisor": {
+          "type": "boolean"
+        },
+        "leaveViewRequested": {
+          "type": "boolean"
+        },
+        "stopDigitalConversation": {
+          "type": "boolean"
+        },
+        "requestId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requestedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resumedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "ui",
+                "voice"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "revision",
+        "wantsHumanAdvisor",
+        "leaveViewRequested",
+        "stopDigitalConversation",
+        "requestId",
+        "requestedAt",
+        "resumedAt",
+        "source"
+      ],
+      "additionalProperties": false
+    },
     "id": {
       "type": "string",
       "pattern": "^[A-Za-z0-9_-]{1,80}$"
@@ -7467,6 +7565,7 @@
     }
   },
   "required": [
+    "handover",
     "id",
     "createdAt",
     "updatedAt",

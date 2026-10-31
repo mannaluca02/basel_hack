@@ -85,8 +85,10 @@ export class ProtectedLifeController {
   @Post('cases/:caseId/locations') async locations(@Req() req:Request,@Param('caseId') id:string,@Body() input:unknown){
     if(req.actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const c=this.r.engine.caseFor(req.actor,uuid(id));
     const body=z.object({search:z.string().regex(/^[A-Za-zÀ-ÿ0-9 -]{2,60}$/),allowSyntheticCalculatorTransfer:z.literal(true)}).strict().parse(input);
-    const result=await this.r.engine.provider.execute('searchLocation',{Search:body.search,Language:{de:1,fr:2,it:3,en:4}[c.locale]});
-    return {locations:result.metadata.locations,provenance:result.provenance};
+    return this.r.engine.runDigital(req.actor,id,async signal=>{
+      const result=await this.r.engine.provider.execute('searchLocation',{Search:body.search,Language:{de:1,fr:2,it:3,en:4}[c.locale]},signal);
+      return {locations:result.metadata.locations,provenance:result.provenance};
+    });
   }
   @Post('cases/:caseId/calculator-estimates') estimate(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.estimates.calculate(req.actor,uuid(id),body);}
   @Get('cases/:caseId/calculator-tools') tools(@Req() req:Request,@Param('caseId') id:string){return this.r.tools.list(req.actor,uuid(id));}
@@ -117,6 +119,8 @@ export class ProtectedLifeController {
   }
   @Post('cases/:caseId/agent-access') agent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});this.r.engine.caseFor(req.actor,uuid(id));return this.r.sessions.agentToken(req.actor,id);}
   @Get('cases/:caseId/advisor/context') context(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.advisorContext(req.actor,uuid(id));}
+  @Get('cases/:caseId/handover') handover(@Req() req:Request,@Param('caseId') id:string){return this.r.handover.read(req.actor,uuid(id));}
+  @Post('cases/:caseId/handover') switchHandover(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.handover.command(req.actor,uuid(id),body);}
   @Post('cases/:caseId/customer-confirmations') createConfirmation(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.confirmations.create(req.actor,uuid(id),body);}
   @Get('cases/:caseId/customer-confirmations/current') currentConfirmation(@Req() req:Request,@Param('caseId') id:string){return this.r.confirmations.current(req.actor,uuid(id));}
   @Get('cases/:caseId/customer-confirmations/:confirmationId') readConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string){return this.r.confirmations.get(req.actor,uuid(id),requestId);}
@@ -134,18 +138,19 @@ export class ProtectedLifeController {
   @Sse('cases/:caseId/advisor/events') events(@Req() req:Request,@Param('caseId') id:string):Observable<MessageEvent> {
     uuid(id);this.r.engine.caseFor(req.actor,id,true);
     return new Observable(subscriber=>{
-      let version=-1;
+      let version=-1,handoverRevision=-1;
       const poll=()=>{
         try{
           if(this.r.closed){subscriber.complete();return;}
           this.r.sessions.assertActive(req.actor);
-          const state=this.r.store.view(db=>{const c=db.cases[id];if(!c)return null;return {version:c.contextRevision,last:c.events.at(-1),expiresAt:c.expiresAt};});
+          const state=this.r.store.view(db=>{const c=db.cases[id];if(!c)return null;return {version:c.contextRevision,last:c.events.at(-1),handover:c.handover,expiresAt:c.expiresAt};});
           if(!state||state.expiresAt<=new Date().toISOString()){subscriber.complete();return;}
           if(state.version<=version)return;version=state.version;
           const eventId=state.last?.id??`snapshot_${version}`;const reason=state.last?.reason??'snapshot';
+          const handoverChanged=state.handover.revision>0&&state.handover.revision!==handoverRevision;handoverRevision=state.handover.revision;
           subscriber.next({type:'advisor.context.updated',id:eventId,data:AdvisorContextUpdatedSchema.parse({schemaVersion:'1.0',messageId:eventId,caseId:id,
             correlationId:eventId,eventId,contextRevision:version,reason,contextRef:`/api/cases/${id}/advisor/context`,
-            interruptPolicy:['conversation_preference_changed','agent_proposal_available','agent_proposal_batch_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
+            handover:state.handover,interruptPolicy:state.handover.stopDigitalConversation||handoverChanged?'immediate':['conversation_preference_changed','agent_proposal_available','agent_proposal_batch_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
         }catch{subscriber.complete();}
       };
       const timer=setInterval(poll,250);poll();return ()=>clearInterval(timer);
@@ -159,7 +164,7 @@ export class ProtectedLifeController {
     return this.r.engine.edit(req.actor,uuid(id),undefined,(c,db)=>{
       delete db.cases[c.id];db.feedback=db.feedback.filter(f=>f.caseId!==c.id);
       for(const [key,s] of Object.entries(db.sessions))if(s.caseId===c.id)delete db.sessions[key];
-      this.r.engine.audit(db,req.actor,c,'case_deleted');return {deleted:true};});
+      this.r.engine.audit(db,req.actor,c,'case_deleted');return {deleted:true};},{allowDuringHandover:true});
   }
 }
 

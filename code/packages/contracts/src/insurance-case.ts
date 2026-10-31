@@ -1,3 +1,4 @@
+import { HumanHandoverSchema,DEFAULT_HUMAN_HANDOVER,HumanAdvisorContactSchema,PAX_HUMAN_ADVISOR_CONTACT } from './human-handover.js';
 import { z } from 'zod';
 import { Id,Cents,Month,DateOnly,StatusSchema,IssueSchema,GraphContextSchema } from './financial.js';
 import { DraftSchema,GoalSchema,LocaleSchema } from './insurance.js';
@@ -52,6 +53,7 @@ export const CalculatorToolRunSchema=z.object({id:Id,createdAt:timestamp,operati
 
 /** Business state only. Ownership, session credentials and command caches remain server-side. */
 export const InsuranceCaseStateSchema=z.object({
+  handover:HumanHandoverSchema.default(()=>structuredClone(DEFAULT_HUMAN_HANDOVER)),
   id:Id,createdAt:timestamp,updatedAt:timestamp,expiresAt:timestamp,locale:LocaleSchema,timeBudgetMinutes:z.number().int().min(3).max(120),
   caseRevision:revision,contextRevision:revision,draft:DraftSchema,draftDirty:z.boolean(),
   confirmedVersions:z.array(ConfirmedProfileSchema).max(20),latestAnalysisRequestId:Id.nullable(),activeRunId:Id.nullable(),
