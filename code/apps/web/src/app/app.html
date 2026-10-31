@@ -1,15 +1,20 @@
+<header class="bar">
+  <span class="brand">{{ 'app.name' | transloco }}</span>
+  <app-language-switcher />
+</header>
+
 <main class="view">
   <router-outlet />
 </main>
 
-<nav class="tabs" aria-label="Workspace">
+<nav class="tabs" [attr.aria-label]="'nav.label' | transloco">
   @for (tab of tabs; track tab.path) {
     <a
       class="tab"
       [routerLink]="tab.path"
       routerLinkActive="tab--active"
       ariaCurrentWhenActive="page"
-      >{{ tab.label }}</a
+      >{{ tab.label | transloco }}</a
     >
   }
 </nav>
