@@ -87,7 +87,8 @@
       "after": "After"
     },
     "neededLine": "Needed: {{amount}}",
-    "payout": "Paid out at retirement ({{year}})"
+    "payout": "Paid out at retirement ({{year}})",
+    "showInInfo": "Show in Info"
   },
   "risks": {
     "title": "Risks",
@@ -101,6 +102,7 @@
       "once": "{{amount}} one-off"
     },
     "showInGraphics": "Show in Graphics",
+    "showInInfo": "Show in Info",
     "severity": {
       "high": "High risk",
       "medium": "Medium risk",
@@ -128,7 +130,44 @@
     "announce": "{{speaker}}: {{text}}"
   },
   "info": {
-    "title": "Info"
+    "title": "Info",
+    "call": "From the call",
+    "empty": "Explanations about your situation appear here as soon as they come up in the call.",
+    "basics": "Basics",
+    "new": "New",
+    "announce": "New information: {{title}}",
+    "neutral": "General, neutral information without product advertising.",
+    "category": {
+      "basics": "Basics",
+      "term": "Term",
+      "assumption": "Assumption"
+    },
+    "glossary": {
+      "threePillars": {
+        "title": "The three-pillar system",
+        "body": "Swiss pension provision rests on three pillars. Pillar 1 (AHV/IV) covers basic living costs. Pillar 2 (pension fund), together with pillar 1, aims to maintain your accustomed standard of living to a reasonable degree. Pillar 3 is voluntary private provision for personal goals and gaps."
+      },
+      "pillar1": {
+        "title": "Pillar 1: AHV/IV",
+        "body": "State pension provision is compulsory for everyone who lives or works in Switzerland. It pays pensions in old age (AHV), to survivors and in case of disability (IV). Today's contributions fund today's pensions. Missing contribution years reduce the pension."
+      },
+      "pillar2": {
+        "title": "Pillar 2: pension fund",
+        "body": "Occupational pension provision is compulsory for employees above a certain annual salary. Employees and employers pay contributions, and the savings are built up for each person individually. At retirement it pays a pension, a lump sum or both. The benefits are shown on the pension fund certificate."
+      },
+      "pillar3a": {
+        "title": "Pillar 3a: tied pension provision",
+        "body": "Anyone with earned income subject to AHV contributions can pay in up to a legal maximum each year and deduct it from taxable income. The savings are tied up and available at the earliest five years before the regular retirement age. Exceptions include buying a home, becoming self-employed or leaving Switzerland for good."
+      },
+      "pillar3b": {
+        "title": "Pillar 3b: flexible provision",
+        "body": "All other private savings, for example in a savings account or in securities. There are no maximum amounts, and the money stays freely available. Pillar 3b usually has no special tax advantages."
+      },
+      "gap": {
+        "title": "Pension gap",
+        "body": "The difference between the income you need in retirement, in case of disability or in case of death, and what your pension provision is expected to pay then. Its size depends on your goals and your situation."
+      }
+    }
   },
   "demo": {
     "badge": "Demo",

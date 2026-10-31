@@ -87,7 +87,8 @@
       "after": "Dopo"
     },
     "neededLine": "Necessario: {{amount}}",
-    "payout": "Versamento al pensionamento ({{year}})"
+    "payout": "Versamento al pensionamento ({{year}})",
+    "showInInfo": "Mostra in Info"
   },
   "risks": {
     "title": "Rischi",
@@ -101,6 +102,7 @@
       "once": "{{amount}} una tantum"
     },
     "showInGraphics": "Mostra in Grafici",
+    "showInInfo": "Mostra in Info",
     "severity": {
       "high": "Rischio elevato",
       "medium": "Rischio medio",
@@ -128,7 +130,44 @@
     "announce": "{{speaker}}: {{text}}"
   },
   "info": {
-    "title": "Info"
+    "title": "Info",
+    "call": "Dal colloquio",
+    "empty": "Le spiegazioni sulla sua situazione compaiono qui non appena vengono trattate nel colloquio.",
+    "basics": "Nozioni di base",
+    "new": "Nuovo",
+    "announce": "Nuova informazione: {{title}}",
+    "neutral": "Informazioni generali e neutrali, senza pubblicità di prodotti.",
+    "category": {
+      "basics": "Nozioni di base",
+      "term": "Termine",
+      "assumption": "Ipotesi"
+    },
+    "glossary": {
+      "threePillars": {
+        "title": "Il sistema dei tre pilastri",
+        "body": "La previdenza svizzera poggia su tre pilastri. Il 1° pilastro (AVS/AI) copre il fabbisogno vitale. Il 2° pilastro (cassa pensioni), insieme al 1° pilastro, deve consentire di mantenere in modo adeguato il tenore di vita abituale. Il 3° pilastro è la previdenza privata facoltativa, per obiettivi personali e lacune."
+      },
+      "pillar1": {
+        "title": "1° pilastro: AVS/AI",
+        "body": "La previdenza statale è obbligatoria per tutte le persone che vivono o lavorano in Svizzera. Versa rendite in vecchiaia (AVS), ai superstiti e in caso di invalidità (AI). I contributi di oggi finanziano le rendite di oggi. Gli anni di contribuzione mancanti riducono la rendita."
+      },
+      "pillar2": {
+        "title": "2° pilastro: cassa pensioni",
+        "body": "La previdenza professionale è obbligatoria per i dipendenti a partire da un determinato salario annuo. Dipendenti e datori di lavoro versano contributi, e l’avere viene accumulato individualmente per ogni persona. Al pensionamento versa una rendita, un capitale o entrambi. Le prestazioni figurano sul certificato di previdenza."
+      },
+      "pillar3a": {
+        "title": "Pilastro 3a: previdenza vincolata",
+        "body": "Chi ha un reddito da attività lucrativa soggetto all’AVS può versare ogni anno fino a un importo massimo legale e dedurlo dal reddito imponibile. L’avere è vincolato e disponibile al più presto cinque anni prima dell’età ordinaria di pensionamento. Le eccezioni comprendono tra l’altro l’acquisto di un’abitazione, l’avvio di un’attività indipendente o la partenza definitiva dalla Svizzera."
+      },
+      "pillar3b": {
+        "title": "Pilastro 3b: previdenza libera",
+        "body": "Ogni altro risparmio privato, ad esempio su un conto di risparmio o in titoli. Non ci sono importi massimi, e il denaro resta liberamente disponibile. Di norma il pilastro 3b non gode di particolari vantaggi fiscali."
+      },
+      "gap": {
+        "title": "Lacuna previdenziale",
+        "body": "La differenza tra il reddito di cui ha bisogno in vecchiaia, in caso di invalidità o di decesso, e ciò che la sua previdenza dovrebbe versare in quel momento. La sua entità dipende dai suoi obiettivi e dalla sua situazione."
+      }
+    }
   },
   "demo": {
     "badge": "Demo",

@@ -6,6 +6,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   untracked,
 } from '@angular/core';
@@ -131,15 +132,30 @@ function impactKey(scenario: EventImpactScenario): string {
         }
       </ul>
 
-      <button
-        type="button"
-        class="toggle"
-        [attr.aria-expanded]="tableOpen()"
-        [attr.aria-controls]="tableId"
-        (click)="tableOpen.set(!tableOpen())"
-      >
-        {{ (tableOpen() ? 'graphics.table.hide' : 'graphics.table.show') | transloco }}
-      </button>
+      <div class="actions">
+        <button
+          type="button"
+          class="toggle"
+          [attr.aria-expanded]="tableOpen()"
+          [attr.aria-controls]="tableId"
+          (click)="tableOpen.set(!tableOpen())"
+        >
+          {{ (tableOpen() ? 'graphics.table.hide' : 'graphics.table.show') | transloco }}
+        </button>
+        @if (infoAvailable()) {
+          <button
+            type="button"
+            class="jump"
+            [attr.aria-describedby]="titleId"
+            (click)="showInfo.emit()"
+          >
+            {{ 'graphics.showInInfo' | transloco }}
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        }
+      </div>
 
       <div class="table" [id]="tableId" [hidden]="!tableOpen()">
         @if (tableOpen()) {
@@ -182,6 +198,9 @@ export class ChartCard {
   private readonly motion = inject(MotionPreference);
 
   readonly chart = input.required<ChartResult>();
+  /** The Info tab explains this chart (FE-18), so "Show in Info" has somewhere to go. */
+  readonly infoAvailable = input(false);
+  readonly showInfo = output<void>();
 
   protected readonly titleId = `chart-card-title-${nextId}`;
   protected readonly tableId = `chart-card-table-${nextId++}`;

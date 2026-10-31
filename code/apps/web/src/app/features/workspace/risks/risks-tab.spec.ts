@@ -7,13 +7,15 @@ import {
   FakeDataSource,
   event,
   impactChart,
+  info,
   risk,
   snapshot,
 } from '../../../core/advisor/store/case-testing';
-import { ChartResult, RiskItem } from '../../../core/advisor/ui-models';
+import { ChartResult, InfoItem, RiskItem } from '../../../core/advisor/ui-models';
 import { Consent } from '../../../core/consent/consent';
 import { provideI18nTesting } from '../../../core/i18n/i18n-testing';
 import { ChartJump } from '../../../core/layout/chart-jump';
+import { InfoJump } from '../../../core/layout/info-jump';
 import { RISK_UPDATED_MS, RisksTab } from './risks-tab';
 
 /** Nests the tab below an OnPush parent like the shell does. */
@@ -29,22 +31,33 @@ const GAP = { currency: 'CHF', unit: 'cent', period: 'month', basis: 'gross' } a
 describe('RisksTab', () => {
   let source: FakeDataSource;
   let jump: { show: ReturnType<typeof vi.fn> };
+  let infoJump: { show: ReturnType<typeof vi.fn> };
   let fixture: ComponentFixture<Shell>;
   let root: HTMLElement;
 
   async function start(
-    initial: { risks?: readonly RiskItem[]; charts?: readonly ChartResult[] } = {},
+    initial: {
+      risks?: readonly RiskItem[];
+      charts?: readonly ChartResult[];
+      info?: readonly InfoItem[];
+    } = {},
   ) {
     source = new FakeDataSource();
     source.nextSnapshot = of(
-      snapshot({ risks: initial.risks ?? [], charts: initial.charts ?? [] }),
+      snapshot({
+        risks: initial.risks ?? [],
+        charts: initial.charts ?? [],
+        info: initial.info ?? [],
+      }),
     );
     jump = { show: vi.fn() };
+    infoJump = { show: vi.fn() };
     TestBed.configureTestingModule({
       providers: [
         provideI18nTesting(),
         { provide: AdvisorDataSource, useValue: source },
         { provide: ChartJump, useValue: jump },
+        { provide: InfoJump, useValue: infoJump },
       ],
     });
     sessionStorage.clear();
@@ -283,5 +296,29 @@ describe('RisksTab', () => {
 
     expect(jump.show).toHaveBeenNthCalledWith(1, { chartId: 'chart_impact', event: 'death' });
     expect(jump.show).toHaveBeenNthCalledWith(2, { chartId: 'chart_impact', event: undefined });
+  });
+
+  it('offers "Show in Info" only once the Info tab has the related card', async () => {
+    await start({ risks: [risk({ relatedInfoId: 'info_bvg' })] });
+    await expand('risk_a');
+    const button = () => row('risk_a')?.querySelector<HTMLButtonElement>('.jump');
+    expect(button()).toBeNull();
+
+    source.emit(event('info', info({ infoId: 'info_bvg' })));
+    await fixture.whenStable();
+
+    expect(squash(button()?.textContent)).toBe('In Info zeigen');
+    button()?.click();
+    expect(infoJump.show).toHaveBeenCalledWith('info_bvg');
+  });
+
+  it('also links a risk that an info card points to', async () => {
+    await start({
+      risks: [risk()],
+      info: [info({ infoId: 'info_disability', relatedRiskId: 'risk_a' })],
+    });
+    await expand('risk_a');
+    row('risk_a')?.querySelector<HTMLButtonElement>('.jump')?.click();
+    expect(infoJump.show).toHaveBeenCalledWith('info_disability');
   });
 });

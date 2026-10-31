@@ -4,6 +4,7 @@ import {
   ElementRef,
   EnvironmentInjector,
   afterNextRender,
+  computed,
   effect,
   inject,
   signal,
@@ -14,8 +15,10 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CaseStore } from '../../../core/advisor/store/case-store';
 import { ChartResult } from '../../../core/advisor/ui-models';
 import { ChartJump } from '../../../core/layout/chart-jump';
+import { InfoJump } from '../../../core/layout/info-jump';
 import { ViewScroller } from '../../../core/layout/view-scroller';
 import { MotionPreference } from '../../../core/theme/motion-preference';
+import { infoForChart, pushedInfo } from '../info/info-links';
 import { ChartCard } from './chart-card';
 import { TITLE_KEYS } from './chart-options';
 
@@ -42,7 +45,11 @@ import { TITLE_KEYS } from './chart-options';
     <ol class="feed">
       @for (chart of charts(); track chart.chartId) {
         <li [animate.enter]="enterClass()">
-          <app-chart-card [chart]="chart" />
+          <app-chart-card
+            [chart]="chart"
+            [infoAvailable]="infoFor(chart) !== null"
+            (showInfo)="showInfo(chart)"
+          />
         </li>
       }
     </ol>
@@ -139,6 +146,7 @@ export class GraphicsTab {
   private readonly motion = inject(MotionPreference);
   private readonly transloco = inject(TranslocoService);
   private readonly jump = inject(ChartJump);
+  private readonly infoJump = inject(InfoJump);
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
   private readonly cards = viewChildren(ChartCard);
   /**
@@ -148,6 +156,7 @@ export class GraphicsTab {
   private readonly injector = inject(EnvironmentInjector);
 
   protected readonly charts = this.store.charts;
+  private readonly pushedInfo = computed(() => pushedInfo(this.store.info()));
   /** Charts that arrived while the user was not at the bottom, in order of arrival. */
   protected readonly unseen = signal<readonly string[]>([]);
   protected readonly announcement = signal('');
@@ -175,6 +184,15 @@ export class GraphicsTab {
     effect(() => {
       if (this.jump.pending() && this.scroller.settled()) untracked(() => this.showTarget());
     });
+  }
+
+  protected infoFor(chart: ChartResult): string | null {
+    return infoForChart(chart, this.pushedInfo());
+  }
+
+  protected showInfo(chart: ChartResult): void {
+    const infoId = this.infoFor(chart);
+    if (infoId) this.infoJump.show(infoId);
   }
 
   /** Scrolls to the first card that arrived while the user was reading further up. */
