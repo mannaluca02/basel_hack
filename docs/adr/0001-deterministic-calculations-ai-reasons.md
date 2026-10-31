@@ -1,0 +1,3 @@
+# Deterministic calculations, AI only reasons and explains
+
+Every number the customer sees (pillar benefits, Vorsorgebedarf, Vorsorgelücke, tax effects, suitability score, premiums) is produced by deterministic logic: the Logismata API plus our own rule set derived from Pax documents. The AI may reason about options, compare scenarios, suggest what to simulate next and explain trade-offs, but it obtains every figure through tool calls and never computes one itself. We chose this because Pax's legal framework requires recommendations to be explainable, documented and auditable on traceable criteria, which a free-reasoning model cannot guarantee.

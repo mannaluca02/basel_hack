@@ -1,0 +1,338 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Question: what should the Pax Beratercharakter look like?
+  A square mascot in the spirit of the ChatGPT voice dot: eyes only, no mouth.
+  Emotions come from the conversation, speech is shown by squash & stretch driven by audio level.
+  Three variants, switchable via ?variant=A|B|C (bottom bar or ← →).
+  Open this file directly in a browser. No build, no server.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PROTOTYPE · Pax Beratercharakter</title>
+<style>
+  :root { --purple: #360573; --green: #9acb41; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: grid; grid-template-columns: 1fr 300px; transition: background .4s; }
+  body[data-variant="A"] { background: #f5f3f8; color: #1d1530; }
+  body[data-variant="B"] { background: var(--purple); color: #fff; }
+  body[data-variant="C"] { background: #14022b; color: #e9e3f5; }
+
+  #stage { display: grid; place-items: center; position: relative; overflow: hidden; }
+  #stage svg { width: min(70vmin, 520px); height: auto; overflow: visible; }
+  #caption { position: absolute; top: 24px; left: 0; right: 0; text-align: center; font-size: 13px; opacity: .6; letter-spacing: .02em; }
+  #say { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); max-width: 70%; text-align: center; font-size: 16px; min-height: 1.4em; opacity: .85; }
+
+  #panel { padding: 20px; overflow-y: auto; font-size: 13px; border-left: 1px solid rgba(127,127,127,.25); }
+  #panel h3 { margin: 18px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .6; }
+  #panel h3:first-child { margin-top: 0; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  button { font: inherit; padding: 7px 8px; border-radius: 8px; border: 1px solid rgba(127,127,127,.35); background: rgba(127,127,127,.08); color: inherit; cursor: pointer; text-align: left; }
+  button:hover { background: rgba(127,127,127,.18); }
+  button.on { background: var(--green); color: #1b1030; border-color: var(--green); }
+  .wide { grid-column: span 2; }
+  pre { font-size: 11px; line-height: 1.45; background: rgba(127,127,127,.1); padding: 10px; border-radius: 8px; margin: 0; white-space: pre-wrap; }
+  .meter { height: 6px; border-radius: 3px; background: rgba(127,127,127,.2); overflow: hidden; }
+  .meter > div { height: 100%; width: 0; background: var(--green); }
+
+  #switcher { position: fixed; bottom: 22px; left: calc(50% - 150px); transform: translateX(-50%); display: flex; align-items: center; gap: 4px;
+    background: #111; color: #fff; border-radius: 999px; padding: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.35); font-size: 13px; z-index: 10; }
+  #switcher button { border: 0; background: #2a2a2a; color: #fff; width: 32px; height: 32px; border-radius: 50%; text-align: center; padding: 0; }
+  #switcher span { padding: 0 12px; min-width: 190px; text-align: center; }
+</style>
+</head>
+<body data-variant="A">
+<main id="stage">
+  <div id="caption">PROTOTYPE · Pax Beratercharakter</div>
+  <svg viewBox="0 0 200 200" aria-label="Pax mascot">
+    <defs>
+      <radialGradient id="gA" cx="35%" cy="28%" r="85%">
+        <stop offset="0" stop-color="#d4f08f" />
+        <stop offset=".45" stop-color="#9acb41" />
+        <stop offset="1" stop-color="#6f9c25" />
+      </radialGradient>
+      <linearGradient id="gC" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#4b1497" />
+        <stop offset="1" stop-color="#2a0459" />
+      </linearGradient>
+      <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="2.6" result="b" />
+        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
+      <mask id="mL" maskUnits="userSpaceOnUse" x="-50" y="-50" width="300" height="300">
+        <rect x="-50" y="-50" width="300" height="300" fill="#fff" />
+        <rect id="lidL" fill="#000" /><circle id="lowL" fill="#000" />
+      </mask>
+      <mask id="mR" maskUnits="userSpaceOnUse" x="-50" y="-50" width="300" height="300">
+        <rect x="-50" y="-50" width="300" height="300" fill="#fff" />
+        <rect id="lidR" fill="#000" /><circle id="lowR" fill="#000" />
+      </mask>
+    </defs>
+
+    <ellipse id="shadow" cx="100" cy="172" rx="48" ry="7" />
+    <rect id="halo" x="34" y="34" width="132" height="132" rx="40" fill="none" stroke="#9acb41" stroke-width="3" filter="url(#glow)" opacity="0" />
+    <g id="char">
+      <rect id="body" x="40" y="40" width="120" height="120" />
+      <ellipse id="shine" cx="72" cy="62" rx="22" ry="11" fill="#fff" transform="rotate(-20 72 62)" />
+      <ellipse id="blushL" cx="66" cy="118" rx="10" ry="5" />
+      <ellipse id="blushR" cx="134" cy="118" rx="10" ry="5" />
+      <g id="eyes">
+        <rect id="eyeL" mask="url(#mL)" />
+        <rect id="eyeR" mask="url(#mR)" />
+      </g>
+    </g>
+    <g id="dots"><circle r="3.2" /><circle r="4.2" /><circle r="5.4" /></g>
+    <g id="sparkles"></g>
+  </svg>
+  <div id="say"></div>
+</main>
+
+<aside id="panel">
+  <h3>Emotion</h3>
+  <div class="grid" id="emotions"></div>
+
+  <h3>Sprechen (Audio → Squash & Stretch)</h3>
+  <div class="grid">
+    <button id="btnSim">Sprache simulieren</button>
+    <button id="btnMic">Mikrofon nutzen</button>
+  </div>
+  <div style="margin-top:8px" class="meter"><div id="meter"></div></div>
+
+  <h3>Gesprächs-Demo</h3>
+  <div class="grid"><button class="wide" id="btnScript">▶ Beratung abspielen</button></div>
+
+  <h3>Zustand</h3>
+  <pre id="state"></pre>
+</aside>
+
+<div id="switcher">
+  <button id="prev" aria-label="Vorherige Variante">‹</button>
+  <span id="vlabel"></span>
+  <button id="next" aria-label="Nächste Variante">›</button>
+</div>
+
+<script>
+// ---------- Variants: pure styling of the same rig ----------
+const VARIANTS = {
+  A: { name: "Soft Block (ChatGPT-Stil)", rx: 34, body: "url(#gA)", eye: "#360573", eyeW: 8.5, eyeH: 13, eyeRx: 8.5,
+       shine: .35, blush: "#ff8fb1", shadow: "rgba(54,5,115,.18)", halo: false, glow: false, accent: "#9acb41" },
+  B: { name: "Logo-Punkt (flach, eckig)", rx: 7, body: "#ffffff", eye: "#360573", eyeW: 8, eyeH: 11, eyeRx: 1.5,
+       shine: 0, blush: "#c9b6ff", shadow: "rgba(0,0,0,.25)", halo: false, glow: false, accent: "#9acb41" },
+  C: { name: "Glow-Display", rx: 30, body: "url(#gC)", eye: "#9acb41", eyeW: 7.5, eyeH: 14, eyeRx: 3.5,
+       shine: .08, blush: "#9acb41", shadow: "rgba(154,203,65,.18)", halo: true, glow: true, accent: "#9acb41" },
+};
+
+// ---------- Emotions: target values for the rig ----------
+// gx/gy gaze (-1..1), open (eye height), size (eye scale), lidA (deg, + = droopy/sad outer corners),
+// lidD (upper lid drop 0..1), smile (lower lid push → ^^ eyes), squint (extra lid on right eye),
+// sx/sy body scale, rot body tilt, ty body lift, hop (bounce amount), blush, dots, sparkles
+const BASE = { gx:0, gy:0, open:1, size:1, lidA:0, lidD:0, smile:0, squint:0, sx:1, sy:1, rot:0, ty:0, hop:0, blush:0, dots:0, sparkles:0 };
+const EMOTIONS = {
+  neutral:     { label: "Neutral" },
+  listening:   { label: "Zuhören",      gy:-.1, open:1.06, size:1.08, rot:5, ty:-2 },
+  thinking:    { label: "Nachdenken",   gx:.75, gy:-.8, open:.92, lidD:.12, squint:.35, rot:-5, dots:1 },
+  happy:       { label: "Freude",       smile:.85, sy:1.02, hop:.5, blush:.6 },
+  empathetic:  { label: "Mitgefühl",    gy:.4, lidA:22, lidD:.38, smile:.2, size:.95, sx:1.03, sy:.96, ty:3, blush:.25 },
+  concerned:   { label: "Besorgt",      gx:-.25, gy:.1, lidA:26, lidD:.2, open:1.1, sx:.98, sy:.97, rot:-3 },
+  surprised:   { label: "Überrascht",   open:1.3, size:1.22, sx:.95, sy:1.08, ty:-6 },
+  celebrating: { label: "Abschluss 🎉", smile:1, size:1.08, hop:1.4, blush:.8, sparkles:1 },
+};
+
+// ---------- State ----------
+let variant = new URLSearchParams(location.search).get("variant") || "A";
+if (!VARIANTS[variant]) variant = "A";
+let emotion = "neutral";
+const cur = { ...BASE };
+let level = 0;            // smoothed speech level 0..1
+let rawLevel = 0;
+let source = "none";      // none | sim | mic | stream
+let analyser = null, audioCtx = null, buf = null;
+let blinkT = 0, nextBlink = 2, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
+let pop = 0;              // spring impulse on emotion change
+let popV = 0;
+
+const $ = (id) => document.getElementById(id);
+const set = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
+
+// ---------- UI ----------
+const emoBox = $("emotions");
+for (const key in EMOTIONS) {
+  const b = document.createElement("button");
+  b.textContent = EMOTIONS[key].label; b.dataset.emo = key;
+  b.onclick = () => setEmotion(key);
+  emoBox.appendChild(b);
+}
+function setEmotion(key) {
+  if (!EMOTIONS[key] || key === emotion) return;
+  emotion = key; popV += 2.2;
+  document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === key));
+}
+function applyVariant() {
+  const v = VARIANTS[variant];
+  document.body.dataset.variant = variant;
+  $("vlabel").textContent = `${variant} · ${v.name}`;
+  set($("body"), { rx: v.rx, fill: v.body });
+  $("shine").setAttribute("opacity", v.shine);
+  ["eyeL", "eyeR"].forEach((id) => set($(id), { fill: v.eye, filter: v.glow ? "url(#glow)" : "" }));
+  ["blushL", "blushR"].forEach((id) => set($(id), { fill: v.blush, filter: "url(#soft)" }));
+  set($("shadow"), { fill: v.shadow });
+  set($("halo"), { rx: v.rx + 6 });
+  $("dots").setAttribute("fill", variant === "A" ? "#360573" : v.accent);
+  const u = new URL(location); u.searchParams.set("variant", variant); history.replaceState(null, "", u);
+}
+function cycle(d) { const k = Object.keys(VARIANTS); variant = k[(k.indexOf(variant) + d + k.length) % k.length]; applyVariant(); }
+$("prev").onclick = () => cycle(-1); $("next").onclick = () => cycle(1);
+addEventListener("keydown", (e) => {
+  if (e.target.closest("input, textarea, [contenteditable]")) return;
+  if (e.key === "ArrowLeft") cycle(-1); if (e.key === "ArrowRight") cycle(1);
+});
+
+// ---------- Audio ----------
+// In the real app: attachStream(remoteStreamFromOpenAIRealtimeWebRTC)
+function attachStream(stream, label = "stream") {
+  audioCtx = audioCtx || new AudioContext();
+  analyser = audioCtx.createAnalyser(); analyser.fftSize = 1024;
+  buf = new Float32Array(analyser.fftSize);
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  source = label;
+}
+$("btnMic").onclick = async () => {
+  if (source === "mic") { source = "none"; analyser = null; $("btnMic").classList.remove("on"); return; }
+  attachStream(await navigator.mediaDevices.getUserMedia({ audio: true }), "mic");
+  $("btnSim").classList.remove("on"); $("btnMic").classList.add("on");
+};
+$("btnSim").onclick = () => {
+  source = source === "sim" ? "none" : "sim";
+  $("btnSim").classList.toggle("on", source === "sim"); $("btnMic").classList.remove("on");
+};
+// Fake speech: syllables at ~5 Hz, words, short pauses
+let simT = 0;
+function simLevel(dt) {
+  simT += dt;
+  const phrase = (Math.sin(simT * 0.9) + Math.sin(simT * 2.3 + 1)) > -0.9 ? 1 : 0;
+  const syll = Math.max(0, Math.sin(simT * 2 * Math.PI * 4.7)) ** 0.6;
+  return phrase * (0.35 + 0.65 * syll) * (0.75 + 0.25 * Math.random());
+}
+function micLevel() {
+  analyser.getFloatTimeDomainData(buf);
+  let s = 0; for (const x of buf) s += x * x;
+  return Math.min(1, Math.sqrt(s / buf.length) * 7);
+}
+
+// ---------- Scripted conversation ----------
+const SCRIPT = [
+  [0,    "happy",       true,  "Grüezi! Ich bin Pax, Ihr digitaler Vorsorge-Berater."],
+  [3200, "listening",   false, "(Kunde erzählt von Familie und Job …)"],
+  [6400, "thinking",    false, "(Vorsorgebild wird berechnet …)"],
+  [8800, "surprised",   true,  "Oh – Sie planen ein Eigenheim? Spannend!"],
+  [11200,"concerned",   true,  "Bei Erwerbsunfähigkeit sehe ich eine Vorsorgelücke."],
+  [14400,"empathetic",  true,  "Ich verstehe, das Thema Tod ist nicht einfach."],
+  [17800,"listening",   false, "(Kunde stellt eine Frage …)"],
+  [20200,"happy",       true,  "Mit Säule 3a schliessen wir die Lücke gut."],
+  [23400,"celebrating", false, "Antrag abgeschlossen!"],
+  [26400,"neutral",     false, ""],
+];
+let timers = [];
+$("btnScript").onclick = () => {
+  timers.forEach(clearTimeout); timers = [];
+  SCRIPT.forEach(([t, emo, speak, text]) => timers.push(setTimeout(() => {
+    setEmotion(emo); $("say").textContent = text;
+    if (source !== "mic") source = speak ? "sim" : "none";
+    $("btnSim").classList.toggle("on", source === "sim");
+  }, t)));
+};
+
+// ---------- Sparkles ----------
+const sparkles = [];
+function spawnSparkle() {
+  const a = Math.random() * Math.PI * 2, r = 70 + Math.random() * 25;
+  const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  el.setAttribute("d", "M0,-6 L1.6,-1.6 6,0 1.6,1.6 0,6 -1.6,1.6 -6,0 -1.6,-1.6Z");
+  $("sparkles").appendChild(el);
+  sparkles.push({ el, x: 100 + Math.cos(a) * r, y: 100 + Math.sin(a) * r, life: 1, s: .6 + Math.random() * .8 });
+}
+
+// ---------- Render loop ----------
+let last = performance.now(), t = 0;
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
+  const v = VARIANTS[variant];
+  const target = { ...BASE, ...EMOTIONS[emotion] };
+  const k = 1 - Math.exp(-dt * 7);
+  for (const key in BASE) cur[key] += (target[key] - cur[key]) * k;
+
+  // speech level with fast attack / slow release
+  rawLevel = source === "sim" ? simLevel(dt) : analyser && source !== "none" ? micLevel() : 0;
+  level += (rawLevel - level) * (1 - Math.exp(-dt * (rawLevel > level ? 30 : 10)));
+
+  // emotion-change pop (damped spring)
+  popV += (-pop * 120 - popV * 12) * dt; pop += popV * dt;
+
+  // blink
+  blinkT += dt; let blink = 1;
+  if (blinkT > nextBlink) { const p = (blinkT - nextBlink) / .14; blink = p < 1 ? Math.abs(1 - 2 * p) : 1;
+    if (p >= 1) { blinkT = 0; nextBlink = 2 + Math.random() * 3.5; } }
+  // micro saccades when idle-ish
+  nextSaccade -= dt;
+  if (nextSaccade < 0) { saccade = { x: (Math.random() - .5) * .5, y: (Math.random() - .5) * .3 }; nextSaccade = 1 + Math.random() * 2.5; }
+  const idleGaze = emotion === "thinking" || emotion === "surprised" ? 0 : 1;
+
+  // body
+  const breathe = Math.sin(t * 2.1) * .012;
+  const hop = cur.hop * Math.max(0, Math.sin(t * 7)) * 7;
+  const sway = Math.sin(t * 1.3) * 1.2;
+  const sy = cur.sy + breathe + level * .09 + pop * .06;
+  const sx = cur.sx - breathe * .6 - level * .045 - pop * .03;
+  const ty = cur.ty - hop - level * 4;
+  const rot = cur.rot + sway + (emotion === "celebrating" ? Math.sin(t * 9) * 4 : 0);
+  $("char").setAttribute("transform", `translate(100 ${160 + ty}) rotate(${rot}) scale(${sx} ${sy}) translate(-100 -160)`);
+  set($("shadow"), { rx: 48 * (1 - (-ty) / 60) * sx, opacity: 1 - Math.min(.6, -ty / 30) });
+  ["blushL", "blushR"].forEach((id) => $(id).setAttribute("opacity", cur.blush * (variant === "C" ? .35 : .55)));
+  set($("halo"), { opacity: v.halo ? level : 0, "stroke-width": 2 + level * 4 });
+
+  // eyes
+  const gx = (cur.gx + saccade.x * idleGaze) * 9, gy = (cur.gy + saccade.y * idleGaze) * 7 - level * 1.5;
+  for (const side of ["L", "R"]) {
+    const sign = side === "L" ? -1 : 1;
+    const cx = 100 + sign * 22 + gx, cy = 98 + gy;
+    const w = v.eyeW * cur.size, h = v.eyeH * cur.size * cur.open * blink;
+    set($("eye" + side), { x: cx - w, y: cy - h, width: w * 2, height: Math.max(.6, h * 2), rx: Math.min(v.eyeRx * cur.size, w, h) });
+    const drop = cur.lidD + (side === "R" ? cur.squint : 0);
+    const m = v.glow ? 5 : 0; // keep glow visible when lids are open
+    const lidY = cy - h - m + drop * (2 * h + m);
+    set($("lid" + side), { x: cx - 30, y: lidY - 40, width: 60, height: 40,
+      transform: `rotate(${sign * cur.lidA} ${cx} ${lidY})` });
+    const r = w * 1.25;
+    set($("low" + side), { cx, cy: cy + h + r + m - cur.smile * (h * 1.45 + m), r });
+  }
+
+  // thinking dots
+  const dots = $("dots").children;
+  for (let i = 0; i < 3; i++) set(dots[i], { cx: 160 + i * 11, cy: 42 - i * 10 + Math.sin(t * 4 + i) * 2, opacity: cur.dots * (.5 + .5 * Math.sin(t * 5 - i)) });
+
+  // sparkles
+  if (cur.sparkles > .5 && Math.random() < dt * 9) spawnSparkle();
+  for (let i = sparkles.length - 1; i >= 0; i--) {
+    const s = sparkles[i]; s.life -= dt * 1.2; s.y -= dt * 18;
+    set(s.el, { transform: `translate(${s.x} ${s.y}) scale(${s.s * Math.sin(Math.max(0, s.life) * Math.PI)})`, fill: v.accent });
+    if (s.life <= 0) { s.el.remove(); sparkles.splice(i, 1); }
+  }
+
+  $("meter").style.width = (level * 100).toFixed(0) + "%";
+  $("state").textContent =
+    `variant   ${variant} (${v.name})\nemotion   ${emotion}\naudio     ${source}  level ${level.toFixed(2)}\n` +
+    `eyes      gaze ${cur.gx.toFixed(2)},${cur.gy.toFixed(2)} open ${cur.open.toFixed(2)}\n` +
+    `          lid ${cur.lidA.toFixed(1)}° drop ${cur.lidD.toFixed(2)} smile ${cur.smile.toFixed(2)}\n` +
+    `body      sx ${sx.toFixed(3)} sy ${sy.toFixed(3)} rot ${rot.toFixed(1)}° ty ${ty.toFixed(1)}`;
+  requestAnimationFrame(frame);
+}
+
+window.pax = { setEmotion, attachStream };
+applyVariant(); setEmotion("listening"); setEmotion(new URLSearchParams(location.search).get("emotion") || "neutral");
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
