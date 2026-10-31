@@ -66,7 +66,14 @@
     "extraction": "Latest server-side extraction (model-v1 with AI consent, otherwise rules)",
     "noTrace": "No payloads recorded yet.",
     "review": "Review · acceptance and profile confirmation",
-    "settings": {"title":"Conversation settings", "source":"Skills from code/voice-agent/skills with assigned: true. Your selection applies at the next conversation start.", "time":"Available conversation time", "priority":"Preferred conversation topic", "natural":"Follow the conversation naturally", "unavailable":"Voice prompt settings are unavailable. Start the current debug backend and reload the case."},
+    "settings": {
+      "title": "Conversation settings",
+      "source": "Skills from code/voice-agent/skills with assigned: true. Your selection applies at the next conversation start.",
+      "time": "Available conversation time",
+      "priority": "Preferred conversation topic",
+      "natural": "Follow the conversation naturally",
+      "unavailable": "Voice prompt settings are unavailable. Start the current debug backend and reload the case."
+    },
     "context": {
       "title": "What the conversation has captured",
       "logs": "Conversation logs",
@@ -434,5 +441,13 @@
       "voiceOpened": "Paxi is open in its own window. What you tell Paxi shows up here as a proposal to review.",
       "voiceFailed": "Paxi could not be connected. Is the voice agent running?"
     }
+  },
+  "voice": {
+    "start": "Live conversation with Paxi",
+    "stop": "End conversation",
+    "title": "Talk to Paxi",
+    "begin": "Start conversation",
+    "cancel": "Cancel",
+    "connected": "Paxi is connected and listening"
   }
 }

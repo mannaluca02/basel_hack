@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CustomerApi } from '../../../src/app/core/advisor/api/customer-api';
-import { APP_ENVIRONMENT } from '../../../src/app/core/config/app-environment';
+import { CustomerApi } from '../advisor/api/customer-api';
+import { APP_ENVIRONMENT } from '../config/app-environment';
 
 @Injectable({providedIn:'root'})
 export class VoiceLabApi {

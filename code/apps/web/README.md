@@ -4,9 +4,8 @@ Angular 22 mobile-first web app (PWA). Standalone components, signals, strict Ty
 
 Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (Angular 22 engines); the repo `.nvmrc` pins 26.
 
-The separate [Debugging App](debugging-app/README.md) lives in `debugging-app/` and has its own
-Angular entry point, scripts and port (4300). It is not a route in this normal web application.
-It reuses this workspace's Angular dependencies and shared authenticated case services.
+Live voice runs in the app itself; the Voice Lab is a debug configuration of it, see
+[Live voice and Voice Lab](../../../documentation/baselhack/plans/voice-lab-debugging.md).
 
 ```bash
 npm ci
@@ -17,6 +16,8 @@ npm run check:tokens  # no colour literals outside tokens.css, WCAG AA text cont
 npm run check:i18n    # missing/empty/extra keys per language, unknown keys used in src/app
 npm run start:api     # dev server against the real case service, /api proxied to port 3000
 npm run start:demo    # same, but opens on a ready synthetic case: no sign-in, no review stand
+npm run start:debug   # demo start plus the Voice Lab tab (live voice trace)
+npm run start:debug:lab  # Voice Lab against the isolated lab backend (code: npm run start:voice-lab), port 4300
 ```
 
 This app keeps its own lockfile. The types of `@pax/contracts` come from its build, so run `npm ci && npm run build` in `code/` first.
@@ -55,5 +56,9 @@ The service worker only registers in production builds (`ng build` + a static se
 
 ## Demo start
 
-`npm run dev:demo` in `code/` starts the case backend with `PAX_DEMO_START=1` (live calculator) and this app with `--configuration demo`. On start the app calls `POST /api/demo/start`; the backend signs in a customer itself, loads the Mueller persona, confirms it and calculates the standard scenarios. All visitors share that case while its session lasts, so reloads do not create new cases. The UI is the normal workspace, without sign-in and review stand.
+`npm run dev:demo` in `code/` starts the case backend with `PAX_DEMO_START=1` (live calculator) and this app with `--configuration demo`. On start the app calls `POST /api/demo/start`; the backend signs in a customer itself, loads the Mueller persona, confirms it and calculates the standard scenarios. All visitors share that case while its session lasts, so reloads do not create new cases. The UI is the normal workspace, without sign-in and review stand. `npm run dev:debug` does the same in the debug configuration.
+
+## Live voice
+
+With `PAX_SYNTHETIC_VOICE_ENABLED=1` and `OPENAI_API_KEY` in the root `.env`, the backend offers GPT-Live and the model extraction, and a microphone button appears in the tab rail above the avatar. It asks for both consents (voice transfer, AI extraction), then `core/voice/live-voice.ts` talks over the case backend: `voice/sessions` (WebRTC), every settled turn to `voice/sessions/:id/turns`, every customer turn to `voice-lab/turns` (model-v1). Proposals arrive as packages, the avatar ring shows the activity (`core/voice/voice-activity.ts`) and the Chat tab the transcript. The control loads in its own chunk after the workspace. A human handover, a new session or a language change ends the call.
 

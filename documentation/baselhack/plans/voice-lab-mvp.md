@@ -6,12 +6,16 @@ The current UI uses live voice only; authored replay and amount-sample buttons h
 Live start requires enabled model extraction, both consents and available prompt settings.
 Assigned skills are loaded directly from `code/voice-agent/skills`; selections, time budget and
 priority reach the provider prompt. Captured proposals and corrections update the readable canonical
-view, and extraction failures never count as unanswered questions. See the
-[Debugging App README](../../../code/apps/web/debugging-app/README.md) for the current workflow.
+view, and extraction failures never count as unanswered questions. See
+[Live voice and Voice Lab](voice-lab-debugging.md) for the current workflow.
+
+**Update:** the separate debugging app is gone. The live voice now runs natively in the web app
+(`core/voice/live-voice.ts`, microphone button in the tab rail), and the Voice Lab is the `debug` /
+`debug-lab` build configuration of that app. Paths and commands below are historical.
 The sections below preserve the earlier implementation and verification history.
 
 The debug UI now lives in its own Angular application under
-**[`code/apps/web/debugging-app/`](../../../code/apps/web/debugging-app/README.md)**.
+**`code/apps/web/debugging-app/`** (since merged back, see above).
 It is no longer a route in the normal web application. Its own server serves `/` and redirects
 the previous `/voice-lab` URL to `/`. It reuses `CustomerApi`, `CustomerReview`, `ApiDataSource`,
 `CaseStore`, the encrypted case runtime and proposal/confirmation workflows.

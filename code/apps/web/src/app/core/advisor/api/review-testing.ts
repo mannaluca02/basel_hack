@@ -94,7 +94,7 @@ export function serve(http: HttpTestingController, state: ServerState = {}): voi
     confirmation: state.confirmation ?? null,
   });
   for (const request of http.match(request => request.method === 'GET' &&
-    ['/summaries','/suitability','/voice/agent-turns'].some(route => request.url.endsWith(route)))) {
+    ['/summaries','/suitability','/voice/agent-turns','/voice/sessions'].some(route => request.url.endsWith(route)))) {
     request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
   }
 }

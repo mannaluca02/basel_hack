@@ -1,6 +1,6 @@
 import { computed, signal } from '@angular/core';
 import type { HumanHandover } from '@pax/contracts';
-import type { CustomerSession } from '../../../src/app/core/advisor/api/customer-api';
+import type { CustomerSession } from '../advisor/api/customer-api';
 
 export interface HandoverEvidence {
   readonly caseId: string;

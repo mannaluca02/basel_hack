@@ -15,6 +15,8 @@ import type {
   SessionResponse,
   SummaryBundle as CaseSummaries,
   SuitabilityView,
+  VoiceSession,
+  VoiceTranscript,
 } from '@pax/contracts';
 import { firstValueFrom } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
@@ -26,6 +28,9 @@ export const CUSTOMER_SESSION_KEY = 'pax.customer-session';
 
 /** The conversation length the backend paces its questions by; nothing in the UI sets it yet. */
 const TIME_BUDGET_MINUTES = 30;
+
+/** How many of the latest live voice sessions the Chat tab shows. */
+const VOICE_SESSIONS_SHOWN = 3;
 
 /** The backend's separate notice for external voice processing. */
 export interface VoicePrivacyNotice {
@@ -111,6 +116,38 @@ export class CustomerApi {
     return firstValueFrom(
       this.http.get<{ turns: AgentTurn[] }>(`${this.caseUrl(caseId)}/voice/agent-turns`),
     ).then(({ turns }) => turns);
+  }
+
+  /**
+   * The finished turns of the app's own live voice (backend voice sessions), oldest first. Only
+   * the latest sessions with turns are read: the Chat tab shows the recent conversation.
+   */
+  async loadVoiceTurns(caseId: string): Promise<readonly AgentTurn[]> {
+    const { sessions } = await firstValueFrom(
+      this.http.get<{ sessions: VoiceSession[] }>(`${this.caseUrl(caseId)}/voice/sessions`),
+    );
+    const recent = sessions
+      .filter((session) => session.turnCount > 0)
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+      .slice(-VOICE_SESSIONS_SHOWN);
+    const transcripts = await Promise.all(
+      recent.map((session) =>
+        firstValueFrom(
+          this.http.get<VoiceTranscript>(
+            `${this.caseUrl(caseId)}/voice/sessions/${encodeURIComponent(session.id)}/transcript`,
+          ),
+        ),
+      ),
+    );
+    return transcripts.flatMap(({ voiceSession, turns }) =>
+      turns.map((turn) => ({
+        messageId: turn.log.messageId,
+        conversationId: voiceSession.id,
+        speaker: turn.speaker,
+        text: turn.log.text,
+        at: turn.receivedAt,
+      })),
+    );
   }
 
   loadHandover(caseId: string): Promise<HumanHandoverView> {

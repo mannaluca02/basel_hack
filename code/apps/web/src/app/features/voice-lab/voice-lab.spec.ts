@@ -2,15 +2,15 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DEFAULT_HUMAN_HANDOVER, PAX_HUMAN_ADVISOR_CONTACT, type InsuranceCaseDto } from '@pax/contracts';
-import { APP_ENVIRONMENT } from '../../../src/app/core/config/app-environment';
-import { Consent } from '../../../src/app/core/consent/consent';
-import { provideI18nTesting } from '../../../src/app/core/i18n/i18n-testing';
-import { AdvisorDataSource } from '../../../src/app/core/advisor/advisor-data-source';
-import { ApiDataSource } from '../../../src/app/core/advisor/api/api-data-source';
-import { CaseStore } from '../../../src/app/core/advisor/store/case-store';
-import { contextUpdate } from '../../../src/app/core/advisor/store/case-testing';
-import { CUSTOMER_SESSION_KEY, CustomerApi } from '../../../src/app/core/advisor/api/customer-api';
-import { CASE_ID, FakeEventSource, reviewCase, reviewContext, settle } from '../../../src/app/core/advisor/api/review-testing';
+import { APP_ENVIRONMENT } from '../../core/config/app-environment';
+import { Consent } from '../../core/consent/consent';
+import { provideI18nTesting } from '../../core/i18n/i18n-testing';
+import { AdvisorDataSource } from '../../core/advisor/advisor-data-source';
+import { ApiDataSource } from '../../core/advisor/api/api-data-source';
+import { CaseStore } from '../../core/advisor/store/case-store';
+import { contextUpdate } from '../../core/advisor/store/case-testing';
+import { CUSTOMER_SESSION_KEY, CustomerApi } from '../../core/advisor/api/customer-api';
+import { CASE_ID, FakeEventSource, reviewCase, reviewContext, settle } from '../../core/advisor/api/review-testing';
 import { TranslocoService } from '@jsverse/transloco';
 import { VoiceLab } from './voice-lab';
 
@@ -85,7 +85,7 @@ describe('Voice Lab rendered setup and browser controls', () => {
         else if (url === currentCaseUrl) request.flush(dto);
         else if (url === `${currentCaseUrl}/advisor/context`) request.flush(reviewContext({ caseId: dto.id }));
          else if (url === `${currentCaseUrl}/customer-confirmations/current`) request.flush({ confirmation: null });
-         else if (['/summaries','/suitability','/voice/agent-turns'].some(route=>url===`${currentCaseUrl}${route}`))
+         else if (['/summaries','/suitability','/voice/agent-turns','/voice/sessions'].some(route=>url===`${currentCaseUrl}${route}`))
            request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
         else throw new Error(`Unexpected GET ${url}`);
       }
@@ -501,7 +501,7 @@ describe('Voice Lab rendered setup and browser controls', () => {
     else oldRead.flush(populatedCase());
     // Also deliver old background reads, and a terminal error from the closed old EventSource.
     for (const request of oldReloads) {
-      if (['/summaries','/suitability','/voice/agent-turns'].some(route=>request.request.url.endsWith(route)))
+      if (['/summaries','/suitability','/voice/agent-turns','/voice/sessions'].some(route=>request.request.url.endsWith(route)))
         request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
       else if (request.request.url.endsWith('/advisor/context')) request.flush(reviewContext());
       else if (request.request.url.endsWith('/current')) request.flush({ confirmation: null });

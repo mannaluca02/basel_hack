@@ -66,7 +66,14 @@
     "extraction": "Letzte serverseitige Extraktion (model-v1 mit KI-Zustimmung, sonst Regeln)",
     "noTrace": "Noch keine Payloads aufgezeichnet.",
     "review": "Review · Übernahme und Profilbestätigung",
-    "settings": {"title":"Gesprächseinstellungen", "source":"Skills aus code/voice-agent/skills, gemäss assigned: true. Die Auswahl gilt ab dem nächsten Gesprächsstart.", "time":"Verfügbare Gesprächszeit", "priority":"Bevorzugtes Gesprächsthema", "natural":"Natürlich dem Gespräch folgen", "unavailable":"Die Voice-Prompt-Einstellungen fehlen. Bitte das aktuelle Debug-Backend starten und den Fall neu laden."},
+    "settings": {
+      "title": "Gesprächseinstellungen",
+      "source": "Skills aus code/voice-agent/skills, gemäss assigned: true. Die Auswahl gilt ab dem nächsten Gesprächsstart.",
+      "time": "Verfügbare Gesprächszeit",
+      "priority": "Bevorzugtes Gesprächsthema",
+      "natural": "Natürlich dem Gespräch folgen",
+      "unavailable": "Die Voice-Prompt-Einstellungen fehlen. Bitte das aktuelle Debug-Backend starten und den Fall neu laden."
+    },
     "context": {
       "title": "Was aus dem Gespräch angekommen ist",
       "logs": "Gesprächslogs",
@@ -434,5 +441,13 @@
       "voiceOpened": "Paxi ist in einem eigenen Fenster offen. Was du erzählst, erscheint hier als Vorschlag zum Prüfen.",
       "voiceFailed": "Paxi konnte nicht verbunden werden. Läuft der Voice-Agent?"
     }
+  },
+  "voice": {
+    "start": "Live-Gespräch mit Paxi",
+    "stop": "Gespräch beenden",
+    "title": "Mit Paxi sprechen",
+    "begin": "Gespräch starten",
+    "cancel": "Abbrechen",
+    "connected": "Paxi ist verbunden und hört zu"
   }
 }

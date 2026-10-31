@@ -1,5 +1,5 @@
 import type { InsuranceCaseDto } from '@pax/contracts';
-import { reviewCase } from '../../../src/app/core/advisor/api/review-testing';
+import { reviewCase } from '../advisor/api/review-testing';
 import { INTAKE_FIELDS, afterCustomerTurn, emptyIntakeMemory, intakeRows, nextIntakeField, steeringContext } from './intake-plan';
 
 const PERSON = 'person_demo_1';

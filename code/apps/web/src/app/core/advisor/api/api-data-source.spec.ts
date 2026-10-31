@@ -145,6 +145,7 @@ describe('ApiDataSource', () => {
     http.expectOne(`/api/cases/${CASE_ID}/advisor/context`).flush(mueller.context);
     http.expectOne(`/api/cases/${CASE_ID}/summaries`).flush(mueller.summaries);
     http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({ turns: [] });
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions`).flush({ caseId: CASE_ID, sessions: [] });
     http.expectOne(`/api/cases/${CASE_ID}/suitability`).flush({ checks: [] });
     await new Promise((resolve) => setTimeout(resolve));
 
@@ -191,13 +192,30 @@ describe('ApiDataSource', () => {
     http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({
       turns: [{ messageId: 'conv_a0', conversationId: 'conv', speaker: 'agent', text: 'Hoi', at: '2026-10-31T12:00:00.000Z' }],
     });
+    // The app's own live voice: only sessions with turns are read, merged by time.
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions`).flush({
+      caseId: CASE_ID,
+      sessions: [
+        { id: 'voice_live', createdAt: '2026-10-31T12:01:00.000Z', turnCount: 1 },
+        { id: 'voice_empty', createdAt: '2026-10-31T12:02:00.000Z', turnCount: 0 },
+      ],
+    });
+    await new Promise((resolve) => setTimeout(resolve));
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/voice_live/transcript`).flush({
+      caseId: CASE_ID,
+      voiceSession: { id: 'voice_live' },
+      turns: [{ speaker: 'customer', receivedAt: '2026-10-31T12:01:30.000Z', log: { messageId: 'turn_1', text: 'Grüezi' } }],
+    });
 
     expect(await snapshot).toMatchObject({
       caseId: CASE_ID,
       contextRevision: 12,
       charts: [],
       summary: null,
-      transcript: [{ entryId: 'conv_a0', speaker: 'agent', text: 'Hoi', status: 'final' }],
+      transcript: [
+        { entryId: 'conv_a0', speaker: 'agent', text: 'Hoi', status: 'final' },
+        { entryId: 'turn_1', speaker: 'customer', text: 'Grüezi', status: 'final' },
+      ],
     });
   });
 

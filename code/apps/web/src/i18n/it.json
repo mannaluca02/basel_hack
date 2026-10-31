@@ -66,7 +66,14 @@
     "extraction": "Ultima estrazione lato server (model-v1 con consenso IA, altrimenti regole)",
     "noTrace": "Nessun payload registrato.",
     "review": "Verifica · accettazione e conferma del profilo",
-    "settings": {"title":"Impostazioni della conversazione", "source":"Skills da code/voice-agent/skills con assigned: true. La selezione vale dal prossimo avvio.", "time":"Tempo disponibile", "priority":"Argomento prioritario", "natural":"Seguire naturalmente la conversazione", "unavailable":"Le impostazioni del prompt non sono disponibili. Avvia il backend attuale e ricarica il caso."},
+    "settings": {
+      "title": "Impostazioni della conversazione",
+      "source": "Skills da code/voice-agent/skills con assigned: true. La selezione vale dal prossimo avvio.",
+      "time": "Tempo disponibile",
+      "priority": "Argomento prioritario",
+      "natural": "Seguire naturalmente la conversazione",
+      "unavailable": "Le impostazioni del prompt non sono disponibili. Avvia il backend attuale e ricarica il caso."
+    },
     "context": {
       "title": "Cosa è stato raccolto dalla conversazione",
       "logs": "Registro della conversazione",
@@ -434,5 +441,13 @@
       "voiceOpened": "Paxi è aperto in una finestra separata. Quello che racconti appare qui come proposta da verificare.",
       "voiceFailed": "Impossibile collegare Paxi. L'agente vocale è avviato?"
     }
+  },
+  "voice": {
+    "start": "Conversazione dal vivo con Paxi",
+    "stop": "Termina la conversazione",
+    "title": "Parla con Paxi",
+    "begin": "Avvia la conversazione",
+    "cancel": "Annulla",
+    "connected": "Paxi è connesso e ascolta"
   }
 }

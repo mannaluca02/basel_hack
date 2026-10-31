@@ -1,4 +1,4 @@
-import { createPaxAvatar } from '../../../../../avatar-prototype/pax-avatar.js';
+import { createPaxAvatar } from '../../../../../../avatar-prototype/pax-avatar.js';
 import { connectAvatarAudio } from './voice-avatar';
 
 /** Exercise the real renderer, not a face-event spy: only the audio clock/source are synthetic. */

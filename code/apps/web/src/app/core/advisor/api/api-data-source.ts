@@ -23,8 +23,8 @@ type Projection = CaseProjection &
  * projected view models as upserts. `CustomerReview` does its own reloading.
  *
  * Besides the case it loads the summaries of the current snapshot (summary sheet, Info tab) and
- * the call history a linked voice agent recorded (Chat tab). Replies stay empty: the backend has
- * no reply route.
+ * the call history of a linked voice agent and of the app's live voice (Chat tab). Replies stay
+ * empty: the backend has no reply route.
  * The same snapshot carries the canonical case for Voice Lab; late former-session reads are ignored.
  */
 export class ApiDataSource extends AdvisorDataSource {
@@ -152,13 +152,16 @@ export class ApiDataSource extends AdvisorDataSource {
 
   private async project(caseId: string): Promise<{ dto: InsuranceCaseDto; contextRevision: number; projection: Projection }> {
     // Only the case is required; the rest may not exist yet (no analysis, no voice agent).
-    const [dto, context, summaries, turns, suitability] = await Promise.all([
+    const [dto, context, summaries, agentTurns, voiceTurns, suitability] = await Promise.all([
       this.api.loadCase(caseId),
       this.api.loadContext(caseId).catch(() => null),
       this.api.loadSummaries(caseId).catch(() => null),
       this.api.loadAgentTurns(caseId).catch(() => []),
+      this.api.loadVoiceTurns(caseId).catch(() => []),
       this.api.loadSuitability(caseId).catch(() => null),
     ]);
+    // Paxi in its own window and the live voice in the app write separate histories.
+    const turns = [...agentTurns, ...voiceTurns].sort((a, b) => a.at.localeCompare(b.at));
     const language = this.language.language();
     const at = new Date().toISOString();
     const projection = projectCase(dto, context, language, at);

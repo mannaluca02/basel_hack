@@ -1,9 +1,9 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { APP_ENVIRONMENT } from '../../../src/app/core/config/app-environment';
-import { CUSTOMER_SESSION_KEY } from '../../../src/app/core/advisor/api/customer-api';
-import { provideI18nTesting } from '../../../src/app/core/i18n/i18n-testing';
+import { APP_ENVIRONMENT } from '../config/app-environment';
+import { CUSTOMER_SESSION_KEY } from '../advisor/api/customer-api';
+import { provideI18nTesting } from '../i18n/i18n-testing';
 import { VoiceLabApi } from './voice-lab-api';
 import { LabTrace, labTraceInterceptor } from './lab-trace';
 
