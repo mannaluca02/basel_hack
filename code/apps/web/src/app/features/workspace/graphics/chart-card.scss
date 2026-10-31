@@ -9,6 +9,16 @@
   border: var(--stroke-border) solid var(--border-soft);
   border-radius: var(--radius-xl);
   background: var(--bg-default);
+  transition:
+    background-color 600ms ease-out,
+    border-color 600ms ease-out;
+}
+
+// "Show in Graphics" from another tab: the card it points to is tinted for a moment. No
+// box-shadow: that is the second ring of the global focus indicator, and the card gets focus.
+.card.targeted {
+  border-color: var(--border-default);
+  background: var(--bg-muted);
 }
 
 .head {
@@ -248,5 +258,9 @@ table.text td {
 @media (prefers-reduced-motion: reduce) {
   .updated {
     animation: none;
+  }
+
+  .card {
+    transition: none;
   }
 }

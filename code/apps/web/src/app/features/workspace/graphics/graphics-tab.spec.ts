@@ -15,6 +15,7 @@ import {
 import { ChartResult } from '../../../core/advisor/ui-models';
 import { Consent } from '../../../core/consent/consent';
 import { provideI18nTesting } from '../../../core/i18n/i18n-testing';
+import { ChartJump, ChartTarget } from '../../../core/layout/chart-jump';
 import { ViewScroller } from '../../../core/layout/view-scroller';
 import { stubChartCanvas } from './graphics-testing';
 import { GraphicsTab } from './graphics-tab';
@@ -28,6 +29,17 @@ class FakeScroller {
   readonly measure = vi.fn(() => this.nearBottom);
   readonly scrollToEnd = vi.fn();
   readonly reveal = vi.fn();
+}
+
+/** "Show in Graphics" from another tab, without the router. */
+class FakeJump {
+  readonly target = signal<ChartTarget | null>(null);
+  readonly pending = this.target.asReadonly();
+  take(): ChartTarget | null {
+    const target = this.target();
+    this.target.set(null);
+    return target;
+  }
 }
 
 /**
@@ -44,6 +56,7 @@ class Shell {}
 describe('GraphicsTab', () => {
   let source: FakeDataSource;
   let scroller: FakeScroller;
+  let jump: FakeJump;
   let fixture: ComponentFixture<Shell>;
   let root: HTMLElement;
 
@@ -51,11 +64,13 @@ describe('GraphicsTab', () => {
     source = new FakeDataSource();
     source.nextSnapshot = of(snapshot({ charts: initialCharts }));
     scroller = new FakeScroller();
+    jump = new FakeJump();
     TestBed.configureTestingModule({
       providers: [
         provideI18nTesting(),
         { provide: AdvisorDataSource, useValue: source },
         { provide: ViewScroller, useValue: scroller },
+        { provide: ChartJump, useValue: jump },
       ],
     });
     stubChartCanvas();
@@ -76,6 +91,44 @@ describe('GraphicsTab', () => {
   const ids = () => cards().map((card) => card.dataset['chartId']);
   const pill = () => root.querySelector<HTMLButtonElement>('.pill');
   const live = () => root.querySelector('[aria-live]')?.textContent?.trim();
+
+  it('scrolls to the card another tab points to once the tab is settled, and focuses it', async () => {
+    await start([incomeChart(), pillar3aChart()]);
+    scroller.settled.set(false);
+    jump.target.set({ chartId: 'chart_3a' });
+    await fixture.whenStable();
+    expect(scroller.reveal).not.toHaveBeenCalled();
+
+    scroller.settled.set(true);
+    await fixture.whenStable();
+
+    const target = cards()[1];
+    const article = target.querySelector('article');
+    expect(scroller.reveal).toHaveBeenCalledWith(target, expect.any(Boolean));
+    expect(document.activeElement).toBe(article);
+    expect(article?.classList).toContain('targeted');
+    expect(jump.pending()).toBeNull();
+  });
+
+  it('opens the life-event scenario the other tab points to', async () => {
+    const [disability] = impactChart().scenarios;
+    await start([impactChart({ scenarios: [disability, { ...disability, event: 'death' }] })]);
+
+    jump.target.set({ chartId: 'chart_impact', event: 'death' });
+    await fixture.whenStable();
+
+    const pressed = root.querySelector('.scenario[aria-pressed="true"]');
+    expect(pressed?.textContent?.trim()).toBe('Todesfall');
+  });
+
+  it('drops a target whose chart is not in the feed', async () => {
+    await start([incomeChart()]);
+    jump.target.set({ chartId: 'chart_missing' });
+    await fixture.whenStable();
+
+    expect(scroller.reveal).not.toHaveBeenCalled();
+    expect(jump.pending()).toBeNull();
+  });
 
   it('says that charts are on their way while there is none', async () => {
     await start();

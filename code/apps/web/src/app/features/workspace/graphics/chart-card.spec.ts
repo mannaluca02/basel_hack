@@ -4,7 +4,7 @@ import { ResultStatus } from '../../../core/advisor/contracts';
 import { chart, impactChart, incomeChart } from '../../../core/advisor/store/case-testing';
 import { ChartResult } from '../../../core/advisor/ui-models';
 import { provideI18nTesting } from '../../../core/i18n/i18n-testing';
-import { ChartCard, UPDATED_MARKER_MS } from './chart-card';
+import { ChartCard, TARGET_MARKER_MS, UPDATED_MARKER_MS } from './chart-card';
 import { stubChartCanvas } from './graphics-testing';
 
 @Component({
@@ -147,6 +147,44 @@ describe('ChartCard', () => {
     // A scenario the update dropped falls back to the first one.
     await set(impactChart({ revision: 3, scenarios: [disability] }));
     expect(text('.scenario-name')).toBe('Invalidität');
+  });
+
+  it('selects the scenario another tab points to and highlights the card for a moment', async () => {
+    const [disability] = impactChart().scenarios;
+    const death = { ...disability, event: 'death' as const };
+    await set(impactChart({ scenarios: [disability, death] }));
+    const card = fixture.debugElement.query((el) => el.name === 'app-chart-card')
+      .componentInstance as ChartCard;
+    const shown = () =>
+      [...root.querySelectorAll<HTMLButtonElement>('.scenario')]
+        .find((b) => b.getAttribute('aria-pressed') === 'true')
+        ?.textContent?.trim();
+    const article = () => root.querySelector('article') as HTMLElement;
+    vi.useFakeTimers();
+
+    card.highlight('death');
+    fixture.detectChanges();
+    expect(shown()).toBe('Todesfall');
+    expect(article().classList).toContain('targeted');
+
+    vi.advanceTimersByTime(TARGET_MARKER_MS);
+    fixture.detectChanges();
+    expect(article().classList).not.toContain('targeted');
+  });
+
+  it('keeps the scenario when the event it is pointed to is not in the chart', async () => {
+    const [disability] = impactChart().scenarios;
+    const death = { ...disability, event: 'death' as const };
+    await set(impactChart({ scenarios: [disability, death] }));
+    const card = fixture.debugElement.query((el) => el.name === 'app-chart-card')
+      .componentInstance as ChartCard;
+
+    card.highlight('retirement');
+    await fixture.whenStable();
+
+    const pressed = root.querySelector('.scenario[aria-pressed="true"]');
+    expect(pressed?.textContent?.trim()).toBe('Invalidität');
+    expect(root.querySelector('article')?.classList).toContain('targeted');
   });
 
   it('names a single scenario instead of offering a switch with one option', async () => {
