@@ -117,6 +117,18 @@ const callbacks = {
 
 const paxi = createPaxiVoice({ ...callbacks, caseLink });
 
+// Call controls of the customer app that opened this window (FE-10). Only that window may steer
+// the call, and only with these actions.
+window.addEventListener("message", (event) => {
+  if (!window.opener || event.source !== window.opener) return;
+  const { type, action } = event.data ?? {};
+  if (type !== "pax.call") return;
+  if (action === "end") paxi.stop();
+  else if (action === "mute") paxi.setMuted(true);
+  else if (action === "unmute") paxi.setMuted(false);
+  else if (action === "stop_speaking") paxi.stopSpeaking();
+});
+
 $("avatar").addEventListener("click", () => {
   if (paxi.running) return;
   const resume = resumable;
