@@ -25,7 +25,7 @@ describe('LiveVoiceControl', () => {
 
   let dto = quietCase();
 
-  async function setup(gptLive = true, demoStart = false) {
+  async function setup(gptLive = true, demoStart = false, voiceAgentUrl?: string) {
     consents = [];
     sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify({ caseId: CASE_ID, csrfToken: 'csrf_test' }));
     FakeEventSource.reset();
@@ -37,7 +37,7 @@ describe('LiveVoiceControl', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart, voiceAgentUrl } },
         { provide: AdvisorDataSource, useClass: ApiDataSource },
       ],
     });
@@ -134,5 +134,12 @@ describe('LiveVoiceControl', () => {
     dto = reviewCase({ handover: DEFAULT_HUMAN_HANDOVER });
     await setup();
     expect(element().querySelector('[data-action="accept"]')).toBeNull();
+  });
+
+  it('leaves the call to Paxi in the paxi configuration, but still offers the acceptance', async () => {
+    dto = reviewCase({ handover: DEFAULT_HUMAN_HANDOVER });
+    await setup(true, true, 'http://localhost:3100');
+    expect(mic()).toBeNull();
+    expect(element().querySelector('[data-action="accept"]')).not.toBeNull();
   });
 });

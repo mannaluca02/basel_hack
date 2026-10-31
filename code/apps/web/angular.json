@@ -116,6 +116,17 @@
                 }
               ],
               "tsConfig": "tsconfig.debug.json"
+            },
+            "paxi": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.paxi.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -144,6 +155,10 @@
             "debug-lab": {
               "buildTarget": "web:build:debug-lab",
               "proxyConfig": "proxy.lab.conf.json"
+            },
+            "paxi": {
+              "buildTarget": "web:build:paxi",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

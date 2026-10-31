@@ -18,7 +18,9 @@
   <main class="view" #view tabindex="-1">
     <app-connection-banner />
     <app-human-advisor-status />
-    <app-call-controls />
+    @if (callControls) {
+      <app-call-controls />
+    }
     @if (reviewEnabled) {
       <app-review-panel />
     }

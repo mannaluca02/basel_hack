@@ -22,6 +22,7 @@
     "start:demo": "npm run build && node scripts/start-demo.mjs",
     "dev:demo": "node scripts/dev-demo.mjs",
     "dev:debug": "node scripts/dev-demo.mjs --debug",
+    "dev:paxi": "node scripts/dev-demo.mjs --paxi",
     "start:voice-lab": "npm run build && node --env-file-if-exists=../.env scripts/start-voice-lab.mjs",
     "demo": "npm run build && node scripts/demo.mjs",
     "test:live": "npm run build && node --env-file-if-exists=../.env scripts/live-journey.mjs",
