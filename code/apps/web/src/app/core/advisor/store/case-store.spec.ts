@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
+import { Consent } from '../../consent/consent';
 import { provideI18nTesting } from '../../i18n/i18n-testing';
 import { AdvisorDataSource, AdvisorSnapshot } from '../advisor-data-source';
 import { MOCK_CALL_SCRIPT } from '../mock/mock-call-script';
@@ -25,6 +26,8 @@ describe('CaseStore', () => {
     TestBed.configureTestingModule({
       providers: [{ provide: AdvisorDataSource, useValue: source }],
     });
+    sessionStorage.clear();
+    TestBed.inject(Consent).grant();
     store = TestBed.inject(CaseStore);
   });
 
@@ -139,6 +142,49 @@ describe('CaseStore', () => {
   });
 });
 
+describe('CaseStore before consent', () => {
+  let source: FakeDataSource;
+  let store: CaseStore;
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    source = new FakeDataSource();
+    TestBed.configureTestingModule({
+      providers: [{ provide: AdvisorDataSource, useValue: source }],
+    });
+    store = TestBed.inject(CaseStore);
+  });
+
+  it('does not connect', () => {
+    store.connect();
+
+    expect(store.connection()).toBe('disconnected');
+    expect(source.snapshotRequests).toBe(0);
+  });
+
+  it('drops events and snapshots even if the data source runs on its own', () => {
+    source.connectionState.next('connected');
+    source.emit(event('chart', chart()), event('risk', risk()));
+
+    expect(source.snapshotRequests).toBe(0);
+    expect(store.loaded()).toBe(false);
+    expect(store.charts()).toEqual([]);
+    expect(store.risks()).toEqual([]);
+    expect(store.unread()).toEqual({ graphics: 0, risks: 0, chat: 0, info: 0 });
+  });
+
+  it('processes only what arrives after consent', () => {
+    source.emit(event('risk', risk({ riskId: 'risk_before' })));
+
+    TestBed.inject(Consent).grant();
+    store.connect();
+    source.emit(event('risk', risk({ riskId: 'risk_after' })));
+
+    expect(store.loaded()).toBe(true);
+    expect(store.risks().map((r) => r.riskId)).toEqual(['risk_after']);
+  });
+});
+
 describe('CaseStore with the scripted mock call', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -157,6 +203,7 @@ describe('CaseStore with the scripted mock call', () => {
 
   it('ends with the full case and one unread count per new or updated item', () => {
     vi.useFakeTimers();
+    TestBed.inject(Consent).grant();
     const store = TestBed.inject(CaseStore);
     store.connect();
     vi.advanceTimersByTime(MOCK_CALL_SCRIPT.at(-1)!.atMs + 1_000);

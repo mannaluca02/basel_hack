@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { RouteReuseStrategy, Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of } from 'rxjs';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { FakeDataSource, risk, snapshot } from './core/advisor/store/case-testing';
+import { FakeDataSource, event, risk } from './core/advisor/store/case-testing';
+import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/consent';
 import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
@@ -15,6 +15,8 @@ describe('App', () => {
 
   beforeEach(async () => {
     localStorage.clear();
+    // Consent from earlier in this browser session; the consent flow has its own suite below.
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
     source = new FakeDataSource();
     await TestBed.configureTestingModule({
       imports: [App],
@@ -76,16 +78,11 @@ describe('App', () => {
     const risksLink = () => root.querySelector('a[href="/risks"]') as HTMLElement;
     expect(risksLink().querySelector('.badge')).toBeNull();
 
-    source.nextSnapshot = of(
-      snapshot({
-        risks: [
-          risk({ riskId: 'risk_a', status: 'identified' }),
-          risk({ riskId: 'risk_b', status: 'needs_data' }),
-          risk({ riskId: 'risk_c', status: 'addressed' }),
-        ],
-      }),
+    source.emit(
+      event('risk', risk({ riskId: 'risk_a', status: 'identified' })),
+      event('risk', risk({ riskId: 'risk_b', status: 'needs_data' })),
+      event('risk', risk({ riskId: 'risk_c', status: 'addressed' })),
     );
-    source.connect();
     await fixture.whenStable();
 
     const badge = risksLink().querySelector('.badge');
@@ -165,5 +162,107 @@ describe('App', () => {
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Espace de travail');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Risques');
     expect(document.title).toBe('Risques | Pax Digital Advisor');
+  });
+});
+
+describe('App before consent', () => {
+  let source: FakeDataSource;
+
+  beforeEach(async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    source = new FakeDataSource();
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        { provide: AdvisorDataSource, useValue: source },
+        provideI18nTesting(),
+      ],
+    }).compileComponents();
+  });
+
+  async function render() {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl('/risks');
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const checkbox = () => root.querySelector('app-consent-screen input') as HTMLInputElement;
+    const startButton = () => root.querySelector('app-consent-screen button') as HTMLButtonElement;
+    return { fixture, root, checkbox, startButton };
+  }
+
+  it('shows only the privacy notice: no workspace, no tabs, no call', async () => {
+    const { root } = await render();
+
+    expect(root.querySelector('h1')?.textContent).toBe('Bevor wir starten');
+    expect(
+      Array.from(root.querySelectorAll('app-consent-screen h2'), (h) => h.textContent),
+    ).toEqual([
+      'Was aufgezeichnet wird',
+      'Eine KI ist beteiligt',
+      'Dies ist eine Demo',
+      'Ein Mensch ist jederzeit erreichbar',
+    ]);
+    expect(root.querySelector('.rail')).toBeNull();
+    expect(root.querySelector('router-outlet')).toBeNull();
+    expect(source.connectionState.value).toBe('disconnected');
+  });
+
+  it('enables "Start advice" only while the box is ticked', async () => {
+    const { fixture, checkbox, startButton } = await render();
+    expect(startButton().textContent?.trim()).toBe('Beratung starten');
+    expect(startButton().disabled).toBe(true);
+
+    checkbox().click();
+    await fixture.whenStable();
+    expect(startButton().disabled).toBe(false);
+
+    checkbox().click();
+    await fixture.whenStable();
+    expect(startButton().disabled).toBe(true);
+    expect(sessionStorage.getItem(CONSENT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('after consent stores it for the session, starts the call and opens the requested tab', async () => {
+    const { fixture, root, checkbox, startButton } = await render();
+
+    checkbox().click();
+    await fixture.whenStable();
+    startButton().click();
+    await fixture.whenStable();
+
+    expect(sessionStorage.getItem(CONSENT_STORAGE_KEY)).toBe(CONSENT_NOTICE_VERSION);
+    expect(localStorage.getItem(CONSENT_STORAGE_KEY)).toBeNull();
+    expect(source.connectionState.value).toBe('connected');
+    expect(root.querySelector('app-consent-screen')).toBeNull();
+    expect(root.querySelector('main app-risks-tab h1')?.textContent).toBe('Risiken');
+    expect(document.activeElement).toBe(root.querySelector('main'));
+  });
+
+  it('shows the Demo badge before and after consent', async () => {
+    const { fixture, root, checkbox, startButton } = await render();
+    const badge = () => root.querySelector('header .demo');
+    expect(badge()?.querySelector('[aria-hidden="true"]')?.textContent).toBe('Demo');
+    expect(badge()?.querySelector('.visually-hidden')?.textContent).toBe(
+      'Demo mit synthetischen Daten',
+    );
+
+    checkbox().click();
+    await fixture.whenStable();
+    startButton().click();
+    await fixture.whenStable();
+
+    expect(badge()).not.toBeNull();
+  });
+
+  it('translates the notice without reload', async () => {
+    const { fixture, root, startButton } = await render();
+
+    await TestBed.inject(AppLanguage).use('it');
+    await fixture.whenStable();
+
+    expect(root.querySelector('h1')?.textContent).toBe('Prima di iniziare');
+    expect(startButton().textContent?.trim()).toBe('Avvia la consulenza');
   });
 });

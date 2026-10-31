@@ -24,5 +24,32 @@
   },
   "info": {
     "title": "Info"
+  },
+  "demo": {
+    "badge": "Demo",
+    "label": "Demo con dati sintetici"
+  },
+  "consent": {
+    "title": "Prima di iniziare",
+    "intro": "Pax Digital Advisor la aiuta a capire la sua previdenza nei tre pilastri. Legga brevemente come funziona.",
+    "recorded": {
+      "title": "Cosa viene registrato",
+      "body": "Ciò che dice durante il colloquio viene convertito in testo e salvato insieme alle sue indicazioni su economia domestica, reddito e previdenza. Questi dati servono solo per questa consulenza."
+    },
+    "ai": {
+      "title": "È coinvolta un’IA",
+      "body": "Un assistente IA conduce il colloquio, pone domande e spiega i risultati. Non calcola da sé: tutti gli importi provengono dagli strumenti di calcolo di Pax. L’IA riceve solo ciò che le serve, senza il suo nome, la data di nascita completa o dati sulla salute."
+    },
+    "demo": {
+      "title": "Questa è una demo",
+      "body": "Questo prototipo del BaselHack 2026 funziona solo con dati sintetici. Non inserisca dati personali reali."
+    },
+    "human": {
+      "title": "Una persona è sempre raggiungibile",
+      "body": "Durante il colloquio può chiedere in qualsiasi momento una consulente o un consulente: basta dirlo. I casi complessi o con conseguenze importanti vengono trasmessi automaticamente a uno specialista."
+    },
+    "session": "Il suo consenso vale solo per questa scheda del browser e termina quando la chiude.",
+    "agree": "Ho letto questa informativa e accetto che i miei dati vengano trattati come descritto.",
+    "start": "Avvia la consulenza"
   }
 }

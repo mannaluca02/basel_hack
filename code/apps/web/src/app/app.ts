@@ -20,7 +20,9 @@ import {
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CaseStore } from './core/advisor/store/case-store';
 import { WorkspaceTab } from './core/advisor/store/case-state';
+import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
+import { ConsentScreen } from './features/consent/consent-screen';
 
 interface TabLink {
   readonly id: WorkspaceTab;
@@ -32,14 +34,24 @@ interface TabLink {
 }
 
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslocoPipe, LanguageSwitcher],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslocoPipe,
+    LanguageSwitcher,
+    ConsentScreen,
+  ],
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.gated]': '!consented()' },
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App {
   private readonly store = inject(CaseStore);
+  private readonly consent = inject(Consent);
+  private readonly injector = inject(Injector);
   private readonly view = viewChild<ElementRef<HTMLElement>>('view');
   /** Scroll offset of the Dynamic View per tab path. */
   private readonly scrollTops = new Map<string, number>();
@@ -56,6 +68,9 @@ export class App {
     },
   ];
 
+  /** Until the user consents, only the privacy notice is shown: no workspace, no call. */
+  protected readonly consented = this.consent.granted;
+
   /** Risks not yet addressed: the count badge on the Risks tab. */
   protected readonly openRisks = computed(
     () => this.store.risks().filter((risk) => risk.status !== 'addressed').length,
@@ -65,7 +80,6 @@ export class App {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll
     // offset, and all tabs share one scroll container. Save it on leave, restore it on return.
     const router = inject(Router);
-    const injector = inject(Injector);
     router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       const view = this.view()?.nativeElement;
       if (!view) return;
@@ -73,9 +87,22 @@ export class App {
         this.scrollTops.set(pathOf(router.url), view.scrollTop);
       } else if (event instanceof NavigationEnd) {
         const top = this.scrollTops.get(pathOf(event.urlAfterRedirects)) ?? 0;
-        afterNextRender({ write: () => (view.scrollTop = top) }, { injector });
+        afterNextRender({ write: () => (view.scrollTop = top) }, { injector: this.injector });
       }
     });
+
+    // Consent lasts the browser session, so after a reload the call resumes right away.
+    if (this.consented()) this.store.connect();
+  }
+
+  protected start(): void {
+    this.consent.grant();
+    this.store.connect();
+    // The consent screen and its button are gone: continue in the workspace, not on <body>.
+    afterNextRender(
+      { write: () => this.view()?.nativeElement.focus() },
+      { injector: this.injector },
+    );
   }
 }
 
