@@ -1,0 +1,6 @@
+{
+  "action": "request",
+  "messageId": "human_advisor_requested",
+  "expectedCaseRevision": 1,
+  "source": "ui"
+}

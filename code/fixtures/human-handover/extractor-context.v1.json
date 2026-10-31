@@ -1,0 +1,54 @@
+{
+  "handover": {
+    "status": "requested",
+    "revision": 1,
+    "wantsHumanAdvisor": true,
+    "leaveViewRequested": true,
+    "stopDigitalConversation": true,
+    "requestId": "72162e6f-1815-4f5b-bb6d-0fe9da9ece73",
+    "requestedAt": "2026-10-31T13:06:49.480Z",
+    "resumedAt": null,
+    "source": "ui"
+  },
+  "humanAdvisorContact": {
+    "organization": "Pax",
+    "kind": "public_general_contact",
+    "phone": "+41612776666",
+    "displayPhone": "+41 61 277 66 66",
+    "sourceUrl": "https://www.pax.ch/de/kontakt-und-services",
+    "verifiedAt": "2026-10-31",
+    "automaticDialing": false,
+    "advisorAssigned": false
+  },
+  "schemaVersion": "1.0",
+  "caseId": "c8f1e35c-7445-44db-94a0-711285d3a390",
+  "caseRevision": 2,
+  "contextRevision": 2,
+  "profileVersion": null,
+  "draftHash": "51dbaea5712c355de7bcd2ac8be011fe12a43615aaf0948c955e02445a2cf3d9",
+  "draftDirty": true,
+  "locale": "de",
+  "dataClassification": "synthetic",
+  "personIds": [],
+  "draft": {
+    "financial": null,
+    "insurance": null,
+    "goals": [],
+    "reviewFlags": []
+  },
+  "fields": [],
+  "proposalBatches": [],
+  "ambiguities": [],
+  "writablePaths": [
+    "financial",
+    "insurance",
+    "goals_add"
+  ],
+  "policy": {
+    "noRawHealthData": true,
+    "noProviderTokens": true,
+    "noExternalAiTransferAuthorized": true,
+    "customerConfirmationRequired": true
+  },
+  "proposals": []
+}

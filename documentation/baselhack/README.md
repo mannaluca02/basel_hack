@@ -1,7 +1,10 @@
 # Pax BaselHack – Teamgrundlage
 
-Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; die Advisor-App ist noch nicht implementiert.
+Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; der Lebensversicherungs-Backend-PoC ist implementiert und geprüft. Angular, KI-Dialog, Voice und Avatar werden durch die jeweiligen Teammitglieder angebunden; echte Abschlüsse bleiben gesperrt.
 
+- [Logik-Backend: Implementierung und Prüfnachweis](reports/logic-backend-implementation.md)
+- [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
+- [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
 - [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
 - [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)

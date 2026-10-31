@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "syntheticOnly": true,
+  "phone": "+41612776666",
+  "contactKind": "public_general_contact",
+  "automaticDialing": false,
+  "callPlaced": false,
+  "advisorAssigned": false,
+  "requestEvent": "human_handover_requested",
+  "interruptPolicy": "immediate",
+  "questionsWhilePaused": null,
+  "maySpeakAmountsWhilePaused": false,
+  "idempotentReplay": true,
+  "explicitResume": true,
+  "calculatorCalls": 0,
+  "openAiCalled": false
+}

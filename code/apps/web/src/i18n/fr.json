@@ -1,0 +1,69 @@
+{
+  "app": {
+    "name": "Pax Digital Advisor"
+  },
+  "language": {
+    "label": "Langue",
+    "current": "Langue : {{language}}"
+  },
+  "nav": {
+    "label": "Espace de travail",
+    "graphics": "Graphiques",
+    "risks": "Risques",
+    "chat": "Chat",
+    "info": "Infos",
+    "openRisks": "{{count}} à traiter"
+  },
+  "graphics": {
+    "title": "Graphiques"
+  },
+  "risks": {
+    "title": "Risques"
+  },
+  "chat": {
+    "title": "Chat"
+  },
+  "info": {
+    "title": "Infos"
+  },
+  "demo": {
+    "badge": "Démo",
+    "label": "Démo avec des données synthétiques"
+  },
+  "consent": {
+    "title": "Avant de commencer",
+    "intro": "Pax Digital Advisor vous aide à comprendre votre prévoyance sur les trois piliers. Prenez un instant pour lire comment il fonctionne.",
+    "recorded": {
+      "title": "Ce qui est enregistré",
+      "body": "Ce que vous dites pendant l’entretien est converti en texte et enregistré avec vos indications sur votre ménage, vos revenus et votre prévoyance. Ces données servent uniquement à ce conseil."
+    },
+    "ai": {
+      "title": "Une IA intervient",
+      "body": "Un assistant IA mène l’entretien, pose des questions et explique les résultats. Il ne calcule rien lui-même : tous les montants proviennent des outils de calcul de Pax. L’IA reçoit uniquement ce dont elle a besoin, sans votre nom, votre date de naissance complète ni vos données de santé."
+    },
+    "demo": {
+      "title": "Ceci est une démo",
+      "body": "Ce prototype du BaselHack 2026 fonctionne uniquement avec des données synthétiques. Merci de ne saisir aucune donnée personnelle réelle."
+    },
+    "human": {
+      "title": "Une personne est toujours joignable",
+      "body": "Pendant l’entretien, vous pouvez demander à tout moment une conseillère ou un conseiller : il suffit de le dire. Les cas complexes ou lourds de conséquences sont transmis automatiquement à un spécialiste."
+    },
+    "session": "Votre consentement ne vaut que pour cet onglet du navigateur et prend fin lorsque vous le fermez.",
+    "agree": "J’ai lu cette information et j’accepte que mes données soient traitées comme décrit.",
+    "start": "Commencer le conseil"
+  },
+  "dock": {
+    "open": "Ouvrir le résumé",
+    "progress": "{{percent}} des informations saisies",
+    "complete": "Toutes les informations sont saisies",
+    "unknown": "État des informations encore inconnu",
+    "activity": {
+      "idle": "Assistant prêt",
+      "listening": "L’assistant écoute",
+      "thinking": "L’assistant réfléchit",
+      "speaking": "L’assistant parle",
+      "error": "Problème avec l’assistant"
+    }
+  }
+}

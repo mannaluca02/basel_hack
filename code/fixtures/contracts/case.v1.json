@@ -1,0 +1,3355 @@
+{
+  "id": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+  "createdAt": "2026-10-31T02:31:27.233Z",
+  "updatedAt": "2026-10-31T02:31:27.283Z",
+  "expiresAt": "2026-11-01T02:31:27.233Z",
+  "locale": "de",
+  "timeBudgetMinutes": 10,
+  "caseRevision": 7,
+  "contextRevision": 7,
+  "draft": {
+    "financial": {
+      "schemaVersion": "1.0",
+      "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+      "caseRevision": 3,
+      "profileVersion": 1,
+      "dataClassification": "synthetic",
+      "valuationDate": "2026-10-31",
+      "priceBasis": "nominal",
+      "persons": [
+        {
+          "id": "person_demo_1",
+          "birthYear": 1985,
+          "employmentRateBps": 10000,
+          "income": {
+            "value": 8400000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:person1-net-income"
+          },
+          "incomeBasis": "net_after_income_tax"
+        },
+        {
+          "id": "person_demo_2",
+          "birthYear": 1987,
+          "employmentRateBps": 8000,
+          "income": {
+            "value": 4800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:person2-net-income"
+          },
+          "incomeBasis": "net_after_income_tax"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "housing",
+          "category": "housing",
+          "amount": {
+            "value": 240000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:rent"
+          }
+        },
+        {
+          "id": "living",
+          "category": "living",
+          "amount": {
+            "value": 300000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:living"
+          }
+        },
+        {
+          "id": "tax",
+          "category": "tax",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:tax-already-in-net"
+          }
+        },
+        {
+          "id": "provision",
+          "category": "provision",
+          "amount": {
+            "value": 50000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:existing-contributions"
+          }
+        },
+        {
+          "id": "debt",
+          "category": "debt",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-debt-service"
+          }
+        },
+        {
+          "id": "reserve",
+          "category": "reserve",
+          "amount": {
+            "value": 80000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:regular-reserve-saving"
+          }
+        }
+      ],
+      "safetyBuffer": {
+        "value": 50000,
+        "currency": "CHF",
+        "unit": "cent",
+        "period": "month",
+        "origin": "synthetic",
+        "confirmation": "confirmed",
+        "review": "unreviewed",
+        "sourceRef": "demo:chosen-buffer"
+      },
+      "assets": [
+        {
+          "id": "cash",
+          "amount": {
+            "value": 10000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:cash"
+          },
+          "liquidity": "free",
+          "availableFrom": "2026-10-31",
+          "pillar": "none",
+          "allocations": [
+            {
+              "goalId": "existing_emergency_reserve",
+              "amountCents": 1000000
+            }
+          ]
+        },
+        {
+          "id": "pillar3_account",
+          "amount": {
+            "value": 5000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:restricted-3a"
+          },
+          "liquidity": "restricted",
+          "availableFrom": "2026-10-31",
+          "pillar": "3",
+          "allocations": []
+        }
+      ],
+      "assetsConfirmed": true,
+      "provisions": [
+        {
+          "id": "p1_person1",
+          "personId": "person_demo_1",
+          "pillar": "1",
+          "event": "retirement",
+          "amount": {
+            "value": 2800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "estimate",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar1-person1"
+          }
+        },
+        {
+          "id": "p2_person1",
+          "personId": "person_demo_1",
+          "pillar": "2",
+          "event": "retirement",
+          "amount": {
+            "value": 3600000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar2-person1"
+          }
+        },
+        {
+          "id": "p3_person1",
+          "personId": "person_demo_1",
+          "pillar": "3",
+          "event": "retirement",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-pillar3-annuity-person1"
+          }
+        },
+        {
+          "id": "p1_person2",
+          "personId": "person_demo_2",
+          "pillar": "1",
+          "event": "retirement",
+          "amount": {
+            "value": 2400000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "estimate",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar1-person2"
+          }
+        },
+        {
+          "id": "p2_person2",
+          "personId": "person_demo_2",
+          "pillar": "2",
+          "event": "retirement",
+          "amount": {
+            "value": 1800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar2-person2"
+          }
+        },
+        {
+          "id": "p3_person2",
+          "personId": "person_demo_2",
+          "pillar": "3",
+          "event": "retirement",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-pillar3-annuity-person2"
+          }
+        }
+      ]
+    },
+    "insurance": {
+      "relationship": "married",
+      "relationshipSinceYear": 2015,
+      "sharedChildren": 0,
+      "taxLocationId": 400100000,
+      "persons": [
+        {
+          "personId": "person_demo_1",
+          "providerSex": 1,
+          "grossAnnualIncomeCents": 12000000,
+          "withPillar2": true,
+          "pillar2Risk": {
+            "disabilityAnnualCents": 4000000,
+            "disabilityChildAnnualCents": 800000,
+            "survivorAnnualCents": 3000000,
+            "orphanAnnualCents": 800000
+          },
+          "retirementPensionAnnualCents": 4000000,
+          "currentPillar2CapitalCents": 10000000,
+          "desiredWorkStopAge": 65,
+          "disabilityNeedAnnualCents": 15000000,
+          "deathNeedAnnualCents": 10000000,
+          "protectionTermMonths": 240,
+          "existingDeathCapitalCents": 0,
+          "deathOneOffCostsCents": 1000000,
+          "debtPayoffCents": 0,
+          "debtTreatment": "included_in_income_need",
+          "deathNeedExcludesRepaidDebtService": false,
+          "personalAffordableAnnualPremiumCents": 400000
+        },
+        {
+          "personId": "person_demo_2",
+          "providerSex": 2,
+          "grossAnnualIncomeCents": 8000000,
+          "withPillar2": true,
+          "pillar2Risk": {
+            "disabilityAnnualCents": 2400000,
+            "disabilityChildAnnualCents": 800000,
+            "survivorAnnualCents": 3000000,
+            "orphanAnnualCents": 800000
+          },
+          "retirementPensionAnnualCents": 2400000,
+          "currentPillar2CapitalCents": 10000000,
+          "desiredWorkStopAge": 65,
+          "disabilityNeedAnnualCents": 15000000,
+          "deathNeedAnnualCents": 10000000,
+          "protectionTermMonths": 240,
+          "existingDeathCapitalCents": 0,
+          "deathOneOffCostsCents": 1000000,
+          "debtPayoffCents": 0,
+          "debtTreatment": "included_in_income_need",
+          "deathNeedExcludesRepaidDebtService": false,
+          "personalAffordableAnnualPremiumCents": 300000
+        }
+      ],
+      "children": [],
+      "debts": [],
+      "debtsConfirmed": true,
+      "existingPrivateRiskBenefitsConfirmed": true,
+      "confession1": 4,
+      "confession2": 4,
+      "taxableFortuneCents": 10000000,
+      "retirementNeedAnnualCents": 9600000,
+      "annualReturnBps": 0,
+      "retirementHorizonAge": 88,
+      "annualSavingCents": 600000,
+      "investmentKnowledgeConfirmed": true,
+      "annualSavingIsAdditional": true,
+      "existingAnnualRetirementSavingCents": 500000,
+      "existingAnnualPillar3aContributionCents": 600000,
+      "riskAppetite": "medium",
+      "riskCapitalStrategy": "preserve_assets_for_other_goals"
+    },
+    "goals": [
+      {
+        "id": "goal_family",
+        "kind": "family",
+        "targetMonth": "2028-01",
+        "priority": 1,
+        "targetCapitalCents": null
+      },
+      {
+        "id": "goal_home",
+        "kind": "home",
+        "targetMonth": "2031-01",
+        "priority": 2,
+        "targetCapitalCents": 100000000
+      },
+      {
+        "id": "goal_retirement",
+        "kind": "retirement",
+        "targetMonth": "2050-01",
+        "priority": 3,
+        "targetCapitalCents": 100000000
+      }
+    ],
+    "reviewFlags": []
+  },
+  "draftDirty": false,
+  "confirmedVersions": [
+    {
+      "version": 1,
+      "draft": {
+        "financial": {
+          "schemaVersion": "1.0",
+          "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+          "caseRevision": 3,
+          "profileVersion": 1,
+          "dataClassification": "synthetic",
+          "valuationDate": "2026-10-31",
+          "priceBasis": "nominal",
+          "persons": [
+            {
+              "id": "person_demo_1",
+              "birthYear": 1985,
+              "employmentRateBps": 10000,
+              "income": {
+                "value": 8400000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:person1-net-income"
+              },
+              "incomeBasis": "net_after_income_tax"
+            },
+            {
+              "id": "person_demo_2",
+              "birthYear": 1987,
+              "employmentRateBps": 8000,
+              "income": {
+                "value": 4800000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:person2-net-income"
+              },
+              "incomeBasis": "net_after_income_tax"
+            }
+          ],
+          "expenses": [
+            {
+              "id": "housing",
+              "category": "housing",
+              "amount": {
+                "value": 240000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:rent"
+              }
+            },
+            {
+              "id": "living",
+              "category": "living",
+              "amount": {
+                "value": 300000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:living"
+              }
+            },
+            {
+              "id": "tax",
+              "category": "tax",
+              "amount": {
+                "value": 0,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:tax-already-in-net"
+              }
+            },
+            {
+              "id": "provision",
+              "category": "provision",
+              "amount": {
+                "value": 50000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:existing-contributions"
+              }
+            },
+            {
+              "id": "debt",
+              "category": "debt",
+              "amount": {
+                "value": 0,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:no-debt-service"
+              }
+            },
+            {
+              "id": "reserve",
+              "category": "reserve",
+              "amount": {
+                "value": 80000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "month",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:regular-reserve-saving"
+              }
+            }
+          ],
+          "safetyBuffer": {
+            "value": 50000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:chosen-buffer"
+          },
+          "assets": [
+            {
+              "id": "cash",
+              "amount": {
+                "value": 10000000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "once",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:cash"
+              },
+              "liquidity": "free",
+              "availableFrom": "2026-10-31",
+              "pillar": "none",
+              "allocations": [
+                {
+                  "goalId": "existing_emergency_reserve",
+                  "amountCents": 1000000
+                }
+              ]
+            },
+            {
+              "id": "pillar3_account",
+              "amount": {
+                "value": 5000000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "once",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:restricted-3a"
+              },
+              "liquidity": "restricted",
+              "availableFrom": "2026-10-31",
+              "pillar": "3",
+              "allocations": []
+            }
+          ],
+          "assetsConfirmed": true,
+          "provisions": [
+            {
+              "id": "p1_person1",
+              "personId": "person_demo_1",
+              "pillar": "1",
+              "event": "retirement",
+              "amount": {
+                "value": 2800000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "estimate",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:illustrative-pillar1-person1"
+              }
+            },
+            {
+              "id": "p2_person1",
+              "personId": "person_demo_1",
+              "pillar": "2",
+              "event": "retirement",
+              "amount": {
+                "value": 3600000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:illustrative-pillar2-person1"
+              }
+            },
+            {
+              "id": "p3_person1",
+              "personId": "person_demo_1",
+              "pillar": "3",
+              "event": "retirement",
+              "amount": {
+                "value": 0,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:no-pillar3-annuity-person1"
+              }
+            },
+            {
+              "id": "p1_person2",
+              "personId": "person_demo_2",
+              "pillar": "1",
+              "event": "retirement",
+              "amount": {
+                "value": 2400000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "estimate",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:illustrative-pillar1-person2"
+              }
+            },
+            {
+              "id": "p2_person2",
+              "personId": "person_demo_2",
+              "pillar": "2",
+              "event": "retirement",
+              "amount": {
+                "value": 1800000,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:illustrative-pillar2-person2"
+              }
+            },
+            {
+              "id": "p3_person2",
+              "personId": "person_demo_2",
+              "pillar": "3",
+              "event": "retirement",
+              "amount": {
+                "value": 0,
+                "currency": "CHF",
+                "unit": "cent",
+                "period": "year",
+                "origin": "synthetic",
+                "confirmation": "confirmed",
+                "review": "unreviewed",
+                "sourceRef": "demo:no-pillar3-annuity-person2"
+              }
+            }
+          ]
+        },
+        "insurance": {
+          "relationship": "married",
+          "relationshipSinceYear": 2015,
+          "sharedChildren": 0,
+          "taxLocationId": 400100000,
+          "persons": [
+            {
+              "personId": "person_demo_1",
+              "providerSex": 1,
+              "grossAnnualIncomeCents": 12000000,
+              "withPillar2": true,
+              "pillar2Risk": {
+                "disabilityAnnualCents": 4000000,
+                "disabilityChildAnnualCents": 800000,
+                "survivorAnnualCents": 3000000,
+                "orphanAnnualCents": 800000
+              },
+              "retirementPensionAnnualCents": 4000000,
+              "currentPillar2CapitalCents": 10000000,
+              "desiredWorkStopAge": 65,
+              "disabilityNeedAnnualCents": 15000000,
+              "deathNeedAnnualCents": 10000000,
+              "protectionTermMonths": 240,
+              "existingDeathCapitalCents": 0,
+              "deathOneOffCostsCents": 1000000,
+              "debtPayoffCents": 0,
+              "debtTreatment": "included_in_income_need",
+              "deathNeedExcludesRepaidDebtService": false,
+              "personalAffordableAnnualPremiumCents": 400000
+            },
+            {
+              "personId": "person_demo_2",
+              "providerSex": 2,
+              "grossAnnualIncomeCents": 8000000,
+              "withPillar2": true,
+              "pillar2Risk": {
+                "disabilityAnnualCents": 2400000,
+                "disabilityChildAnnualCents": 800000,
+                "survivorAnnualCents": 3000000,
+                "orphanAnnualCents": 800000
+              },
+              "retirementPensionAnnualCents": 2400000,
+              "currentPillar2CapitalCents": 10000000,
+              "desiredWorkStopAge": 65,
+              "disabilityNeedAnnualCents": 15000000,
+              "deathNeedAnnualCents": 10000000,
+              "protectionTermMonths": 240,
+              "existingDeathCapitalCents": 0,
+              "deathOneOffCostsCents": 1000000,
+              "debtPayoffCents": 0,
+              "debtTreatment": "included_in_income_need",
+              "deathNeedExcludesRepaidDebtService": false,
+              "personalAffordableAnnualPremiumCents": 300000
+            }
+          ],
+          "children": [],
+          "debts": [],
+          "debtsConfirmed": true,
+          "existingPrivateRiskBenefitsConfirmed": true,
+          "confession1": 4,
+          "confession2": 4,
+          "taxableFortuneCents": 10000000,
+          "retirementNeedAnnualCents": 9600000,
+          "annualReturnBps": 0,
+          "retirementHorizonAge": 88,
+          "annualSavingCents": 600000,
+          "investmentKnowledgeConfirmed": true,
+          "annualSavingIsAdditional": true,
+          "existingAnnualRetirementSavingCents": 500000,
+          "existingAnnualPillar3aContributionCents": 600000,
+          "riskAppetite": "medium",
+          "riskCapitalStrategy": "preserve_assets_for_other_goals"
+        },
+        "goals": [
+          {
+            "id": "goal_family",
+            "kind": "family",
+            "targetMonth": "2028-01",
+            "priority": 1,
+            "targetCapitalCents": null
+          },
+          {
+            "id": "goal_home",
+            "kind": "home",
+            "targetMonth": "2031-01",
+            "priority": 2,
+            "targetCapitalCents": 100000000
+          },
+          {
+            "id": "goal_retirement",
+            "kind": "retirement",
+            "targetMonth": "2050-01",
+            "priority": 3,
+            "targetCapitalCents": 100000000
+          }
+        ],
+        "reviewFlags": []
+      },
+      "confirmedAt": "2026-10-31T02:31:27.248Z",
+      "confirmedBy": "38ce699b-053c-4620-825b-dc1032ff27aa",
+      "noticeVersion": "lifemap-synthetic-v1",
+      "calculatorTransferAllowed": true
+    }
+  ],
+  "latestAnalysisRequestId": null,
+  "activeRunId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+  "runs": [
+    {
+      "id": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "modelVersion": "lifemap-life-insurance-0.2.0",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+      "createdAt": "2026-10-31T02:31:27.267Z",
+      "scenario": {
+        "kind": "baseline"
+      },
+      "status": "current",
+      "local": {
+        "schemaVersion": "1.0",
+        "messageId": "8caa3ee9-e86d-4a30-8330-74d4c5d790c6",
+        "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+        "correlationId": "79e67c46-10b0-4f55-bd3c-38ff2439f20a",
+        "profileVersion": 1,
+        "scenarioVersionId": "baseline_v1",
+        "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+        "calculationInputHash": "ee4ab415fd76345862c268b35e282f1835ea697b24116d276738ef4cd905df64",
+        "modelVersion": "lifemap-domain-0.1.0",
+        "createdAt": "2026-10-31T02:31:27.255Z",
+        "dataClassification": "synthetic",
+        "valuationDate": "2026-10-31",
+        "priceBasis": "nominal",
+        "periodStart": "2026-10",
+        "periodEnd": "2027-09",
+        "statusByArea": {
+          "budget": "estimated",
+          "capital": "estimated",
+          "pillars": "estimated"
+        },
+        "metrics": [
+          {
+            "id": "incomeAnnual",
+            "value": 13200000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "expensesAnnual",
+            "value": 8040000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "cashflowAnnual",
+            "value": 5160000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "safetyBufferAnnual",
+            "value": 600000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "affordableContributionAnnual",
+            "value": 4560000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "deficitAnnual",
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:person1-net-income",
+              "demo:person2-net-income",
+              "demo:rent",
+              "demo:living",
+              "demo:tax-already-in-net",
+              "demo:existing-contributions",
+              "demo:no-debt-service",
+              "demo:regular-reserve-saving",
+              "demo:chosen-buffer"
+            ]
+          },
+          {
+            "id": "freeCapital",
+            "value": 9000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:cash",
+              "demo:restricted-3a"
+            ]
+          },
+          {
+            "id": "totalCapital",
+            "value": 15000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:cash",
+              "demo:restricted-3a"
+            ]
+          },
+          {
+            "id": "pillar3Capital",
+            "value": 5000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:restricted-3a"
+            ]
+          },
+          {
+            "id": "restrictedCapital",
+            "value": 5000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "status": "estimated",
+            "sourceRefs": [
+              "demo:restricted-3a"
+            ]
+          },
+          {
+            "id": "pillar_1_retirement_person_demo_1",
+            "value": 2800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_1",
+            "sourceRefs": [
+              "demo:illustrative-pillar1-person1"
+            ]
+          },
+          {
+            "id": "pillar_1_retirement_person_demo_2",
+            "value": 2400000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_2",
+            "sourceRefs": [
+              "demo:illustrative-pillar1-person2"
+            ]
+          },
+          {
+            "id": "pillar_2_retirement_person_demo_1",
+            "value": 3600000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_1",
+            "sourceRefs": [
+              "demo:illustrative-pillar2-person1"
+            ]
+          },
+          {
+            "id": "pillar_2_retirement_person_demo_2",
+            "value": 1800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_2",
+            "sourceRefs": [
+              "demo:illustrative-pillar2-person2"
+            ]
+          },
+          {
+            "id": "pillar_3_retirement_person_demo_1",
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_1",
+            "sourceRefs": [
+              "demo:no-pillar3-annuity-person1"
+            ]
+          },
+          {
+            "id": "pillar_3_retirement_person_demo_2",
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "status": "estimated",
+            "personId": "person_demo_2",
+            "sourceRefs": [
+              "demo:no-pillar3-annuity-person2"
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "code": "TAX_ALREADY_INCLUDED",
+            "path": "expenses.tax",
+            "message": "Tax already included in net-after-tax income; not deducted twice."
+          }
+        ],
+        "assumptions": [
+          "Flows are annualized snapshot values, not a time-varying pension forecast.",
+          "Integer CHF cents; month-to-year multiplication, display rounding only."
+        ],
+        "capitalBreakdown": [
+          {
+            "assetId": "cash",
+            "totalCents": 10000000,
+            "allocatedCents": 1000000,
+            "freeCents": 9000000,
+            "excludedReason": null,
+            "allocations": [
+              {
+                "goalId": "existing_emergency_reserve",
+                "amountCents": 1000000
+              }
+            ]
+          },
+          {
+            "assetId": "pillar3_account",
+            "totalCents": 5000000,
+            "allocatedCents": 0,
+            "freeCents": 0,
+            "excludedReason": "restricted",
+            "allocations": []
+          }
+        ],
+        "progress": {
+          "domain": "data_capture",
+          "percent": 100,
+          "reviewOpen": true,
+          "groups": [
+            {
+              "id": "income",
+              "complete": true,
+              "missing": []
+            },
+            {
+              "id": "budget",
+              "complete": true,
+              "missing": []
+            },
+            {
+              "id": "capital",
+              "complete": true,
+              "missing": []
+            },
+            {
+              "id": "pillar_1",
+              "complete": true,
+              "missing": []
+            },
+            {
+              "id": "pillar_2",
+              "complete": true,
+              "missing": []
+            },
+            {
+              "id": "pillar_3",
+              "complete": true,
+              "missing": []
+            }
+          ]
+        }
+      },
+      "providerResults": [
+        {
+          "operation": "saving3aLimits",
+          "status": "valid",
+          "metrics": [
+            {
+              "id": "max3aWithP2",
+              "value": 725800,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "max3aWithoutP2",
+              "value": 3628800,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "eligibilityNotEstablished": true
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_getSaving3aLimits",
+            "inputHash": "afc3cedf3e230b34f03f5277bc01042de9a82a9141b4adfb2d2470e83dc08073",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-saving3aLimits"
+          }
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid",
+          "metrics": [],
+          "issues": [],
+          "metadata": {
+            "ageLimits": {
+              "BirthYear": 1985,
+              "RegularPensionAge": 65,
+              "MinimumAHVAge": 63,
+              "MaximumAHVAge": 70,
+              "CurrentAge": 41,
+              "MinimumPensionAge": 58,
+              "MaximumPensionAge": 70,
+              "MaximumSaving3aAge": 65,
+              "MinimumSaving3aAge": 18,
+              "AllowedForSaving3a": true
+            },
+            "personId": "person_demo_1"
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_getAgeLimits",
+            "inputHash": "ffe6c3778c42e9273ea815286e2b94e68261993c3aa0f13bf05f7159a2123d6d",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-ageLimits"
+          }
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid",
+          "metrics": [],
+          "issues": [],
+          "metadata": {
+            "ageLimits": {
+              "BirthYear": 1987,
+              "RegularPensionAge": 65,
+              "MinimumAHVAge": 63,
+              "MaximumAHVAge": 70,
+              "CurrentAge": 39,
+              "MinimumPensionAge": 58,
+              "MaximumPensionAge": 70,
+              "MaximumSaving3aAge": 65,
+              "MinimumSaving3aAge": 18,
+              "AllowedForSaving3a": true
+            },
+            "personId": "person_demo_2"
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_getAgeLimits",
+            "inputHash": "4f96a22cc040766d14b9c6afa21f7e0e9a89a1cb7e3a00171be991c736e46f93",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-ageLimits"
+          }
+        },
+        {
+          "operation": "riskBase",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "Person1_Disability",
+              "value": 4000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person1_DisabilityChildren",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person1_Widow",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person1_Orphan",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_Disability",
+              "value": 2400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_DisabilityChildren",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_Widow",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_Orphan",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "baselineEstimateNotPensionCertificate": true
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateRiskBase",
+            "inputHash": "ef20d0de939c2ed37e8b17dc56de67d8e686fc7005ac83169b5193e6c3ea473f",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-riskBase"
+          }
+        },
+        {
+          "operation": "risk",
+          "status": "valid",
+          "metrics": [
+            {
+              "id": "risk_1_need",
+              "value": 15000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_1_gap",
+              "value": 2200000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_1_surplus",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_1_incomeTotal",
+              "value": 12800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_1_pillar1",
+              "value": 2800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_1_pillar2",
+              "value": 4000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 1
+            },
+            {
+              "id": "risk_2_need",
+              "value": 15000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_2_gap",
+              "value": 2200000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_2_surplus",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_2_incomeTotal",
+              "value": 12800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_2_pillar1",
+              "value": 2800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_2_pillar2",
+              "value": 4000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 2
+            },
+            {
+              "id": "risk_3_need",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_3_gap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_3_surplus",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_3_incomeTotal",
+              "value": 10800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_3_pillar1",
+              "value": 1800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_3_pillar2",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 3
+            },
+            {
+              "id": "risk_4_need",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_4_gap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_4_surplus",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_4_incomeTotal",
+              "value": 10800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_4_pillar1",
+              "value": 1800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_4_pillar2",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 4
+            },
+            {
+              "id": "risk_5_need",
+              "value": 15000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_5_gap",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_5_surplus",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_5_incomeTotal",
+              "value": 14200000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_5_pillar1",
+              "value": 2800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_5_pillar2",
+              "value": 2400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 5
+            },
+            {
+              "id": "risk_6_need",
+              "value": 15000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_6_gap",
+              "value": 800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_6_surplus",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_6_incomeTotal",
+              "value": 14200000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_6_pillar1",
+              "value": 2800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_6_pillar2",
+              "value": 2400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 6
+            },
+            {
+              "id": "risk_7_need",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_7_gap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_7_surplus",
+              "value": 3800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_7_incomeTotal",
+              "value": 13800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_7_pillar1",
+              "value": 1800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_7_pillar2",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 7
+            },
+            {
+              "id": "risk_8_need",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            },
+            {
+              "id": "risk_8_gap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            },
+            {
+              "id": "risk_8_surplus",
+              "value": 3800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            },
+            {
+              "id": "risk_8_incomeTotal",
+              "value": 13800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            },
+            {
+              "id": "risk_8_pillar1",
+              "value": 1800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            },
+            {
+              "id": "risk_8_pillar2",
+              "value": 3000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid",
+              "scenario": 8
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "scenarioCodes": "1-4 Person1, 5-8 Person2: disability illness/accident, death illness/accident"
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateRisk",
+            "inputHash": "4b76b8d526df8265f2e65e73a9d1ec95d51c3fd9c2c38003027220a80bbdde42",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-risk"
+          }
+        },
+        {
+          "operation": "retirementBase",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "Person1_Pension",
+              "value": 4000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person1_CurrentCapital",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_Pension",
+              "value": 2400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "Person2_CurrentCapital",
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "baselineEstimateNotPensionCertificate": true
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateRetirementBase",
+            "inputHash": "535b0880e9531121e279be4ec4cfeaced4681baa6f53349ce6733897d162a290",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-retirementBase"
+          }
+        },
+        {
+          "operation": "retirement",
+          "status": "valid",
+          "metrics": [
+            {
+              "id": "IncomeNeed",
+              "value": 9600000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "IncomeGap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "IncomeTotal",
+              "value": 11400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "IncomePillar1",
+              "value": 5000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "IncomePillar2",
+              "value": 6400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "IncomeWithdrawal",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "valid"
+            },
+            {
+              "id": "AvailableFortune",
+              "value": 31000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "valid"
+            },
+            {
+              "id": "CapitalNeed",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "valid"
+            },
+            {
+              "id": "CapitalGap",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "valid"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "returnAndCapitalAssumptionsUnverified": true
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateRetirement",
+            "inputHash": "4f6812d68d2f0cafb0235197d8167fc5a8b5a3fd7e77819a41e0beb4bdeaf5dd",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-retirement"
+          }
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "proposedExpenses",
+              "value": 8000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "proposedNetIncome",
+              "value": 16000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "categorySuggestions": [
+              {
+                "label": "Wohnen",
+                "valueCents": 3000000,
+                "period": "year"
+              }
+            ],
+            "requiresCustomerConfirmation": true
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateBudgetProposal",
+            "inputHash": "374dd9f9640fdc9f5d21499dd57941e2fa1cdf7645ea307f94707b178cace043",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-budgetProposal"
+          }
+        },
+        {
+          "operation": "location",
+          "status": "valid",
+          "metrics": [],
+          "issues": [],
+          "metadata": {
+            "locations": [
+              {
+                "LocationID": 400100000,
+                "ZipCode": 4001,
+                "City": "Basel",
+                "Canton": "BS",
+                "Location": "Basel BS"
+              }
+            ]
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_getLocation",
+            "inputHash": "225e51ee61cd254bb627b9389e4245428f27dcd0c300534eb906b1f3ebc5ce09",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-location"
+          }
+        },
+        {
+          "operation": "income",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "convertedIncome",
+              "value": 9600000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "incomeType": 3,
+            "incomeTaxNotDeducted": true,
+            "personId": "person_demo_1"
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateIncome",
+            "inputHash": "44a83339de105b484f429d8fa4b266610bf584567b4bc69cdbaf321b20549027",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-income"
+          }
+        },
+        {
+          "operation": "income",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "convertedIncome",
+              "value": 6400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "incomeType": 3,
+            "incomeTaxNotDeducted": true,
+            "personId": "person_demo_2"
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateIncome",
+            "inputHash": "9ca7714b52dce8081fc9fc95ed1ff721f18d68b026c87dbc0064066e7304edd2",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-income"
+          }
+        },
+        {
+          "operation": "saving",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "deposits",
+              "value": 23400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "estimated"
+            },
+            {
+              "id": "projectedCapital",
+              "value": 23400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "estimated"
+            },
+            {
+              "id": "periodicInvestment",
+              "value": 600000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "durationMonths": 288,
+            "guaranteed": false
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateSaving",
+            "inputHash": "cd882519f24e8a8a9dedc565f25992e7f623ffcb01ca56467762a2ad5afabfda",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-saving"
+          }
+        },
+        {
+          "operation": "consumption",
+          "status": "estimated",
+          "metrics": [
+            {
+              "id": "withdrawal",
+              "value": 9600000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "status": "estimated"
+            },
+            {
+              "id": "endCapital",
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "status": "estimated"
+            }
+          ],
+          "issues": [],
+          "metadata": {
+            "durationMonths": 0,
+            "guaranteed": false
+          },
+          "provenance": {
+            "mode": "replay",
+            "operationId": "APICalc_calculateConsumption",
+            "inputHash": "23f44e24a5df510aed67967fcdc585274d165e254fa3f8c5105d4b8856c3a722",
+            "capturedAt": "2026-10-31",
+            "sourceRef": "test:synthetic-consumption"
+          }
+        }
+      ],
+      "providerFailures": [],
+      "riskNeeds": [
+        {
+          "personId": "person_demo_1",
+          "scenario": 1,
+          "event": "disability_illness",
+          "annualNeedCents": 15000000,
+          "providerReportedNeedCents": 15000000,
+          "providerIncomeCents": 12800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 2200000,
+          "deathCapitalCents": null,
+          "liquidAssetsAppliedCents": null,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_1",
+          "scenario": 2,
+          "event": "disability_accident",
+          "annualNeedCents": 15000000,
+          "providerReportedNeedCents": 15000000,
+          "providerIncomeCents": 12800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 2200000,
+          "deathCapitalCents": null,
+          "liquidAssetsAppliedCents": null,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_1",
+          "scenario": 3,
+          "event": "death_illness",
+          "annualNeedCents": 10000000,
+          "providerReportedNeedCents": 10000000,
+          "providerIncomeCents": 10800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 0,
+          "deathCapitalCents": 1000000,
+          "liquidAssetsAppliedCents": 0,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_1",
+          "scenario": 4,
+          "event": "death_accident",
+          "annualNeedCents": 10000000,
+          "providerReportedNeedCents": 10000000,
+          "providerIncomeCents": 10800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 0,
+          "deathCapitalCents": 1000000,
+          "liquidAssetsAppliedCents": 0,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_2",
+          "scenario": 5,
+          "event": "disability_illness",
+          "annualNeedCents": 15000000,
+          "providerReportedNeedCents": 15000000,
+          "providerIncomeCents": 14200000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 800000,
+          "deathCapitalCents": null,
+          "liquidAssetsAppliedCents": null,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_2",
+          "scenario": 6,
+          "event": "disability_accident",
+          "annualNeedCents": 15000000,
+          "providerReportedNeedCents": 15000000,
+          "providerIncomeCents": 14200000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 800000,
+          "deathCapitalCents": null,
+          "liquidAssetsAppliedCents": null,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_2",
+          "scenario": 7,
+          "event": "death_illness",
+          "annualNeedCents": 10000000,
+          "providerReportedNeedCents": 10000000,
+          "providerIncomeCents": 13800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 0,
+          "deathCapitalCents": 1000000,
+          "liquidAssetsAppliedCents": 0,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        },
+        {
+          "personId": "person_demo_2",
+          "scenario": 8,
+          "event": "death_accident",
+          "annualNeedCents": 10000000,
+          "providerReportedNeedCents": 10000000,
+          "providerIncomeCents": 13800000,
+          "privatePillar3IncomeCents": 0,
+          "annualGapCents": 0,
+          "deathCapitalCents": 1000000,
+          "liquidAssetsAppliedCents": 0,
+          "status": "valid",
+          "sourceRefs": [
+            "test:synthetic-risk",
+            "rule:finite-protection-capital-v1"
+          ]
+        }
+      ],
+      "timeline": null,
+      "reviewReasons": [
+        "LIFE_INSURANCE_DEMO_REVIEW_REQUIRED",
+        "PENSION_CAPITAL_RELEASE_NOT_ASSUMED"
+      ],
+      "assumptions": [
+        "Synthetic data only; actual calculator calls do not constitute insurance acceptance.",
+        "Provider benefits, private pillar-3 benefits and current capital remain distinct.",
+        "Flows are annualized snapshot values, not a time-varying pension forecast.",
+        "Integer CHF cents; month-to-year multiplication, display rounding only."
+      ],
+      "pillarPicture": [
+        {
+          "pillar": "1",
+          "status": "estimated",
+          "annualPensions": [
+            {
+              "event": "retirement_household",
+              "personId": null,
+              "amountCents": 5000000
+            },
+            {
+              "event": "disability_illness",
+              "personId": "person_demo_1",
+              "amountCents": 2800000
+            },
+            {
+              "event": "disability_accident",
+              "personId": "person_demo_1",
+              "amountCents": 2800000
+            },
+            {
+              "event": "death_illness",
+              "personId": "person_demo_1",
+              "amountCents": 1800000
+            },
+            {
+              "event": "death_accident",
+              "personId": "person_demo_1",
+              "amountCents": 1800000
+            },
+            {
+              "event": "disability_illness",
+              "personId": "person_demo_2",
+              "amountCents": 2800000
+            },
+            {
+              "event": "disability_accident",
+              "personId": "person_demo_2",
+              "amountCents": 2800000
+            },
+            {
+              "event": "death_illness",
+              "personId": "person_demo_2",
+              "amountCents": 1800000
+            },
+            {
+              "event": "death_accident",
+              "personId": "person_demo_2",
+              "amountCents": 1800000
+            }
+          ],
+          "capitalCents": null,
+          "annualContributionCents": null,
+          "capitalIsReferenceOnly": true,
+          "sourceRefs": [
+            "test:synthetic-retirement",
+            "test:synthetic-risk"
+          ]
+        },
+        {
+          "pillar": "2",
+          "status": "estimated",
+          "annualPensions": [
+            {
+              "event": "retirement_household",
+              "personId": null,
+              "amountCents": 6400000
+            },
+            {
+              "event": "disability_illness",
+              "personId": "person_demo_1",
+              "amountCents": 4000000
+            },
+            {
+              "event": "disability_accident",
+              "personId": "person_demo_1",
+              "amountCents": 4000000
+            },
+            {
+              "event": "death_illness",
+              "personId": "person_demo_1",
+              "amountCents": 3000000
+            },
+            {
+              "event": "death_accident",
+              "personId": "person_demo_1",
+              "amountCents": 3000000
+            },
+            {
+              "event": "disability_illness",
+              "personId": "person_demo_2",
+              "amountCents": 2400000
+            },
+            {
+              "event": "disability_accident",
+              "personId": "person_demo_2",
+              "amountCents": 2400000
+            },
+            {
+              "event": "death_illness",
+              "personId": "person_demo_2",
+              "amountCents": 3000000
+            },
+            {
+              "event": "death_accident",
+              "personId": "person_demo_2",
+              "amountCents": 3000000
+            }
+          ],
+          "capitalCents": 20000000,
+          "annualContributionCents": null,
+          "capitalIsReferenceOnly": true,
+          "sourceRefs": [
+            "test:synthetic-retirement",
+            "test:synthetic-risk"
+          ]
+        },
+        {
+          "pillar": "3",
+          "status": "estimated",
+          "annualPensions": [
+            {
+              "event": "retirement",
+              "personId": "person_demo_1",
+              "amountCents": 0
+            },
+            {
+              "event": "retirement",
+              "personId": "person_demo_2",
+              "amountCents": 0
+            }
+          ],
+          "capitalCents": 5000000,
+          "annualContributionCents": 600000,
+          "capitalIsReferenceOnly": true,
+          "sourceRefs": [
+            "demo:no-pillar3-annuity-person1",
+            "demo:no-pillar3-annuity-person2",
+            "demo:restricted-3a"
+          ]
+        }
+      ]
+    }
+  ],
+  "reviewTasks": [
+    {
+      "id": "1295fc43-cb3c-4992-81fe-bedab52b8df6",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "reasons": [
+        "LIFE_INSURANCE_DEMO_REVIEW_REQUIRED",
+        "PENSION_CAPITAL_RELEASE_NOT_ASSUMED"
+      ],
+      "status": "open",
+      "decision": null
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "e5f779ac-1e13-46ae-baac-ddf991c1fe04",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "createdAt": "2026-10-31T02:31:27.278Z",
+      "status": "human_review_required",
+      "candidates": [
+        {
+          "id": "737861d0-42e3-491d-9d62-511f3f789555",
+          "productId": "pax_disability",
+          "productName": "Pax Erwerbsunfähigkeitsversicherung",
+          "personId": "person_demo_1",
+          "needAmountCents": 2200000,
+          "needPeriod": "year",
+          "rule": {
+            "ruleId": "disability_gap_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "CONFIRMED_ANNUAL_NEED",
+              "THREE_PILLAR_COORDINATION",
+              "CAUSES_NOT_SUMMED"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung",
+              "pax-document:disability_terms",
+              "pax-document:disability_brochure"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        },
+        {
+          "id": "a87eeb6d-e3bf-4ec7-92a7-beec7dea01ba",
+          "productId": "pax_term_life",
+          "productName": "Pax Todesfallversicherung",
+          "personId": "person_demo_1",
+          "needAmountCents": 1000000,
+          "needPeriod": "once",
+          "rule": {
+            "ruleId": "survivor_capital_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "FINITE_PROTECTION_TERM",
+              "DEBT_TREATMENT_EXPLICIT",
+              "EXISTING_DEATH_CAPITAL_DEDUCTED",
+              "LIQUID_ASSET_STRATEGY_CONFIRMED"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung",
+              "pax-document:term_terms",
+              "pax-document:term_brochure"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        },
+        {
+          "id": "908bcdad-0c60-45ea-af04-bf8f4349257e",
+          "productId": "pax_disability",
+          "productName": "Pax Erwerbsunfähigkeitsversicherung",
+          "personId": "person_demo_2",
+          "needAmountCents": 800000,
+          "needPeriod": "year",
+          "rule": {
+            "ruleId": "disability_gap_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "CONFIRMED_ANNUAL_NEED",
+              "THREE_PILLAR_COORDINATION",
+              "CAUSES_NOT_SUMMED"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung",
+              "pax-document:disability_terms",
+              "pax-document:disability_brochure"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        },
+        {
+          "id": "f25973a9-ffec-4407-9a2c-9fa5c10f0ca8",
+          "productId": "pax_term_life",
+          "productName": "Pax Todesfallversicherung",
+          "personId": "person_demo_2",
+          "needAmountCents": 1000000,
+          "needPeriod": "once",
+          "rule": {
+            "ruleId": "survivor_capital_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "FINITE_PROTECTION_TERM",
+              "DEBT_TREATMENT_EXPLICIT",
+              "EXISTING_DEATH_CAPITAL_DEDUCTED",
+              "LIQUID_ASSET_STRATEGY_CONFIRMED"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung",
+              "pax-document:term_terms",
+              "pax-document:term_brochure"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        },
+        {
+          "id": "b215dc5c-e749-40ed-bcfa-00b83eca4df9",
+          "productId": "pax_3a",
+          "productName": "Pax 3a",
+          "personId": "person_demo_1",
+          "needAmountCents": 125800,
+          "needPeriod": "year",
+          "rule": {
+            "ruleId": "retirement_saving_gap_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "RETIREMENT_GAP_DOCUMENTED",
+              "ANNUAL_BUDGET_CHECKED",
+              "PROVIDER_3A_CEILING_NOT_EXCEEDED"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-3a",
+              "pax-document:pax3a_kid"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        },
+        {
+          "id": "339011ae-2d8e-4c2b-a59b-63e8d6df1db9",
+          "productId": "pax_fondsstar",
+          "productName": "Pax FondsStar",
+          "personId": "person_demo_1",
+          "needAmountCents": 400000,
+          "needPeriod": "year",
+          "rule": {
+            "ruleId": "fund_linked_alternative_v1",
+            "ruleVersion": "pax-life-needs-2026-10-31-v1",
+            "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+            "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+            "reasonCodes": [
+              "CAPITAL_GOAL_GAP",
+              "INVESTMENT_PROFILE_CAPTURED",
+              "ALTERNATIVE_NOT_ADDITIONAL_COMMITMENT"
+            ],
+            "sourceRefs": [
+              "test:synthetic-saving3aLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-ageLimits",
+              "test:synthetic-riskBase",
+              "test:synthetic-risk",
+              "test:synthetic-retirementBase",
+              "test:synthetic-retirement",
+              "test:synthetic-budgetProposal",
+              "test:synthetic-location",
+              "test:synthetic-income",
+              "test:synthetic-income",
+              "test:synthetic-saving",
+              "test:synthetic-consumption",
+              "https://www.pax.ch/de/private-vorsorge/produkte/pax-fondsstar",
+              "pax-document:fondsstar_kid",
+              "pax-document:fondsstar_terms"
+            ]
+          },
+          "premiumCents": null,
+          "premiumStatus": "pax_tariff_api_unavailable",
+          "eligibility": "human_review_required",
+          "conditions": [
+            "No real premium or underwriting decision is available.",
+            "Product documents, age/term, beneficiary, exclusions and personal affordability require review."
+          ]
+        }
+      ],
+      "alternatives": [
+        "Keep existing cover and make no additional contract.",
+        "Adjust the goal, protect liquidity or obtain human advice before committing."
+      ],
+      "decision": {
+        "ruleId": "needs_before_products_v1",
+        "ruleVersion": "pax-life-needs-2026-10-31-v1",
+        "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+        "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+        "reasonCodes": [
+          "LIFE_SITUATION_CONFIRMED",
+          "CALCULATED_NEED_REFERENCED"
+        ],
+        "sourceRefs": [
+          "test:synthetic-saving3aLimits",
+          "test:synthetic-ageLimits",
+          "test:synthetic-ageLimits",
+          "test:synthetic-riskBase",
+          "test:synthetic-risk",
+          "test:synthetic-retirementBase",
+          "test:synthetic-retirement",
+          "test:synthetic-budgetProposal",
+          "test:synthetic-location",
+          "test:synthetic-income",
+          "test:synthetic-income",
+          "test:synthetic-saving",
+          "test:synthetic-consumption"
+        ]
+      }
+    }
+  ],
+  "quotes": [],
+  "applications": [],
+  "policies": [],
+  "graphContext": {
+    "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+    "profileVersion": 1,
+    "scenarioVersionId": "baseline_v1",
+    "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+    "graphId": "household_budget",
+    "metricId": "cashflowAnnual",
+    "periodStart": "2026-10",
+    "periodEnd": "2027-09"
+  },
+  "events": [
+    {
+      "id": "89bb9c57-9854-4cfe-aa36-12bef77576f4",
+      "contextRevision": 2,
+      "reason": "draft_changed",
+      "at": "2026-10-31T02:31:27.241Z"
+    },
+    {
+      "id": "c777d663-6317-493c-9c25-0dce9bd63900",
+      "contextRevision": 3,
+      "reason": "confirmed_profile_changed",
+      "at": "2026-10-31T02:31:27.248Z"
+    },
+    {
+      "id": "b4060b02-459c-4d1c-919e-160789801e8f",
+      "contextRevision": 4,
+      "reason": "analysis_started",
+      "at": "2026-10-31T02:31:27.257Z"
+    },
+    {
+      "id": "f7da6e1e-712c-4be4-87da-c3a0d32059b7",
+      "contextRevision": 5,
+      "reason": "analysis_ready",
+      "at": "2026-10-31T02:31:27.270Z"
+    },
+    {
+      "id": "c8fbd716-fcaf-4e90-b5a0-303ec691ebbe",
+      "contextRevision": 6,
+      "reason": "recommendation_available",
+      "at": "2026-10-31T02:31:27.278Z"
+    },
+    {
+      "id": "1814b67c-cc0d-4559-b9dd-0d701d4c0e44",
+      "contextRevision": 7,
+      "reason": "graph_context_changed",
+      "at": "2026-10-31T02:31:27.283Z"
+    }
+  ],
+  "proposals": [],
+  "estimates": [],
+  "comparisons": [],
+  "toolRuns": [],
+  "schemaVersion": "1.0",
+  "presentation": {
+    "locale": "de",
+    "activeRun": {
+      "locale": "de",
+      "statusLabel": "Aktueller Rechenstand",
+      "metrics": [
+        {
+          "id": "incomeAnnual",
+          "label": "Jährliches Einkommen",
+          "valueCents": 13200000,
+          "formatted": "CHF 132'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "expensesAnnual",
+          "label": "Jährliche Ausgaben",
+          "valueCents": 8040000,
+          "formatted": "CHF 80'400.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "cashflowAnnual",
+          "label": "Jährlicher Überschuss oder Fehlbetrag",
+          "valueCents": 5160000,
+          "formatted": "CHF 51'600.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "safetyBufferAnnual",
+          "label": "Jährlicher Sicherheitspuffer",
+          "valueCents": 600000,
+          "formatted": "CHF 6'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "affordableContributionAnnual",
+          "label": "Zusätzlicher jährlicher Spielraum",
+          "valueCents": 4560000,
+          "formatted": "CHF 45'600.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "deficitAnnual",
+          "label": "Jährlicher Fehlbetrag",
+          "valueCents": 0,
+          "formatted": "CHF 0.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "freeCapital",
+          "label": "Frei verfügbares Kapital",
+          "valueCents": 9000000,
+          "formatted": "CHF 90'000.00",
+          "period": "once",
+          "periodLabel": "einmaliges Kapital",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "totalCapital",
+          "label": "Erfasstes Gesamtkapital",
+          "valueCents": 15000000,
+          "formatted": "CHF 150'000.00",
+          "period": "once",
+          "periodLabel": "einmaliges Kapital",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar3Capital",
+          "label": "Kapital der dritten Säule",
+          "valueCents": 5000000,
+          "formatted": "CHF 50'000.00",
+          "period": "once",
+          "periodLabel": "einmaliges Kapital",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "restrictedCapital",
+          "label": "Gebundenes Kapital",
+          "valueCents": 5000000,
+          "formatted": "CHF 50'000.00",
+          "period": "once",
+          "periodLabel": "einmaliges Kapital",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_1_retirement_person_demo_1",
+          "personId": "person_demo_1",
+          "label": "Erste Säule: AHV/IV · Pensionierung",
+          "valueCents": 2800000,
+          "formatted": "CHF 28'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_1_retirement_person_demo_2",
+          "personId": "person_demo_2",
+          "label": "Erste Säule: AHV/IV · Pensionierung",
+          "valueCents": 2400000,
+          "formatted": "CHF 24'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_2_retirement_person_demo_1",
+          "personId": "person_demo_1",
+          "label": "Zweite Säule: Pensionskasse · Pensionierung",
+          "valueCents": 3600000,
+          "formatted": "CHF 36'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_2_retirement_person_demo_2",
+          "personId": "person_demo_2",
+          "label": "Zweite Säule: Pensionskasse · Pensionierung",
+          "valueCents": 1800000,
+          "formatted": "CHF 18'000.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_3_retirement_person_demo_1",
+          "personId": "person_demo_1",
+          "label": "Dritte Säule: private Vorsorge · Pensionierung",
+          "valueCents": 0,
+          "formatted": "CHF 0.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        },
+        {
+          "id": "pillar_3_retirement_person_demo_2",
+          "personId": "person_demo_2",
+          "label": "Dritte Säule: private Vorsorge · Pensionierung",
+          "valueCents": 0,
+          "formatted": "CHF 0.00",
+          "period": "year",
+          "periodLabel": "pro Jahr",
+          "status": "estimated",
+          "statusLabel": "Schätzung"
+        }
+      ],
+      "assumptions": [
+        "Ausschliesslich erfundene Daten; die Berechnung ist keine Versicherungsannahme.",
+        "Staatliche, berufliche und private Leistungen sowie Kapital bleiben getrennte Grössen.",
+        "Die aktuellen Jahreswerte sind eine Momentaufnahme und keine zeitlich wechselnde Rentenprognose.",
+        "Geldbeträge werden in ganzen CHF-Rappen gerechnet; Anzeigerundungen verändern die Rechnung nicht."
+      ],
+      "reviewReasons": [
+        {
+          "code": "LIFE_INSURANCE_DEMO_REVIEW_REQUIRED",
+          "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+        },
+        {
+          "code": "PENSION_CAPITAL_RELEASE_NOT_ASSUMED",
+          "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+        }
+      ],
+      "issues": [
+        {
+          "code": "TAX_ALREADY_INCLUDED",
+          "path": "expenses.tax",
+          "message": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+        }
+      ],
+      "legalDocumentsNotice": "Die verlinkten Originalunterlagen sind deutschsprachige Archivdokumente. Für einen echten Abschluss sind die aktuellen Unterlagen in der passenden Sprache erforderlich.",
+      "demoLabel": "DEMO – KEIN VERSICHERUNGSSCHUTZ"
+    },
+    "recommendations": [
+      {
+        "id": "e5f779ac-1e13-46ae-baac-ddf991c1fe04",
+        "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+        "profileVersion": 1,
+        "createdAt": "2026-10-31T02:31:27.278Z",
+        "status": "human_review_required",
+        "candidates": [
+          {
+            "id": "737861d0-42e3-491d-9d62-511f3f789555",
+            "productId": "pax_disability",
+            "productName": "Pax Erwerbsunfähigkeitsschutz",
+            "personId": "person_demo_1",
+            "needAmountCents": 2200000,
+            "needPeriod": "year",
+            "rule": {
+              "ruleId": "disability_gap_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "CONFIRMED_ANNUAL_NEED",
+                "THREE_PILLAR_COORDINATION",
+                "CAUSES_NOT_SUMMED"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung",
+                "pax-document:disability_terms",
+                "pax-document:disability_brochure"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Diese Option bezieht sich auf die berechnete jährliche Einkommenslücke bei Erwerbsunfähigkeit. Krankheit und Unfall werden als Alternativen betrachtet.",
+            "reasonDetails": [
+              {
+                "code": "CONFIRMED_ANNUAL_NEED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "THREE_PILLAR_COORDINATION",
+                "text": "PK-Folgen, Bezugsalter und Leistungsannahmen benötigen Fachprüfung."
+              },
+              {
+                "code": "CAUSES_NOT_SUMMED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              }
+            ]
+          },
+          {
+            "id": "a87eeb6d-e3bf-4ec7-92a7-beec7dea01ba",
+            "productId": "pax_term_life",
+            "productName": "Pax Todesfallschutz",
+            "personId": "person_demo_1",
+            "needAmountCents": 1000000,
+            "needPeriod": "once",
+            "rule": {
+              "ruleId": "survivor_capital_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "FINITE_PROTECTION_TERM",
+                "DEBT_TREATMENT_EXPLICIT",
+                "EXISTING_DEATH_CAPITAL_DEDUCTED",
+                "LIQUID_ASSET_STRATEGY_CONFIRMED"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung",
+                "pax-document:term_terms",
+                "pax-document:term_brochure"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Der Kapitalbedarf folgt aus der bestätigten Schutzdauer, Einmalkosten, Schuldenbehandlung und bestehenden Mitteln.",
+            "reasonDetails": [
+              {
+                "code": "FINITE_PROTECTION_TERM",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "DEBT_TREATMENT_EXPLICIT",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "EXISTING_DEATH_CAPITAL_DEDUCTED",
+                "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+              },
+              {
+                "code": "LIQUID_ASSET_STRATEGY_CONFIRMED",
+                "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+              }
+            ]
+          },
+          {
+            "id": "908bcdad-0c60-45ea-af04-bf8f4349257e",
+            "productId": "pax_disability",
+            "productName": "Pax Erwerbsunfähigkeitsschutz",
+            "personId": "person_demo_2",
+            "needAmountCents": 800000,
+            "needPeriod": "year",
+            "rule": {
+              "ruleId": "disability_gap_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "CONFIRMED_ANNUAL_NEED",
+                "THREE_PILLAR_COORDINATION",
+                "CAUSES_NOT_SUMMED"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-erwerbsunfaehigkeitsversicherung",
+                "pax-document:disability_terms",
+                "pax-document:disability_brochure"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Diese Option bezieht sich auf die berechnete jährliche Einkommenslücke bei Erwerbsunfähigkeit. Krankheit und Unfall werden als Alternativen betrachtet.",
+            "reasonDetails": [
+              {
+                "code": "CONFIRMED_ANNUAL_NEED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "THREE_PILLAR_COORDINATION",
+                "text": "PK-Folgen, Bezugsalter und Leistungsannahmen benötigen Fachprüfung."
+              },
+              {
+                "code": "CAUSES_NOT_SUMMED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              }
+            ]
+          },
+          {
+            "id": "f25973a9-ffec-4407-9a2c-9fa5c10f0ca8",
+            "productId": "pax_term_life",
+            "productName": "Pax Todesfallschutz",
+            "personId": "person_demo_2",
+            "needAmountCents": 1000000,
+            "needPeriod": "once",
+            "rule": {
+              "ruleId": "survivor_capital_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "FINITE_PROTECTION_TERM",
+                "DEBT_TREATMENT_EXPLICIT",
+                "EXISTING_DEATH_CAPITAL_DEDUCTED",
+                "LIQUID_ASSET_STRATEGY_CONFIRMED"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-todesfallversicherung",
+                "pax-document:term_terms",
+                "pax-document:term_brochure"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Der Kapitalbedarf folgt aus der bestätigten Schutzdauer, Einmalkosten, Schuldenbehandlung und bestehenden Mitteln.",
+            "reasonDetails": [
+              {
+                "code": "FINITE_PROTECTION_TERM",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "DEBT_TREATMENT_EXPLICIT",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "EXISTING_DEATH_CAPITAL_DEDUCTED",
+                "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+              },
+              {
+                "code": "LIQUID_ASSET_STRATEGY_CONFIRMED",
+                "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+              }
+            ]
+          },
+          {
+            "id": "b215dc5c-e749-40ed-bcfa-00b83eca4df9",
+            "productId": "pax_3a",
+            "productName": "Pax 3a",
+            "personId": "person_demo_1",
+            "needAmountCents": 125800,
+            "needPeriod": "year",
+            "rule": {
+              "ruleId": "retirement_saving_gap_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "RETIREMENT_GAP_DOCUMENTED",
+                "ANNUAL_BUDGET_CHECKED",
+                "PROVIDER_3A_CEILING_NOT_EXCEEDED"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-3a",
+                "pax-document:pax3a_kid"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Der Sparvorschlag bezieht sich auf den Vorsorgebedarf und bleibt im erfassten persönlichen Spielraum sowie der verbleibenden 3a-Grenze.",
+            "reasonDetails": [
+              {
+                "code": "RETIREMENT_GAP_DOCUMENTED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "ANNUAL_BUDGET_CHECKED",
+                "text": "Einkommensangaben und Steuerbasis müssen geprüft oder ergänzt werden."
+              },
+              {
+                "code": "PROVIDER_3A_CEILING_NOT_EXCEEDED",
+                "text": "Die Rechnerantwort ist fachlich noch nicht freigegeben."
+              }
+            ]
+          },
+          {
+            "id": "339011ae-2d8e-4c2b-a59b-63e8d6df1db9",
+            "productId": "pax_fondsstar",
+            "productName": "Pax FondsStar",
+            "personId": "person_demo_1",
+            "needAmountCents": 400000,
+            "needPeriod": "year",
+            "rule": {
+              "ruleId": "fund_linked_alternative_v1",
+              "ruleVersion": "pax-life-needs-2026-10-31-v1",
+              "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+              "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+              "reasonCodes": [
+                "CAPITAL_GOAL_GAP",
+                "INVESTMENT_PROFILE_CAPTURED",
+                "ALTERNATIVE_NOT_ADDITIONAL_COMMITMENT"
+              ],
+              "sourceRefs": [
+                "test:synthetic-saving3aLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-ageLimits",
+                "test:synthetic-riskBase",
+                "test:synthetic-risk",
+                "test:synthetic-retirementBase",
+                "test:synthetic-retirement",
+                "test:synthetic-budgetProposal",
+                "test:synthetic-location",
+                "test:synthetic-income",
+                "test:synthetic-income",
+                "test:synthetic-saving",
+                "test:synthetic-consumption",
+                "https://www.pax.ch/de/private-vorsorge/produkte/pax-fondsstar",
+                "pax-document:fondsstar_kid",
+                "pax-document:fondsstar_terms"
+              ]
+            },
+            "premiumCents": null,
+            "premiumStatus": "pax_tariff_api_unavailable",
+            "eligibility": "human_review_required",
+            "conditions": [
+              "Eine persönliche Pax-Prämie liegt noch nicht vor.",
+              "Produktunterlagen, Alter, Laufzeit, Begünstigung, Ausschlüsse und persönlicher Spielraum müssen geprüft werden."
+            ],
+            "explanation": "Diese Fondsvariante ist eine Alternative für das erfasste Sparziel; sie ist keine zusätzliche gleichzeitige Verpflichtung. Risiken und Kosten sind zu prüfen.",
+            "reasonDetails": [
+              {
+                "code": "CAPITAL_GOAL_GAP",
+                "text": "Verfügbarkeit, Bestätigung und Zuordnung des Vermögens müssen geprüft werden."
+              },
+              {
+                "code": "INVESTMENT_PROFILE_CAPTURED",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              },
+              {
+                "code": "ALTERNATIVE_NOT_ADDITIONAL_COMMITMENT",
+                "text": "Eine Fachperson muss diese Angaben und Annahmen prüfen."
+              }
+            ]
+          }
+        ],
+        "alternatives": [
+          "Bestehenden Schutz beibehalten und keinen zusätzlichen Vertrag abschliessen.",
+          "Ziel anpassen, Liquidität schützen oder vor einer Entscheidung eine Fachperson einbeziehen."
+        ],
+        "decision": {
+          "ruleId": "needs_before_products_v1",
+          "ruleVersion": "pax-life-needs-2026-10-31-v1",
+          "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+          "inputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+          "reasonCodes": [
+            "LIFE_SITUATION_CONFIRMED",
+            "CALCULATED_NEED_REFERENCED"
+          ],
+          "sourceRefs": [
+            "test:synthetic-saving3aLimits",
+            "test:synthetic-ageLimits",
+            "test:synthetic-ageLimits",
+            "test:synthetic-riskBase",
+            "test:synthetic-risk",
+            "test:synthetic-retirementBase",
+            "test:synthetic-retirement",
+            "test:synthetic-budgetProposal",
+            "test:synthetic-location",
+            "test:synthetic-income",
+            "test:synthetic-income",
+            "test:synthetic-saving",
+            "test:synthetic-consumption"
+          ]
+        },
+        "locale": "de",
+        "statusLabel": "Fachperson erforderlich",
+        "disclaimer": "Diese Testkonfiguration ist keine echte Offerte, Unterschrift, Annahme oder Police von Pax.",
+        "documentsLanguageNotice": "Die verlinkten Originalunterlagen sind deutschsprachige Archivdokumente. Für einen echten Abschluss sind die aktuellen Unterlagen in der passenden Sprache erforderlich."
+      }
+    ],
+    "portal": {
+      "quotes": [],
+      "applications": [],
+      "policies": [],
+      "locale": "de",
+      "displayLabel": "DEMO – KEIN VERSICHERUNGSSCHUTZ",
+      "documentsLanguageNotice": "Die verlinkten Originalunterlagen sind deutschsprachige Archivdokumente. Für einen echten Abschluss sind die aktuellen Unterlagen in der passenden Sprache erforderlich."
+    }
+  },
+  "proposalBatches": [],
+  "ambiguities": []
+}

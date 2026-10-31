@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "1.0",
+  "id": "e990ed0d-3668-413e-87df-c85bc9e13356",
+  "caseId": "81508195-f8a0-488d-bfea-ff25ace56889",
+  "target": {
+    "kind": "confirm_profile"
+  },
+  "channel": "voice",
+  "basisCaseRevision": 8,
+  "basisProfileVersion": 1,
+  "basisDraftHash": "9f4c8419545b7d0f656ef141f43cbba08c8b346588d3d004bc11d7edfaa8b25f",
+  "targetHash": "2f4456966493839173ccaf8e64bcd9d2ea0815e37c1e71690affb0520f210565",
+  "locale": "de",
+  "questionId": "3a712710-29c4-4d4a-9d1c-8d6d83c72af5",
+  "questionTurnId": "question_turn_2",
+  "questionReplyId": "question_reply_2",
+  "questionHash": "865ac066b6c581ee1d54ead5a1fa5dfd21bf063ce3000bddc5a1197586a916ca",
+  "questionText": "Bestätigen Sie das angezeigte Gesamtprofil und seine Annahmen und erlauben Sie die Übertragung der ausdrücklich erfundenen Berechnungsdaten an den autorisierten Logismata-Hackathon-Rechner? Dies bestätigt keinen Versicherungsvertrag.",
+  "review": {
+    "draft": {
+      "financial": {
+        "schemaVersion": "1.0",
+        "caseId": "81508195-f8a0-488d-bfea-ff25ace56889",
+        "caseRevision": 3,
+        "profileVersion": 1,
+        "dataClassification": "synthetic",
+        "valuationDate": "2026-10-31",
+        "priceBasis": "nominal",
+        "persons": [
+          {
+            "id": "person_demo_1",
+            "birthYear": 1985,
+            "employmentRateBps": 10000,
+            "income": {
+              "value": 8400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:person1-net-income"
+            },
+            "incomeBasis": "net_after_income_tax"
+          },
+          {
+            "id": "person_demo_2",
+            "birthYear": 1987,
+            "employmentRateBps": 8000,
+            "income": {
+              "value": 4800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:person2-net-income"
+            },
+            "incomeBasis": "net_after_income_tax"
+          }
+        ],
+        "expenses": [
+          {
+            "id": "housing",
+            "category": "housing",
+            "amount": {
+              "value": 240000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:rent"
+            }
+          },
+          {
+            "id": "living",
+            "category": "living",
+            "amount": {
+              "value": 300000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:living"
+            }
+          },
+          {
+            "id": "tax",
+            "category": "tax",
+            "amount": {
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:tax-already-in-net"
+            }
+          },
+          {
+            "id": "provision",
+            "category": "provision",
+            "amount": {
+              "value": 50000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:existing-contributions"
+            }
+          },
+          {
+            "id": "debt",
+            "category": "debt",
+            "amount": {
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:no-debt-service"
+            }
+          },
+          {
+            "id": "reserve",
+            "category": "reserve",
+            "amount": {
+              "value": 80000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "month",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:regular-reserve-saving"
+            }
+          }
+        ],
+        "safetyBuffer": {
+          "value": 50000,
+          "currency": "CHF",
+          "unit": "cent",
+          "period": "month",
+          "origin": "synthetic",
+          "confirmation": "confirmed",
+          "review": "unreviewed",
+          "sourceRef": "demo:chosen-buffer"
+        },
+        "assets": [
+          {
+            "id": "cash",
+            "amount": {
+              "value": 10000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:cash"
+            },
+            "liquidity": "free",
+            "availableFrom": "2026-10-31",
+            "pillar": "none",
+            "allocations": [
+              {
+                "goalId": "existing_emergency_reserve",
+                "amountCents": 1000000
+              }
+            ]
+          },
+          {
+            "id": "pillar3_account",
+            "amount": {
+              "value": 5000000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "once",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:restricted-3a"
+            },
+            "liquidity": "restricted",
+            "availableFrom": "2026-10-31",
+            "pillar": "3",
+            "allocations": []
+          }
+        ],
+        "assetsConfirmed": true,
+        "provisions": [
+          {
+            "id": "p1_person1",
+            "personId": "person_demo_1",
+            "pillar": "1",
+            "event": "retirement",
+            "amount": {
+              "value": 2800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "estimate",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:illustrative-pillar1-person1"
+            }
+          },
+          {
+            "id": "p2_person1",
+            "personId": "person_demo_1",
+            "pillar": "2",
+            "event": "retirement",
+            "amount": {
+              "value": 3600000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:illustrative-pillar2-person1"
+            }
+          },
+          {
+            "id": "p3_person1",
+            "personId": "person_demo_1",
+            "pillar": "3",
+            "event": "retirement",
+            "amount": {
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:no-pillar3-annuity-person1"
+            }
+          },
+          {
+            "id": "p1_person2",
+            "personId": "person_demo_2",
+            "pillar": "1",
+            "event": "retirement",
+            "amount": {
+              "value": 2400000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "estimate",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:illustrative-pillar1-person2"
+            }
+          },
+          {
+            "id": "p2_person2",
+            "personId": "person_demo_2",
+            "pillar": "2",
+            "event": "retirement",
+            "amount": {
+              "value": 1800000,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:illustrative-pillar2-person2"
+            }
+          },
+          {
+            "id": "p3_person2",
+            "personId": "person_demo_2",
+            "pillar": "3",
+            "event": "retirement",
+            "amount": {
+              "value": 0,
+              "currency": "CHF",
+              "unit": "cent",
+              "period": "year",
+              "origin": "synthetic",
+              "confirmation": "confirmed",
+              "review": "unreviewed",
+              "sourceRef": "demo:no-pillar3-annuity-person2"
+            }
+          }
+        ]
+      },
+      "insurance": {
+        "relationship": "married",
+        "relationshipSinceYear": 2015,
+        "sharedChildren": 0,
+        "taxLocationId": 400100000,
+        "persons": [
+          {
+            "personId": "person_demo_1",
+            "providerSex": 1,
+            "grossAnnualIncomeCents": 11900000,
+            "withPillar2": true,
+            "pillar2Risk": {
+              "disabilityAnnualCents": 4000000,
+              "disabilityChildAnnualCents": 800000,
+              "survivorAnnualCents": 3000000,
+              "orphanAnnualCents": 800000
+            },
+            "retirementPensionAnnualCents": 4000000,
+            "currentPillar2CapitalCents": 10000000,
+            "desiredWorkStopAge": 65,
+            "disabilityNeedAnnualCents": 15000000,
+            "deathNeedAnnualCents": 10000000,
+            "protectionTermMonths": 240,
+            "existingDeathCapitalCents": 0,
+            "deathOneOffCostsCents": 1000000,
+            "debtPayoffCents": 0,
+            "debtTreatment": "included_in_income_need",
+            "deathNeedExcludesRepaidDebtService": false,
+            "personalAffordableAnnualPremiumCents": 400000
+          },
+          {
+            "personId": "person_demo_2",
+            "providerSex": 2,
+            "grossAnnualIncomeCents": 8000000,
+            "withPillar2": true,
+            "pillar2Risk": {
+              "disabilityAnnualCents": 2400000,
+              "disabilityChildAnnualCents": 800000,
+              "survivorAnnualCents": 3000000,
+              "orphanAnnualCents": 800000
+            },
+            "retirementPensionAnnualCents": 2400000,
+            "currentPillar2CapitalCents": 10000000,
+            "desiredWorkStopAge": 65,
+            "disabilityNeedAnnualCents": 15000000,
+            "deathNeedAnnualCents": 10000000,
+            "protectionTermMonths": 240,
+            "existingDeathCapitalCents": 0,
+            "deathOneOffCostsCents": 1000000,
+            "debtPayoffCents": 0,
+            "debtTreatment": "included_in_income_need",
+            "deathNeedExcludesRepaidDebtService": false,
+            "personalAffordableAnnualPremiumCents": 300000
+          }
+        ],
+        "children": [],
+        "debts": [],
+        "debtsConfirmed": true,
+        "existingPrivateRiskBenefitsConfirmed": true,
+        "confession1": 4,
+        "confession2": 4,
+        "taxableFortuneCents": 10000000,
+        "retirementNeedAnnualCents": 9600000,
+        "annualReturnBps": 0,
+        "retirementHorizonAge": 88,
+        "annualSavingCents": 600000,
+        "investmentKnowledgeConfirmed": true,
+        "annualSavingIsAdditional": true,
+        "existingAnnualRetirementSavingCents": 500000,
+        "existingAnnualPillar3aContributionCents": 600000,
+        "riskAppetite": "medium",
+        "riskCapitalStrategy": "preserve_assets_for_other_goals"
+      },
+      "goals": [
+        {
+          "id": "goal_family",
+          "kind": "family",
+          "targetMonth": "2028-01",
+          "priority": 1,
+          "targetCapitalCents": null
+        },
+        {
+          "id": "goal_home",
+          "kind": "home",
+          "targetMonth": "2031-01",
+          "priority": 2,
+          "targetCapitalCents": 100000000
+        },
+        {
+          "id": "goal_retirement",
+          "kind": "retirement",
+          "targetMonth": "2050-01",
+          "priority": 3,
+          "targetCapitalCents": 100000000
+        }
+      ],
+      "reviewFlags": []
+    },
+    "changes": [],
+    "noticeVersion": "lifemap-synthetic-v1",
+    "allowSyntheticCalculatorTransfer": true,
+    "confirmProfileAndAssumptions": true
+  },
+  "createdAt": "2026-10-31T12:53:16.693Z",
+  "expiresAt": "2026-10-31T12:55:16.693Z",
+  "status": "awaiting_presentation",
+  "presentedAt": null,
+  "playbackId": null,
+  "answerMessageId": null,
+  "answeredAt": null,
+  "invalidationReason": null
+}

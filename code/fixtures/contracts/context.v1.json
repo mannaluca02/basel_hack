@@ -1,0 +1,354 @@
+{
+  "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+  "caseRevision": 7,
+  "contextRevision": 7,
+  "profileVersion": 1,
+  "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+  "scenarioVersionId": "baseline_v1",
+  "calculationInputHash": "27589131a5408153d786379bf72dad1f2e2458ce18699265cc45c4632a75113d",
+  "locale": "de",
+  "tempo": "compact",
+  "graphContext": {
+    "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+    "profileVersion": 1,
+    "scenarioVersionId": "baseline_v1",
+    "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+    "graphId": "household_budget",
+    "metricId": "cashflowAnnual",
+    "periodStart": "2026-10",
+    "periodEnd": "2027-09"
+  },
+  "contextId": "1b2edec7f6bf8a78d901a285f79f4ca5766d564794728f9f8820bce1350bca73",
+  "selectedGraphFacts": {
+    "metric": {
+      "id": "cashflowAnnual",
+      "value": 5160000,
+      "unit": "cent",
+      "currency": "CHF",
+      "period": "year",
+      "status": "estimated",
+      "sourceRefs": [
+        "demo:person1-net-income",
+        "demo:person2-net-income",
+        "demo:rent",
+        "demo:living",
+        "demo:tax-already-in-net",
+        "demo:existing-contributions",
+        "demo:no-debt-service",
+        "demo:regular-reserve-saving",
+        "demo:chosen-buffer"
+      ]
+    },
+    "series": [],
+    "sourceRefs": [
+      "demo:person1-net-income",
+      "demo:person2-net-income",
+      "demo:rent",
+      "demo:living",
+      "demo:tax-already-in-net",
+      "demo:existing-contributions",
+      "demo:no-debt-service",
+      "demo:regular-reserve-saving",
+      "demo:chosen-buffer"
+    ]
+  },
+  "maySpeakSelectedAmounts": true,
+  "calculationStatus": "current",
+  "approvedFacts": [
+    {
+      "metricId": "incomeAnnual",
+      "value": 13200000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Jährliches Einkommen",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "expensesAnnual",
+      "value": 8040000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Jährliche Ausgaben",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "cashflowAnnual",
+      "value": 5160000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Jährlicher Überschuss oder Fehlbetrag",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "safetyBufferAnnual",
+      "value": 600000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Jährlicher Sicherheitspuffer",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "affordableContributionAnnual",
+      "value": 4560000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Zusätzlicher jährlicher Spielraum",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "deficitAnnual",
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Jährlicher Fehlbetrag",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "freeCapital",
+      "value": 9000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "once",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Frei verfügbares Kapital",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "totalCapital",
+      "value": 15000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "once",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Erfasstes Gesamtkapital",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar3Capital",
+      "value": 5000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "once",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Kapital der dritten Säule",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "restrictedCapital",
+      "value": 5000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "once",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Gebundenes Kapital",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_1_retirement_person_demo_1",
+      "value": 2800000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Erste Säule: AHV/IV · Pensionierung",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_1_retirement_person_demo_2",
+      "value": 2400000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Erste Säule: AHV/IV · Pensionierung",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_2_retirement_person_demo_1",
+      "value": 3600000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Zweite Säule: Pensionskasse · Pensionierung",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_2_retirement_person_demo_2",
+      "value": 1800000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Zweite Säule: Pensionskasse · Pensionierung",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_3_retirement_person_demo_1",
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Dritte Säule: private Vorsorge · Pensionierung",
+      "statusLabel": "Schätzung"
+    },
+    {
+      "metricId": "pillar_3_retirement_person_demo_2",
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "status": "estimated",
+      "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+      "profileVersion": 1,
+      "scenarioVersionId": "baseline_v1",
+      "humanReviewedForDemo": false,
+      "label": "Dritte Säule: private Vorsorge · Pensionierung",
+      "statusLabel": "Schätzung"
+    }
+  ],
+  "nextQuestion": null,
+  "missingFields": [],
+  "scenarioComparisons": [],
+  "reviewStatus": "open",
+  "maySpeakAmounts": true,
+  "progress": {
+    "domain": "data_capture",
+    "percent": 100,
+    "reviewOpen": true,
+    "groups": [
+      {
+        "id": "income",
+        "complete": true,
+        "missing": [],
+        "label": "Einkommen"
+      },
+      {
+        "id": "budget",
+        "complete": true,
+        "missing": [],
+        "label": "Haushaltsbudget"
+      },
+      {
+        "id": "capital",
+        "complete": true,
+        "missing": [],
+        "label": "Vermögen und Zuordnung"
+      },
+      {
+        "id": "pillar_1",
+        "complete": true,
+        "missing": [],
+        "label": "Erste Säule: AHV/IV"
+      },
+      {
+        "id": "pillar_2",
+        "complete": true,
+        "missing": [],
+        "label": "Zweite Säule: Pensionskasse"
+      },
+      {
+        "id": "pillar_3",
+        "complete": true,
+        "missing": [],
+        "label": "Dritte Säule: private Vorsorge"
+      },
+      {
+        "id": "life_goals",
+        "complete": true,
+        "missing": [],
+        "label": "Lebensziele"
+      },
+      {
+        "id": "insurance_parameters",
+        "complete": true,
+        "missing": [],
+        "label": "Versicherungsbedarf"
+      }
+    ],
+    "scope": "whole_life_intake"
+  },
+  "allowedActions": [
+    "read_context",
+    "propose_patch"
+  ],
+  "policy": {
+    "noRawHealthData": true,
+    "noProviderTokens": true,
+    "noExternalAiTransferAuthorized": true,
+    "productFirstSelling": false
+  }
+}

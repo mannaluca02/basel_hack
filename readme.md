@@ -1,8 +1,14 @@
 # Pax Digital Advisor – BaselHack 2026
 
-Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Quellen und Bauplan; eine eigene Advisor-App ist noch nicht implementiert.
+Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Workshop-Plan und ein geprüfter Lebensversicherungs-Backend-PoC mit echten Rechen-APIs und lokalem Demo-Vertragsweg. Die vollständige Advisor-App entsteht gemeinsam im Team.
 
 - [Voice-Feature: Setup, Integration und API](code/voice-agent/README.md)
+- [Verbindliche Team-Schnittstellen und gemeinsamer Fall-DTO](documentation/baselhack/plans/team-api-guide.md)
+- [API, Speicher und Datenbank-Ausbau](documentation/baselhack/plans/persistence-and-api.md)
+- [Logik-Backend: Start, API und Team-Integration](code/README.md)
+- [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)
+- [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)
+- [Implementierungsstand und offene Fachfragen](documentation/baselhack/reports/logic-backend-implementation.md)
 - [Bestätigte Workshop-Entscheide und Rollen](documentation/baselhack/plans/workshop-decisions.md)
 - [Workflow und Schnittstellen aus dem Workshop](documentation/baselhack/plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](documentation/baselhack/plans/implementation-plan.md)

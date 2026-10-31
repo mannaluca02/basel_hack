@@ -8,6 +8,9 @@ from the challenge hub, the Logismata API and the material PDFs.
 | [Friendly sales conversations: research and examples](baselhack/research/friendly-sales-conversation.md) | Evidence on follow-up questions, autonomy and reactance; Paxi pitch, sample dialogue, hesitation handling and proposed improvements. Distilled into Paxi's skill [`friendly-conversation.md`](../code/voice-agent/skills/friendly-conversation.md) |
 | [Voice feature: setup and integration](../code/voice-agent/README.md) | Paxi demo, configuration, browser callbacks, HTTP API, language switching, questionnaire extraction, logs and troubleshooting |
 | [Customer data portfolio](../code/voice-agent/questionnaire.json) | All 53 customer details Pax needs (person, family, income, living, provision, goals, calculation needs, suitability check), with tier, type, casual question, backend contract path and source; used by the Paxi voice agent |
+| [Voice backend integration](baselhack/plans/voice-backend-integration.md) | Nest routes, shared observations, 37-field mapping, provider setup and Dario/Erni handoff |
+| [Model extraction notice](baselhack/plans/model-extraction-notice.md) | Separate OpenAI extraction notice, hash-bound customer consent and Earnie's server-side gate |
+| [Logic backend implementation](baselhack/reports/logic-backend-implementation.md) | Runtime schemas, domain calculations, NestJS demo, Logismata adapter and validation evidence |
 | [Workflow and interface contracts](baselhack/plans/interface-contracts.md) | VoiceLog, shared case, calculation result, replies, playback and export contracts from the second photo |
 | [Workshop decisions](baselhack/plans/workshop-decisions.md) | Confirmed UI/roles, feature interpretation and explicit open details |
 | [Detailed Angular implementation plan](baselhack/plans/implementation-plan.md) | Screens, domain logic, AI, interfaces, state machine, security and 55 acceptance cases |

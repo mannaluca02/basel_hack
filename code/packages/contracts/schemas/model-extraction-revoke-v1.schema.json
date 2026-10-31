@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "expectedCaseRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "expectedCaseRevision"
+  ],
+  "additionalProperties": false,
+  "title": "model-extraction-revoke-v1",
+  "description": "Pax synthetic-data PoC contract v1. Runtime Zod/domain reference checks and authorization remain authoritative; JSON Schema alone does not grant permission."
+}

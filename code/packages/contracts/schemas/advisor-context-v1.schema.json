@@ -1,0 +1,1209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "handover": {
+      "default": {
+        "status": "digital",
+        "revision": 0,
+        "wantsHumanAdvisor": false,
+        "leaveViewRequested": false,
+        "stopDigitalConversation": false,
+        "requestId": null,
+        "requestedAt": null,
+        "resumedAt": null,
+        "source": null
+      },
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "digital",
+            "requested"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "wantsHumanAdvisor": {
+          "type": "boolean"
+        },
+        "leaveViewRequested": {
+          "type": "boolean"
+        },
+        "stopDigitalConversation": {
+          "type": "boolean"
+        },
+        "requestId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requestedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resumedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "ui",
+                "voice"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "revision",
+        "wantsHumanAdvisor",
+        "leaveViewRequested",
+        "stopDigitalConversation",
+        "requestId",
+        "requestedAt",
+        "resumedAt",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "humanAdvisorContact": {
+      "default": {
+        "organization": "Pax",
+        "kind": "public_general_contact",
+        "phone": "+41612776666",
+        "displayPhone": "+41 61 277 66 66",
+        "sourceUrl": "https://www.pax.ch/de/kontakt-und-services",
+        "verifiedAt": "2026-10-31",
+        "automaticDialing": false,
+        "advisorAssigned": false
+      },
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string",
+          "const": "Pax"
+        },
+        "kind": {
+          "type": "string",
+          "const": "public_general_contact"
+        },
+        "phone": {
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{7,14}$"
+        },
+        "displayPhone": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "verifiedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "automaticDialing": {
+          "type": "boolean",
+          "const": false
+        },
+        "advisorAssigned": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "organization",
+        "kind",
+        "phone",
+        "displayPhone",
+        "sourceUrl",
+        "verifiedAt",
+        "automaticDialing",
+        "advisorAssigned"
+      ],
+      "additionalProperties": false
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "caseRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "contextRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "profileVersion": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "scenarioVersionId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calculationInputHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "de",
+        "fr",
+        "it",
+        "en"
+      ]
+    },
+    "tempo": {
+      "type": "string",
+      "enum": [
+        "compact",
+        "detailed"
+      ]
+    },
+    "graphContext": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "caseId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            "profileVersion": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "scenarioVersionId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            "runId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            "graphId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            "metricId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,160}$"
+            },
+            "personId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            },
+            "periodStart": {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+            },
+            "periodEnd": {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+            }
+          },
+          "required": [
+            "caseId",
+            "profileVersion",
+            "scenarioVersionId",
+            "runId",
+            "graphId",
+            "metricId",
+            "periodStart",
+            "periodEnd"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "contextId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "selectedGraphFacts": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "unit": {
+                  "type": "string",
+                  "const": "cent"
+                },
+                "currency": {
+                  "type": "string",
+                  "const": "CHF"
+                },
+                "period": {
+                  "type": "string",
+                  "enum": [
+                    "month",
+                    "year",
+                    "once",
+                    "range"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "estimated",
+                    "requires_review",
+                    "needs_input",
+                    "provider_error",
+                    "unsupported",
+                    "stale"
+                  ]
+                },
+                "personId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                },
+                "sourceRefs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "value",
+                "unit",
+                "currency",
+                "period",
+                "status"
+              ],
+              "additionalProperties": false
+            },
+            "series": {
+              "maxItems": 24,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "month": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                  },
+                  "value": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "const": "cent"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "const": "CHF"
+                  },
+                  "period": {
+                    "type": "string",
+                    "enum": [
+                      "month",
+                      "once"
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "valid",
+                      "estimated",
+                      "requires_review",
+                      "needs_input",
+                      "provider_error",
+                      "unsupported",
+                      "stale"
+                    ]
+                  }
+                },
+                "required": [
+                  "month",
+                  "value",
+                  "unit",
+                  "currency",
+                  "period",
+                  "status"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "sourceRefs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "rangeSummary": {
+              "type": "object",
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "minimum": 25,
+                  "maximum": 1200
+                },
+                "first": {
+                  "type": "object",
+                  "properties": {
+                    "month": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "type": "string",
+                      "const": "cent"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "CHF"
+                    },
+                    "period": {
+                      "type": "string",
+                      "enum": [
+                        "month",
+                        "once"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "valid",
+                        "estimated",
+                        "requires_review",
+                        "needs_input",
+                        "provider_error",
+                        "unsupported",
+                        "stale"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "month",
+                    "value",
+                    "unit",
+                    "currency",
+                    "period",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                },
+                "last": {
+                  "type": "object",
+                  "properties": {
+                    "month": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "type": "string",
+                      "const": "cent"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "CHF"
+                    },
+                    "period": {
+                      "type": "string",
+                      "enum": [
+                        "month",
+                        "once"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "valid",
+                        "estimated",
+                        "requires_review",
+                        "needs_input",
+                        "provider_error",
+                        "unsupported",
+                        "stale"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "month",
+                    "value",
+                    "unit",
+                    "currency",
+                    "period",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                },
+                "minimumKnown": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maximumKnown": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "unknownPoints": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "points",
+                "first",
+                "last",
+                "minimumKnown",
+                "maximumKnown",
+                "unknownPoints"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "metric",
+            "series",
+            "sourceRefs"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "maySpeakSelectedAmounts": {
+      "type": "boolean"
+    },
+    "calculationStatus": {
+      "type": "string",
+      "enum": [
+        "current",
+        "stale",
+        "provider_error",
+        "needs_input",
+        "running"
+      ]
+    },
+    "ambiguities": {
+      "default": [],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "personId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "turnId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "required": [
+              "messageId",
+              "turnId",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "de",
+              "fr",
+              "it",
+              "en"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "resolvedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolvedByBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolutionSourceRef": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dialogueStatus": {
+            "type": "string",
+            "enum": [
+              "needs_answer",
+              "awaiting_customer_acceptance",
+              "resolved"
+            ]
+          },
+          "answerBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "question",
+          "source",
+          "id",
+          "locale",
+          "createdAt",
+          "status",
+          "resolvedAt",
+          "resolvedByBatchId",
+          "resolutionSourceRef",
+          "dialogueStatus",
+          "answerBatchId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "pendingAcceptanceBatchIds": {
+      "default": [],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+      }
+    },
+    "approvedFacts": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metricId": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "value": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "const": "CHF"
+          },
+          "unit": {
+            "type": "string",
+            "const": "cent"
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "month",
+              "year",
+              "once"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "estimated",
+              "requires_review",
+              "needs_input",
+              "provider_error",
+              "unsupported",
+              "stale"
+            ]
+          },
+          "runId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "profileVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "scenarioVersionId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "humanReviewedForDemo": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "statusLabel": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "metricId",
+          "value",
+          "currency",
+          "unit",
+          "period",
+          "status",
+          "runId",
+          "profileVersion",
+          "scenarioVersionId",
+          "humanReviewedForDemo",
+          "label",
+          "statusLabel"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "nextQuestion": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "maxLength": 250
+            },
+            "mandatory": {
+              "type": "boolean",
+              "const": true
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4000
+            }
+          },
+          "required": [
+            "path",
+            "mandatory",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "missingFields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scenarioComparisons": {
+      "maxItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "scope": {
+            "type": "string",
+            "const": "valuation_snapshot_local_metrics"
+          },
+          "valuationDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "futureTimelineCompared": {
+            "type": "boolean",
+            "const": false
+          },
+          "profileVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "baselineRunId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "variantRunId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "baselineInputHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "variantInputHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "metrics": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "personId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                },
+                "currency": {
+                  "type": "string",
+                  "const": "CHF"
+                },
+                "unit": {
+                  "type": "string",
+                  "const": "cent"
+                },
+                "period": {
+                  "type": "string",
+                  "enum": [
+                    "month",
+                    "year",
+                    "once"
+                  ]
+                },
+                "baselineValue": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "variantValue": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "delta": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "valid",
+                    "estimated",
+                    "requires_review",
+                    "needs_input",
+                    "provider_error",
+                    "unsupported",
+                    "stale"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "currency",
+                "unit",
+                "period",
+                "baselineValue",
+                "variantValue",
+                "delta",
+                "status"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "scope",
+          "valuationDate",
+          "futureTimelineCompared",
+          "profileVersion",
+          "baselineRunId",
+          "variantRunId",
+          "baselineInputHash",
+          "variantInputHash",
+          "metrics"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "reviewStatus": {
+      "type": "string",
+      "enum": [
+        "approved_for_demo",
+        "open",
+        "not_started"
+      ]
+    },
+    "maySpeakAmounts": {
+      "type": "boolean"
+    },
+    "progress": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "const": "data_capture"
+        },
+        "percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reviewOpen": {
+          "type": "boolean"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "complete": {
+                "type": "boolean"
+              },
+              "missing": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 4000
+              }
+            },
+            "required": [
+              "id",
+              "complete",
+              "missing",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "scope": {
+          "type": "string",
+          "const": "whole_life_intake"
+        }
+      },
+      "required": [
+        "domain",
+        "percent",
+        "reviewOpen",
+        "groups",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "allowedActions": {
+      "maxItems": 10,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "read_context",
+          "propose_patch",
+          "update_draft",
+          "confirm_profile",
+          "calculate",
+          "request_human",
+          "resume_digital",
+          "record_review"
+        ]
+      }
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "noRawHealthData": {
+          "type": "boolean",
+          "const": true
+        },
+        "noProviderTokens": {
+          "type": "boolean",
+          "const": true
+        },
+        "noExternalAiTransferAuthorized": {
+          "type": "boolean",
+          "const": true
+        },
+        "productFirstSelling": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "noRawHealthData",
+        "noProviderTokens",
+        "noExternalAiTransferAuthorized",
+        "productFirstSelling"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "handover",
+    "humanAdvisorContact",
+    "caseId",
+    "caseRevision",
+    "contextRevision",
+    "profileVersion",
+    "runId",
+    "scenarioVersionId",
+    "calculationInputHash",
+    "locale",
+    "tempo",
+    "graphContext",
+    "contextId",
+    "selectedGraphFacts",
+    "maySpeakSelectedAmounts",
+    "calculationStatus",
+    "ambiguities",
+    "pendingAcceptanceBatchIds",
+    "approvedFacts",
+    "nextQuestion",
+    "missingFields",
+    "scenarioComparisons",
+    "reviewStatus",
+    "maySpeakAmounts",
+    "progress",
+    "allowedActions",
+    "policy"
+  ],
+  "additionalProperties": false,
+  "title": "advisor-context-v1",
+  "description": "Pax synthetic-data PoC contract v1. Runtime Zod/domain reference checks and authorization remain authoritative; JSON Schema alone does not grant permission."
+}

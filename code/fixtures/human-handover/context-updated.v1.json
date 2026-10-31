@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "messageId": "00c80c52-570c-4b51-9921-4ae6648ff33c",
+  "caseId": "c8f1e35c-7445-44db-94a0-711285d3a390",
+  "correlationId": "00c80c52-570c-4b51-9921-4ae6648ff33c",
+  "eventId": "00c80c52-570c-4b51-9921-4ae6648ff33c",
+  "contextRevision": 2,
+  "reason": "human_handover_requested",
+  "contextRef": "/api/cases/c8f1e35c-7445-44db-94a0-711285d3a390/advisor/context",
+  "handover": {
+    "status": "requested",
+    "revision": 1,
+    "wantsHumanAdvisor": true,
+    "leaveViewRequested": true,
+    "stopDigitalConversation": true,
+    "requestId": "72162e6f-1815-4f5b-bb6d-0fe9da9ece73",
+    "requestedAt": "2026-10-31T13:06:49.480Z",
+    "resumedAt": null,
+    "source": "ui"
+  },
+  "interruptPolicy": "immediate"
+}
