@@ -17,7 +17,7 @@ npm install
 npm start
 ```
 
-Put `OPENAI_API_KEY` in the repo root `.env` (see `.env.example`) and open http://localhost:3100. Tap Paxi to start; microphone access needs `localhost` or HTTPS. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
+Put `OPENAI_API_KEY` in the repo root `.env` (see `.env.example`) and open http://localhost:3100. The page requests microphone permission on load where the browser allows it, then immediately releases that stream. Once the microphone is allowed, the logo dot shows closed eyes; tap it to wake Paxi and start the conversation; audio playback still needs this click. Microphone access needs `localhost` or HTTPS. Use `?intro=0` to skip the logo animation. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
 
 `npm test` runs the log and validation tests.
 
