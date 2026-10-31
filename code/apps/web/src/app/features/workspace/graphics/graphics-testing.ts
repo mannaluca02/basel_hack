@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChartCanvas } from './chart-canvas';
 import { ChartCard } from './chart-card';
 import { ChartOption } from './chart-options';
+import { GraphicsTab } from './graphics-tab';
 
 /** Stands in for the ECharts canvas: ECharts needs layout and ResizeObserver, jsdom has neither. */
 @Component({ selector: 'app-chart-canvas', template: '' })
@@ -20,4 +21,8 @@ export function stubChartCanvas(): void {
     remove: { imports: [ChartCanvas] },
     add: { imports: [ChartCanvasStub] },
   });
+  // TestBed only rebuilds the components it overrides. A standalone parent keeps the template it
+  // compiled in an earlier spec (app.spec renders the Graphics tab through the router), and that
+  // template still points at the real card. An empty override recompiles it against the stub.
+  TestBed.overrideComponent(GraphicsTab, {});
 }
