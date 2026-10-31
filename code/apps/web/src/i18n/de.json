@@ -330,5 +330,18 @@
       "year": "pro Jahr",
       "once": "einmalig"
     }
+  },
+  "call": {
+    "label": "Gespräch",
+    "start": "Gespräch starten",
+    "startPaxi": "Mit Paxi sprechen",
+    "openPaxi": "Verstanden, Paxi öffnen",
+    "cancel": "Abbrechen",
+    "active": "Gespräch läuft",
+    "activePaxi": "Paxi ist in einem eigenen Fenster offen",
+    "mute": "Stumm",
+    "unmute": "Ton an",
+    "stopSpeaking": "Paxi unterbrechen",
+    "end": "Gespräch beenden"
   }
 }

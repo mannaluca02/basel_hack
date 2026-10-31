@@ -31,6 +31,7 @@ import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
 import { ConnectionBanner } from './features/connection/connection-banner';
 import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
+import { CallControls } from './features/call-controls/call-controls';
 import { SummaryDialog } from './features/summary/summary-dialog';
 import { HumanAdvisor } from './core/advisor/api/human-advisor';
 import { ReviewPanel } from './features/review/review-panel';
@@ -55,6 +56,7 @@ interface TabLink {
     AgentDock,
     ConnectionBanner,
     HumanAdvisorStatus,
+    CallControls,
     SummaryDialog,
     ReviewPanel,
   ],

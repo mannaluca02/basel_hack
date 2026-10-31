@@ -330,5 +330,18 @@
       "year": "per year",
       "once": "once"
     }
+  },
+  "call": {
+    "label": "Call",
+    "start": "Start the call",
+    "startPaxi": "Talk to Paxi",
+    "openPaxi": "Understood, open Paxi",
+    "cancel": "Cancel",
+    "active": "Call running",
+    "activePaxi": "Paxi is open in its own window",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "stopSpeaking": "Interrupt Paxi",
+    "end": "End the call"
   }
 }

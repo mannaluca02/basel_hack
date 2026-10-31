@@ -18,6 +18,8 @@ export class VoiceAgentLink {
   private readonly url = inject(APP_ENVIRONMENT).voiceAgentUrl ?? null;
   private readonly stateValue = signal<VoiceLinkState>('idle');
   private readonly noticeValue = signal<VoicePrivacyNotice | null>(null);
+  /** The Paxi window this tab opened; only it accepts our call controls. */
+  private paxiWindow: Window | null = null;
 
   readonly available = this.url !== null;
   readonly state = this.stateValue.asReadonly();
@@ -34,6 +36,19 @@ export class VoiceAgentLink {
 
   dismiss(): void {
     this.stateValue.set('idle');
+  }
+
+  /** Steers the call in the Paxi window (FE-10); Paxi only listens to the window that opened it. */
+  control(action: 'end' | 'mute' | 'unmute' | 'stop_speaking'): void {
+    const target = this.paxiWindow;
+    if (!this.url || !target || target.closed) return;
+    target.postMessage({ type: 'pax.call', action }, new URL(this.url).origin);
+    if (action === 'end') this.stateValue.set('idle');
+  }
+
+  /** The Paxi window is still open. */
+  get windowOpen(): boolean {
+    return !!this.paxiWindow && !this.paxiWindow.closed;
   }
 
   /** Call from the click itself, so the browser allows the new window. */
@@ -55,7 +70,7 @@ export class VoiceAgentLink {
       );
       const page = `${this.url}/?link=${encodeURIComponent(linkId)}`;
       if (target) target.location.href = page;
-      else window.open(page, 'paxi');
+      this.paxiWindow = target ?? window.open(page, 'paxi');
       this.stateValue.set('opened');
     } catch (error) {
       target?.close();

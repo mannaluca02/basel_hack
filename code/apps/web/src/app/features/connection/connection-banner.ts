@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CaseStore } from '../../core/advisor/store/case-store';
+import { VoiceCall } from '../../core/voice/voice-call';
 
 /**
  * "Connection lost" (FE-20): once the live stream was up, any drop is shown above the tabs. While
@@ -59,8 +60,11 @@ export class ConnectionBanner {
   protected readonly store = inject(CaseStore);
   private readonly wasConnected = signal(false);
 
+  private readonly call = inject(VoiceCall);
+
+  /** A call the customer ended on purpose is no lost connection. */
   protected readonly lost = computed(
-    () => this.wasConnected() && this.store.connection() !== 'connected',
+    () => this.wasConnected() && this.store.connection() !== 'connected' && !this.call.endedByUser(),
   );
 
   constructor() {
