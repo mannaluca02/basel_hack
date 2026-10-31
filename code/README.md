@@ -18,7 +18,7 @@ npm start
 
 `npm start` lädt die gitignorierte Root-`.env` (Vorlage [`.env.example`](../.env.example)) oder die Serverumgebung. Benötigt wird `LOGISMATA_BEARER_TOKEN`; bei fehlendem Token startet der Live-Dienst nicht. Zugangsdaten werden weder geloggt noch ins Angular-Bundle eingebaut.
 
-Der Dienst bindet an `http://127.0.0.1:3000`; `PORT=3001 npm start` ändert den Port. Öffentliche Einstiege sind `/api/privacy`, `/api/status` und `/api/openapi.json`. Alle Fall-, Dokument-, Portal- und Gesprächsdaten benötigen eine Sitzung. Der Start gibt ausschließlich den Pfad der lokalen Zugangscode-Datei aus.
+Der Dienst bindet an `http://127.0.0.1:3000`; `PORT=3001 npm start` ändert den Port. Im selben Prozess läuft Darios Voice-Agent Paxi auf `http://localhost:3100` (eigene Origin für Seite, Origin-Prüfung und `postMessage`); dafür einmal `npm install` in `code/voice-agent`. `PAX_VOICE_AGENT=0` lässt ihn weg, `PAX_VOICE_AGENT_PORT` ändert seinen Port. Ist der Port belegt oder fehlt die Installation, startet das Backend trotzdem und meldet das. Öffentliche Einstiege sind `/api/privacy`, `/api/status` und `/api/openapi.json`. Alle Fall-, Dokument-, Portal- und Gesprächsdaten benötigen eine Sitzung. Der Start gibt ausschließlich den Pfad der lokalen Zugangscode-Datei aus.
 
 Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichnis (0700), getrennte Kunden-/Reviewer-Zugangscodes und ein Schlüssel (0600), verschlüsselte Fall-/Sitzungsdaten sowie eine Prozesssperre. `.local/` ist Git-ignoriert. Der Speicher ist für einen lokalen Node-Prozess ausgelegt. Kein Deployment und keine Freigabe für echte Kundendaten sind eingerichtet.
 
