@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { DraftSchema,type InsuranceDraft,type LifeScenario } from '@pax/contracts';
 import type { LifeInsuranceEngine } from './engine.js';
 import type { DraftEstimateService } from './estimates.js';
+import type { ExtractionWorkflow } from './extraction.js';
 import type { SessionService } from './auth.js';
 import type { BootstrapCredentials } from './store.js';
 import { WorkflowError,type Actor } from './types.js';
@@ -83,6 +84,7 @@ export class DemoJourney {
   private current:Promise<DemoSession>|null=null;
   /** `demoStart` is null unless the server was started with the explicit demo flag. */
   constructor(private readonly engine:LifeInsuranceEngine,private readonly estimates:DraftEstimateService,
+    private readonly extraction:ExtractionWorkflow,
     private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null){}
 
   get startEnabled(){return this.demoStart!==null;}
@@ -121,6 +123,32 @@ export class DemoJourney {
         allowSyntheticCalculatorTransfer:true,operations:['saving3a'],saving3a:{years,initialCents,annualCents}});
       return {status:'calculated' as const,years,initialCents,annualCents};
     }catch(error){if(!(error instanceof WorkflowError))throw error;return {status:'failed' as const,code:error.code};}
+  }
+
+  /**
+   * Demo start only: takes over what the voice agent proposed in one step, like the demo start
+   * confirms its persona. Accepts the open packages in order, confirms the profile and calculates
+   * the standard scenarios again. A package that became stale is skipped and reported.
+   */
+  async acceptPending(actor:Actor,caseId:string) {
+    if(!this.demoStart)throw new WorkflowError('NOT_FOUND',404);
+    if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
+    const open=this.engine.caseFor(actor,caseId).proposalBatches.filter(b=>b.status==='proposed');
+    const accepted:string[]=[],skipped:string[]=[];
+    for(const batch of open) {
+      const c=this.engine.caseFor(actor,caseId);
+      if(c.proposalBatches.find(b=>b.id===batch.id)?.status!=='proposed')continue;
+      try{await this.extraction.acceptBatch(actor,caseId,batch.id,{expectedCaseRevision:c.caseRevision,accept:true});accepted.push(batch.id);}
+      catch(error){if(!(error instanceof WorkflowError))throw error;skipped.push(batch.id);}
+    }
+    let c=this.engine.caseFor(actor,caseId);
+    if(!c.draftDirty)return {accepted,skipped,profileVersion:c.confirmedVersions.at(-1)?.version??null,runs:[]};
+    await this.engine.confirm(actor,caseId,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,
+      allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
+    c=this.engine.caseFor(actor,caseId);
+    const profileVersion=c.confirmedVersions.at(-1)!.version;
+    const {runs}=await this.runStandardAnalyses(actor,caseId,{expectedProfileVersion:profileVersion});
+    return {accepted,skipped,profileVersion,runs};
   }
 
   private valid(session:DemoSession){

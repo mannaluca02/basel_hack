@@ -8,6 +8,7 @@ import { WorkflowError, type Actor, type InsuranceCase, type StoredVoiceSession 
 import { sha256Json } from '../calculation/hash.js';
 import { gatewaysFor, type VoiceOptions, type VoiceGateway } from './providers.js';
 import { mapVoiceObservations, portfolioCatalog } from './portfolio.js';
+import { productText } from '../insurance/i18n.js';
 /**
  * Observations from a separately running voice agent (Paxi) that holds its own provider session.
  * It quotes the final customer turns it relied on; no audio and no full transcript reach the case.
@@ -224,6 +225,20 @@ export class VoiceIntegrationService {
             }
             return { caseId: id, contextRevision: c.contextRevision, recorded: changed, total: c.agentTurns.length };
         });
+    }
+    /**
+     * What the voice agent may say about solutions: the current recommendation of the active run,
+     * with product names in the case language. Only the rule-based result, no amounts it would
+     * have to explain on its own; `null` before there is one.
+     */
+    agentRecommendation(actor: Actor, id: string) {
+        if (actor.role === 'reviewer')
+            throw new WorkflowError('FORBIDDEN', 403);
+        const c = this.engine.caseFor(actor, id, true);
+        const rec = [...c.recommendations].reverse().find(r => r.runId === c.activeRunId) ?? null;
+        return { caseId: id, recommendation: rec && { id: rec.id, status: rec.status, reviewOpen: rec.status === 'human_review_required',
+            candidates: rec.candidates.map(x => ({ productId: x.productId, productName: productText(c.locale, x.productId), personId: x.personId,
+                suitabilityCheckRequired: x.rule.reasonCodes.includes('SUITABILITY_CHECK_REQUIRED') })) } };
     }
     /** The owner's call history from a separate voice agent; never part of the case DTO. */
     agentTurns(actor: Actor, id: string) {

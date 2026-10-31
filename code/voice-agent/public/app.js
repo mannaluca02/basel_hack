@@ -92,15 +92,33 @@ const statusText = {
   error: "Fehler",
 };
 
+// The customer app that opened this window (FE-10): it gets Paxi's state for its avatar ring
+// and controls. Only its own origin, passed in the URL, receives these messages.
+const appOrigin = (() => {
+  try {
+    return window.opener ? new URL(new URLSearchParams(location.search).get("app") ?? "").origin : null;
+  } catch {
+    return null;
+  }
+})();
+const tellApp = (status) => {
+  if (appOrigin && window.opener && !window.opener.closed) window.opener.postMessage({ type: "pax.status", ...status }, appOrigin);
+};
+window.addEventListener("pagehide", () => tellApp({ state: "ended" }));
+
 const callbacks = {
   onAudioStream: (stream) => avatar.attachAudio(stream),
-  onAvatarEvent: (event) => avatar.handle(event),
+  onAvatarEvent: (event) => {
+    avatar.handle(event);
+    if (event.type === "activity") tellApp({ state: "connected", activity: event.state });
+  },
   onTranscript: showFragment,
   onAnswer: ({ fieldId, value, status }) => {
     captured[fieldId] = { value, status };
     renderAnswers();
   },
   onStatus: ({ state, detail, conversationId }) => {
+    tellApp({ state: state === "error" ? "ended" : state, ...(state === "ended" || state === "error" ? { activity: "idle" } : {}) });
     const inactive = state === "ended" && detail === "inactive";
     resumable = inactive ? conversationId : state === "connecting" ? resumable : null;
     $("status").textContent = state === "error" ? `${statusText.error}: ${detail}` : statusText[inactive ? "inactive" : state];
@@ -117,8 +135,35 @@ const callbacks = {
 
 const paxi = createPaxiVoice({ ...callbacks, caseLink });
 
+// Call controls of the customer app that opened this window (FE-10). Only that window may steer
+// the call, and only with these actions.
+window.addEventListener("message", (event) => {
+  if (!window.opener || event.source !== window.opener) return;
+  const { type, action } = event.data ?? {};
+  if (type !== "pax.call") return;
+  if (action === "end") paxi.stop();
+  else if (action === "mute") paxi.setMuted(true);
+  else if (action === "unmute") paxi.setMuted(false);
+  else if (action === "stop_speaking") paxi.stopSpeaking();
+  else if (action === "language" && ["de", "fr", "it", "en"].includes(event.data.language)) paxi.setLanguage(event.data.language);
+});
+
+// Opened without the customer app: the voice notice comes before the microphone.
+const noticeNeeded = !caseLink;
+let noticeAccepted = false;
+$("notice-accept")?.addEventListener("click", () => {
+  noticeAccepted = true;
+  $("notice").hidden = true;
+});
+if (noticeNeeded) $("notice").hidden = false;
+
 $("avatar").addEventListener("click", () => {
   if (paxi.running) return;
+  if (noticeNeeded && !noticeAccepted) {
+    $("notice").hidden = false;
+    $("notice-accept").focus();
+    return;
+  }
   const resume = resumable;
   if (!resume) {
     turns = [];

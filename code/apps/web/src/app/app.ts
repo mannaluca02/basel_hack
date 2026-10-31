@@ -30,6 +30,7 @@ import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
+import { VoiceAgentLink } from './core/advisor/api/voice-agent-link';
 import { ReviewPanel } from './features/review/review-panel';
 
 interface TabLink {
@@ -96,7 +97,11 @@ export class App {
 
   /** Data capture for the ring around the avatar. */
   protected readonly progress = this.store.progress;
-  protected readonly activity = computed(() => this.store.agent().activity);
+  private readonly paxi = inject(VoiceAgentLink);
+  /** Paxi's activity while it talks in its own window, else the advisor's. */
+  protected readonly activity = computed(() =>
+    this.paxi.state() === 'opened' ? this.paxi.activity() : this.store.agent().activity,
+  );
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll

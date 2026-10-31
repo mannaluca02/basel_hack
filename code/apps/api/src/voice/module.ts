@@ -118,6 +118,19 @@ class AgentTurnsController {
     @Body()
     body: unknown) { return this.r.voice.recordAgentTurns(req.actor, uuid(id), body); }
 }
-@Module({ controllers: [PublicVoiceController, CaseVoiceController, ExternalVoiceController, AgentTurnsController] })
+@Controller('api/cases/:caseId/voice/agent-recommendation')
+@UseGuards(LifeSessionGuard)
+class AgentRecommendationController {
+    constructor(
+    @Inject(LIFE_RUNTIME)
+    private readonly r: LifeRuntime) { }
+    @Get()
+    read(
+    @Req()
+    req: Request,
+    @Param('caseId')
+    id: string) { return this.r.voice.agentRecommendation(req.actor, uuid(id)); }
+}
+@Module({ controllers: [PublicVoiceController, CaseVoiceController, ExternalVoiceController, AgentTurnsController, AgentRecommendationController] })
 export class VoiceModule {
 }
