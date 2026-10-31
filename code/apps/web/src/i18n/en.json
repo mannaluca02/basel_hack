@@ -1,0 +1,55 @@
+{
+  "app": {
+    "name": "Pax Digital Advisor"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "nav": {
+    "label": "Workspace",
+    "graphics": "Graphics",
+    "risks": "Risks",
+    "chat": "Chat",
+    "info": "Info",
+    "openRisks": "{{count}} open"
+  },
+  "graphics": {
+    "title": "Graphics"
+  },
+  "risks": {
+    "title": "Risks"
+  },
+  "chat": {
+    "title": "Chat"
+  },
+  "info": {
+    "title": "Info"
+  },
+  "demo": {
+    "badge": "Demo",
+    "label": "Demo with synthetic data"
+  },
+  "consent": {
+    "title": "Before we start",
+    "intro": "Pax Digital Advisor helps you understand your pension provision across all three pillars. Please take a moment to read how it works.",
+    "recorded": {
+      "title": "What is recorded",
+      "body": "What you say during the conversation is converted to text and stored together with the details you give about your household, income and pension provision. This data is used only for this advice."
+    },
+    "ai": {
+      "title": "An AI is involved",
+      "body": "An AI assistant leads the conversation, asks questions and explains results. It does not calculate anything itself: all amounts come from Pax calculation tools. The AI only receives what it needs, without your name, full date of birth or health details."
+    },
+    "demo": {
+      "title": "This is a demo",
+      "body": "This prototype from BaselHack 2026 works with synthetic data only. Please do not enter any real personal data."
+    },
+    "human": {
+      "title": "A person is always available",
+      "body": "You can ask for a human advisor at any time during the conversation: just say so. Complex or far-reaching cases are handed over to a specialist automatically."
+    },
+    "session": "Your consent applies to this browser tab only and ends when you close it.",
+    "agree": "I have read this notice and agree that my information is processed as described.",
+    "start": "Start advice"
+  }
+}

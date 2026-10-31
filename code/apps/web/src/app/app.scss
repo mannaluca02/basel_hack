@@ -1,0 +1,223 @@
+// Whiteboard layout: Dynamic View left, vertical tab rail right, agent dock at the bottom of
+// the rail. The dock has its own place in the rail, so it never covers the Dynamic View.
+// Only the Dynamic View scrolls; header and rail stay put.
+:host {
+  // Icon-only rail: the tab (at least a 44px touch target) plus room for its focus ring.
+  --tab-size: 3rem;
+  --tab-gap: 1rem;
+  --icon-size: 1.5rem;
+  --rail-width: calc(var(--tab-size) + 4 * var(--stroke-focusring));
+  --dock-size: 2.75rem;
+
+  display: grid;
+  grid-template:
+    'bar rail' auto
+    'view rail' minmax(0, 1fr)
+    / minmax(0, 1fr) calc(var(--rail-width) + env(safe-area-inset-right));
+  height: 100dvh;
+}
+
+// Before consent: header and privacy notice only, no rail.
+:host(.gated) {
+  grid-template:
+    'bar' auto
+    'view' minmax(0, 1fr)
+    / minmax(0, 1fr);
+}
+
+@media (min-width: 768px) {
+  :host {
+    --tab-size: 3.25rem;
+    --tab-gap: 1.25rem;
+    --icon-size: 1.75rem;
+    --dock-size: 3rem;
+  }
+}
+
+.bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.5rem 1rem;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  border-bottom: var(--stroke-border) solid var(--border-soft);
+}
+
+.brand {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// Always visible: the whole app runs on synthetic data only.
+.demo {
+  flex: none;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  color: var(--text-inverse);
+  background: var(--bg-brand-purple);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bar app-language-switcher {
+  margin-left: auto;
+}
+
+.view {
+  grid-area: view;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+
+  // Focused by script only, as the landing point after consent; not a control, so no ring.
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.rail {
+  grid-area: rail;
+  // Above the Dynamic View, so a tab's tooltip can overlap it.
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tab-gap);
+  min-height: 0;
+  padding: 0.5rem 0;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  border-left: var(--stroke-border) solid var(--border-soft);
+  background: var(--bg-default);
+}
+
+.tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  // Tabs sit at the bottom, just above the dock: within thumb reach on phones.
+  justify-content: flex-end;
+  gap: var(--tab-gap);
+  // Room for the focus ring.
+  padding: calc(2 * var(--stroke-focusring));
+}
+
+.tab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--tab-size);
+  height: var(--tab-size);
+  border-radius: var(--radius-m);
+  color: var(--text-default);
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bg-muted);
+    }
+  }
+}
+
+.tab--active {
+  color: var(--text-brand);
+  background: var(--bg-muted);
+
+  // Bar on the view side; with the background the active tab does not rely on colour alone.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0.625rem auto 0.625rem 0;
+    width: 0.1875rem;
+    border-radius: var(--radius-full);
+    background: var(--icon-brand);
+  }
+}
+
+// The tab's accessible name. Invisible until hover (mouse) or keyboard focus, then shown as a
+// tooltip next to the rail. On phones the open tab's heading names it.
+.label {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.5rem);
+  padding: 0.25rem 0.5rem;
+  border: var(--stroke-border) solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--text-default);
+  background: var(--bg-default);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 120ms ease-out;
+}
+
+.tab:focus-visible .label {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .tab:hover .label {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: none;
+  }
+}
+
+.glyph {
+  position: relative;
+  display: inline-flex;
+}
+
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.badge {
+  position: absolute;
+  top: -0.375rem;
+  left: calc(100% - 0.5rem);
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.25rem;
+  border-radius: var(--radius-full);
+  color: var(--text-on-brand);
+  background: var(--bg-brand);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.125rem;
+  text-align: center;
+}
+
+.dock {
+  flex: none;
+  width: var(--dock-size);
+  height: var(--dock-size);
+  border: var(--stroke-m) dashed var(--border-subtle);
+  border-radius: var(--radius-full);
+}

@@ -1,0 +1,55 @@
+{
+  "app": {
+    "name": "Pax Digital Advisor"
+  },
+  "language": {
+    "label": "Sprache"
+  },
+  "nav": {
+    "label": "Arbeitsbereich",
+    "graphics": "Grafiken",
+    "risks": "Risiken",
+    "chat": "Chat",
+    "info": "Info",
+    "openRisks": "{{count}} offen"
+  },
+  "graphics": {
+    "title": "Grafiken"
+  },
+  "risks": {
+    "title": "Risiken"
+  },
+  "chat": {
+    "title": "Chat"
+  },
+  "info": {
+    "title": "Info"
+  },
+  "demo": {
+    "badge": "Demo",
+    "label": "Demo mit synthetischen Daten"
+  },
+  "consent": {
+    "title": "Bevor wir starten",
+    "intro": "Der Pax Digital Advisor hilft Ihnen, Ihre Vorsorge über alle drei Säulen zu verstehen. Bitte lesen Sie kurz, wie er arbeitet.",
+    "recorded": {
+      "title": "Was aufgezeichnet wird",
+      "body": "Was Sie im Gespräch sagen, wird in Text umgewandelt und zusammen mit Ihren Angaben zu Haushalt, Einkommen und Vorsorge gespeichert. Diese Daten werden nur für diese Beratung verwendet."
+    },
+    "ai": {
+      "title": "Eine KI ist beteiligt",
+      "body": "Ein KI-Assistent führt das Gespräch, stellt Fragen und erklärt Ergebnisse. Er rechnet nicht selbst: Alle Beträge stammen aus den Berechnungswerkzeugen von Pax. Die KI erhält nur, was sie braucht, ohne Namen, vollständiges Geburtsdatum oder Gesundheitsangaben."
+    },
+    "demo": {
+      "title": "Dies ist eine Demo",
+      "body": "Dieser Prototyp vom BaselHack 2026 arbeitet nur mit synthetischen Daten. Bitte geben Sie keine echten persönlichen Daten ein."
+    },
+    "human": {
+      "title": "Ein Mensch ist jederzeit erreichbar",
+      "body": "Sie können während des Gesprächs jederzeit eine Beraterin oder einen Berater verlangen: Sagen Sie es einfach. Komplexe oder folgenreiche Fälle werden automatisch an eine Fachperson übergeben."
+    },
+    "session": "Ihre Einwilligung gilt nur für diesen Browser-Tab und endet, wenn Sie ihn schliessen.",
+    "agree": "Ich habe diesen Hinweis gelesen und bin einverstanden, dass meine Angaben wie beschrieben bearbeitet werden.",
+    "start": "Beratung starten"
+  }
+}
