@@ -2,13 +2,16 @@
 // the Angular app in its demo configuration on 4200. The app opens on a ready, calculated
 // synthetic case (Mueller persona); no access code. Ctrl+C stops both.
 // `--debug` serves the app in its debug configuration instead: the same, plus the Voice Lab view.
+// `--paxi` serves its paxi configuration and starts Dario's voice agent (Paxi, port 3100) in the
+// backend's process: Paxi talks in its own window instead of the live voice in the app.
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const code = fileURLToPath(new URL('..', import.meta.url));
-const app = process.argv.includes('--debug') ? 'start:debug' : 'start:demo';
+const paxi = process.argv.includes('--paxi');
+const app = paxi ? 'start:paxi' : process.argv.includes('--debug') ? 'start:debug' : 'start:demo';
 const children = [
-  spawn('npm', ['start'], { cwd: code, stdio: 'inherit', env: { ...process.env, PAX_DEMO_START: '1' } }),
+  spawn('npm', ['start'], { cwd: code, stdio: 'inherit', env: { ...process.env, PAX_DEMO_START: '1', ...(paxi ? { PAX_VOICE_AGENT: '1' } : {}) } }),
   spawn('npm', ['run', app, '--', '--host', '127.0.0.1', '--port', '4200'], {
     cwd: `${code}apps/web`,
     stdio: 'inherit',

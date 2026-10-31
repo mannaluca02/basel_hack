@@ -9,7 +9,7 @@ Each conversation is written to `data/conversations/<conversationId>.json`. The 
 
 Requires Node.js 22 or newer, npm, a browser with microphone/WebRTC support and an OpenAI project key with access to the configured models.
 
-Paxi runs inside the case backend's process: `npm start` (or `npm run dev:demo`) in `code/` also serves Paxi on port 3100, so there is no second process to start. Install its dependencies once:
+Paxi runs inside the case backend's process: `npm run dev:paxi` in `code/` starts the backend with `PAX_VOICE_AGENT=1`, which also serves Paxi on port 3100, and the app in its `paxi` configuration, where the customer talks to Paxi in its own window. The other app configurations use the live voice built into the app instead. Install Paxi's dependencies once:
 
 ```bash
 cd code/voice-agent
@@ -31,7 +31,7 @@ The server reads the repository-root `.env`, not a file inside `code/voice-agent
 | `OPENAI_API_KEY` | Required to start a call | Server-side credentials; never put this key in browser code. |
 | `PAX_VOICE_AGENT_PORT` | `3100` | HTTP port inside the case backend's process; the server binds to `127.0.0.1`. |
 | `PORT` | `3100` | HTTP port when run on its own (`npm start` here). |
-| `PAX_VOICE_AGENT` | on | `0` keeps the case backend from starting Paxi. |
+| `PAX_VOICE_AGENT` | off | `1` makes the case backend start Paxi (`dev:paxi` sets it). |
 | `PAX_API_URL` | `http://127.0.0.1:3000` | Valentin's case backend that receives Paxi's proposals once a case is linked. |
 | `PAX_APP_ORIGINS` | `http://localhost:4200,http://127.0.0.1:4200` | Customer app origins allowed to hand a case to Paxi via `/api/case-link`. |
 | `LIVE_MODEL` | `gpt-live-1` | Live speech model. |

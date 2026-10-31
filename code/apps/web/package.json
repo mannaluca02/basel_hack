@@ -9,6 +9,8 @@
     "start:api": "ng serve web --configuration api",
     "prestart:demo": "node scripts/sync-voice-avatar.mjs",
     "start:demo": "ng serve web --configuration demo",
+    "prestart:paxi": "node scripts/sync-voice-avatar.mjs",
+    "start:paxi": "ng serve web --configuration paxi",
     "prestart:debug": "node scripts/sync-voice-avatar.mjs",
     "start:debug": "ng serve web --configuration debug",
     "prestart:debug:lab": "node scripts/sync-voice-avatar.mjs",

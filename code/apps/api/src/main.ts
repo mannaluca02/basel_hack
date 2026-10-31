@@ -11,11 +11,12 @@ import { openAiResponsesTransport } from './erni-dialog/responses.js';
 /**
  * Dario's voice agent (Paxi, code/voice-agent) runs in this process instead of a second one. It
  * keeps its own port (3100): its page, origin checks and the app's postMessage link rely on that
- * origin. It talks to this backend over HTTP like any client. PAX_VOICE_AGENT=0 leaves it off;
- * a missing install or a taken port only costs Paxi, never the backend.
+ * origin. It talks to this backend over HTTP like any client. Only with PAX_VOICE_AGENT=1 (the
+ * app's `paxi` configuration, `npm run dev:paxi`); the other configurations use the live voice in
+ * the app. A missing install or a taken port only costs Paxi, never the backend.
  */
 async function startVoiceAgent() {
-  if(process.env.PAX_VOICE_AGENT==='0')return;
+  if(process.env.PAX_VOICE_AGENT!=='1')return;
   process.env.PAX_VOICE_AGENT_PORT??='3100';
   try{
     const entry=new URL('../../../voice-agent/server.mjs',import.meta.url).href;

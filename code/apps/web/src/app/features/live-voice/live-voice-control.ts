@@ -22,8 +22,8 @@ let nextId = 0;
  * backend (`LiveVoice`). While the call runs the same button ends it. What Paxi hears arrives as
  * proposals; the avatar ring shows its activity.
  *
- * Only shown when the backend offers GPT-Live and the model extraction, and not while Paxi talks
- * in its own window. The demo start has no review stand: there a card next to the rail offers to
+ * Only shown when the backend offers GPT-Live and the model extraction, and not in the `paxi`
+ * configuration, where Paxi talks in its own window. The demo start has no review stand: there a card next to the rail offers to
  * accept what Paxi heard, which also recalculates the scenarios.
  */
 @Component({
@@ -94,14 +94,16 @@ let nextId = 0;
         @if (!open()) {
           <p class="error" role="alert">{{ error | transloco }}</p>
         }
-      } @else if (offerAccept() && !open()) {
-        <section class="card" role="status">
-          <p>{{ (acceptFailed() ? 'voice.acceptFailed' : 'voice.pending') | transloco }}</p>
-          <button type="button" class="action action--primary" data-action="accept" [disabled]="accepting()" (click)="accept()">
-            {{ (accepting() ? 'voice.accepting' : 'voice.accept') | transloco }}
-          </button>
-        </section>
       }
+    }
+    <!-- Also in the paxi configuration: Paxi's proposals need the same acceptance in the demo. -->
+    @if (offerAccept() && !open() && !(shown() && errorLabel())) {
+      <section class="card" role="status">
+        <p>{{ (acceptFailed() ? 'voice.acceptFailed' : 'voice.pending') | transloco }}</p>
+        <button type="button" class="action action--primary" data-action="accept" [disabled]="accepting()" (click)="accept()">
+          {{ (accepting() ? 'voice.accepting' : 'voice.accept') | transloco }}
+        </button>
+      </section>
     }
   `,
   styles: `
@@ -301,7 +303,7 @@ export class LiveVoiceControl {
 
   /** Also while a call runs, so it can always be stopped. */
   protected readonly shown = computed(
-    () => this.live.active() || (this.live.available() && this.paxi.state() !== 'opened'),
+    () => this.live.active() || (this.live.available() && !this.paxi.available),
   );
 
   /** Translation key of the reason Start is disabled, or `null`. */

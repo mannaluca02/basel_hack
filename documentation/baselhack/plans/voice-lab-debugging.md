@@ -46,8 +46,12 @@ zurückzufallen.
 | `npm run start:demo` | demo | Backend 3000, Demo-Start | nein |
 | `npm run start:debug` | debug | Backend 3000, Demo-Start | ja |
 | `npm run start:debug:lab` | debug-lab | Lab-Backend 3030, Anmeldung | ja |
+| `npm run start:paxi` | paxi | Backend 3000 mit Paxi (3100), Demo-Start | nein |
 
-Live-Voice gibt es in allen Konfigurationen mit Backend. Die Debug-Konfigurationen ersetzen
+Live-Voice gibt es in allen Konfigurationen mit Backend ausser `paxi`: Dort spricht Darios Paxi in
+einem eigenen Fenster (Gesprächsleiste oben), gestartet mit `npm --prefix code run dev:paxi`, das den
+Paxi-Server im Backend-Prozess mitstartet (`PAX_VOICE_AGENT=1`). Die Übernahme-Karte der Demo gilt
+für beide Wege. Im Mock-Modus steuert die Gesprächsleiste den Skript-Anruf. Die Debug-Konfigurationen ersetzen
 `environment.ts` (`debugVoice: true`) und `src/app/debug-routes.ts` durch `debug-routes.voice.ts`
 und kompilieren mit `tsconfig.debug.json`; nur dort ist der Trace-Interceptor aktiv.
 

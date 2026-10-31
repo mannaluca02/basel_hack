@@ -17,6 +17,7 @@ npm run check:i18n    # missing/empty/extra keys per language, unknown keys used
 npm run start:api     # dev server against the real case service, /api proxied to port 3000
 npm run start:demo    # same, but opens on a ready synthetic case: no sign-in, no review stand
 npm run start:debug   # demo start plus the Voice Lab tab (live voice trace)
+npm run start:paxi    # demo start with Dario's Paxi in its own window instead of the live voice (code: npm run dev:paxi)
 npm run start:debug:lab  # Voice Lab against the isolated lab backend (code: npm run start:voice-lab), port 4300
 ```
 
