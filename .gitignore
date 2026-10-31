@@ -11,6 +11,8 @@ AGENTS.md
 # Environments and dependencies
 .venv/
 node_modules/
+dist/
+.angular/
 __pycache__/
 .DS_Store
 

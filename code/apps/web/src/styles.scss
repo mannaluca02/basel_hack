@@ -1,0 +1,17 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  color: #121212;
+  background: #fff;
+  font-family: system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}

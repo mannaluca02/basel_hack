@@ -1,0 +1,15 @@
+<main class="view">
+  <router-outlet />
+</main>
+
+<nav class="tabs" aria-label="Workspace">
+  @for (tab of tabs; track tab.path) {
+    <a
+      class="tab"
+      [routerLink]="tab.path"
+      routerLinkActive="tab--active"
+      ariaCurrentWhenActive="page"
+      >{{ tab.label }}</a
+    >
+  }
+</nav>
