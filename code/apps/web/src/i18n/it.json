@@ -10,7 +10,8 @@
     "graphics": "Grafici",
     "risks": "Rischi",
     "chat": "Chat",
-    "info": "Info"
+    "info": "Info",
+    "openRisks": "{{count}} da gestire"
   },
   "graphics": {
     "title": "Grafici"

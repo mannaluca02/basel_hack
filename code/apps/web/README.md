@@ -16,6 +16,7 @@ npm run check:i18n    # missing/empty/extra keys per language, unknown keys used
 ## Structure
 
 - `src/app/features/workspace/{graphics,risks,chat,info}` – one lazy-loaded route per tab
+- `src/app/app.{ts,html,scss}` – app shell: header, Dynamic View (the only scroll container), icon-only tab rail on the right (the name shows as a tooltip on hover and keyboard focus and stays the accessible name) with the agent dock slot at its bottom (filled in FE-09). Tab routes carry `data: { keepAlive: true }`; `core/layout/keep-alive-route-reuse-strategy.ts` keeps their components alive across tab switches and the shell restores each tab's scroll offset. The global `:focus-visible` ring in `styles.scss` uses `box-shadow`, so do not override it on focus
 - `src/styles/tokens.css` – Pax colours, radius and stroke; the theme follows the OS (`prefers-color-scheme`), there is no manual toggle. Components use only the semantic tokens (`--bg-*`, `--text-*`, `--icon-*`, `--border-*`, `--chart-1..8`)
 - `src/app/core/theme/color-scheme.ts` – `ColorScheme.scheme` signal and `token()` for canvas charts that cannot read `var()`
 - `src/i18n/{de,fr,it,en}.json` – UI texts; German is the source language, add every key there first. Missing keys fall back to German at runtime
