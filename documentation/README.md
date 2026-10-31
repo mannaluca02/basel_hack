@@ -5,6 +5,7 @@ from the challenge hub, the Logismata API and the material PDFs.
 
 | File | Contents |
 |---|---|
+| [Customer data portfolio](../code/voice-agent/questionnaire.json) | All 37 customer details Pax needs (person, family, income, living, provision, goals, suitability check), with tier, type, casual question, contract path and source; used by the Paxi voice agent |
 | [Workflow and interface contracts](baselhack/plans/interface-contracts.md) | VoiceLog, shared case, calculation result, replies, playback and export contracts from the second photo |
 | [Workshop decisions](baselhack/plans/workshop-decisions.md) | Confirmed UI/roles, feature interpretation and explicit open details |
 | [Detailed Angular implementation plan](baselhack/plans/implementation-plan.md) | Screens, domain logic, AI, interfaces, state machine, security and 55 acceptance cases |

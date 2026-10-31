@@ -1,4 +1,2 @@
 # Conversation logs contain personal data; never commit them.
 data/
-# Recorded takes; only the picked welcome.pcm is kept.
-welcome/take-*

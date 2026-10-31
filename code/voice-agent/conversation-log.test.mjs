@@ -49,8 +49,36 @@ test("validates dates and names", () => {
   assert.equal(validateAnswer(birthDate, "2999-01-01").ok, false);
 });
 
+test("validates numbers, amounts, choices and yes/no", () => {
+  const integer = { type: "integer", min: 0, max: 100 };
+  assert.deepEqual(validateAnswer(integer, "80"), { ok: true, value: 80 });
+  assert.equal(validateAnswer(integer, "120").ok, false);
+  assert.equal(validateAnswer(integer, "achtzig").ok, false);
+  const money = { type: "money" };
+  assert.deepEqual(validateAnswer(money, "CHF 85'000"), { ok: true, value: 85000 });
+  assert.equal(validateAnswer(money, "viel").ok, false);
+  const choice = { type: "enum", options: ["rent", "own"] };
+  assert.deepEqual(validateAnswer(choice, "rent"), { ok: true, value: "rent" });
+  assert.equal(validateAnswer(choice, "Miete").ok, false);
+  assert.deepEqual(validateAnswer({ type: "boolean" }, "false"), { ok: true, value: false });
+});
+
+test("counts only open details of the requested tier", () => {
+  const log = createLog({
+    conversationId: "live_4",
+    questionnaire: { ...questionnaire, fields: [...questionnaire.fields, { id: "smoker", label: "Raucher", type: "boolean", tier: "extended" }] },
+    model: "m",
+  });
+  assert.deepEqual(openFields(log), ["full_name", "birth_date"]);
+  assert.deepEqual(openFields(log, "extended"), ["smoker"]);
+});
+
 test("lists fields that are still open", () => {
   const log = createLog({ conversationId: "live_3", questionnaire, model: "m" });
   log.answers.full_name.status = "captured";
   assert.deepEqual(openFields(log), ["birth_date"]);
+  log.answers.birth_date.status = "declined_once";
+  assert.deepEqual(openFields(log), ["birth_date"]);
+  log.answers.birth_date.status = "declined";
+  assert.deepEqual(openFields(log), []);
 });

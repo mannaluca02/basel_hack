@@ -12,22 +12,32 @@ $("questionnaire-title").textContent = questionnaire.title;
 const avatar = createAvatarController(mountPaxAvatar($("avatar")));
 const captured = {};
 let turns = [];
+// Set when Paxi closed the call for inactivity; the next tap continues that conversation.
+let resumable = null;
+const tierTitles = { core: "Kernangaben", extended: "Wenn es passt" };
 
 function renderAnswers() {
   $("answers").replaceChildren(
-    ...questionnaire.fields.map((field) => {
-      const card = document.createElement("div");
-      card.className = "answer" + (captured[field.id] ? " captured" : "");
-      const label = document.createElement("div");
-      label.className = "label";
-      label.textContent = field.label;
-      const value = document.createElement("div");
-      value.className = "value";
-      value.textContent = captured[field.id] ?? "–";
-      card.append(label, value);
-      return card;
+    ...Object.entries(tierTitles).flatMap(([tier, title]) => {
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+      return [heading, ...questionnaire.fields.filter((field) => (field.tier ?? "core") === tier).map(renderField)];
     }),
   );
+}
+
+function renderField(field) {
+  const card = document.createElement("div");
+  const answer = captured[field.id];
+  card.className = "answer" + (answer ? ` ${answer.status}` : "");
+  const label = document.createElement("div");
+  label.className = "label";
+  label.textContent = field.label;
+  const value = document.createElement("div");
+  value.className = "value";
+  value.textContent = !answer ? "–" : answer.status === "declined" ? "Möchte es nicht sagen – Kollege klärt es" : String(answer.value);
+  card.append(label, value);
+  return card;
 }
 renderAnswers();
 
@@ -61,6 +71,7 @@ const statusText = {
   connected: "Verbunden – sprich einfach los.",
   switching: "Wechsle zur passenden Stimme…",
   ended: "Gespräch beendet. Log gespeichert.",
+  inactive: "Wegen Inaktivität beendet. Tippe auf Paxi, um dort weiterzumachen.",
   error: "Fehler",
 };
 
@@ -68,16 +79,18 @@ const paxi = createPaxiVoice({
   onAudioStream: (stream) => avatar.attachAudio(stream),
   onAvatarEvent: (event) => avatar.handle(event),
   onTranscript: showFragment,
-  onAnswer: ({ fieldId, value }) => {
-    captured[fieldId] = value;
+  onAnswer: ({ fieldId, value, status }) => {
+    captured[fieldId] = { value, status };
     renderAnswers();
   },
-  onStatus: ({ state, detail }) => {
-    $("status").textContent = state === "error" ? `${statusText.error}: ${detail}` : statusText[state];
+  onStatus: ({ state, detail, conversationId }) => {
+    const inactive = state === "ended" && detail === "inactive";
+    resumable = inactive ? conversationId : state === "connecting" ? resumable : null;
+    $("status").textContent = state === "error" ? `${statusText.error}: ${detail}` : statusText[inactive ? "inactive" : state];
     const active = state === "connecting" || state === "connected" || state === "switching";
     $("avatar").disabled = active;
     $("stop").hidden = !active;
-    $("hint").textContent = active ? "" : "Tippe auf Paxi, um das Gespräch zu starten.";
+    $("hint").textContent = active ? "" : inactive ? "Tippe auf Paxi, um weiterzumachen." : "Tippe auf Paxi, um das Gespräch zu starten.";
     if (paxi?.logUrl) {
       $("download").href = paxi.logUrl;
       $("download").hidden = false;
@@ -87,11 +100,14 @@ const paxi = createPaxiVoice({
 
 $("avatar").addEventListener("click", () => {
   if (paxi.running) return;
-  turns = [];
-  $("transcript").replaceChildren();
-  $("caption").textContent = "";
-  for (const key of Object.keys(captured)) delete captured[key];
-  renderAnswers();
-  paxi.start().catch(() => {});
+  const resume = resumable;
+  if (!resume) {
+    turns = [];
+    $("transcript").replaceChildren();
+    $("caption").textContent = "";
+    for (const key of Object.keys(captured)) delete captured[key];
+    renderAnswers();
+  }
+  paxi.start({ resume }).catch(() => {});
 });
 $("stop").addEventListener("click", () => paxi.stop());

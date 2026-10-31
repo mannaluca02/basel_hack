@@ -18,7 +18,7 @@ export const contextSchema = {
     },
     possible_needs: {
       type: "array",
-      description: "Pension or insurance topics a Pax specialist could explore, in German. Internal only.",
+      description: "Pension or insurance topics a Pax colleague could explore, in German. Internal only.",
       items: { type: "string" },
     },
   },
@@ -36,7 +36,7 @@ export async function extractContext(client, model, log) {
       instructions:
         "Du wertest ein lockeres Kennenlern-Gespräch zwischen Paxi (digitaler Begleiter von Pax) und einer Person aus. " +
         "Halte nur fest, was die Person selbst gesagt hat; erfinde nichts. Formuliere auf Deutsch, auch wenn das Gespräch in einer anderen Sprache war. " +
-        "possible_needs sind Ansatzpunkte für eine Pax-Fachperson (z. B. Familie absichern, Wohneigentum, Selbständigkeit), keine Produktempfehlungen.",
+        "possible_needs sind Ansatzpunkte für einen Pax-Kollegen oder eine Pax-Kollegin (z. B. Familie absichern, Wohneigentum, Selbständigkeit), keine Produktempfehlungen.",
       input: transcript,
       text: { format: { type: "json_schema", name: "conversation_context", strict: true, schema: contextSchema } },
     });

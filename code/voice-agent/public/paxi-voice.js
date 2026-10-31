@@ -14,6 +14,22 @@ const FINAL_CLOSE_TIMEOUT_MS = 15_000;
 // events, so activity comes from local audio energy.
 const LEVEL_THRESHOLD = 0.015;
 const SILENCE_MS = 600;
+// Pause after the person's first words before their language is detected.
+const FIRST_WORDS_PAUSE_MS = 700;
+// Paxi takes the initiative after this much silence, at most twice in a row.
+const IDLE_MS = 8000;
+const MAX_NUDGES = 2;
+// If the person says nothing for this long, Paxi announces that it will close the call,
+// and closes it after the grace period. The conversation can be resumed later.
+const INACTIVE_WARN_MS = 30_000;
+const INACTIVE_GRACE_MS = 30_000;
+// Time for Paxi's goodbye before the call is closed.
+const GOODBYE_MS = 7000;
+// The recorded intro can echo back through the microphone without headphones. Speech
+// counts as the person's own once at least this share of its words is not from the intro.
+const OWN_WORDS_SHARE = 0.5;
+// Echo transcripts arrive a little after the audio, so the filter outlasts the intro.
+const ECHO_TAIL_MS = 2000;
 
 /**
  * @param {object} options
@@ -21,7 +37,8 @@ const SILENCE_MS = 600;
  * @param {(stream: MediaStream) => void} [options.onAudioStream] The stream the person hears; called again after a voice switch.
  * @param {(event: object) => void} [options.onAvatarEvent] AvatarEvents: activity, playback.
  * @param {(fragment: {speaker: "user"|"agent", text: string, startMs: number, endMs: number}) => void} [options.onTranscript]
- * @param {(answer: {fieldId: string, value: string}) => void} [options.onAnswer] A questionnaire detail was saved.
+ * @param {(answer: {fieldId: string, value: string|null, status: "captured"|"declined"}) => void} [options.onAnswer]
+ *   A questionnaire detail was saved, or the person declined it (a Pax colleague follows up).
  * @param {(status: {state: "connecting"|"connected"|"switching"|"ended"|"error", detail?: string, conversationId?: string}) => void} [options.onStatus]
  */
 export function createPaxiVoice({
@@ -48,6 +65,17 @@ export function createPaxiVoice({
   let monitors = [];
   let playbackSequence = 0;
   let playbackId = null;
+  let languageChosen = false;
+  let firstWords = "";
+  let firstWordsTimer;
+  let intro = null; // { audio, monitor, words, endedAt, pending: [] } while the recorded intro runs
+  let lastActivity = 0;
+  let nudges = 0;
+  let idleTimer;
+  let lastUserAt = 0;
+  let inactiveWarnedAt = null;
+  let closingForInactivity = false;
+  let resumeId = null;
 
   const emit = (callback, value) => {
     try {
@@ -127,6 +155,7 @@ export function createPaxiVoice({
       const rms = Math.sqrt(m.samples.reduce((sum, n) => sum + n * n, 0) / m.samples.length);
       if (rms > LEVEL_THRESHOLD) {
         m.lastSound = now;
+        lastActivity = now;
         if (m.active) continue;
         m.active = true;
         if (m.output) {
@@ -150,12 +179,22 @@ export function createPaxiVoice({
     try {
       const args = JSON.parse(item.arguments);
       output = await postJson(`/api/conversations/${session.id}/answers`, { ...args, call_id: item.call_id });
-      if (output.saved) emit(onAnswer, { fieldId: output.field_id, value: output.value });
+      if (output.saved) emit(onAnswer, { fieldId: output.field_id, value: output.value, status: "captured" });
+      noteProgress(session, output);
     } catch (error) {
       console.error("save_answer failed", error);
       output = { saved: false, reason: "Technischer Fehler beim Speichern." };
     }
     returnToolResult(session, item.call_id, output);
+  }
+
+  // Quiet context for Paxi, so it never wraps up while core details are missing.
+  function noteProgress(session, output) {
+    if (!output.open_core) return;
+    const content = output.core_complete
+      ? "All core details are collected. Continue naturally; extended details are welcome if they fit."
+      : `Core details still open: ${output.open_core.join(", ")}. Do not wrap up or say goodbye before you have asked for them.`;
+    send(session, { type: "session.thinking.append", delegation_id: null, content });
   }
 
   async function handleSetLanguage(session, item) {
@@ -166,12 +205,42 @@ export function createPaxiVoice({
       console.error("set_language failed", error);
       result = { ok: false };
     }
+    if (result.ok) languageChosen = true;
     if (!result.ok || !result.switch_voice || switching) {
       // This voice already fits (or the switch failed): carry on in this session.
       returnToolResult(session, item.call_id, { ok: result.ok, language: result.language });
       return;
     }
     switchVoice(session, item.call_id, result.voice);
+  }
+
+  // The person picks the language just by speaking, often while Paxi is still
+  // welcoming them. Detecting it here makes the voice switch independent of whether
+  // the model remembers to call set_language.
+  function collectFirstWords(session, text) {
+    if (languageChosen || session.previous) return;
+    firstWords += text;
+    clearTimeout(firstWordsTimer);
+    clearInterval(idleTimer);
+    if (intro) {
+      intro.audio.pause();
+      intro = null;
+    }
+    firstWordsTimer = setTimeout(() => detectLanguage(session), FIRST_WORDS_PAUSE_MS);
+  }
+
+  async function detectLanguage(session) {
+    if (languageChosen || switching || !firstWords.trim()) return;
+    let result;
+    try {
+      result = await postJson(`/api/conversations/${session.id}/language`, { text: firstWords });
+    } catch (error) {
+      console.error("Language detection failed", error);
+      return;
+    }
+    if (!result.ok || languageChosen) return;
+    languageChosen = true;
+    if (result.switch_voice && !switching) switchVoice(session, null, result.voice);
   }
 
   // --- Voice switch -------------------------------------------------------------------
@@ -193,7 +262,7 @@ export function createPaxiVoice({
       if (previous.stream) previous.monitor = monitor(previous.stream, true);
       switching = false;
       status("connected", "voice switch failed, same voice continues");
-      returnToolResult(previous, callId, { ok: false, reason: "voice switch failed, continue in this voice" });
+      if (callId) returnToolResult(previous, callId, { ok: false, reason: "voice switch failed, continue in this voice" });
     }
   }
 
@@ -213,19 +282,110 @@ export function createPaxiVoice({
     await postJson(`/api/conversations/${session.id}/close`, { status: "handoff", usage }).catch(console.error);
   }
 
-  // --- Welcome ---------------------------------------------------------------------------
-
-  // The server plays the recorded welcome through the session; if that fails, Paxi says it live.
-  async function playWelcome(session) {
+  async function handleDeclineAnswer(session, item) {
+    let output;
     try {
-      const result = await postJson(`/api/conversations/${session.id}/welcome`, {});
-      const startMs = performance.now() - session.connectedAt;
-      emit(onTranscript, { speaker: "agent", text: result.text, startMs, endMs: startMs + result.durationMs });
+      output = await postJson(`/api/conversations/${session.id}/declined`, JSON.parse(item.arguments));
+      // The first refusal only means "ask again later"; a second one goes to a colleague.
+      if (output.ok && output.handed_to_colleague) emit(onAnswer, { fieldId: output.field_id, value: null, status: "declined" });
+      noteProgress(session, output);
     } catch (error) {
-      console.error("Welcome recording failed", error);
-      send(session, { type: "session.commentary.append", delegation_id: null, content: session.fallbackGreeting });
+      console.error("decline_answer failed", error);
+      output = { ok: false };
     }
+    returnToolResult(session, item.call_id, output);
   }
+
+  // --- Recorded intro ----------------------------------------------------------------------
+
+  // The browser plays the intro itself while the microphone already runs, so the person
+  // can interrupt it by simply speaking.
+  async function playIntro(session) {
+    const audio = new Audio(`${baseUrl}${session.intro.url}`);
+    audio.crossOrigin = "anonymous";
+    const words = new Set(wordsOf(session.intro.text));
+    intro = { audio, words, endedAt: null, pending: [] };
+    audio.addEventListener("ended", () => endIntro("ended"));
+    try {
+      await audio.play();
+    } catch (error) {
+      console.error("Intro playback failed", error);
+      intro = null;
+      send(session, { type: "session.commentary.append", delegation_id: null, content: session.fallbackGreeting });
+      return;
+    }
+    const stream = audio.captureStream();
+    intro.monitor = monitor(stream, true);
+    emit(onAudioStream, stream);
+    const startMs = performance.now() - session.connectedAt;
+    const fragment = { speaker: "agent", text: session.intro.text, start_ms: startMs, end_ms: startMs + audio.duration * 1000 };
+    pendingFragments.push({ sessionId: session.id, fragment });
+    emit(onTranscript, { speaker: "agent", text: fragment.text, startMs: fragment.start_ms, endMs: fragment.end_ms });
+  }
+
+  function endIntro(reason) {
+    if (!intro || intro.endedAt) return;
+    intro.endedAt = performance.now();
+    intro.audio.pause();
+    if (intro.monitor) stopMonitor(intro.monitor);
+    endPlayback(reason === "interrupted" ? "cancelled" : "ended");
+    lastActivity = performance.now();
+    lastUserAt = performance.now();
+    // Hand the avatar back the session's own voice.
+    if (current?.stream) emit(onAudioStream, current.stream);
+  }
+
+  // Decides whether a user transcript fragment is the person or the intro echoing back.
+  // Returns the fragments to treat as the person's speech.
+  function filterIntroEcho(session, fragment) {
+    if (!intro || session.previous) return [fragment];
+    if (intro.endedAt && performance.now() - intro.endedAt > ECHO_TAIL_MS) {
+      intro = null;
+      return [fragment];
+    }
+    intro.pending.push(fragment);
+    const words = wordsOf(intro.pending.map((f) => f.text).join(" "));
+    const own = words.filter((word) => !intro.words.has(word)).length;
+    if (words.length === 0 || own / words.length < OWN_WORDS_SHARE) return [];
+    // The person is speaking: stop the intro and let their words through.
+    const accepted = intro.pending;
+    endIntro("interrupted");
+    intro = null;
+    return accepted;
+  }
+
+  // --- Taking the initiative ---------------------------------------------------------------
+
+  function checkIdle() {
+    if (!running || switching || closingForInactivity || !current?.ready || (intro && !intro.endedAt)) return;
+    const now = performance.now();
+    if (playbackId) lastActivity = now;
+    const say = (content) => send(current, { type: "session.commentary.append", delegation_id: null, content });
+
+    // Long inactivity: announce the close, then close after the grace period.
+    if (inactiveWarnedAt && now - inactiveWarnedAt >= INACTIVE_GRACE_MS) {
+      closingForInactivity = true;
+      say("The person still has not reacted. Say in the conversation language, in one or two short sentences, that you are ending the call now because nothing has happened for a while, and that they can simply start again later and you will continue right where you left off. Then stop.");
+      setTimeout(() => finish("inactive"), GOODBYE_MS);
+      return;
+    }
+    if (!inactiveWarnedAt && now - lastUserAt >= INACTIVE_WARN_MS && !playbackId) {
+      inactiveWarnedAt = now;
+      say("The person has not said anything for a while. Kindly say in the conversation language that you will close the call in about 30 seconds if you do not hear from them, and that they can simply start again later and continue right where you left off.");
+      return;
+    }
+
+    // Short silence: take the initiative.
+    if (inactiveWarnedAt || now - lastActivity < IDLE_MS || nudges >= MAX_NUDGES) return;
+    nudges += 1;
+    lastActivity = now;
+    say(
+      !languageChosen
+        ? "Nobody has answered yet. Warmly ask again, very briefly in German, French, Italian and English, which language they would like, and say they can just start speaking."
+        : "The person has been quiet for a while. Take the initiative in the conversation language: ask a light, open question, ask for a core detail that is still open, or pick up something they told you earlier. Keep it short.",
+    );
+  }
+
 
   // --- Session events ------------------------------------------------------------------
 
@@ -234,7 +394,8 @@ export function createPaxiVoice({
       case "session.started":
         session.ready = true;
         session.connectedAt = performance.now();
-        if (session.welcome) playWelcome(session);
+        lastActivity = performance.now();
+        if (session.intro) playIntro(session);
         // The opening is also in the startup history; this makes the agent speak first.
         else send(session, { type: "session.commentary.append", delegation_id: null, content: session.opening });
         if (session.previous) {
@@ -248,16 +409,19 @@ export function createPaxiVoice({
         // A muted, retiring session may still talk; nobody hears it, so it is not logged.
         if (session.retired || session.audio.muted) break;
         const speaker = event.type === "session.input_transcript.delta" ? "user" : "agent";
-        pendingFragments.push({
-          sessionId: session.id,
-          fragment: { speaker, text: event.delta, start_ms: event.start_ms, end_ms: event.end_ms },
-        });
-        emit(onTranscript, {
-          speaker,
-          text: event.delta,
-          startMs: event.start_ms + session.offsetMs,
-          endMs: event.end_ms + session.offsetMs,
-        });
+        const fragment = { speaker, text: event.delta, start_ms: event.start_ms, end_ms: event.end_ms };
+        const accepted = speaker === "user" ? filterIntroEcho(session, fragment) : [fragment];
+        for (const f of accepted) {
+          lastActivity = performance.now();
+          if (speaker === "user") {
+            nudges = 0;
+            lastUserAt = performance.now();
+            inactiveWarnedAt = null;
+            collectFirstWords(session, f.text);
+          }
+          pendingFragments.push({ sessionId: session.id, fragment: f });
+          emit(onTranscript, { speaker, text: f.text, startMs: f.start_ms + session.offsetMs, endMs: f.end_ms + session.offsetMs });
+        }
         break;
       }
       case "response.event": {
@@ -268,6 +432,7 @@ export function createPaxiVoice({
         handledCalls.add(item.call_id);
         if (item.name === "save_answer") handleSaveAnswer(session, item);
         else if (item.name === "set_language") handleSetLanguage(session, item);
+        else if (item.name === "decline_answer") handleDeclineAnswer(session, item);
         break;
       }
       case "session.closed":
@@ -314,16 +479,17 @@ export function createPaxiVoice({
     try {
       await peer.setLocalDescription(await peer.createOffer());
       await waitForIceGathering(peer);
-      const result = await postJson("/api/session", { sdp: peer.localDescription.sdp, continueFrom });
+      const result = await postJson("/api/session", { sdp: peer.localDescription.sdp, continueFrom, resume: previous ? undefined : resumeId });
       Object.assign(session, {
         id: result.session.id,
         voice: result.voice,
         offsetMs: result.offsetMs,
         opening: result.greeting,
-        welcome: result.welcome,
+        intro: result.intro,
         fallbackGreeting: result.fallbackGreeting,
       });
       conversationId ??= result.conversationId;
+      if (result.language) languageChosen = true;
       await peer.setRemoteDescription({ type: "answer", sdp: result.transport.sdp });
       return session;
     } catch (error) {
@@ -348,6 +514,7 @@ export function createPaxiVoice({
 
   function cleanup() {
     clearInterval(levelTimer);
+    clearTimeout(firstWordsTimer);
     endPlayback("cancelled");
     emit(onAvatarEvent, { type: "activity", state: "idle" });
     microphone?.getTracks().forEach((track) => track.stop());
@@ -367,14 +534,26 @@ export function createPaxiVoice({
   }
 
   return {
-    /** Starts a conversation. Call it from a click or tap: browsers require a user action. */
-    async start() {
+    /**
+     * Starts a conversation. Call it from a click or tap: browsers require a user action.
+     * Pass { resume: conversationId } to continue a conversation that was closed, for
+     * example after inactivity; Paxi then picks up where it left off.
+     */
+    async start({ resume } = {}) {
       if (running) return;
+      resumeId = resume ?? null;
       running = true;
       finishing = false;
       conversationId = undefined;
       pendingFragments = [];
       handledCalls = new Set();
+      languageChosen = false;
+      firstWords = "";
+      intro = null;
+      nudges = 0;
+      lastUserAt = performance.now();
+      inactiveWarnedAt = null;
+      closingForInactivity = false;
       status("connecting");
       try {
         // Created inside the click, so the browser lets it run.
@@ -386,6 +565,7 @@ export function createPaxiVoice({
         });
         monitor(microphone, false);
         levelTimer = setInterval(checkLevels, 50);
+        idleTimer = setInterval(checkIdle, 1000);
         current = await connect({});
         flushTimer = setInterval(flushTranscript, FLUSH_INTERVAL_MS);
       } catch (error) {
@@ -432,4 +612,8 @@ function waitForIceGathering(connection) {
     }
     connection.addEventListener("icegatheringstatechange", onState);
   });
+}
+
+function wordsOf(text) {
+  return text.toLowerCase().match(/[\p{L}']+/gu) ?? [];
 }

@@ -29,9 +29,12 @@
   .turn { max-width: 90%; padding: 6px 10px; border-radius: 10px; line-height: 1.4; white-space: pre-wrap; }
   .turn.agent { background: #fff; border: 1px solid var(--line); align-self: flex-start; }
   .turn.user { background: var(--purple); color: #fff; align-self: flex-end; }
+  #answers h3 { font-size: 12px; font-weight: 600; margin: 12px 0 6px; color: var(--muted); }
   .answer { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; }
   .answer .label { font-size: 12px; color: var(--muted); }
   .answer.captured { border-color: var(--green); box-shadow: inset 4px 0 0 var(--green); }
+  .answer.declined { border-color: #e0a100; box-shadow: inset 4px 0 0 #e0a100; }
+  .answer.declined .value { font-weight: 400; font-style: italic; }
   .answer .value { font-weight: 600; min-height: 1.2em; }
   a { color: var(--purple); }
 </style>
