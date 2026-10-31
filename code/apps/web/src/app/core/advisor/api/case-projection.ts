@@ -123,11 +123,12 @@ function last<T>(items: readonly T[], match: (item: T) => boolean): T | undefine
 // --- Charts ------------------------------------------------------------------------------------
 
 /**
- * A chart only changes with a new run, profile or estimate, which also brings new version refs;
- * so revision and time come from its source and a reload of unchanged data stays a duplicate.
+ * A chart only changes with a new run, profile or estimate. Revision and time come from that
+ * source: a reload of unchanged data stays a duplicate, and a newer source counts up, so the card
+ * shows "Updated".
  */
 function stable(updatedAt: string) {
-  return { revision: 1, updatedAt };
+  return { revision: Date.parse(updatedAt) || 1, updatedAt };
 }
 
 function refs(run: LifeAnalysis) {
