@@ -14,6 +14,7 @@ import type {
   PrivacyNoticeResponse,
   SessionResponse,
   SummaryBundle as CaseSummaries,
+  SuitabilityView,
 } from '@pax/contracts';
 import { firstValueFrom } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
@@ -98,6 +99,11 @@ export class CustomerApi {
   /** Customer and advisor projection of one snapshot, in the case's language. */
   loadSummaries(caseId: string): Promise<CaseSummaries> {
     return firstValueFrom(this.http.get<CaseSummaries>(`${this.caseUrl(caseId)}/summaries`));
+  }
+
+  /** Suitability pre-checks for fund-linked products (Pax form 0054, not binding). */
+  loadSuitability(caseId: string): Promise<SuitabilityView> {
+    return firstValueFrom(this.http.get<SuitabilityView>(`${this.caseUrl(caseId)}/suitability`));
   }
 
   /** The call history a linked voice agent recorded. */

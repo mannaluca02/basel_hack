@@ -145,6 +145,7 @@ describe('ApiDataSource', () => {
     http.expectOne(`/api/cases/${CASE_ID}/advisor/context`).flush(mueller.context);
     http.expectOne(`/api/cases/${CASE_ID}/summaries`).flush(mueller.summaries);
     http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({ turns: [] });
+    http.expectOne(`/api/cases/${CASE_ID}/suitability`).flush({ checks: [] });
     await new Promise((resolve) => setTimeout(resolve));
 
     const types = events.map((event) => event.type);
@@ -186,6 +187,7 @@ describe('ApiDataSource', () => {
     const missing = { status: 404, statusText: 'Not Found' };
     http.expectOne(`/api/cases/${CASE_ID}/advisor/context`).flush({ code: 'NOT_FOUND' }, missing);
     http.expectOne(`/api/cases/${CASE_ID}/summaries`).flush({ code: 'NOT_FOUND' }, missing);
+    http.expectOne(`/api/cases/${CASE_ID}/suitability`).flush({ code: 'NOT_FOUND' }, missing);
     http.expectOne(`/api/cases/${CASE_ID}/voice/agent-turns`).flush({
       turns: [{ messageId: 'conv_a0', conversationId: 'conv', speaker: 'agent', text: 'Hoi', at: '2026-10-31T12:00:00.000Z' }],
     });
