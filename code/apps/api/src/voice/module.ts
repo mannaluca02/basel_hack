@@ -82,6 +82,21 @@ class CaseVoiceController {
     @Body()
     body: unknown) { return this.r.voice.close(req.actor, uuid(id), uuid(sid), body); }
 }
-@Module({ controllers: [PublicVoiceController, CaseVoiceController] })
+@Controller('api/cases/:caseId/voice/agent-observations')
+@UseGuards(LifeSessionGuard)
+class ExternalVoiceController {
+    constructor(
+    @Inject(LIFE_RUNTIME)
+    private readonly r: LifeRuntime) { }
+    @Post()
+    observations(
+    @Req()
+    req: Request,
+    @Param('caseId')
+    id: string,
+    @Body()
+    body: unknown) { return this.r.voice.proposeExternal(req.actor, uuid(id), body); }
+}
+@Module({ controllers: [PublicVoiceController, CaseVoiceController, ExternalVoiceController] })
 export class VoiceModule {
 }

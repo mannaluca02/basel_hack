@@ -1,12 +1,24 @@
 import { randomUUID } from 'node:crypto';
 import { CreateVoiceSessionSchema, VoiceSessionSchema, VoiceSessionStartResponseSchema, VoiceTurnInputSchema, VoiceTranscriptSchema, CloseVoiceSessionSchema, VoiceExtractionInputSchema, VoiceExtractionResponseSchema, VOICE_NOTICE_VERSION, type VoiceSession } from '@pax/contracts';
-import type { z } from 'zod';
+import { z } from 'zod';
+import { VoiceObservationSchema } from '@pax/contracts';
 import { LifeInsuranceEngine } from '../insurance/engine.js';
 import { ExtractionWorkflow } from '../insurance/extraction.js';
 import { WorkflowError, type Actor, type InsuranceCase, type StoredVoiceSession } from '../insurance/types.js';
 import { sha256Json } from '../calculation/hash.js';
 import { gatewaysFor, type VoiceOptions, type VoiceGateway } from './providers.js';
 import { mapVoiceObservations, portfolioCatalog } from './portfolio.js';
+/**
+ * Observations from a separately running voice agent (Paxi) that holds its own provider session.
+ * It quotes the final customer turns it relied on; no audio and no full transcript reach the case.
+ */
+export const ExternalVoiceObservationsSchema = z.object({
+    messageId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/), conversationId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/),
+    expectedCaseRevision: z.number().int().positive(), expectedProfileVersion: z.number().int().positive().nullable(), basisDraftHash: z.string().regex(/^[a-f0-9]{64}$/),
+    turns: z.array(z.object({ messageId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/), turnId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/), text: z.string().min(1).max(4000) }).strict()).min(1).max(24),
+    observations: z.array(VoiceObservationSchema).min(1).max(50),
+    supersedesBatchIds: z.array(z.string().regex(/^[A-Za-z0-9_-]{1,120}$/)).max(20).default([]),
+}).strict();
 const active = (s: StoredVoiceSession) => s.status === 'active' || s.status === 'starting';
 const now = () => new Date().toISOString();
 const prompt = (locale: string) => `You are Paxi, a friendly voice intake assistant. Speak ${locale}. This is a synthetic-data demonstration only. Ask one short question at a time. Never ask for real names, full birth dates, identifying details or health data. Never invent missing amounts, average a range, infer a risk appetite or calculate pension/tax limits. Ask for clarification. Collect annual gross income explicitly separately from monthly net income. All calculations, proposed changes and confirmations belong to the case backend. Never claim that data is confirmed or a colleague will call. Never confirm a profile, accept a contract or place a call. Stop immediately when the application requests handover. Financial recommendations require backend-approved facts; do not improvise them.`;
@@ -166,6 +178,37 @@ export class VoiceIntegrationService {
             this.notify(c, 'voice_turn_available', s.id);
             this.engine.audit(db, actor, c, 'voice_turn_finalized');
             return { voiceSession: this.dto(s), replayed: false };
+        });
+    }
+    /** Same mapping and gates as a backend voice session, for a voice agent with its own provider session. */
+    async proposeExternal(actor: Actor, id: string, input: unknown) {
+        this.engine.sessions.assertActive(actor);
+        if (actor.role !== 'advisor')
+            throw new WorkflowError('FORBIDDEN', 403);
+        if (!this.enabled)
+            throw new WorkflowError('VOICE_PROVIDER_DISABLED', 503);
+        this.engine.caseFor(actor, id, true);
+        const b = ExternalVoiceObservationsSchema.parse(input);
+        return this.engine.store.transaction(db => {
+            const c = db.cases[id];
+            if (!c || c.ownerId !== actor.id || actor.caseId !== id || c.expiresAt <= now())
+                throw new WorkflowError('NOT_FOUND', 404);
+            const turnOf = (messageId: string) => b.turns.find(t => t.messageId === messageId);
+            for (const observation of b.observations) {
+                const turn = turnOf(observation.sourceMessageId);
+                if (!turn || !turn.text.toLocaleLowerCase().includes(observation.quote.toLocaleLowerCase()))
+                    throw new WorkflowError('VOICE_SOURCE_NOT_FOUND', 422);
+            }
+            const mapped = mapVoiceObservations(c.draft, b.observations, c.locale);
+            const sourceRef = (messageId: string) => `voice-agent:${b.conversationId}:${messageId}`;
+            const source = (messageId: string) => ({ messageId: b.messageId, turnId: turnOf(messageId)!.turnId, sourceRef: sourceRef(messageId) });
+            const batch = mapped.changes.length || mapped.questions.length ? this.extraction.proposeBatchInTransaction(actor, c, db, { messageId: b.messageId,
+                expectedCaseRevision: b.expectedCaseRevision, expectedProfileVersion: b.expectedProfileVersion, basisDraftHash: b.basisDraftHash,
+                source: source(b.observations[0]!.sourceMessageId), changes: mapped.changes,
+                ambiguities: mapped.questions.map(({ sourceMessageId, ...q }) => ({ ...q, source: source(sourceMessageId) })),
+                supersedesBatchIds: b.supersedesBatchIds, supersedesProposalIds: [], resolvesAmbiguityIds: [] }) : null;
+            this.engine.audit(db, actor, c, 'external_voice_observations_mapped');
+            return { caseId: id, caseRevision: c.caseRevision, contextRevision: c.contextRevision, mappingVersion: 'voice-portfolio-v1', proposalBatch: batch, issues: mapped.issues, confirmationStillRequired: true };
         });
     }
     async propose(actor: Actor, id: string, sessionId: string, input: unknown) {
