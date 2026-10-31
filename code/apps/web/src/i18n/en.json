@@ -284,5 +284,11 @@
       "voiceOpened": "Paxi is open in its own window. What you tell Paxi shows up here as a proposal to review.",
       "voiceFailed": "Paxi could not be connected. Is the voice agent running?"
     }
+  },
+  "connection": {
+    "lost": "The connection to the advisor is interrupted.",
+    "reconnecting": "Reconnecting …",
+    "paused": "Until then no new figures arrive; the ones shown may be outdated.",
+    "retry": "Reconnect"
   }
 }

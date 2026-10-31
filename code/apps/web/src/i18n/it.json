@@ -284,5 +284,11 @@
       "voiceOpened": "Paxi è aperto in una finestra separata. Quello che racconti appare qui come proposta da verificare.",
       "voiceFailed": "Impossibile collegare Paxi. L'agente vocale è avviato?"
     }
+  },
+  "connection": {
+    "lost": "La connessione al consulente è interrotta.",
+    "reconnecting": "La connessione viene ristabilita …",
+    "paused": "Fino ad allora non arrivano nuovi dati; quelli mostrati possono essere superati.",
+    "retry": "Riconnetti"
   }
 }

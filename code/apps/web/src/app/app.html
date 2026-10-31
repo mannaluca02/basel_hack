@@ -16,6 +16,7 @@
   </main>
 } @else {
   <main class="view" #view tabindex="-1">
+    <app-connection-banner />
     @if (reviewEnabled) {
       <app-review-panel />
     }

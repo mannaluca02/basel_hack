@@ -284,5 +284,11 @@
       "voiceOpened": "Paxi ist in einem eigenen Fenster offen. Was du erzählst, erscheint hier als Vorschlag zum Prüfen.",
       "voiceFailed": "Paxi konnte nicht verbunden werden. Läuft der Voice-Agent?"
     }
+  },
+  "connection": {
+    "lost": "Die Verbindung zum Berater ist unterbrochen.",
+    "reconnecting": "Die Verbindung wird wiederhergestellt …",
+    "paused": "Bis dahin kommen keine neuen Zahlen; die angezeigten können veraltet sein.",
+    "retry": "Erneut verbinden"
   }
 }
