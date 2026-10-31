@@ -20,22 +20,19 @@ describe('ColorScheme', () => {
 
   function setup(dark: boolean): ColorScheme {
     query = new FakeMediaQuery(dark);
-    vi.spyOn(window, 'matchMedia').mockImplementation((media) => {
+    window.matchMedia = vi.fn((media: string) => {
       expect(media).toBe('(prefers-color-scheme: dark)');
       return query as unknown as MediaQueryList;
     });
     return TestBed.inject(ColorScheme);
   }
 
-  beforeEach(() => {
-    // jsdom lacks the property entirely, so spyOn needs something to wrap.
-    window.matchMedia ??= () => {
-      throw new Error('matchMedia not stubbed');
-    };
-  });
+  // jsdom has no matchMedia. Specs share one window, so the fake goes back out after each test:
+  // a leftover would answer in every later spec whose services read the OS preferences.
+  const originalMatchMedia = window.matchMedia;
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    window.matchMedia = originalMatchMedia;
     root.style.removeProperty('--chart-1');
   });
 

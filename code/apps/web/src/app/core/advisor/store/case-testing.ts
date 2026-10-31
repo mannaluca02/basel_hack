@@ -8,7 +8,16 @@ import {
   emptySnapshot,
 } from '../advisor-data-source';
 import { AdvisorContextUpdate, AgentReply, AnalysisResult, ProgressSnapshot } from '../contracts';
-import { InfoItem, LifeEventsChart, RiskItem, TranscriptEntry } from '../ui-models';
+import {
+  EventImpactChart,
+  IncomeTimelineChart,
+  InfoItem,
+  LifeEventsChart,
+  MoneySeries,
+  Pillar3aGrowthChart,
+  RiskItem,
+  TranscriptEntry,
+} from '../ui-models';
 
 /** Synthetic fixtures for the store specs. No persona data. */
 
@@ -43,6 +52,83 @@ export function chart(overrides: Partial<LifeEventsChart> = {}): LifeEventsChart
     fromYear: 2020,
     toYear: 2060,
     events: [],
+    ...overrides,
+  };
+}
+
+const valid = (values: readonly (number | null)[]): MoneySeries => ({ values, status: 'valid' });
+
+/** Two years; pillar 2 and the gap are unknown in the second one. Amounts in Rappen. */
+export function incomeChart(overrides: Partial<IncomeTimelineChart> = {}): IncomeTimelineChart {
+  return {
+    chartId: 'chart_income',
+    type: 'income_timeline',
+    status: 'needs_input',
+    revision: 1,
+    updatedAt: AT,
+    reviewReasons: [],
+    profileVersion: 1,
+    scenarioVersionId: 'scenario_1',
+    runId: 'run_01',
+    unit: { currency: 'CHF', unit: 'cent', period: 'year', basis: 'gross' },
+    years: [2030, 2060],
+    series: {
+      employment: valid([10_000_000, 0]),
+      pillar1: { values: [0, 3_000_000], status: 'estimated' },
+      pillar2: { values: [0, null], status: 'needs_input' },
+      pillar3: valid([0, 600_000]),
+      gap: { values: [0, null], status: 'needs_input' },
+    },
+    target: valid([null, 8_000_000]),
+    ...overrides,
+  };
+}
+
+export function impactChart(overrides: Partial<EventImpactChart> = {}): EventImpactChart {
+  return {
+    chartId: 'chart_impact',
+    type: 'event_impact',
+    status: 'estimated',
+    revision: 1,
+    updatedAt: AT,
+    reviewReasons: [],
+    profileVersion: 1,
+    scenarioVersionId: 'scenario_1',
+    runId: 'run_01',
+    unit: { currency: 'CHF', unit: 'cent', period: 'month', basis: 'gross' },
+    scenarios: [
+      {
+        event: 'disability',
+        personId: 'person_test',
+        status: 'estimated',
+        incomeBefore: 1_000_000,
+        incomeAfter: { employment: 400_000, pillar1: 200_000, pillar2: 300_000, pillar3: 0 },
+        needed: 950_000,
+        gap: 50_000,
+      },
+    ],
+    ...overrides,
+  };
+}
+
+export function pillar3aChart(overrides: Partial<Pillar3aGrowthChart> = {}): Pillar3aGrowthChart {
+  return {
+    chartId: 'chart_3a',
+    type: 'pillar3a_growth',
+    status: 'valid',
+    revision: 1,
+    updatedAt: AT,
+    reviewReasons: [],
+    profileVersion: 1,
+    scenarioVersionId: 'scenario_1',
+    runId: 'run_01',
+    unit: { currency: 'CHF', unit: 'cent', period: 'once', basis: 'capital' },
+    years: [2030, 2040],
+    series: {
+      withContributions: valid([1_000_000, 8_000_000]),
+      withoutContributions: valid([1_000_000, 1_200_000]),
+    },
+    taxSaving: null,
     ...overrides,
   };
 }

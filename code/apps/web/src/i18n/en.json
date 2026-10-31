@@ -15,7 +15,79 @@
     "openRisks": "{{count}} open"
   },
   "graphics": {
-    "title": "Graphics"
+    "title": "Graphics",
+    "empty": "Charts appear here as soon as the conversation provides the information they need.",
+    "newChart": "New chart",
+    "updated": "Updated",
+    "legend": "Legend",
+    "unknown": "unknown",
+    "announce": {
+      "new": "New chart: {{title}}",
+      "updated": "Chart updated: {{title}}"
+    },
+    "chart": {
+      "income_timeline": "Income until and after retirement",
+      "event_impact": "Income after a life event",
+      "pillar3a_growth": "Pillar 3a growth",
+      "life_events": "Life events"
+    },
+    "status": {
+      "valid": "Calculated",
+      "estimated": "Estimated",
+      "requires_review": "Under review",
+      "needs_input": "Information missing",
+      "provider_error": "Calculation failed",
+      "stale": "Out of date"
+    },
+    "unit": {
+      "month": "CHF per month",
+      "year": "CHF per year",
+      "once": "CHF"
+    },
+    "basis": {
+      "gross": "gross",
+      "net_before_income_tax": "net before income tax",
+      "net_after_income_tax": "net after income tax",
+      "capital": "capital"
+    },
+    "series": {
+      "employment": "Employment income",
+      "pillar1": "Pillar 1 (AHV/IV)",
+      "pillar2": "Pillar 2 (pension fund)",
+      "pillar3": "Pillar 3",
+      "gap": "Gap",
+      "target": "Target income",
+      "before": "Income before",
+      "needed": "Income needed",
+      "withContributions": "With yearly contributions",
+      "withoutContributions": "Without further contributions"
+    },
+    "event": {
+      "disability": "Disability",
+      "death": "Death",
+      "retirement": "Retirement"
+    },
+    "certainty": {
+      "past": "Past",
+      "confirmed": "Confirmed",
+      "planned": "Planned"
+    },
+    "table": {
+      "show": "Show data as a table",
+      "hide": "Hide table",
+      "year": "Year",
+      "scenario": "Event",
+      "event": "Life event",
+      "certainty": "Certainty",
+      "status": "Status"
+    },
+    "scenario": "Scenario",
+    "impact": {
+      "before": "Before",
+      "after": "After"
+    },
+    "neededLine": "Needed: {{amount}}",
+    "payout": "Paid out at retirement ({{year}})"
   },
   "risks": {
     "title": "Risks"

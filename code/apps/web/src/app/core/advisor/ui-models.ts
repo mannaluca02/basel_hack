@@ -136,6 +136,11 @@ export interface Pillar3aGrowthChart extends ChartBase {
   readonly years: readonly number[];
   readonly series: Readonly<Record<'withContributions' | 'withoutContributions', MoneySeries>>;
   readonly taxSaving: Money | null;
+  /**
+   * Year the 3a capital is paid out, usually the retirement year. Frontend proposal for FE-06
+   * (#13): the chart marks it; without it the chart simply ends.
+   */
+  readonly payoutYear?: number;
 }
 
 export type LifeEventKind = 'marriage' | 'child_birth' | 'home_purchase' | 'retirement' | 'today';

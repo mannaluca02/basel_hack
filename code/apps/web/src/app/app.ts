@@ -5,12 +5,15 @@ import {
   Injector,
   afterNextRender,
   computed,
+  effect,
   inject,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
+  NavigationCancel,
   NavigationEnd,
+  NavigationError,
   NavigationStart,
   Router,
   RouterLink,
@@ -23,6 +26,7 @@ import { WorkspaceTab } from './core/advisor/store/case-state';
 import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
+import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
 import { ReviewPanel } from './features/review/review-panel';
@@ -57,6 +61,7 @@ export class App {
   private readonly store = inject(CaseStore);
   private readonly consent = inject(Consent);
   private readonly injector = inject(Injector);
+  private readonly scroller = inject(ViewScroller);
   private readonly view = viewChild<ElementRef<HTMLElement>>('view');
   /** Scroll offset of the Dynamic View per tab path. */
   private readonly scrollTops = new Map<string, number>();
@@ -97,10 +102,29 @@ export class App {
       if (!view) return;
       if (event instanceof NavigationStart) {
         this.scrollTops.set(pathOf(router.url), view.scrollTop);
+        this.scroller.unsettle();
       } else if (event instanceof NavigationEnd) {
         const top = this.scrollTops.get(pathOf(event.urlAfterRedirects)) ?? 0;
-        afterNextRender({ write: () => (view.scrollTop = top) }, { injector: this.injector });
+        afterNextRender(
+          {
+            write: () => {
+              view.scrollTop = top;
+              this.scroller.settle();
+            },
+          },
+          { injector: this.injector },
+        );
+      } else if (event instanceof NavigationCancel || event instanceof NavigationError) {
+        this.scroller.settle();
       }
+    });
+
+    // The Dynamic View exists only after consent; feed tabs read and scroll it via ViewScroller.
+    effect((onCleanup) => {
+      const view = this.view()?.nativeElement;
+      if (!view) return;
+      this.scroller.attach(view);
+      onCleanup(() => this.scroller.detach());
     });
 
     // Consent lasts the browser session, so after a reload the call resumes right away.

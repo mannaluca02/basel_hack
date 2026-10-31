@@ -15,7 +15,79 @@
     "openRisks": "{{count}} offen"
   },
   "graphics": {
-    "title": "Grafiken"
+    "title": "Grafiken",
+    "empty": "Die Grafiken erscheinen hier, sobald das Gespräch die nötigen Angaben liefert.",
+    "newChart": "Neue Grafik",
+    "updated": "Aktualisiert",
+    "legend": "Legende",
+    "unknown": "unbekannt",
+    "announce": {
+      "new": "Neue Grafik: {{title}}",
+      "updated": "Grafik aktualisiert: {{title}}"
+    },
+    "chart": {
+      "income_timeline": "Einkommen bis und nach der Pensionierung",
+      "event_impact": "Einkommen nach einem Ereignis",
+      "pillar3a_growth": "Entwicklung der Säule 3a",
+      "life_events": "Lebensereignisse"
+    },
+    "status": {
+      "valid": "Berechnet",
+      "estimated": "Geschätzt",
+      "requires_review": "Wird geprüft",
+      "needs_input": "Angaben fehlen",
+      "provider_error": "Berechnung fehlgeschlagen",
+      "stale": "Veraltet"
+    },
+    "unit": {
+      "month": "CHF pro Monat",
+      "year": "CHF pro Jahr",
+      "once": "CHF"
+    },
+    "basis": {
+      "gross": "brutto",
+      "net_before_income_tax": "netto vor Einkommenssteuer",
+      "net_after_income_tax": "netto nach Einkommenssteuer",
+      "capital": "Kapital"
+    },
+    "series": {
+      "employment": "Erwerbseinkommen",
+      "pillar1": "1. Säule (AHV/IV)",
+      "pillar2": "2. Säule (Pensionskasse)",
+      "pillar3": "3. Säule",
+      "gap": "Lücke",
+      "target": "Zieleinkommen",
+      "before": "Einkommen vorher",
+      "needed": "Benötigtes Einkommen",
+      "withContributions": "Mit jährlichen Einzahlungen",
+      "withoutContributions": "Ohne weitere Einzahlungen"
+    },
+    "event": {
+      "disability": "Invalidität",
+      "death": "Todesfall",
+      "retirement": "Pensionierung"
+    },
+    "certainty": {
+      "past": "Vergangen",
+      "confirmed": "Bestätigt",
+      "planned": "Geplant"
+    },
+    "table": {
+      "show": "Daten als Tabelle anzeigen",
+      "hide": "Tabelle ausblenden",
+      "year": "Jahr",
+      "scenario": "Ereignis",
+      "event": "Lebensereignis",
+      "certainty": "Stand",
+      "status": "Status"
+    },
+    "scenario": "Szenario",
+    "impact": {
+      "before": "Vorher",
+      "after": "Nachher"
+    },
+    "neededLine": "Benötigt: {{amount}}",
+    "payout": "Auszahlung bei Pensionierung ({{year}})"
   },
   "risks": {
     "title": "Risiken"
