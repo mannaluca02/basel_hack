@@ -1,21 +1,23 @@
-<header class="bar">
-  <span class="brand">{{ 'app.name' | transloco }}</span>
+<header class="bar" [inert]="introShown()">
+  <app-pax-logo class="logo" />
+  <span class="brand">{{ 'app.product' | transloco }}</span>
   <span class="demo">
     <span aria-hidden="true">{{ 'demo.badge' | transloco }}</span>
     <span class="visually-hidden">{{ 'demo.label' | transloco }}</span>
   </span>
-  <!-- Before consent there is no rail, so the switcher stays in the header until then. -->
-  @if (!consented()) {
-    <app-language-switcher />
+  <!-- Only once Paxi has made room for the content; until then Paxi has the stage alone. -->
+  @if (spot() === 'corner') {
+    <app-language-switcher class="language" />
   }
 </header>
 
 @if (!consented()) {
-  <main class="view">
-    <app-consent-screen (started)="start()" />
-  </main>
+  <!-- On the logo intro, only before consent, so a returning user never loads it. -->
+  @defer (on immediate) {
+    <app-consent-banner [voice]="autoCall" (agreed)="start()" />
+  }
 } @else {
-  <main class="view" #view tabindex="-1">
+  <main class="view" #view tabindex="-1" [inert]="introShown()">
     <app-connection-banner />
     <app-human-advisor-status />
     @if (callControls) {
@@ -27,9 +29,19 @@
     <router-outlet />
   </main>
 
-  <div class="rail">
-    <app-language-switcher placement="rail" />
+  <app-paxi-stage
+    class="stage"
+    [inert]="introShown()"
+    [spot]="spot()"
+    [progress]="progress()"
+    [activity]="activity()"
+    [audio]="audio()"
+    [caption]="caption()"
+    [hint]="hint()"
+    [veiled]="!revealed()"
+  />
 
+  <div class="tabbar" [inert]="introShown()">
     <nav class="tabs" [attr.aria-label]="'nav.label' | transloco">
       @for (tab of tabs; track tab.id) {
         @let fresh = unread()[tab.id] > 0;
@@ -71,10 +83,15 @@
         <app-live-voice-control class="live-voice" />
       }
     }
-
-    <!-- Lukas's avatar renderer goes inside, as projected content. -->
-    <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()" />
   </div>
 
-  <app-summary-dialog />
+  <app-summary-dialog [inert]="introShown()" />
+}
+
+@if (introShown()) {
+  @defer (on immediate) {
+    <app-logo-intro #intro />
+  } @placeholder {
+    <div class="intro-placeholder"></div>
+  }
 }

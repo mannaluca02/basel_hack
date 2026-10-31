@@ -157,7 +157,8 @@
     }
   },
   "app": {
-    "name": "Pax Digital Advisor"
+    "name": "Pax Digital Advisor",
+    "product": "Digital Advisor"
   },
   "language": {
     "label": "Langue",
@@ -361,8 +362,17 @@
       "body": "Pendant l’entretien, vous pouvez demander à tout moment une conseillère ou un conseiller : il suffit de le dire. Les cas complexes ou lourds de conséquences sont transmis automatiquement à un spécialiste."
     },
     "session": "Votre consentement ne vaut que pour cet onglet du navigateur et prend fin lorsque vous le fermez.",
-    "agree": "J’ai lu cette information et j’accepte que mes données soient traitées comme décrit.",
-    "start": "Commencer le conseil"
+    "banner": {
+      "text": "Paxi vous conseille sur votre prévoyance, uniquement avec des indications fictives : ne communiquez aucune donnée réelle.",
+      "textVoice": "Paxi vous parle de votre prévoyance : le microphone et l’entretien sont transmis à OpenAI. Uniquement des indications fictives.",
+      "details": "Détails sur la protection des données",
+      "agree": "J’accepte",
+      "decline": "Je refuse",
+      "declined": "Sans votre consentement, Paxi ne peut pas vous conseiller."
+    },
+    "details": {
+      "close": "Fermer"
+    }
   },
   "dock": {
     "open": "Ouvrir le résumé",
@@ -512,5 +522,8 @@
     "accept": "Reprendre et recalculer",
     "accepting": "Reprise en cours …",
     "acceptFailed": "La reprise n’a pas fonctionné. Veuillez réessayer."
+  },
+  "paxi": {
+    "hint": "Touchez le microphone en bas à droite pour parler avec Paxi."
   }
 }

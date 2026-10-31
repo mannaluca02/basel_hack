@@ -1,24 +1,25 @@
-// Whiteboard layout: Dynamic View left, vertical tab rail right, agent dock at the bottom of
-// the rail. The dock has its own place in the rail, so it never covers the Dynamic View.
-// Only the Dynamic View scrolls; header and rail stay put.
+// Header on top, Dynamic View in the middle, tab bar at the bottom. Paxi stands on a layer over
+// the Dynamic View: in the centre while there is nothing to show, then in the bottom right
+// corner (see PaxiPlacement). Only the Dynamic View scrolls; header and tab bar stay put.
 :host {
-  // Icon-only rail: the tab (at least a 44px touch target) plus room for its focus ring.
   --tab-size: 3rem;
-  --tab-gap: 1rem;
   --icon-size: 1.5rem;
-  --rail-width: calc(var(--tab-size) + 4 * var(--stroke-focusring));
-  // The avatar with its ring: as wide as a tab, so the rail stays narrow.
-  --dock-size: var(--tab-size);
+  // Paxi's two spots, read by the stage and by the Dynamic View that makes room for him.
+  --paxi-top: 1.5rem;
+  --paxi-centre: clamp(8rem, 28dvh, 14rem);
+  --paxi-corner: 5.175rem;
+  --paxi-gap: 0.75rem;
 
   display: grid;
   grid-template:
-    'bar rail' auto
-    'view rail' minmax(0, 1fr)
-    / minmax(0, 1fr) calc(var(--rail-width) + env(safe-area-inset-right));
+    'bar' auto
+    'view' minmax(0, 1fr)
+    'tabs' auto
+    / minmax(0, 1fr);
   height: 100dvh;
 }
 
-// Before consent: header and privacy notice only, no rail.
+// Before consent: header only, under the logo intro and the consent banner.
 :host(.gated) {
   grid-template:
     'bar' auto
@@ -29,21 +30,29 @@
 @media (min-width: 768px) {
   :host {
     --tab-size: 3.25rem;
-    --tab-gap: 1.25rem;
     --icon-size: 1.75rem;
+    --paxi-corner: 6.9rem;
+    --paxi-gap: 1.25rem;
   }
 }
 
+// Logo, product name and Demo badge on the left, language on the right, one baseline.
 .bar {
   grid-area: bar;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, auto) auto 1fr auto;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
+  column-gap: 0.75rem;
+  min-height: 3.5rem;
   padding: 0.5rem 1rem;
   padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-right: max(1rem, env(safe-area-inset-right));
   padding-left: max(1rem, env(safe-area-inset-left));
   border-bottom: var(--stroke-border) solid var(--border-soft);
+}
+
+.logo {
+  height: 1.75rem;
 }
 
 .brand {
@@ -56,7 +65,6 @@
 
 // Always visible: the whole app runs on synthetic data only.
 .demo {
-  flex: none;
   padding: 0.125rem 0.5rem;
   border-radius: var(--radius-full);
   color: var(--text-inverse);
@@ -67,8 +75,24 @@
   text-transform: uppercase;
 }
 
-.bar app-language-switcher {
-  margin-left: auto;
+// Its column stays when the switcher is hidden, so the header keeps its layout.
+.language {
+  grid-column: 5;
+}
+
+// Phones: the product name gives way, the logo still names the app.
+@media (max-width: 479px) {
+  .brand {
+    display: none;
+  }
+}
+
+// The intro's purple while its chunk loads, so the workspace never flashes.
+.intro-placeholder {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: var(--intro-bg);
 }
 
 .view {
@@ -77,8 +101,11 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 1rem;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  // Room for Paxi in the corner, so he never covers the last card.
+  padding-bottom: max(calc(var(--paxi-corner) + 2 * var(--paxi-gap)), env(safe-area-inset-bottom));
   padding-left: max(1rem, env(safe-area-inset-left));
+  // Same pace as Paxi's move to the corner (PaxiStage), so content and Paxi travel together.
+  transition: padding-top 900ms cubic-bezier(0.65, 0, 0.2, 1);
 
   // Focused by script only, as the landing point after consent; not a control, so no ring.
   &:focus-visible {
@@ -87,40 +114,49 @@
   }
 }
 
-.rail {
-  grid-area: rail;
-  // Above the Dynamic View, so a tab's tooltip can overlap it.
+// Paxi in the centre: the content starts below him and his caption.
+:host([data-paxi='centre']) .view {
+  padding-top: calc(var(--paxi-top) + var(--paxi-centre) + 6rem);
+}
+
+.stage {
+  grid-area: view;
   z-index: 1;
+}
+
+.tabbar {
+  grid-area: tabs;
+  // Above Paxi's layer, so the live voice's panel can open over the Dynamic View.
+  z-index: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--tab-gap);
-  min-height: 0;
-  padding: 0.5rem 0;
-  padding-top: max(0.5rem, env(safe-area-inset-top));
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-  border-left: var(--stroke-border) solid var(--border-soft);
+  gap: 0.5rem;
+  padding: 0.25rem 1rem;
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  border-top: var(--stroke-border) solid var(--border-soft);
   background: var(--bg-default);
 }
 
 .tabs {
   display: flex;
   flex: 1;
-  flex-direction: column;
-  // Tabs sit at the bottom, just above the dock: within thumb reach on phones.
-  justify-content: flex-end;
-  gap: var(--tab-gap);
-  // Room for the focus ring.
-  padding: calc(2 * var(--stroke-focusring));
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 .tab {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--tab-size);
-  height: var(--tab-size);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  max-width: 7.5rem;
+  min-height: var(--tab-size);
+  padding: 0.375rem 0.25rem;
   border-radius: var(--radius-m);
   color: var(--text-default);
   text-decoration: none;
@@ -140,46 +176,23 @@
   &::before {
     content: '';
     position: absolute;
-    inset: 0.625rem auto 0.625rem 0;
-    width: 0.1875rem;
+    inset: 0 1rem auto;
+    height: 0.1875rem;
     border-radius: var(--radius-full);
     background: var(--icon-brand);
   }
 }
 
-// The tab's accessible name. Invisible until hover (mouse) or keyboard focus, then shown as a
-// tooltip next to the rail. On phones the open tab's heading names it.
 .label {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 0.5rem);
-  padding: 0.25rem 0.5rem;
-  border: var(--stroke-border) solid var(--border-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-default);
-  background: var(--bg-default);
-  font-size: 0.8125rem;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.75rem;
   white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-50%);
-  transition: opacity 120ms ease-out;
+  text-overflow: ellipsis;
 }
 
-.tab:focus-visible .label {
-  opacity: 1;
-}
-
-@media (hover: hover) {
-  .tab:hover .label {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .label {
-    transition: none;
-  }
+.tab--active .label {
+  font-weight: 700;
 }
 
 .glyph {
@@ -216,18 +229,16 @@
   }
 }
 
+.live-voice {
+  flex: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .view {
+    transition: none;
+  }
+
   .dot {
     animation: none;
   }
-}
-
-.dock {
-  flex: none;
-  width: var(--dock-size);
-  height: var(--dock-size);
-}
-
-.live-voice {
-  flex: none;
 }

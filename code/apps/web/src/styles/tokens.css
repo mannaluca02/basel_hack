@@ -133,6 +133,16 @@
   --chart-6: var(--color-chart-red);
   --chart-7: var(--color-chart-silver);
   --chart-8: var(--color-chart-beige);
+
+  /* Pax logo: Pax Green letters, the "." in Deep Purple (positive version). */
+  --logo-letters: var(--color-brand-pax-green);
+  --logo-dot: var(--color-brand-deep-purple);
+  /* Logo intro before consent: the negative logo on Pax Purple, in both themes. */
+  --intro-bg: var(--color-brand-pax-purple);
+  --intro-dot: var(--color-neutral-white);
+  --intro-eye: var(--color-brand-pax-purple);
+  /* The square the "." grows into on its way to Paxi; Paxi's body is Pax Green. */
+  --intro-paxi: var(--color-brand-pax-green);
 }
 
 @media (min-width: 1024px) {
@@ -174,5 +184,8 @@
     /* Pax Green on gray-4 is 1.16:1; on gray-7 it is 7.62:1. */
     --border-track: var(--color-neutral-gray-7);
     --border-warning: var(--color-neutral-gray-2);
+
+    /* Negative logo on the dark page. */
+    --logo-dot: var(--color-neutral-white);
   }
 }

@@ -4,7 +4,6 @@ import {
   ElementRef,
   ErrorHandler,
   inject,
-  input,
   signal,
   viewChild,
 } from '@angular/core';
@@ -24,15 +23,14 @@ let nextId = 0;
 /**
  * Flag button with a disclosure list of flag and language name. A native select cannot show
  * images. The flags are decorative: the button and every option are named in words.
- * Lives in the app shell, so it is reachable from every screen including consent: in the header
- * before consent, at the top of the tab rail after it.
+ * Lives in the app header, shown once Paxi has moved to the corner (FE-28); before that the app
+ * uses the stored or browser language.
  */
 @Component({
   selector: 'app-language-switcher',
   imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[class.in-rail]': "placement() === 'rail'",
     '(keydown.escape)': 'close(true)',
     '(focusout)': 'onFocusOut($event)',
     '(document:click)': 'onDocumentClick($event)',
@@ -126,31 +124,7 @@ let nextId = 0;
       transform: rotate(180deg);
     }
 
-    // In the rail: a borderless square like the tabs, flag only; the list opens beside the rail.
-    :host(.in-rail) .trigger {
-      justify-content: center;
-      width: var(--tab-size, 3rem);
-      height: var(--tab-size, 3rem);
-      padding: 0;
-      border: 0;
-      border-radius: var(--radius-m);
-
-      @media (hover: hover) {
-        &:hover {
-          background: var(--bg-muted);
-        }
-      }
-    }
-
-    :host(.in-rail) .chevron {
-      display: none;
-    }
-
-    :host(.in-rail) [aria-expanded='true'] {
-      background: var(--bg-muted);
-    }
-
-    // Above the Dynamic View and the rail.
+    // Above the Dynamic View and Paxi.
     .menu {
       position: absolute;
       top: calc(100% + 0.25rem);
@@ -163,11 +137,6 @@ let nextId = 0;
       border-radius: var(--radius-m);
       background: var(--bg-default);
       list-style: none;
-    }
-
-    :host(.in-rail) .menu {
-      top: 0;
-      right: calc(100% + 0.5rem);
     }
 
     .option {
@@ -208,9 +177,6 @@ export class LanguageSwitcher {
   private readonly errorHandler = inject(ErrorHandler);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
-
-  /** `rail`: compact, for the tab rail; `bar`: with chevron and border, for the header. */
-  readonly placement = input<'bar' | 'rail'>('bar');
 
   protected readonly languages = LANGUAGES;
   protected readonly names = LANGUAGE_NAMES;

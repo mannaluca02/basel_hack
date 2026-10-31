@@ -157,7 +157,8 @@
     }
   },
   "app": {
-    "name": "Pax Digital Advisor"
+    "name": "Pax Digital Advisor",
+    "product": "Digital Advisor"
   },
   "language": {
     "label": "Sprache",
@@ -361,8 +362,17 @@
       "body": "Sie können während des Gesprächs jederzeit eine Beraterin oder einen Berater verlangen: Sagen Sie es einfach. Komplexe oder folgenreiche Fälle werden automatisch an eine Fachperson übergeben."
     },
     "session": "Ihre Einwilligung gilt nur für diesen Browser-Tab und endet, wenn Sie ihn schliessen.",
-    "agree": "Ich habe diesen Hinweis gelesen und bin einverstanden, dass meine Angaben wie beschrieben bearbeitet werden.",
-    "start": "Beratung starten"
+    "banner": {
+      "text": "Paxi berät Sie zu Ihrer Vorsorge, nur mit erfundenen Angaben: Bitte nennen Sie keine echten Daten.",
+      "textVoice": "Paxi spricht mit Ihnen über Ihre Vorsorge: Mikrofon und Gespräch gehen an OpenAI. Bitte nur erfundene Angaben.",
+      "details": "Details zum Datenschutz",
+      "agree": "Ich stimme zu",
+      "decline": "Ich lehne ab",
+      "declined": "Ohne Ihre Einwilligung kann Paxi Sie nicht beraten."
+    },
+    "details": {
+      "close": "Schliessen"
+    }
   },
   "dock": {
     "open": "Zusammenfassung öffnen",
@@ -512,5 +522,8 @@
     "accept": "Übernehmen und neu berechnen",
     "accepting": "Wird übernommen …",
     "acceptFailed": "Übernehmen hat nicht geklappt. Bitte nochmals versuchen."
+  },
+  "paxi": {
+    "hint": "Tippen Sie auf das Mikrofon unten rechts, um mit Paxi zu sprechen."
   }
 }
