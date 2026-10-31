@@ -1,18 +1,37 @@
 # Avatar prototype (throwaway)
 
-Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via eyes and body, speech via squash & stretch.
+Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Eleven expressions via eyes, blush, and calm characteristic motion.
 
 **Voice integration: read [AVATAR-INTERFACE.md](AVATAR-INTERFACE.md).**
 
 | File | Owner | What |
 |---|---|---|
-| `pax-avatar.js` | Lukas | Drawing + animation. `mountPaxAvatar(el)` |
-| `pax-avatar-controller.js` | Lukas | **The interface for voice**: `attachAudio(source)`, `handle(AvatarEvent)` |
-| `pax-avatar.d.ts`, `pax-avatar-controller.d.ts` | Lukas | TypeScript types for Angular |
+| `pax-avatar.js` | Lukas | `createPaxAvatar(el)`: events, audio, drawing and animation |
+| `pax-avatar.d.ts` | Lukas | TypeScript types for Angular |
 | `openai-realtime-adapter.js` | Dario | Reference adapter: GPT-Live (WebRTC) → AvatarEvents |
 | `server.mjs` | Dario | Dev server: static files + `POST /session` exchanges SDP with the Live API |
 | `index.html` | — | Design demo: face buttons, fake speech, mic, scripted conversation as AvatarEvents |
+| `expressions.html` | — | Live eleven-expression review sheet, focused view and replay |
 | `realtime.html` | — | Live test against GPT-Live |
+
+```js
+import { createPaxAvatar } from "./pax-avatar.js";
+const avatar = createPaxAvatar(hostElement);
+avatar.attachAudio(remoteStream); // stream, media element, level callback, or null to detach
+avatar.handle(event);
+// Design/demo: avatar.show("pleased"); always replays entry motion.
+// Read avatar.state; call avatar.reset() between sessions and avatar.destroy() on teardown.
+```
+
+## Expressions and listening
+
+The eleven faces follow the expression sheet: `neutral` has upright pill eyes; `listening` holds an attentive tilt; `acknowledging` uses flattened pills and a slow nod; `curious` peers through a monocle on the right eye with a head tilt; `thinking` looks up with independent flat lids and sequential thought dots; `explaining` uses tall alert pills; `shocked` stares with wide pills beneath a pop-up exclamation mark; `empathetic` lowers its gaze beneath slanted lids; `pleased` closes its eyes into arcs with blush; `recovering` resets with asymmetric pills; `presenting_offer` adds green twinkling stars to the welcoming arcs.
+
+`listening` and `thinking` are activity faces. The other nine are reply emotions. Live trigger descriptions distinguish acknowledgment, explanation, genuine shock, concern, clarification, correction, welcome, and an actually presented offer or result. Input decisions prepare the upcoming reply.
+
+The body moves subtly for each expression: slow breathing and sway, a small listening/curiosity tilt, a gentle acknowledgment nod, and a single small lift on entering the welcoming or offer expressions. Recovery gives a brief tiny shake, then settles; shock starts with a quick upward startle, then freezes while the body shrinks to 85% as if stepping back. Translation stays within four viewBox units, rotation within six degrees, and scale within three percent. Shadow size follows the lift. Reduced-motion preferences suppress decorative motion and blinking, keeping the expression visible. Audio never drives body motion; explaining can react very slightly through eye height.
+
+Open [expressions.html](expressions.html) for all eleven live expressions, or add `?only=curious` for a focused view. Each tile links to the interactive demo and offers a replay button for entry motion. Multiple mounts have unique SVG IDs. The microphone demo explicitly enters listening mode.
 
 ## Run
 

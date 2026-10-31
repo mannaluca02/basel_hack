@@ -22,12 +22,15 @@ const HOST = process.env.HOST || "127.0.0.1";   // expose via `tailscale serve`,
 const MODEL = "gpt-live-1";
 const VOICE = process.env.OPENAI_REALTIME_VOICE || "marin";
 const EMOTION_CHOICES = [
-  { value: "neutral", description: "Sachliche Information und ruhige Vorsorgeberatung." },
-  { value: "happy", description: "Begrüssung, gute Nachricht oder Zustimmung." },
-  { value: "empathetic", description: "Tod, Krankheit, Erwerbsunfähigkeit oder Trennung: mitfühlend reagieren." },
-  { value: "concerned", description: "Ein erkanntes Risiko oder eine mögliche Vorsorgelücke." },
-  { value: "surprised", description: "Eine unerwartete oder neue Information." },
-  { value: "celebrating", description: "Ein Ziel wurde erreicht oder ein Vertrag abgeschlossen." },
+  { value: "neutral", description: "Sachlicher, ruhiger Grundzustand ohne besonderen Anlass. Im Zweifel neutral." },
+  { value: "acknowledging", description: "Kurze Bestätigung oder Zusammenfassung: Ich habe Sie verstanden. Keine neue Erklärung oder Erfolgsmeldung." },
+  { value: "curious", description: "Offene Rückfrage zu Wünschen, Lebenssituation oder fehlenden Angaben des Kunden." },
+  { value: "explaining", description: "Der Berater erklärt Zusammenhänge, Berechnungen, Vorsorgelücken oder nächste Optionen sachlich und engagiert." },
+  { value: "shocked", description: "Nur bei echtem Schock: etwas wirklich Unerwartetes oder Alarmierendes wurde gesagt. Nicht bei blosser Sorge, Überraschung oder Belastung." },
+  { value: "empathetic", description: "Persönlicher Verlust, Krankheit oder Belastung: stilles Mitgefühl zeigen." },
+  { value: "pleased", description: "Warme Begrüssung, Willkommen oder freundliche Freude über eine gute Nachricht." },
+  { value: "recovering", description: "Der Berater hat etwas missverstanden, korrigiert sich oder muss einen Versuch beziehungsweise eine Erklärung wiederholen." },
+  { value: "presenting_offer", description: "Nur wenn gerade eine konkrete Offerte oder ein fertiges Ergebnis tatsächlich präsentiert wird. Nicht bei einer Ankündigung oder blossen Zustimmung." },
 ];
 
 const INSTRUCTIONS = `Du bist Pax, ein KI-Vorsorgeberater der Pax Versicherung (klar als KI erkennbar).
