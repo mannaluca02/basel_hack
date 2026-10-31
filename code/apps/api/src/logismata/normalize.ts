@@ -1,11 +1,10 @@
-import type { MoneyMetric,Status,Issue } from '@pax/contracts';
+import type { MoneyMetric,Status,Issue,ProviderResult } from '@pax/contracts';
 import { money } from '@pax/contracts';
 import { z } from 'zod';
 import { ProviderEnvelope,RiskResponse,RetirementResponse,LimitsResponse,AgeResponse,BaseResponse,type Operation } from './contracts.js';
 
 export type ProviderMetric=MoneyMetric & {id:string;status:Status;scenario?:number};
-export type NormalizedProviderResult={operation:Operation;status:Status;metrics:ProviderMetric[];issues:Issue[];metadata:Record<string,unknown>;
-  provenance:{mode:'replay'|'live';operationId:string;inputHash:string;capturedAt:string;sourceRef:string}};
+export type NormalizedProviderResult=ProviderResult;
 export type Normalization=Omit<NormalizedProviderResult,'provenance'>;
 const cents=(n:number)=> {const v=Math.round(n*100);if(!Number.isSafeInteger(v))throw new RangeError('Provider money overflow');return v;};
 const record=(x:unknown)=>x as Record<string,unknown>;
@@ -161,5 +160,5 @@ export function normalizeResponse(operation:Operation,request:unknown,envelope:u
       add(`${person}_${key}`,value,['CurrentCapital','CoverageCapital'].includes(key)?'once':'year','estimated');
     metadata.baselineEstimateNotPensionCertificate=true;
   }
-  return {operation,status,metrics,issues,metadata};
+  return {operation,status,metrics,issues,metadata:z.record(z.string(),z.json()).parse(metadata)};
 }

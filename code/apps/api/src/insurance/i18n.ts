@@ -1,5 +1,6 @@
 import type { InsuranceCase,LifeRun,Recommendation } from './types.js';
 import { Messages,Locales,t,type Locale,type MessageKey,intlLocale } from './messages.js';
+import { InsuranceCaseDtoSchema,CASE_DTO_VERSION,type InsuranceCaseDto } from '@pax/contracts';
 
 export { t,languageNumber,intlLocale,type Locale } from './messages.js';
 export const localeOf=(value:unknown):Locale=>{
@@ -69,7 +70,10 @@ export function presentJourney<T>(data:T,locale:Locale):T&{locale:Locale;display
   };
   return {...walk(data) as T,locale,displayLabel:t(locale,'common.demo'),documentsLanguageNotice:t(locale,'common.documents')};
 }
-export const localizedCase=(c:InsuranceCase)=>({...c,presentation:{locale:c.locale,
-  activeRun:c.activeRunId?presentRun(c.runs.find(r=>r.id===c.activeRunId)!,c.locale):null,
-  recommendations:c.recommendations.map(r=>presentRecommendation(r,c.locale)),
-  portal:presentJourney({quotes:c.quotes,applications:c.applications,policies:c.policies},c.locale)}});
+export const localizedCase=(c:InsuranceCase):InsuranceCaseDto=>{
+  const {ownerId,idempotency,...business}=c;
+  return InsuranceCaseDtoSchema.parse({...business,schemaVersion:CASE_DTO_VERSION,toolRuns:c.toolRuns??[],presentation:{locale:c.locale,
+    activeRun:c.activeRunId?presentRun(c.runs.find(r=>r.id===c.activeRunId)!,c.locale):null,
+    recommendations:c.recommendations.map(r=>presentRecommendation(r,c.locale)),
+    portal:presentJourney({quotes:c.quotes,applications:c.applications,policies:c.policies},c.locale)}});
+};

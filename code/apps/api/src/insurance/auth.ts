@@ -2,6 +2,7 @@ import { createHash,randomBytes,randomUUID,timingSafeEqual } from 'node:crypto';
 import { WorkflowError,type Actor } from './types.js';
 import type { Database } from './types.js';
 import { EncryptedCaseStore,type BootstrapCredentials } from './store.js';
+import { SessionResponseSchema,AgentAccessResponseSchema } from '@pax/contracts';
 
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 const same=(a:string,b:string)=>timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b)));
@@ -28,7 +29,7 @@ export class SessionService {
       if(Object.keys(db.sessions).length>=200)throw new WorkflowError('SESSION_CAPACITY',429);
       db.sessions[sessionHash]=actor;
     });
-    return {sessionToken:token,csrfToken,expiresAt:actor.expiresAt,role:actor.role,actorId:actor.id};
+    return SessionResponseSchema.parse({sessionToken:token,csrfToken,expiresAt:actor.expiresAt,role:actor.role,actorId:actor.id});
   }
   authenticate(token:string):Actor {
     if(!/^[A-Za-z0-9_-]{40,100}$/.test(token))throw new WorkflowError('UNAUTHORIZED',401);
@@ -54,6 +55,6 @@ export class SessionService {
     await this.store.transaction(db=>{
       this.assertActive(owner,db);if(Object.keys(db.sessions).length>=200)throw new WorkflowError('SESSION_CAPACITY',429);
       const c=db.cases[caseId];if(!c||c.ownerId!==owner.id)throw new WorkflowError('NOT_FOUND',404);db.sessions[actor.sessionHash]=actor;
-    });return {sessionToken:token,role:actor.role,caseId,expiresAt:actor.expiresAt};
+    });return AgentAccessResponseSchema.parse({sessionToken:token,role:actor.role,caseId,expiresAt:actor.expiresAt});
   }
 }

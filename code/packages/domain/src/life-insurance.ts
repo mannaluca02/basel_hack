@@ -68,7 +68,7 @@ export function deathCapitalNeed(input:{annualGapCents:number|null;termMonths:nu
 const monthNumber=(m:string)=>Number(m.slice(0,4))*12+Number(m.slice(5))-1;
 const monthString=(n:number)=>`${Math.floor(n/12).toString().padStart(4,'0')}-${(n%12+1).toString().padStart(2,'0')}`;
 type RetirementPeriod = {
-  month:string;persons:{personId:string;employmentCents:number|null;pillar1Cents:number|null;pillar2Cents:number|null;pillar3Cents:number|null;phase:string}[];
+  month:string;persons:{personId:string;employmentCents:number|null;pillar1Cents:number|null;pillar2Cents:number|null;pillar3Cents:number|null;phase:'working'|'bridge'|'pension'}[];
   knownIncomeCents:number;incomeCents:number|null;needCents:number|null;withdrawalCents:number|null;
   unfundedCents:number|null;capitalCents:number|null;knownCapitalCents:number;contributionCents:number;unfundedContributionCents:number;
   restrictedSavingCapitalCents:number;
@@ -108,7 +108,7 @@ export function retirementTimeline(financial:CaseSnapshot,input:RetirementScenar
       capitalInput+=asset.amount.value!-allocatedElsewhere;remainingAssets.delete(id);
     }
     capital+=capitalInput;
-    const persons=s.persons.map(plan=> {
+    const persons:RetirementPeriod['persons']=s.persons.map(plan=> {
       const p=c.persons.find(p=>p.id===plan.personId)!;
       const working=month<plan.workEndsMonth;const pension=month>=plan.pensionStartsMonth;
       return {personId:p.id,employmentCents:working?(annual(p.income)===null?null:Math.round(annual(p.income)!/12)):0,
@@ -143,7 +143,7 @@ export function retirementTimeline(financial:CaseSnapshot,input:RetirementScenar
   const phases=periods.filter((p,index)=>index===0||p.persons.map(x=>x.phase).join()!==periods[index-1]!.persons.map(x=>x.phase).join())
     .map(p=>({fromMonth:p.month,persons:p.persons.map(x=>({personId:x.personId,phase:x.phase}))}));
   return {status:periods.some(p=>p.status==='needs_input')?'needs_input' as const:'estimated' as const,
-    priceBasis:s.priceBasis,periods,phases,issues,guaranteed:false,
+    priceBasis:s.priceBasis,periods,phases,issues,guaranteed:false as const,
     firstUnfundedMonth:periods.find(p=>(p.unfundedCents??0)>0)?.month??null,
     assumptions:['Monthly end-of-period illustration; work exit and pension start are separate.',
       'Pension amounts are supplied assumptions, not inferred benefit entitlements.',

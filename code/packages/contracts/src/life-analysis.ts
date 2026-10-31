@@ -44,3 +44,5 @@ export const LifeAnalysisSchema=z.object({
   }).strict()).length(3),
 }).strict();
 export type LifeAnalysis=z.infer<typeof LifeAnalysisSchema>;
+export type ProviderResult=z.infer<typeof ProviderResultSchema>;
+export type RetirementTimeline=z.infer<typeof RetirementTimelineSchema>;

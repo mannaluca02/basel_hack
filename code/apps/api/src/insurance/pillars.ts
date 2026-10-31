@@ -28,6 +28,6 @@ export function pillarPicture(draft:InsuranceDraft,results:NormalizedProviderRes
     }
     return {pillar,status:pillar==='3'?(capital===null?'needs_input':'estimated'):statuses([retirement?.status,risk?.status].filter(s=>s!==undefined)),
       annualPensions:pensions,capitalCents:capital,annualContributionCents:pillar==='3'?intake.existingAnnualPillar3aContributionCents:null,
-      capitalIsReferenceOnly:true,sourceRefs:[...new Set(sources)]};
+      capitalIsReferenceOnly:true as const,sourceRefs:[...new Set(sources)]};
   });
 }

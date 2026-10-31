@@ -1,14 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { DraftSchema,GoalSchema } from '@pax/contracts';
+import { DraftSchema,GoalSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema } from '@pax/contracts';
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
 
-const ProposalSchema=z.object({messageId:z.string().regex(/^[A-Za-z0-9_-]{1,80}$/),
-  path:z.string().max(200),value:z.union([z.number().finite(),z.boolean(),z.null(),GoalSchema,z.string().max(80)]),
-  expectedProfileVersion:z.number().int().positive().nullable()}).strict();
-const AcceptSchema=z.object({expectedCaseRevision:z.number().int().positive(),accept:z.literal(true)}).strict();
+const ProposalSchema=AdvisorProposalInputSchema;
+const AcceptSchema=AcceptProposalInputSchema;
 const permitted=(path:string)=>path==='goals_add'||/^goals\.\d+\.targetMonth$/.test(path)||/^financial\.persons\.\d+\.income\.value$/.test(path)||
   /^financial\.expenses\.\d+\.amount\.value$/.test(path)||
   /^insurance\.persons\.\d+\.(grossAnnualIncomeCents|deathNeedAnnualCents|disabilityNeedAnnualCents|personalAffordableAnnualPremiumCents|protectionTermMonths)$/.test(path)||

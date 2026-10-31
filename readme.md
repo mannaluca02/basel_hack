@@ -2,6 +2,8 @@
 
 Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Workshop-Plan und ein geprüfter Lebensversicherungs-Backend-PoC mit echten Rechen-APIs und lokalem Demo-Vertragsweg. Die vollständige Advisor-App entsteht gemeinsam im Team.
 
+- [Verbindliche Team-Schnittstellen und gemeinsamer Fall-DTO](documentation/baselhack/plans/team-api-guide.md)
+- [API, Speicher und Datenbank-Ausbau](documentation/baselhack/plans/persistence-and-api.md)
 - [Logik-Backend: Start, API und Team-Integration](code/README.md)
 - [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)
 - [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)

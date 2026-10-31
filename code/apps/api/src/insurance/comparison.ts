@@ -25,7 +25,7 @@ export class ScenarioComparisonService {
             first.value!==null&&second.value!==null&&['valid','estimated'].includes(first.status)&&['valid','estimated'].includes(second.status);
           return [{id:first.id,...(first.personId?{personId:first.personId}:{}),currency:first.currency,unit:first.unit,period:first.period,
             baselineValue:first.value,variantValue:second.value,delta:comparable?second.value!-first.value!:null,
-            status:comparable?'estimated':'requires_review'}];
+            status:comparable?'estimated' as const:'requires_review' as const}];
         })};
       c.comparisons.push(result);this.engine.touch(c,'comparison_available');this.engine.audit(db,actor,c,'scenario_comparison_created');return result;
     });

@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnalysisSchema,ReviewDecisionSchema,
-  JourneyActionSchema,DemoApplicationDecisionSchema,GraphContextSchema,LifeAnalysisSchema,GoalSchema } from '@pax/contracts';
+  JourneyActionSchema,DemoApplicationDecisionSchema,GraphContextSchema,LifeAnalysisResponseSchema,
+  InsuranceCaseDtoSchema,AdvisorContextSchema,QuestionsResponseSchema,AdvisorContextUpdatedSchema,
+  RecommendationPresentationSchema,CasePreferencesSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema,
+  SessionResponseSchema,AgentAccessResponseSchema,ApiErrorSchema,SummaryBundleSchema,PortalDtoSchema } from '@pax/contracts';
 import { EstimateRequestSchema } from './estimates.js';
 import { AdditionalToolRequestSchema } from './tools.js';
 
@@ -36,10 +39,10 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases/{caseId}/dossier','Export JSON or escaped print HTML',undefined],
   ['get','/api/cases/{caseId}/advisor/context','Read minimal current conversational context',undefined],
   ['post','/api/cases/{caseId}/agent-access','Create case-scoped 15-minute agent token; keep server-side',z.object({})],
-  ['post','/api/cases/{caseId}/advisor/proposals','Agent proposes a whitelisted draft change',z.object({messageId:z.string().max(80),path:z.string().max(200),value:z.union([z.number().finite(),z.boolean(),z.null(),GoalSchema,z.string().max(80)]),expectedProfileVersion:z.number().int().positive().nullable()})],
-  ['post','/api/cases/{caseId}/advisor/proposals/{proposalId}/accept','Customer accepts a proposal; profile confirmation is still separate',z.object({expectedCaseRevision:z.number().int().positive(),accept:z.literal(true)})],
+  ['post','/api/cases/{caseId}/advisor/proposals','Agent proposes a whitelisted draft change',AdvisorProposalInputSchema],
+  ['post','/api/cases/{caseId}/advisor/proposals/{proposalId}/accept','Customer accepts a proposal; profile confirmation is still separate',AcceptProposalInputSchema],
   ['get','/api/cases/{caseId}/advisor/events','Subscribe to versioned SSE context events',undefined],
-  ['patch','/api/cases/{caseId}/preferences','Change locale and/or duration without invalidating financial runs; at least one field required',z.object({timeBudgetMinutes:z.number().int().min(3).max(120).optional(),locale:z.enum(['de','fr','it','en']).optional()})],
+  ['patch','/api/cases/{caseId}/preferences','Change locale and/or duration without invalidating financial runs; at least one field required',CasePreferencesSchema],
   ['post','/api/cases/{caseId}/graph-context','Select exact run/person/metric/period',GraphContextSchema],
   ['get','/api/cases/{caseId}/documents/{documentId}','Download authorized allowlisted Pax document',undefined],
   ['get','/api/cases/{caseId}/products','Read educational catalog; not a personal recommendation',undefined],
@@ -58,14 +61,25 @@ export function lifeOpenApi() {
       for(const child of Object.values(value))rewrite(child);};
     rewrite(json);schemas[name]=json;return {$ref:base};
   };
-  const lifeAnalysis=reference('LifeAnalysis',LifeAnalysisSchema);
+  const caseDto=reference('InsuranceCaseDto',InsuranceCaseDtoSchema);
+  const analysis=reference('LifeAnalysisResponse',LifeAnalysisResponseSchema),context=reference('AdvisorContext',AdvisorContextSchema);
+  const questions=reference('QuestionsResponse',QuestionsResponseSchema),recommendation=reference('RecommendationPresentation',RecommendationPresentationSchema);
+  const event=reference('AdvisorContextUpdated',AdvisorContextUpdatedSchema),error=reference('ApiError',ApiErrorSchema);
+  const session=reference('SessionResponse',SessionResponseSchema),agentAccess=reference('AgentAccessResponse',AgentAccessResponseSchema);
+  const summary=reference('SummaryBundle',SummaryBundleSchema),portal=reference('PortalDto',PortalDtoSchema);
   for(const [method,path,summary,schema] of endpoints) {
     const publicRoute=['/api/privacy','/api/status','/api/sessions','/api/openapi.json','/api/translations'].includes(path);
     const parameters=[...path.matchAll(/\{(\w+)\}/g)].map(m=>({in:'path',name:m[1],required:true,schema:{type:'string'}}));
     const languageParameters=['/api/translations','/api/privacy'].includes(path)?[{in:'query',name:'locale',required:false,schema:{type:'string',enum:['de','fr','it','en']}}]:[];
+    const responseSchema=(path==='/api/cases'&&method==='post')||path==='/api/cases/{caseId}'&&method==='get'||path.endsWith('/draft')||path.endsWith('/confirmations')?caseDto:
+      path.endsWith('/calculations')?analysis:path.endsWith('/advisor/context')?context:path.endsWith('/questions')?questions:
+      path.endsWith('/recommendations')?recommendation:path.endsWith('/agent-access')?agentAccess:path==='/api/sessions'?session:
+      path.endsWith('/summaries')?summary:path.endsWith('/portal')?portal:undefined;
+    const errors=Object.fromEntries([[400,'Invalid input'],[401,'Session required'],[403,'Role/CSRF forbidden'],[404,'Not found or unauthorized case'],[409,'Version, review or journey conflict'],[422,'Missing/unsupported domain data']].map(([code,description])=>[code,{description,content:{'application/json':{schema:error}}}]));
     const operation={summary,security:publicRoute?[]:[{bearerAuth:[]},{cookieAuth:[]}],parameters:[...parameters,...languageParameters],
       ...(schema?{requestBody:{required:true,content:{'application/json':{schema:reference(`${method}_${path.replace(/[^a-zA-Z0-9]/g,'_')}`,schema)}}}}:{}),
-      responses:{[method==='post'?'201':'200']:{description:'Success',...(path.endsWith('/calculations')?{content:{'application/json':{schema:{type:'object',properties:{run:lifeAnalysis},required:['run']}}}}:{})},400:{description:'Invalid input'},401:{description:'Session required'},403:{description:'Role/CSRF forbidden'},404:{description:'Not found or unauthorized case'},409:{description:'Version, review or journey conflict'},422:{description:'Missing/unsupported domain data'}}};
+      ...(path.endsWith('/advisor/events')?{'x-sse-event-name':'advisor.context.updated','x-sse-data-schema':event}:{}),
+      responses:{[method==='post'?'201':'200']:{description:'Success',...(responseSchema?{content:{'application/json':{schema:responseSchema}}}:{})},...errors}};
     paths[path]??={};paths[path][method]=operation;
   }
   return {openapi:'3.1.0',info:{title:'Pax LifeMap life-insurance backend',version:'0.2.0',description:'Synthetic-data PoC with real calculators and explicitly non-binding contract artifacts. Runtime Zod/domain validation adds invariants beyond JSON Schema. Cookie authentication requires X-CSRF-Token for writes. Reviewer approval/start-review/decisions/policy issuance require a separately authenticated reviewer. An agent is restricted to its granted case and context/events/proposals.'},

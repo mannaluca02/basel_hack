@@ -24,7 +24,7 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 
 | Befehl | Wirkung |
 |---|---|
-| `npm test` | Vollständiger Build und 111 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
+| `npm test` | Vollständiger Build und 121 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
 | `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
 | `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
@@ -155,3 +155,12 @@ Die zentrale lokale Textsammlung enthält 191 vollständige Schlüssel in **DE/F
 Kundenlesbare Rückfragen, Produktbeschreibungen, Empfehlungsbegründungen/-bedingungen, Alternativen, Risiko-/Status-/Perioden-/Fortschrittsbeschriftungen, Disclaimer, Datenschutzanzeige und beide Dossier-Sichten werden lokalisiert. Rechenantworten ergänzen `presentation`; der gemeinsame Fall bietet dieselbe aktuelle Projektion unter `presentation`. Der HTML-Export nutzt die Fall-Locale, Schweizer Zahlenformate und lesbare Abschnitte anstelle technischer JSON-Blöcke. Technische IDs, Original-Provenienz und kanonische Rechendaten bleiben unverändert. **Luca soll die Präsentationsfelder und den Katalog rendern; Earnie/Dario verwenden die aktuelle `locale` vor jeder Antwort.** Angular-Oberfläche, generierter Dialog und reale Sprachausgabe müssen von den jeweiligen Teammitgliedern angebunden werden.
 
 Archivierte Vertrags-PDFs bleiben gekennzeichnete deutschsprachige Originale. Sie werden nicht maschinell als rechtsverbindliche französische, italienische oder englische Dokumente ausgegeben; dafür sind aktuelle von Pax freigegebene Sprachfassungen erforderlich. Dies wird auch im Übersetzungskatalog und im Dossier erklärt.
+
+
+## Gemeinsame vollständige Verträge und Datenhaltung
+
+Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjekte werden aus `@pax/contracts` importiert und dort aus Zod abgeleitet. Es gibt keine zweite handgeschriebene Backend-Definition dieser Fachdaten mehr. Private Besitz-/Sitzungs-/Idempotenzdaten bleiben serverseitige Ergänzungen und werden nicht im HTTP-Fall ausgegeben. Fallantworten tragen `schemaVersion:"1.0"`; Create, GET, Draft-Patch und Bestätigung verwenden dasselbe validierte Format. Auch Agent-Kontext, SSE, Rechenausgabe, Portal und Summary verwenden gemeinsame Laufzeitverträge.
+
+Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/baselhack/plans/persistence-and-api.md) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
+
+Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt zehn [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und 121 automatisierte Tests. VoiceLog, AgentReply und Playback sind bereitgestellte Team-Nachrichtenschemas; ihre tatsächlichen STT-/LLM-/TTS-/Avatar-Transporte bleiben die Implementierung der zuständigen Teammitglieder.

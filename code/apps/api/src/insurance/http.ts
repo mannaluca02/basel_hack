@@ -2,7 +2,7 @@ import { Body,Controller,Get,Post,Put,Delete,Patch,Param,Query,Req,Res,UseGuards
   Catch,HttpException,Sse,type CanActivate,type ExecutionContext,type ArgumentsHost,type ExceptionFilter,type DynamicModule,type MessageEvent } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { z } from 'zod';
-import { PRIVACY_NOTICE } from '@pax/contracts';
+import { PRIVACY_NOTICE,AdvisorContextUpdatedSchema,PortalDtoSchema,CASE_DTO_VERSION } from '@pax/contracts';
 import { LIFE_RUNTIME,type LifeRuntime } from './runtime.js';
 import { WorkflowError,type Actor } from './types.js';
 import { Operations } from '../logismata/contracts.js';
@@ -73,10 +73,10 @@ export class ProtectedLifeController {
     await this.r.sessions.revoke(req.actor);res.setHeader('Set-Cookie','pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0');return {revoked:true};
   }
   @Get('cases') list(@Req() req:Request){return this.r.engine.list(req.actor);}
-  @Post('cases') create(@Req() req:Request,@Body() body:unknown){return this.r.engine.createCase(req.actor,body);}
+  @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}
   @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return localizedCase(this.r.engine.caseFor(req.actor,uuid(id)));}
-  @Patch('cases/:caseId/draft') patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.patchDraft(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/confirmations') confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.confirm(req.actor,uuid(id),body);}
+  @Patch('cases/:caseId/draft') async patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.patchDraft(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/confirmations') async confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.confirm(req.actor,uuid(id),body));}
   @Get('cases/:caseId/questions') questions(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.questions(req.actor,uuid(id));}
   @Post('cases/:caseId/calculations') analyze(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.analyze(req.actor,uuid(id),body);}
   @Post('cases/:caseId/active-analysis') selectAnalysis(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.selectAnalysis(req.actor,uuid(id),body);}
@@ -100,7 +100,7 @@ export class ProtectedLifeController {
   @Post('cases/:caseId/demo-applications/start-review') startReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.startReview(req.actor,uuid(id),body));}
   @Post('cases/:caseId/demo-applications/decisions') decide(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.decide(req.actor,uuid(id),body));}
   @Post('cases/:caseId/demo-policies') policy(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.issuePolicy(req.actor,uuid(id),body));}
-  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){return presentJourney(this.r.journey.portal(req.actor,uuid(id)),this.r.engine.caseFor(req.actor,id).locale);}
+  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){return PortalDtoSchema.parse({...presentJourney(this.r.journey.portal(req.actor,uuid(id)),this.r.engine.caseFor(req.actor,id).locale),schemaVersion:CASE_DTO_VERSION});}
   @Get('cases/:caseId/summaries') summaries(@Req() req:Request,@Param('caseId') id:string){return this.r.dossier.bundle(req.actor,uuid(id));}
   @Get('cases/:caseId/dossier') dossier(@Req() req:Request,@Param('caseId') id:string,@Query('audience') audience='customer',@Query('format') format='json',@Res({passthrough:true}) res:Response){
     const a=z.enum(['customer','advisor']).parse(audience);const f=z.enum(['json','html']).parse(format);
@@ -133,9 +133,9 @@ export class ProtectedLifeController {
           if(!state||state.expiresAt<=new Date().toISOString()){subscriber.complete();return;}
           if(state.version<=version)return;version=state.version;
           const eventId=state.last?.id??`snapshot_${version}`;const reason=state.last?.reason??'snapshot';
-          subscriber.next({type:'advisor.context.updated',id:eventId,data:{schemaVersion:'1.0',messageId:eventId,caseId:id,
+          subscriber.next({type:'advisor.context.updated',id:eventId,data:AdvisorContextUpdatedSchema.parse({schemaVersion:'1.0',messageId:eventId,caseId:id,
             correlationId:eventId,eventId,contextRevision:version,reason,contextRef:`/api/cases/${id}/advisor/context`,
-            interruptPolicy:['conversation_preference_changed','agent_proposal_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'}});
+            interruptPolicy:['conversation_preference_changed','agent_proposal_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
         }catch{subscriber.complete();}
       };
       const timer=setInterval(poll,250);poll();return ()=>clearInterval(timer);

@@ -751,7 +751,7 @@
         "I09",
         "I10"
       ],
-      "implementation_note": "Autorisierter gemeinsamer Fall, unveränderliche bestätigte Profile, Schemas für vollständige Analyse, GraphContext, Kontextrevision und Fortschrittsgruppen implementiert und automatisch geprüft. UI-/Voice-/Avatar-Anschluss gemeinsam abnehmen.",
+      "implementation_note": "Vollständiger versionierter Shared-Fall-DTO, Unterobjekte, Agent-/SSE-/Portal-/Summary-Verträge und bereitgestellte Team-Nachrichten implementiert. Ausgabevalidierung, Browser-Typecheck und JSON-Schema-Exporte geprüft; Team-Integration bleibt gemeinsam abzunehmen.",
       "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
@@ -923,7 +923,7 @@
         "I08",
         "I10"
       ],
-      "implementation_note": "111 Tests und echter 24-Operationen-/Vier-Sprachen-Durchstich bestanden; Finanzwerte bleiben beim Sprachwechsel unverändert. Team-/Pax-Fachabnahme bleibt getrennt offen.",
+      "implementation_note": "121 Tests inklusive gemeinsamer DTOs, Privatfeld-/Querverweisprüfung und konkurrierender Falländerungen bestanden. Fach-/Teamabnahme und zukünftige DB-/Netzintegration bleiben getrennt offen.",
       "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
@@ -1203,7 +1203,7 @@
   "implementation_report_path": "documentation/baselhack/reports/logic-backend-implementation.md",
   "logic_backend_verification": {
     "date": "2026-10-31",
-    "automated_tests_passed": 111,
+    "automated_tests_passed": 121,
     "live_operations_verified": 24,
     "data_classification": "synthetic",
     "real_coverage_enabled": false,
@@ -1214,6 +1214,7 @@
       "it",
       "en"
     ],
-    "translation_keys": 191
+    "translation_keys": 191,
+    "shared_case_dto_version": "1.0"
   }
 }

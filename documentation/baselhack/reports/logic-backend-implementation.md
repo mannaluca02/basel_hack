@@ -33,7 +33,7 @@ Das sind geprüfte PoC-Schutzmaßnahmen. Rechtskonformität im Produktivbetrieb,
 
 Der Live-Client verwendet einen festen Host/Pfad, keine Redirects, maximal zwei parallele Requests, begrenzte Queue, fünf Sekunden Timeout je Versuch und höchstens einen Retry bei vorübergehenden Fehlern. Authentisierungsfehler werden nicht wiederholt, Payloads/Tokens nicht in Fehlermeldungen gespiegelt. Es gibt keinen stillen Replay-Fallback. Der Replay-Provider benötigt einen exakt identischen vollständigen Request-Hash.
 
-**Automatische Suite:** 111 Tests, 0 Fehler. Sie umfasst die bisherigen Fach-/Adaptertests und neue Lebensversicherungs-, Persistenz-, Review-, Vertrags-, Rollen-, HTTP-, CSRF-, Dokument-, SSE-, OpenAPI-, Vergleichs- und NPS-Negativfälle. Provider in normalen Tests sind synthetisch injiziert; reale Requests sind dem ausdrücklichen Live-Test vorbehalten.
+**Automatische Suite:** 121 Tests, 0 Fehler. Sie umfasst die bisherigen Fach-/Adaptertests und neue Lebensversicherungs-, Persistenz-, Review-, Vertrags-, Rollen-, HTTP-, CSRF-, Dokument-, SSE-, OpenAPI-, Vergleichs- und NPS-Negativfälle. Provider in normalen Tests sind synthetisch injiziert; reale Requests sind dem ausdrücklichen Live-Test vorbehalten.
 
 **Echter Live-Durchstich:** 24 Operationen erfolgreich; Baseline, Familie, Eigenheim, Pensionierung ohne Providerfehler, drei Vergleiche. Empfehlung, separate Test-Reviewer-Rolle, Demo-Konfiguration mit archivierten Dokumentnachweisen, Antrag, idempotente Einreichung, Demo-Annahme, Demo-Police, identische Summary-Snapshots und Portal nach Server-Neustart durchlaufen. Alle verwendeten Angaben waren erfunden. Temporäre Testdaten wurden anschließend gelöscht. Zugangsdaten wurden weder kopiert noch ausgegeben.
 
@@ -58,4 +58,9 @@ Die acht zuvor ausgelassenen Sponsor-Operationen sind als geschützte isolierte 
 
 Die vorher nur teilweise vorhandene Mehrsprachigkeit wurde vervollständigt: 191 lokale Texte für DE/FR/IT/EN, öffentliche Katalog-/Datenschutzprojektion, übersetzte Rückfragen, Empfehlungen, Bedingungen/Alternativen, Status-/Grafik-/Fortschrittsbeschriftungen, Fehlermeldungen und beide lesbaren Dossier-Exporte. Sprachwechsel verändert technische Kontextrevisionen, aber keine finanzielle Version und keinen bestehenden Rechenhash. Die normale Budget-Abfrage verwendet jetzt die passende Sprache statt fest Deutsch.
 
-Die vollständige Suite umfasst 111 erfolgreiche Tests. Der echte Durchstich führt alle 24 Operationen und vier Sprach-/Exportprüfungen mit erfundenen Daten aus. Sprachprüfungen bleiben Backend-/API-Prüfungen; die Darstellung und Audioausgabe durch die anderen vier Teammitglieder sowie rechtsgültige Originaldokumente in passenden Sprachen werden gesondert integriert und abgenommen.
+Die vollständige Suite umfasst 121 erfolgreiche Tests. Der echte Durchstich führt alle 24 Operationen und vier Sprach-/Exportprüfungen mit erfundenen Daten aus. Sprachprüfungen bleiben Backend-/API-Prüfungen; die Darstellung und Audioausgabe durch die anderen vier Teammitglieder sowie rechtsgültige Originaldokumente in passenden Sprachen werden gesondert integriert und abgenommen.
+
+
+## Vollständiger gemeinsamer DTO
+
+Der Fall-Datenvertrag ist jetzt vollständig im gemeinsamen Paket versioniert. Entwurf, bestätigte Profile, Läufe, Vergleiche, Empfehlungen, Reviews, Demo-Journey und Übersetzungsprojektion sind typisiert und als Zod-Ausgabe validiert. Interne Eigentümerreferenz und Befehls-Cache bleiben privat. Browser-Typechecks und zehn synchron gehaltene JSON-Schemas ergänzen 121 erfolgreiche Tests. API, Speicher und Datenbank-Ausbauschritte sind im [Team-Leitfaden](../plans/team-api-guide.md) und [Architekturentscheid](../plans/persistence-and-api.md) beschrieben; eine neue Datenbank wurde nicht eingerichtet.

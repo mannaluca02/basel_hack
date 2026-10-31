@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { CaseSnapshotSchema,CreateInsuranceCaseSchema,DraftSchema,DraftPatchSchema,ConfirmProfileSchema,
-  RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema, type InsuranceDraft,type LifeScenario } from '@pax/contracts';
+  RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft,type LifeScenario } from '@pax/contracts';
 import { calculateBudget,calculateCapital,intakeQuestions,retirementTimeline,simulateScenario,calculateProgress } from '@pax/domain';
 import { CalculationService,createAnalysisRequest } from '../calculation/calculation.service.js';
 import { sha256Json } from '../calculation/hash.js';
@@ -97,10 +97,10 @@ export class LifeInsuranceEngine {
   }
   questions(actor:Actor,id:string) {
     const c=this.caseFor(actor,id,true);const fields=intakeQuestions(c.draft);
-    return {profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
+    return QuestionsResponseSchema.parse({profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
       mandatoryFields:fields,questions:fields.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
         text:questionText(c.locale,path)})),
-      pace:c.timeBudgetMinutes<=10?'compact':'detailed'};
+      pace:c.timeBudgetMinutes<=10?'compact':'detailed'});
   }
   async confirm(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=ConfirmProfileSchema.parse(input);
@@ -194,7 +194,7 @@ export class LifeInsuranceEngine {
         c.reviewTasks.push({id:randomUUID(),runId:run.id,profileVersion:run.profileVersion,reasons:run.reviewReasons,status:'open',decision:null});
         this.touch(c,'analysis_ready');
       }
-      this.audit(db,actor,c,'analysis_finished',run.status);return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,run,presentation:presentRun(run,c.locale)};
+      this.audit(db,actor,c,'analysis_finished',run.status);return LifeAnalysisResponseSchema.parse({caseRevision:c.caseRevision,contextRevision:c.contextRevision,run,presentation:presentRun(run,c.locale)});
     });
   }
   async recommendation(actor:Actor,id:string) {
@@ -241,8 +241,7 @@ export class LifeInsuranceEngine {
     });
   }
   async preferences(actor:Actor,id:string,input:unknown) {
-    this.role(actor,'customer');const body=z.object({timeBudgetMinutes:z.number().int().min(3).max(120).optional(),locale:z.enum(['de','fr','it','en']).optional()}).strict()
-      .refine(b=>b.locale!==undefined||b.timeBudgetMinutes!==undefined).parse(input);
+    this.role(actor,'customer');const body=CasePreferencesSchema.parse(input);
     return this.edit(actor,id,undefined,(c,db)=>{if(body.timeBudgetMinutes!==undefined)c.timeBudgetMinutes=body.timeBudgetMinutes;if(body.locale)c.locale=body.locale;
       this.touch(c,'conversation_preference_changed');this.audit(db,actor,c,'preferences_changed');return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,locale:c.locale};});
   }
@@ -279,7 +278,7 @@ export class LifeInsuranceEngine {
     const projected=selected&&selected.series.length>24?{...selected,series:[],rangeSummary:{points:selected.series.length,
       first:selected.series[0],last:selected.series.at(-1),minimumKnown:values.length?Math.min(...values):null,
       maximumKnown:values.length?Math.max(...values):null,unknownPoints:selected.series.length-values.length}}:selected;
-    return {caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
+    return AdvisorContextSchema.parse({caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
       runId:run?.id??null,scenarioVersionId:run?.scenarioVersionId??null,calculationInputHash:run?.inputHash??null,
       locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:c.graphContext,
       contextId:c.graphContext?sha256Json(c.graphContext):null,
@@ -292,8 +291,8 @@ export class LifeInsuranceEngine {
       scenarioComparisons:run?c.comparisons.filter(x=>x.variantRunId===run.id).slice(-1):[],
       reviewStatus:approved?'approved_for_demo':run?'open':'not_started',maySpeakAmounts:facts.length>0,
       progress:{...this.progress(c),groups:progressText(c.locale,this.progress(c).groups)},
-      allowedActions:actor.role==='advisor'?['read_context','propose_patch']:['update_draft','confirm_profile','calculate','request_human'],
-      policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,productFirstSelling:false}};
+      allowedActions:actor.role==='advisor'?['read_context','propose_patch']:actor.role==='reviewer'?['read_context','record_review']:['update_draft','confirm_profile','calculate','request_human'],
+      policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,productFirstSelling:false}});
   }
   progress(c:InsuranceCase) {
     const financial=c.draft.financial;const run=!c.draftDirty?c.runs.find(r=>r.id===c.activeRunId):undefined;

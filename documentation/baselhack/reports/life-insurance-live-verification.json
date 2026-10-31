@@ -2,7 +2,7 @@
   "dataClassification": "synthetic",
   "providerMode": "live",
   "automatedReviewer": "test-only role simulation; no real Pax expert approval",
-  "capturedAt": "2026-10-31T02:06:05.214Z",
+  "capturedAt": "2026-10-31T02:28:01.372Z",
   "stages": [
     "profile_confirmed",
     "recommendation_explained",
@@ -62,11 +62,11 @@
           "status": "valid"
         },
         {
-          "operation": "income",
+          "operation": "saving",
           "status": "estimated"
         },
         {
-          "operation": "saving",
+          "operation": "income",
           "status": "estimated"
         },
         {
@@ -106,12 +106,12 @@
           "status": "requires_review"
         },
         {
-          "operation": "budgetProposal",
-          "status": "estimated"
-        },
-        {
           "operation": "retirement",
           "status": "valid"
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated"
         },
         {
           "operation": "location",
@@ -122,11 +122,11 @@
           "status": "estimated"
         },
         {
-          "operation": "saving",
+          "operation": "income",
           "status": "estimated"
         },
         {
-          "operation": "income",
+          "operation": "saving",
           "status": "estimated"
         },
         {
@@ -238,11 +238,11 @@
           "status": "valid"
         },
         {
-          "operation": "income",
+          "operation": "saving",
           "status": "estimated"
         },
         {
-          "operation": "saving",
+          "operation": "income",
           "status": "estimated"
         },
         {

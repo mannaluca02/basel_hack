@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { Cents,ProviderResultSchema } from '@pax/contracts';
+import { Cents,ProviderResultSchema,type CalculatorToolRun } from '@pax/contracts';
 import { Operations,RequestSchemas } from '../logismata/contracts.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { sha256Json } from '../calculation/hash.js';
@@ -44,7 +44,7 @@ export class AdditionalCalculatorTools {
     catch{throw new WorkflowError('PROVIDER_UNAVAILABLE',503);}
     return this.engine.edit(actor,id,undefined,(current,db)=>{
       if((current.toolRuns?.length??0)>=40)throw new WorkflowError('TOOL_CAPACITY',429);
-      const record={id:randomUUID(),createdAt:new Date().toISOString(),operation,requestUnits:'CHF_CENTS',request:b.request,
+      const record:CalculatorToolRun={id:randomUUID(),createdAt:new Date().toISOString(),operation,requestUnits:'CHF_CENTS',request:z.record(z.string(),z.json()).parse(b.request),
         result,scope:'isolated_calculator_estimate',profileMutated:false,financialInputHashChanged:false,
         inputHash:sha256Json({operation,request:b.request}),locale:c.locale};
       (current.toolRuns??=[]).push(record);this.engine.touch(current,'estimate_available');this.engine.audit(db,actor,current,'additional_calculator_executed');return record;

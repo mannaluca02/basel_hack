@@ -8,7 +8,11 @@
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "build": "tsc -b",
-    "test": "npm run build && node --test tests/*.test.mjs",
+    "test": "npm run build && npm run typecheck:clients && npm run contracts:check && node --test tests/*.test.mjs",
+    "typecheck:clients": "tsc -p examples/contracts/tsconfig.json",
+    "contracts:export": "npm run build && node scripts/export-contracts.mjs",
+    "contracts:check": "node scripts/export-contracts.mjs --check",
+    "contracts:examples": "npm run build && node scripts/export-demo-contracts.mjs",
     "start": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env apps/api/dist/main.js",
     "start:demo": "npm run build && node scripts/start-demo.mjs",
     "demo": "npm run build && node scripts/demo.mjs",

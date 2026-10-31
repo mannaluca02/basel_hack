@@ -648,7 +648,7 @@ P0 · implementiert, gemeinsame Abnahme offen · 2.5 Personenstunden · M5
 - [ ] Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.
 - [ ] Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich.
 
-**Implementierungsstand (31.10.2026):** 111 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+**Implementierungsstand (31.10.2026):** 121 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
 
 
 ## Earnie – KI-Backend
@@ -829,3 +829,6 @@ I10 konkretisiert die bestehenden Fall-/Voice-Integrationspakete: Earnie baut Co
 
 
 **Ergänzter Prüfumfang:** Alle 24 Sponsor-Operationen und 191 vollständige DE/FR/IT/EN-Anzeigetexte sind im Backend implementiert. Sprachwechsel ohne finanzielle Invalidierung, beide Dossier-Sprachen und die acht gezielten Zusatzrechner sind automatisch und live geprüft. Siehe [Requirements](../reports/life-insurance-requirements.md).
+
+
+**Gemeinsamer Vertragsstand:** Vollständiger Fall-/Agent-/SSE-/Portal-/Summary-DTO im Shared-Paket, browserfähige Beispiele und zehn JSON-Schema-Exporte implementiert. 121 Tests bestehen. Rollen-/API-Integration siehe [Team-Leitfaden](team-api-guide.md); bestehende Persistenz und DB-Ausbau siehe [Architekturentscheid](persistence-and-api.md).

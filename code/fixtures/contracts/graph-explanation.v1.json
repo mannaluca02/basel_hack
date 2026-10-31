@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0",
+  "messageId": "graph_message_01",
+  "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+  "correlationId": "correlation_demo_01",
+  "turnId": "turn_demo_01",
+  "contextId": "1b2edec7f6bf8a78d901a285f79f4ca5766d564794728f9f8820bce1350bca73",
+  "graphContext": {
+    "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+    "profileVersion": 1,
+    "scenarioVersionId": "baseline_v1",
+    "runId": "d8760030-3d66-4e6b-bded-bbbb61cbf1af",
+    "graphId": "household_budget",
+    "metricId": "cashflowAnnual",
+    "periodStart": "2026-10",
+    "periodEnd": "2027-09"
+  },
+  "question": "Was bedeutet dieser jährliche Betrag?"
+}
