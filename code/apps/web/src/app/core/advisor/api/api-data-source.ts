@@ -14,18 +14,18 @@ import { CaseProjection, projectCase } from './case-projection';
 import { projectInfo, projectSummary, projectTranscript } from './summary-projection';
 import { CustomerApi } from './customer-api';
 
+type Projection = CaseProjection &
+  Pick<AdvisorSnapshot, 'transcript' | 'info' | 'summary'>;
+
 /**
  * The advisor backend behind `dataSource: 'api'`. The backend's only live event says "the case
  * changed, reload it": this passes it on as a context event, reloads the case and pushes the
- * projected charts, risks and progress as upserts. `CustomerReview` does its own reloading.
+ * projected view models as upserts. `CustomerReview` does its own reloading.
  *
  * Besides the case it loads the summaries of the current snapshot (summary sheet, Info tab) and
  * the call history a linked voice agent recorded (Chat tab). Replies stay empty: the backend has
  * no reply route.
  */
-type Projection = CaseProjection &
-  Pick<AdvisorSnapshot, 'transcript' | 'info' | 'summary'>;
-
 export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);
   private readonly language = inject(AppLanguage);
