@@ -38,7 +38,10 @@ function recommendationNote(progress) {
   const rec = progress.case_recommendation;
   if (!rec) return "";
   if (!rec.products.length) return "The Pax analysis found no need for an additional contract right now; say so if the person asks for solutions.";
-  const names = rec.products.map((p) => (p.suitabilityCheckRequired ? `${p.name} (needs the suitability check with a colleague first)` : p.name));
+  // One candidate per person and product; Paxi names each product once.
+  const names = [...new Map(rec.products.map((p) => [p.name, p])).values()].map((p) =>
+    p.suitabilityCheckRequired ? `${p.name} (needs the suitability check with a colleague first)` : p.name,
+  );
   return `The Pax analysis of this case points to: ${names.join(", ")}. When you propose plans, use only these, explain them from the person's situation${rec.reviewOpen ? ", and say that a Pax colleague still reviews them" : ""}.`;
 }
 
