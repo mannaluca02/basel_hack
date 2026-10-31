@@ -4,6 +4,10 @@ Angular 22 mobile-first web app (PWA). Standalone components, signals, strict Ty
 
 Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (Angular 22 engines); the repo `.nvmrc` pins 26.
 
+The separate [Debugging App](debugging-app/README.md) lives in `debugging-app/` and has its own
+Angular entry point, scripts and port (4300). It is not a route in this normal web application.
+It reuses this workspace's Angular dependencies and shared authenticated case services.
+
 ```bash
 npm ci
 npm start          # dev server on http://localhost:4200

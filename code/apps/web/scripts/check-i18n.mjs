@@ -72,7 +72,7 @@ const keyLiteral = new RegExp(
   'g',
 );
 const used = new Set();
-for (const file of walk(join(root, 'src/app'))) {
+for (const file of [...walk(join(root, 'src/app')), ...walk(join(root, 'debugging-app/src/app'))]) {
   readFileSync(file, 'utf8')
     .split('\n')
     .forEach((line, i) => {

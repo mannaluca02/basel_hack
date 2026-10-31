@@ -1,8 +1,10 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { EMPTY, catchError, filter, switchMap } from 'rxjs';
+import { EMPTY, Subject, catchError, filter, switchMap } from 'rxjs';
 import { Consent } from '../../consent/consent';
 import { AdvisorDataSource, AdvisorEvent } from '../advisor-data-source';
+import { caseProjection } from '../api/case-presenter';
+import type { AdvisorContextUpdate } from '../contracts';
 import {
   CaseState,
   CaseTransition,
@@ -14,6 +16,9 @@ import {
 } from './case-state';
 
 type UnreadIds = Readonly<Record<WorkspaceTab, ReadonlySet<string>>>;
+export type DigitalStop =
+  | { readonly reason: 'human-handover'; readonly update: AdvisorContextUpdate }
+  | { readonly reason: 'session-ended' };
 
 /**
  * The single UI state of the current case, fed by `AdvisorDataSource`. Components read the
@@ -37,6 +42,14 @@ export class CaseStore {
   private readonly syncFailedState = signal(false);
   /** Events held back until a snapshot is applied; `null` while live. */
   private pending: AdvisorEvent[] | null = [];
+  private generation = 0;
+  private readonly stopCommands = new Subject<DigitalStop>();
+  private readonly contextNotifications = new Subject<AdvisorContextUpdate>();
+
+  /** Synchronous control plane: never waits for a snapshot, promise, or Angular effect. */
+  readonly digitalStops = this.stopCommands.asObservable();
+  /** Original backend notifications for diagnostics; financial views still read projections. */
+  readonly contextUpdates = this.contextNotifications.asObservable();
 
   readonly connection = toSignal(this.source.connection, { initialValue: 'disconnected' });
   /** True once the first snapshot is applied. */
@@ -46,6 +59,10 @@ export class CaseStore {
 
   readonly caseId = computed(() => this.state().data.caseId);
   readonly contextRevision = computed(() => this.state().data.contextRevision);
+  readonly canonical = computed(() => this.state().data.canonical ?? null);
+  readonly projection = computed(() => {
+    const dto=this.canonical();return dto ? caseProjection(dto) : null;
+  });
   readonly agent = computed(() => this.state().data.agent);
   readonly progress = computed(() => this.state().data.progress);
   readonly transcript = computed(() => this.state().data.transcript);
@@ -70,6 +87,7 @@ export class CaseStore {
 
   constructor() {
     const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => { this.stopCommands.complete(); this.contextNotifications.complete(); });
     // Subscribe to events before the first snapshot request so no event slips through.
     this.source.events
       .pipe(
@@ -82,8 +100,11 @@ export class CaseStore {
         filter((state) => state === 'connected' && this.consent.granted()),
         switchMap(() => {
           this.pending ??= [];
+          const generation=this.generation;
           return this.source.snapshot().pipe(
+            filter(()=>generation===this.generation),
             catchError((error: unknown) => {
+              if(generation!==this.generation)return EMPTY;
               console.error('CaseStore: loading the case snapshot failed', error);
               this.syncFailedState.set(true);
               this.flushPending();
@@ -112,6 +133,32 @@ export class CaseStore {
     this.source.disconnect();
   }
 
+  /** End of an authenticated case session: retained results and late reads lose their authority. */
+  clear(): void {
+    this.stopCommands.next({ reason: 'session-ended' });
+    ++this.generation;
+    this.disconnect();
+    this.pending=[];
+    this.state.set(initialCaseState());
+    this.unreadIds.set(noUnread());
+    this.loadedState.set(false);
+    this.syncFailedState.set(false);
+  }
+
+  /** Reload after a case command. Canonical revision guards also cover late overlapping reads. */
+  refresh(): void {
+    if (!this.consent.granted()) return;
+    const generation=this.generation;
+    this.source.snapshot().subscribe({
+      next: snapshot => {
+        if(generation!==this.generation)return;
+        this.commit(applyCaseSnapshot(this.state(),snapshot),this.loadedState());
+        this.loadedState.set(true);this.syncFailedState.set(false);
+      },
+      error: () => {if(generation===this.generation)this.syncFailedState.set(true);},
+    });
+  }
+
   /** Call when the tab is shown, and again while it stays visible and its count rises. */
   markRead(tab: WorkspaceTab): void {
     if (this.unreadIds()[tab].size === 0) return;
@@ -119,17 +166,26 @@ export class CaseStore {
   }
 
   private receive(event: AdvisorEvent): void {
+    if (event.type === 'context') {
+      // Stop goes first, even while the financial snapshot/event buffer is still loading.
+      if (event.payload.handover?.stopDigitalConversation) {
+        this.stopCommands.next({ reason: 'human-handover', update: event.payload });
+      }
+      this.contextNotifications.next(event.payload);
+    }
     if (this.pending) {
       this.pending.push(event);
       return;
     }
     this.commit(applyCaseEvent(this.state(), event), true);
+    if (event.type === 'context') this.refresh();
   }
 
   private flushPending(): void {
     const events = this.pending ?? [];
     this.pending = null;
     for (const event of events) this.commit(applyCaseEvent(this.state(), event), true);
+    if (events.some(event=>event.type==='context')) this.refresh();
   }
 
   private commit({ state, changes }: CaseTransition, countUnread: boolean): void {

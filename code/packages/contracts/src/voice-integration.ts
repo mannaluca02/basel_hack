@@ -9,7 +9,9 @@ export const VoiceProviderSchema = z.enum(['gpt-live', 'elevenlabs']);
 export const PortfolioFieldIdSchema = z.enum(['full_name', 'birth_date', 'postal_code', 'sex', 'smoker', 'civil_status', 'relationship_since_year', 'partner_birth_year', 'partner_annual_gross_income_chf', 'children_count', 'children_birth_years', 'expecting_child', 'employment_type', 'occupation', 'employment_rate_percent', 'annual_gross_income_chf', 'first_working_year_switzerland', 'has_pension_fund', 'has_pillar_3a', 'pillar_3a_annual_contribution_chf', 'existing_life_insurance', 'free_assets_chf', 'housing', 'monthly_housing_cost_chf', 'debts_chf', 'goals', 'desired_retirement_age', 'home_purchase_year', 'risk_appetite', 'net_income_band', 'net_worth_band', 'annual_saving_capacity_band', 'one_time_investment_band', 'investment_goal', 'investment_horizon', 'securities_experience', 'reaction_to_30_percent_loss']);
 export const CreateVoiceSessionSchema = z.object({ messageId: Id, expectedCaseRevision: revision, provider: VoiceProviderSchema, locale: LocaleSchema,
     dataClassification: z.literal('synthetic'), noticeVersion: z.literal(VOICE_NOTICE_VERSION), allowExternalVoiceProcessing: z.literal(true),
-    sdp: z.string().min(4).max(100000).optional(), resumeFrom: Id.optional() }).strict();
+    sdp: z.string().min(4).max(100000).optional(), resumeFrom: Id.optional(),
+    conversationSettings: z.object({skillIds:z.array(z.string().min(1).max(100)).max(20).optional(),
+      timeBudgetMinutes:z.number().int().min(5).max(60).optional(),priorities:z.array(PortfolioFieldIdSchema).max(8).optional()}).strict().optional() }).strict();
 export const VoiceSessionSchema = z.object({ schemaVersion: z.literal('1.0'), id: Id, caseId: Id, provider: VoiceProviderSchema, locale: LocaleSchema,
     status: z.enum(['starting', 'active', 'closed', 'interrupted', 'failed']), createdAt: z.iso.datetime(), expiresAt: z.iso.datetime(), endedAt: z.iso.datetime().nullable(),
     closeReason: z.enum(['customer_closed', 'voice_switch', 'inactive', 'human_handover', 'session_revoked', 'expired', 'server_restart', 'provider_failed', 'shutdown']).nullable(),
@@ -20,7 +22,7 @@ export const VoiceConnectionSchema = z.discriminatedUnion('provider', [
     z.object({ provider: z.literal('gpt-live'), session: z.object({ id: z.string().min(1).max(200) }).strict(), transport: z.object({ type: z.literal('webrtc'), sdp: z.string().min(1).max(150000) }).strict() }).strict(),
     z.object({ provider: z.literal('elevenlabs'), token: z.string().min(1).max(16000), conversationId: z.string().min(1).max(200), agentId: z.string().min(1).max(200) }).strict(),
 ]);
-export const VoiceSessionStartResponseSchema = z.object({ voiceSession: VoiceSessionSchema, connection: VoiceConnectionSchema, prompt: z.string().max(16000), replayed: z.boolean() }).strict();
+export const VoiceSessionStartResponseSchema = z.object({ voiceSession: VoiceSessionSchema, connection: VoiceConnectionSchema, prompt: z.string().max(32000), replayed: z.boolean() }).strict();
 export const VoiceTurnInputSchema = z.object({ speaker: z.enum(['customer', 'agent']), log: VoiceLogSchema }).strict();
 export const StoredVoiceTurnSchema = VoiceTurnInputSchema.extend({ receivedAt: z.iso.datetime() }).strict();
 export const VoiceTranscriptSchema = z.object({ caseId: Id, voiceSession: VoiceSessionSchema, turns: z.array(StoredVoiceTurnSchema).max(250) }).strict();

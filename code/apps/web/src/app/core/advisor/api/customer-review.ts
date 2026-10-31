@@ -301,8 +301,9 @@ export class CustomerReview {
   }
 
   private async refresh(): Promise<void> {
-    const caseId = this.api.session()?.caseId;
-    if (!caseId) return;
+    const session = this.api.session();
+    if (!session) return;
+    const caseId = session.caseId;
     const reload = ++this.reloads;
     try {
       const [dto, context, confirmation] = await Promise.all([
@@ -310,12 +311,12 @@ export class CustomerReview {
         this.api.loadContext(caseId),
         this.api.currentConfirmation(caseId),
       ]);
-      if (reload !== this.reloads) return;
+      if (reload !== this.reloads || this.api.session() !== session) return;
       this.caseState.set(dto);
       this.contextState.set(context);
       this.hold(confirmation);
     } catch (error) {
-      if (reload === this.reloads) this.fail(error);
+      if (reload === this.reloads && this.api.session() === session) this.fail(error);
     }
   }
 
@@ -350,6 +351,9 @@ export class CustomerReview {
     } finally {
       this.busyState.set(false);
       this.store.connect();
+      // A stream may stay open (or reconnect) without delivering a notification. Also reload
+      // after failed commands: the server may have committed before the response was lost.
+      this.store.refresh();
       await this.refresh();
     }
   }
@@ -364,7 +368,7 @@ export class CustomerReview {
   /** The customer signs in again; nothing of the old session stays on screen. */
   private endSession(): void {
     this.api.clearSession();
-    this.store.disconnect();
+    this.store.clear();
     this.caseState.set(null);
     this.contextState.set(null);
     this.confirmationState.set(null);

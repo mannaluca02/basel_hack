@@ -1,0 +1,14 @@
+{
+  "name": "pax-debugging-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prestart": "node scripts/sync-voice-avatar.mjs",
+    "start": "node ../node_modules/@angular/cli/bin/ng.js serve debugging-app --port 4300",
+    "prebuild": "node scripts/sync-voice-avatar.mjs",
+    "build": "node ../node_modules/@angular/cli/bin/ng.js build debugging-app",
+    "pretest": "node scripts/sync-voice-avatar.mjs",
+    "test": "node ../node_modules/@angular/cli/bin/ng.js test debugging-app --watch=false",
+    "start:backend": "npm --prefix ../../.. run build && node --env-file-if-exists=../../../../.env scripts/start-api.mjs"
+  }
+}

@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { CONSENT_NOTICE_VERSION } from '../../consent/consent';
 import { provideI18nTesting } from '../../i18n/i18n-testing';
-import { AdvisorDataSource, AdvisorEvent, ConnectionState } from '../advisor-data-source';
+import { AdvisorDataSource, AdvisorEvent, AdvisorSnapshot, ConnectionState } from '../advisor-data-source';
 import { provideAdvisorDataSource } from '../provide-advisor-data-source';
 import { ApiDataSource } from './api-data-source';
 import { CUSTOMER_SESSION_KEY, CustomerApi } from './customer-api';
@@ -199,6 +199,44 @@ describe('ApiDataSource', () => {
       summary: null,
       transcript: [{ entryId: 'conv_a0', speaker: 'agent', text: 'Hoi', status: 'final' }],
     });
+  });
+
+  it('rebinds the stream and rejects former-session snapshots even when authentication returns the same case ID', async () => {
+    const { source, states, http } = setup();
+    const events: AdvisorEvent[] = [], snapshots: AdvisorSnapshot[] = [];
+    source.events.subscribe(event => events.push(event));
+    source.connect();
+    const oldStream = FakeEventSource.instances[0]; oldStream.open();
+    source.snapshot().subscribe(snapshot => snapshots.push(snapshot));
+    const oldRead = http.expectOne(`/api/cases/${CASE_ID}`);
+    const oldRelatedReads = http.match(request => request.method === 'GET');
+    const login = TestBed.inject(CustomerApi).signIn('replacement-access-code');
+    http.expectOne('/api/sessions').flush({ csrfToken: 'csrf_replacement' });
+    await new Promise(resolve => setTimeout(resolve));
+    http.expectOne('/api/cases').flush({ id: CASE_ID });
+    await login;
+
+    source.connect();
+    expect(oldStream.closed).toBe(true);
+    expect(FakeEventSource.instances).toHaveLength(2);
+    const currentStream = FakeEventSource.instances[1]; currentStream.open();
+    const update = { caseId: CASE_ID, contextRevision: 8, reason: 'human_handover_requested' };
+    oldStream.emit('advisor.context.updated', update); oldStream.fail({ closed: true }); oldStream.open();
+    expect(currentStream.closed).toBe(false);
+    expect(states.at(-1)).toBe('connected');
+    expect(events).toEqual([]);
+    currentStream.emit('advisor.context.updated', update);
+    expect(events).toEqual([{ type: 'context', payload: update }]);
+    oldRead.flush({ ...mueller.case, id: CASE_ID, contextRevision: 100 });
+    for(const request of oldRelatedReads)request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
+    source.disconnect();
+    for(const request of http.match(request => request.method === 'GET')){
+      if(request.request.url===`/api/cases/${CASE_ID}`)request.flush({...mueller.case,id:CASE_ID});
+      else request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
+    }
+    await new Promise(resolve => setTimeout(resolve));
+    expect(snapshots).toEqual([]);
+    http.verify();
   });
 });
 

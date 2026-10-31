@@ -26,7 +26,9 @@ export function reviewCase(overrides: Partial<InsuranceCaseDto> = {}): Insurance
     draftDirty,
     proposalBatches,
     ambiguities,
-    confirmedVersions: [{ version: 1 }],
+    confirmedVersions: [{ version: 1, draft, confirmedAt: '2026-10-31T10:00:00.000Z' }],
+    runs: [], estimates: [], activeRunId: null,
+    createdAt: '2026-10-31T10:00:00.000Z', updatedAt: '2026-10-31T10:00:00.000Z',
     ...overrides,
   } as unknown as InsuranceCaseDto;
 }
@@ -91,6 +93,10 @@ export function serve(http: HttpTestingController, state: ServerState = {}): voi
   answer(`/api/cases/${CASE_ID}/customer-confirmations/current`, {
     confirmation: state.confirmation ?? null,
   });
+  for (const request of http.match(request => request.method === 'GET' &&
+    ['/summaries','/suitability','/voice/agent-turns'].some(route => request.url.endsWith(route)))) {
+    request.flush({code:'NOT_FOUND'},{status:404,statusText:'Not Found'});
+  }
 }
 
 /** Lets pending promises and the render after them finish. */

@@ -3,8 +3,9 @@ import { MODEL_EXTRACTION_NOTICE_VERSION,ModelExtractionConsentInputSchema,Model
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor,type InsuranceCase } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
+import type { ResponsesTransport } from '../erni-dialog/responses.js';
 
-export type ModelExtractionOptions={enabled?:boolean};
+export type ModelExtractionOptions={enabled?:boolean;transport?:ResponsesTransport};
 type Locale='de'|'fr'|'it'|'en';
 const texts:Record<Locale,string>={
   de:'Optionale KI-Extraktion: Damit Sie Angaben aus dem Gespräch nicht zusätzlich eintippen müssen, sendet der Prototyp nach Ihrer gesonderten Zustimmung einen kleinen, ausdrücklich erfundenen Ausschnitt an OpenAI: den Gesprächsausschnitt, eine pseudonyme Personen-ID, betroffene Feldwerte mit Einheit und Einkommensbasis, erlaubte Zielfelder und zugehörige Rückfragen. Nicht übertragen werden der vollständige Fall, Versionen und Berechtigungen, Zugangsdaten, Audio, Gesundheitsdaten oder echte Kundendaten. Das Ergebnis ist nur ein Vorschlag, den Sie prüfen und annehmen müssen. Diese Zustimmung gilt nicht für echte Daten, den Logismata-Rechner oder die Sprachdemo.',

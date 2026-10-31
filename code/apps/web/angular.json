@@ -7,6 +7,38 @@
   },
   "newProjectRoot": "projects",
   "projects": {
+    "debugging-app": {
+      "projectType": "application",
+      "root": "debugging-app",
+      "sourceRoot": "debugging-app/src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "debugging-app/src/main.ts",
+            "index": "debugging-app/src/index.html",
+            "outputPath": "debugging-app/dist",
+            "tsConfig": "debugging-app/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [{ "glob": "**/*", "input": "debugging-app/public" }],
+            "styles": ["src/styles/tokens.css", "src/styles.scss"]
+          },
+          "configurations": {
+            "production": { "outputHashing": "all" },
+            "development": { "optimization": false, "extractLicenses": false, "sourceMap": true }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": { "buildTarget": "debugging-app:build:development", "proxyConfig": "debugging-app/proxy.conf.json" }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": { "buildTarget": "debugging-app:build:development", "tsConfig": "debugging-app/tsconfig.spec.json" }
+        }
+      }
+    },
     "web": {
       "projectType": "application",
       "schematics": {

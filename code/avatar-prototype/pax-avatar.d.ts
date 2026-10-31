@@ -2,6 +2,8 @@ export type ReplyEmotion = "neutral" | "acknowledging" | "curious" | "explaining
 export type Face = ReplyEmotion | "listening" | "thinking";
 
 export type AvatarEvent =
+  /** Opt-in local energy-driven pose. Not a playback boundary or confirmation signal. */
+  | { type: "local-audio-visual"; enabled: boolean }
   | { type: "activity"; state: "idle" | "listening" | "thinking" }
   | { type: "emotion"; emotion: ReplyEmotion; playbackId?: string }
   | { type: "playback"; event: "started" | "ended" | "cancelled" | "error"; playbackId: string; turnId?: string; replyId?: string };
@@ -12,6 +14,8 @@ export interface AvatarState {
   playing: string | null;
   replyEmotion: ReplyEmotion;
   level: number;
+  /** Local output-energy heuristic only; never proof of audibility or completed playback. */
+  localAudioActive: boolean;
 }
 
 export interface PaxAvatar {

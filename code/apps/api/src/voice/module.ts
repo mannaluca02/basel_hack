@@ -4,6 +4,8 @@ import { LIFE_RUNTIME, type LifeRuntime } from '../insurance/runtime.js';
 import { LifeSessionGuard } from '../insurance/http.js';
 import type { Actor } from '../insurance/types.js';
 import { WorkflowError } from '../insurance/types.js';
+import { VoiceLabController } from './lab.js';
+import { voicePromptSettings } from './prompt.js';
 type Request = {
     actor: Actor;
 };
@@ -22,6 +24,8 @@ class PublicVoiceController {
     selected: unknown) { return this.r.voice.privacy(selected === undefined ? 'de' : z.enum(['de', 'fr', 'it', 'en']).parse(selected)); }
     @Get('portfolio')
     catalog() { return this.r.voice.catalog(); }
+    @Get('settings')
+    settings() { return voicePromptSettings(); }
 }
 @Controller('api/cases/:caseId/voice/sessions')
 @UseGuards(LifeSessionGuard)
@@ -118,6 +122,6 @@ class AgentTurnsController {
     @Body()
     body: unknown) { return this.r.voice.recordAgentTurns(req.actor, uuid(id), body); }
 }
-@Module({ controllers: [PublicVoiceController, CaseVoiceController, ExternalVoiceController, AgentTurnsController] })
+@Module({ controllers: [PublicVoiceController, CaseVoiceController, ExternalVoiceController, AgentTurnsController, VoiceLabController] })
 export class VoiceModule {
 }

@@ -44,7 +44,7 @@ function* walk(dir) {
 }
 
 const literal = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?)\(/i;
-for (const file of walk(join(root, 'src'))) {
+for (const file of [...walk(join(root, 'src')), ...walk(join(root, 'debugging-app/src'))]) {
   if (file === tokensPath) continue;
   readFileSync(file, 'utf8')
     .split('\n')

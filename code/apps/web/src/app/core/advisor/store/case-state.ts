@@ -155,6 +155,9 @@ export function applyCaseEvent(state: CaseState, event: AdvisorEvent): CaseTrans
  */
 export function applyCaseSnapshot(state: CaseState, snapshot: AdvisorSnapshot): CaseTransition {
   const before = state.data;
+  if (before.caseId === snapshot.caseId && before.canonical && snapshot.canonical &&
+      (snapshot.canonical.caseRevision < before.canonical.caseRevision ||
+       snapshot.canonical.contextRevision < before.canonical.contextRevision)) return unchanged(state);
   const changes: TabChange[] = [
     ...changedIds('graphics', before.charts, snapshot.charts, (c) => c.chartId),
     ...changedIds('risks', before.risks, snapshot.risks, (r) => r.riskId),
