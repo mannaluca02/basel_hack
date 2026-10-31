@@ -2,7 +2,7 @@
 <!--
   PROTOTYPE — throwaway. Live test: OpenAI Realtime voice driving the Pax avatar.
   Run: node code/avatar-prototype/server.mjs  →  http://localhost:8787/realtime.html
-  Wiring: openai-realtime-adapter.js (voice, Dario) → AvatarEvents → pax-avatar-controller.js (avatar, Lukas)
+  Wiring: openai-realtime-adapter.js (voice, Dario) → AvatarEvents → pax-avatar.js (avatar, Lukas)
 -->
 <html lang="de">
 <head>
@@ -37,20 +37,20 @@
 
 <audio id="remote" autoplay></audio>
 <script type="module">
-import { mountPaxAvatar, EMOTIONS } from "./pax-avatar.js";
-import { createAvatarController } from "./pax-avatar-controller.js";
+import { createPaxAvatar, EMOTIONS } from "./pax-avatar.js";
 import { connectOpenAIRealtime } from "./openai-realtime-adapter.js";
 
 const $ = (id) => document.getElementById(id);
 let connection = "idle", call = null, lastReply = null;
 
-const rig = mountPaxAvatar($("avatar"), { onFrame: ({ level }) => {
+const avatar = createPaxAvatar($("avatar"));
+setInterval(() => {
+  const { level } = avatar.state;
   $("meter").style.width = (level * 100).toFixed(0) + "%";
   const s = avatar.state;
   document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === s.face));
   $("state").textContent = `connection ${connection}\nface       ${s.face}\nactivity   ${s.activity}\nplaying    ${s.playing ?? "–"}\nreply      ${s.replyEmotion}`;
-} });
-const avatar = createAvatarController(rig);
+}, 100);
 
 // Test buttons: sent as AvatarEvents through the controller, the same path the voice adapter uses.
 // Reply emotions are queued while listening/thinking and stabilised during a reply,

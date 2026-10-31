@@ -42,23 +42,18 @@
 </aside>
 
 <script type="module">
-import { mountPaxAvatar, EMOTIONS } from "./pax-avatar.js";
-import { createAvatarController } from "./pax-avatar-controller.js";
+import { createPaxAvatar, EMOTIONS } from "./pax-avatar.js";
 
 const $ = (id) => document.getElementById(id);
 let source = "none";      // none | sim | mic
 
-const rig = mountPaxAvatar($("avatar"), { onFrame: ({ emotion, level, cur, body }) => {
-  $("meter").style.width = (level * 100).toFixed(0) + "%";
+const avatar = createPaxAvatar($("avatar"));
+setInterval(() => {
   const s = avatar.state;
-  $("state").textContent =
-    `face      ${emotion}\nactivity  ${s.activity}  playing ${s.playing ?? "–"}\naudio     ${source}  level ${level.toFixed(2)}\n` +
-    `eyes      gaze ${cur.gx.toFixed(2)},${cur.gy.toFixed(2)} open ${cur.open.toFixed(2)}\n` +
-    `          lid ${cur.angleL.toFixed(1)}° drop ${cur.lidL.toFixed(2)} smile ${cur.smile.toFixed(2)}\n` +
-    `body      sx ${body.sx.toFixed(3)} sy ${body.sy.toFixed(3)} rot ${body.rot.toFixed(1)}° ty ${body.ty.toFixed(1)}`;
-  document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === emotion));
-} });
-const avatar = createAvatarController(rig);
+  $("meter").style.width = (s.level * 100).toFixed(0) + "%";
+  $("state").textContent = `face      ${s.face}\nactivity  ${s.activity}\nplaying   ${s.playing ?? "–"}\nreply     ${s.replyEmotion}\naudio     ${source}  level ${s.level.toFixed(2)}`;
+  document.querySelectorAll("[data-emo]").forEach(b => b.classList.toggle("on", b.dataset.emo === s.face));
+}, 100);
 
 function log(line) {
   $("log").textContent = `${line}\n` + $("log").textContent.slice(0, 4000);
@@ -68,15 +63,16 @@ function log(line) {
 for (const key in EMOTIONS) {
   const b = document.createElement("button");
   b.textContent = EMOTIONS[key].label; b.dataset.emo = key;
-  b.onclick = () => rig.setEmotion(key);
+  b.onclick = () => avatar.show(key);
   $("emotions").appendChild(b);
 }
 
 // ---------- Audio ----------
 // Fake speech: syllables at ~5 Hz, words, short pauses
-let simT = 0;
-function simLevel(dt) {
-  simT += dt;
+let simT = 0, simLast = performance.now();
+function simLevel() {
+  const now = performance.now();
+  simT += Math.min(.05, (now - simLast) / 1000); simLast = now;
   const phrase = (Math.sin(simT * 0.9) + Math.sin(simT * 2.3 + 1)) > -0.9 ? 1 : 0;
   const syll = Math.max(0, Math.sin(simT * 2 * Math.PI * 4.7)) ** 0.6;
   return phrase * (0.35 + 0.65 * syll) * (0.75 + 0.25 * Math.random());
@@ -84,7 +80,7 @@ function simLevel(dt) {
 function setSource(next) {
   if (source === "mic" && next !== "mic") avatar.handle({ type: "activity", state: "idle" });
   source = next;
-  if (next !== "mic") avatar.setLevelSource(next === "sim" ? simLevel : null);
+  if (next !== "mic") avatar.attachAudio(next === "sim" ? simLevel : null);
   $("btnSim").classList.toggle("on", source === "sim"); $("btnMic").classList.toggle("on", source === "mic");
 }
 $("btnSim").onclick = () => setSource(source === "sim" ? "none" : "sim");
@@ -134,8 +130,8 @@ $("btnScript").onclick = () => {
   }, t)));
 };
 
-window.pax = { rig, avatar };
-rig.setEmotion(new URLSearchParams(location.search).get("emotion") || "neutral");
+window.pax = { avatar };
+avatar.show(new URLSearchParams(location.search).get("emotion") || "neutral");
 </script>
 </body>
 </html>

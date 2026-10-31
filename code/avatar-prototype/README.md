@@ -6,14 +6,22 @@ Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Eleven expressi
 
 | File | Owner | What |
 |---|---|---|
-| `pax-avatar.js` | Lukas | Drawing + animation. `mountPaxAvatar(el)` |
-| `pax-avatar-controller.js` | Lukas | **The interface for voice**: `attachAudio(source)`, `handle(AvatarEvent)` |
-| `pax-avatar.d.ts`, `pax-avatar-controller.d.ts` | Lukas | TypeScript types for Angular |
+| `pax-avatar.js` | Lukas | `createPaxAvatar(el)`: events, audio, drawing and animation |
+| `pax-avatar.d.ts` | Lukas | TypeScript types for Angular |
 | `openai-realtime-adapter.js` | Dario | Reference adapter: GPT-Live (WebRTC) → AvatarEvents |
 | `server.mjs` | Dario | Dev server: static files + `POST /session` exchanges SDP with the Live API |
 | `index.html` | — | Design demo: face buttons, fake speech, mic, scripted conversation as AvatarEvents |
 | `expressions.html` | — | Live eleven-expression review sheet, focused view and replay |
 | `realtime.html` | — | Live test against GPT-Live |
+
+```js
+import { createPaxAvatar } from "./pax-avatar.js";
+const avatar = createPaxAvatar(hostElement);
+avatar.attachAudio(remoteStream); // stream, media element, level callback, or null to detach
+avatar.handle(event);
+// Design/demo: avatar.show("pleased"); always replays entry motion.
+// Read avatar.state; call avatar.reset() between sessions and avatar.destroy() on teardown.
+```
 
 ## Expressions and listening
 

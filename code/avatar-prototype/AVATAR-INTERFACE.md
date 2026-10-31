@@ -7,15 +7,16 @@ Handoff for Dario (Voice). Lukas owns the avatar side. This extends **I06 VoiceP
 The voice layer gives the avatar **the audio it plays** and a stream of **`AvatarEvent`s**. It never sets the face directly.
 
 ```js
-import { mountPaxAvatar } from "./pax-avatar.js";
-import { createAvatarController } from "./pax-avatar-controller.js";
+import { createPaxAvatar } from "./pax-avatar.js";
 
-const avatar = createAvatarController(mountPaxAvatar(hostElement));
+const avatar = createPaxAvatar(hostElement);
 avatar.attachAudio(remoteStream);   // MediaStream or <audio> element that the user hears
 avatar.handle(event);               // every AvatarEvent, in the order they happen
 ```
 
-Types: [`pax-avatar.d.ts`](pax-avatar.d.ts) and [`pax-avatar-controller.d.ts`](pax-avatar-controller.d.ts). Reference implementation for GPT-Live: [`openai-realtime-adapter.js`](openai-realtime-adapter.js).
+Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Live: [`openai-realtime-adapter.js`](openai-realtime-adapter.js).
+
+`attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
 
 ## The three events
 
@@ -62,31 +63,28 @@ Live has no speech-start/stop or playback boundary events. Listening/thinking an
 
 ## Integrating into the Angular app
 
-1. **Copy the avatar files** into the app, e.g. `src/app/avatar/`: `pax-avatar.js`, `pax-avatar-controller.js` and both `.d.ts` files. They are plain ES modules with type declarations, no build step or dependency.
+1. **Copy the avatar files** into the app, e.g. `src/app/avatar/`: `pax-avatar.js` and `pax-avatar.d.ts`. They are plain ES modules with type declarations, no build step or dependency.
 2. **Mount it in a component, outside the Angular zone** (the avatar animates every frame; inside the zone that would trigger change detection 60 times per second). Multiple avatars can coexist: each mount gives its SVG definitions unique IDs.
 
    ```ts
    import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inject } from "@angular/core";
-   import { mountPaxAvatar, type PaxAvatarRig } from "./pax-avatar.js";
-   import { createAvatarController, type AvatarController } from "./pax-avatar-controller.js";
+   import { createPaxAvatar, type PaxAvatar } from "./pax-avatar.js";
 
    @Component({ selector: "pax-avatar", standalone: true, template: `<div #host></div>` })
    export class PaxAvatarComponent implements AfterViewInit, OnDestroy {
      @ViewChild("host", { static: true }) host!: ElementRef<HTMLElement>;
      private zone = inject(NgZone);
-     private rig?: PaxAvatarRig;
-     controller?: AvatarController;
+     avatar?: PaxAvatar;
 
      ngAfterViewInit() {
        this.zone.runOutsideAngular(() => {
-         this.rig = mountPaxAvatar(this.host.nativeElement);
-         this.controller = createAvatarController(this.rig);
+         this.avatar = createPaxAvatar(this.host.nativeElement);
        });
      }
-     ngOnDestroy() { this.rig?.destroy(); }
+     ngOnDestroy() { this.avatar?.destroy(); }
    }
    ```
-3. **Hand the controller to the voice service** (e.g. an `AvatarService` holding the `AvatarController`). The voice code calls only `attachAudio(stream)` once per call and `handle(event)` for every AvatarEvent. Nothing else of the avatar is public.
+3. **Hand the avatar to the voice service** (e.g. an `AvatarService` holding the `PaxAvatar`). The voice code calls only `attachAudio(stream)` once per call and `handle(event)` for every AvatarEvent. Use `show()` only for design/demo overrides.
 4. **Move `POST /session` into the NestJS backend** (Dario's VoiceAdapter). It takes `{ sdp }` from the browser, calls `POST https://api.openai.com/v1/live/sessions` with the session config from `server.mjs` (instructions, voice, Decisions delegation, emotion triggers) and returns the SDP answer. The API key never reaches the browser. Keep the voice-only retry so a rejected Decisions config never breaks voice.
 5. **Port the adapter** (`openai-realtime-adapter.js`) into the voice service or reuse it as is; its only output is `onAvatarEvent(ev)`, `onAudioStream(stream)` and `onTranscript(delta)`. Replace the demo action registry with real app actions (show the Vorsorgebild, request a human advisor).
 

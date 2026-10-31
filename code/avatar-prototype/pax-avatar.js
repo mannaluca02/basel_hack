@@ -1,10 +1,4 @@
-// PROTOTYPE — Pax Beratercharakter rig ("Soft Block"): drawing + animation only.
-// Framework-free ES module. Voice code should not call this directly; use pax-avatar-controller.js.
-//
-//   const rig = mountPaxAvatar(document.getElementById("host"));
-//   rig.setEmotion("pleased");
-//   rig.attachStream(remoteAudioStream);   // audio level remains available to the UI
-//   rig.setLevelSource(() => 0.4);         // or any custom 0..1 level
+// Pax avatar: one factory for conversation events, audio and animation.
 const SVG = `
 <svg viewBox="0 0 200 200" aria-label="Pax Beratercharakter" style="width:100%;height:auto;overflow:visible">
   <defs>
@@ -13,7 +7,7 @@ const SVG = `
       <stop offset=".45" stop-color="#8bcb00" />
       <stop offset="1" stop-color="#62a600" />
     </radialGradient>
-    <filter id="paxSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.8" /></filter>
+    <radialGradient id="paxBlush"><stop stop-color="#ff8fb1" stop-opacity=".9" /><stop offset="1" stop-color="#ff8fb1" stop-opacity="0" /></radialGradient>
     <mask id="paxMaskL" maskUnits="userSpaceOnUse" x="-50" y="-50" width="300" height="300">
       <rect x="-50" y="-50" width="300" height="300" fill="#fff" />
       <rect data-part="lidL" fill="#000" /><circle data-part="lowL" fill="#000" />
@@ -27,8 +21,10 @@ const SVG = `
   <g data-part="char">
     <rect x="40" y="40" width="120" height="120" rx="34" fill="url(#paxBody)" />
     <ellipse data-part="highlight" cx="72" cy="62" rx="22" ry="11" fill="#fff" opacity=".35" transform="rotate(-20 72 62)" />
-    <ellipse data-part="blushL" cx="66" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
-    <ellipse data-part="blushR" cx="134" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
+    <g data-part="blush">
+    <ellipse data-part="blushL" cx="66" cy="118" rx="17" ry="12" fill="url(#paxBlush)" />
+    <ellipse data-part="blushR" cx="134" cy="118" rx="17" ry="12" fill="url(#paxBlush)" />
+    </g>
     <g fill="#360573">
       <ellipse data-part="eyeL" mask="url(#paxMaskL)" />
       <ellipse data-part="eyeR" mask="url(#paxMaskR)" />
@@ -70,36 +66,69 @@ export const EMOTIONS = {
 };
 let mountId = 0;
 
-const set = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
+export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "reassuring", "empathetic", "pleased", "recovering", "presenting_offer"];
+const HOLD_AFTER_REPLY_MS = 1500;
+const EMOTION_HOLD_MS = 2000;
+const MAX_FINISHED_IDS = 50;
 
-export function mountPaxAvatar(host, { onFrame } = {}) {
+const POSES = Object.fromEntries(Object.entries(EMOTIONS).map(([key, value]) => [key, { ...BASE, ...value }]));
+const SIDES = ["L", "R"], GAZES = [[-1.4,0], [.9,-.45], [0,.35], [-.6,-.4]];
+const silence = () => 0;
+// Cache strings at the SVG boundary; static geometry stops touching the DOM.
+const attributes = new WeakMap();
+function set(el, key, value) {
+  const formatted = typeof value === "number" ? String(Math.round(value * 100) / 100) : value;
+  const cache = attributes.get(el);
+  if (cache[key] !== formatted) { cache[key] = formatted; el.setAttribute(key, formatted); }
+}
+const fmt = (value) => Math.round(value * 10000) / 10000;
+
+export function createPaxAvatar(host) {
   const id = `pax-${++mountId}-`;
   host.innerHTML = SVG.replace(/id="(pax\w+)"/g, (_, name) => `id="${id}${name}"`)
     .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
   const part = (name) => host.querySelector(`[data-part="${name}"]`);
   const P = {};
-  for (const n of ["shadow", "char", "highlight", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
+  for (const n of ["shadow", "char", "highlight", "blush", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
 
-  let emotion = "neutral";
+  for (const el of host.querySelectorAll("*")) attributes.set(el, Object.create(null));
+  let emotion = "neutral", destroyed = false, visible = true;
   const cur = { ...BASE };
-  let level = 0, levelSource = () => 0, hasLevelSource = false;
+  let level = 0, levelSource = silence, hasLevelSource = false;
   let slowLevel = 0, onsetReady = true, beatAge = Infinity, beatStrength = 0, beatPose = 0;
   let beatCooldown = 0, nextBeat = .8, nextEngagedGaze = 0;
   const engagedGaze = { x:0, y:0 }, engagedTarget = { x:0, y:0 };
-  let analyser = null, audioCtx = null, buf = null;
+  let analyser = null, audioCtx = null, buf = null, audioNode = null;
+  const mediaNodes = new Map();
   let blinkDuration = 0, blinkExitDuration = 0;
   let blinkT = 0, nextBlink = 3 + Math.random() * 3, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
   const gaze = { x: 0, y: 0 };
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const sparkles = [];
   let dotsEnteredAt = 0;
-  let nodClock = 0, nodInterval = BASE.nodInterval, nodPose = 0;
-  let yawClock = 0, yawInterval = BASE.yawInterval, yawPose = 0, yawDirection = 1;
+  let nodPose = 0, yawPose = 0, yawDirection = 1;
+  const nodGesture = { clock:0, interval:BASE.nodInterval }, yawGesture = { clock:0, interval:BASE.yawInterval };
+  function periodic(gesture, kind, target, dt, enter = false) {
+    if (enter) gesture.clock = -Math.max(target[kind + "Delay"], blinkDuration ? nextBlink + blinkDuration - blinkT + .04 : 0);
+    else if (cur[kind] > .001 || POSES[emotion][kind]) gesture.clock += dt;
+    if (enter || (cur[kind] > .001 && gesture.clock >= gesture.interval)) {
+      if (!enter) gesture.clock -= gesture.interval;
+      gesture.interval = target[kind + "Interval"] + (Math.random() * 2 - 1) * target[kind + "Jitter"];
+    }
+  }
+  function blocksBlink(gesture, amount, duration) {
+    return amount > .01 && (gesture.interval - gesture.clock < cur.blinkDuration + .05 || gesture.clock < duration + .1);
+  }
+  function nodDip(age) {
+    if (age < 0 || age >= cur.nodDown + cur.nodUp) return 0;
+    return age < cur.nodDown ? (1 - Math.cos(Math.PI * age / cur.nodDown)) / 2
+      : (1 + Math.cos(Math.PI * (age - cur.nodDown) / cur.nodUp)) / 2;
+  }
   const entries = [];
   const dotOpacity = [0, 0, 0];
   const pose = { sx:1, sy:1, rot:0, ty:0, tx:0, lift:0 };
   function replay() {
-    const target = { ...BASE, ...EMOTIONS[emotion] };
+    const target = POSES[emotion];
     // Let an in-flight gesture finish; changing expressions cannot reset its envelope.
     for (const kind of ["hop", "shake"]) {
       if (target[kind] && !entries.some(e => e.kind === kind)) {
@@ -111,69 +140,64 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
   for (const [x,y,scale] of [[32,47,.7],[48,20,.8],[145,22,.65],[174,42,1],[176,105,.7],[124,183,.6]]) {
     const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
     el.setAttribute("d", "M0,-7 L2,-2 7,0 2,2 0,7 -2,2 -7,0 -2,-2Z");
+    attributes.set(el, Object.create(null));
     P.sparkles.appendChild(el);
     sparkles.push({ el, x, y, scale });
   }
 
-  function setEmotion(key) {
-    if (!Object.hasOwn(EMOTIONS, key) || key === emotion) return false;
+  function setEmotion(key, force = false) {
+    if (!Object.hasOwn(EMOTIONS, key) || (key === emotion && !force)) return false;
     // Carry the slower speaking blink through the first blink after a gesture exit.
     if (EMOTIONS[emotion].beat && !EMOTIONS[key].beat && !blinkDuration) blinkExitDuration = cur.blinkDuration;
     emotion = key;
-    if (EMOTIONS[key].nod) {
-      const nodTarget = { ...BASE, ...EMOTIONS[key] };
-      nodClock = -Math.max(nodTarget.nodDelay, blinkDuration ? nextBlink + blinkDuration - blinkT + .04 : 0);
-      nodInterval = nodTarget.nodInterval + (Math.random() * 2 - 1) * nodTarget.nodJitter;
-    }
-    if (EMOTIONS[key].yaw) {
-      const yawTarget = { ...BASE, ...EMOTIONS[key] };
-      yawClock = -Math.max(yawTarget.yawDelay, blinkDuration ? nextBlink + blinkDuration - blinkT + .04 : 0);
-      yawInterval = yawTarget.yawInterval + (Math.random() * 2 - 1) * yawTarget.yawJitter;
-      yawDirection = yawTarget.yawDir || Math.sign(yawTarget.tilt) || 1;
-    }
+    const target = POSES[key];
+    if (target.nod) periodic(nodGesture, "nod", target, 0, true);
+    if (target.yaw) { periodic(yawGesture, "yaw", target, 0, true); yawDirection = target.yawDir || Math.sign(target.tilt) || 1; }
     if (EMOTIONS[key].beat) { nextBeat = .8; nextEngagedGaze = 0; }
     if (key === "thinking") dotsEnteredAt = t;
     replay();
     return true;
   }
   function setLevelSource(fn) {
-    levelSource = fn || (() => 0);
+    levelSource = fn || silence;
     hasLevelSource = !!fn;
     slowLevel = level = 0;
     onsetReady = true;
     nextBeat = .8;
   }
-  // Speech level from a MediaStream (e.g. the remote track of an OpenAI Realtime WebRTC call)
-  // or from an <audio> element that plays TTS. Chrome only delivers samples from a remote
-  // WebRTC stream if it is also played by an <audio> element.
-  function attachStream(source) {
-    audioCtx = audioCtx || new AudioContext();
-    if (audioCtx.state === "suspended") audioCtx.resume();
+  function audioLevel() {
+    analyser.getFloatTimeDomainData(buf);
+    let sum = 0; for (const x of buf) sum += x * x;
+    return Math.min(1, Math.sqrt(sum / buf.length) * 7);
+  }
+  function attachAudio(source) {
+    if (destroyed) return;
+    audioNode?.disconnect(); analyser?.disconnect(); audioNode = analyser = buf = null;
+    setLevelSource(typeof source === "function" ? source : null);
+    if (!source || typeof source === "function") return;
+    audioCtx ||= new AudioContext();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
     analyser = audioCtx.createAnalyser(); analyser.fftSize = 1024;
     buf = new Float32Array(analyser.fftSize);
     if (source instanceof HTMLMediaElement) {
-      // a media element can only be routed once; it must still reach the speakers
-      const node = audioCtx.createMediaElementSource(source);
-      node.connect(analyser); node.connect(audioCtx.destination);
-    } else {
-      audioCtx.createMediaStreamSource(source).connect(analyser);
-    }
-    setLevelSource(() => {
-      analyser.getFloatTimeDomainData(buf);
-      let s = 0; for (const x of buf) s += x * x;
-      return Math.min(1, Math.sqrt(s / buf.length) * 7);
-    });
+      audioNode = mediaNodes.get(source);
+      if (!audioNode) { audioNode = audioCtx.createMediaElementSource(source); mediaNodes.set(source, audioNode); }
+      audioNode.connect(audioCtx.destination);
+    } else audioNode = audioCtx.createMediaStreamSource(source);
+    audioNode.connect(analyser); setLevelSource(audioLevel);
   }
 
   let last = performance.now(), t = 0, phase = 0, breathPhase = 0, raf = 0;
+  const body = { sx:1, sy:1, rot:0, ty:0, tx:0, lift:0 };
   function frame(now) {
+    if (destroyed || !visible) return;
     const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
-    const target = { ...BASE, ...EMOTIONS[emotion] };
+    const target = POSES[emotion];
     const k = 1 - Math.exp(-dt * 7);
     for (const key in BASE) cur[key] += (target[key] - cur[key]) * k;
 
     // speech level with fast attack / slow release
-    const raw = levelSource(dt);
+    const raw = levelSource();
     level += (raw - level) * (1 - Math.exp(-dt * (raw > level ? 30 : 10)));
 
     const motion = reducedMotion.matches ? 0 : 1;
@@ -182,32 +206,18 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     let hop = 0, shake = 0;
     for (let i = entries.length - 1; i >= 0; i--) {
       const e = entries[i], age = t - e.startedAt;
-      if (age >= e.duration) { entries.splice(i, 1); continue; }
+      if (age >= e.duration) { for (let j = i; j < entries.length - 1; j++) entries[j] = entries[j + 1]; entries.pop(); continue; }
       const progress = age / e.duration;
       if (e.kind === "hop") hop += e.amount * Math.sin(progress * Math.PI) ** 2;
       else shake += e.amount * Math.sin(progress * 5 * Math.PI) * Math.sin(progress * Math.PI) ** 2 * (1 - progress);
     }
-    // An entry-relative clock keeps the gesture independent of the long-running sway phase.
-    if (cur.nod > .001 || target.nod) nodClock += dt;
-    if (cur.nod > .001 && nodClock >= nodInterval) {
-      nodClock -= nodInterval;
-      nodInterval = cur.nodInterval + (Math.random() * 2 - 1) * cur.nodJitter;
-    }
-    const nodDip = (age) => {
-      if (age < 0 || age >= cur.nodDown + cur.nodUp) return 0;
-      return age < cur.nodDown
-        ? (1 - Math.cos(Math.PI * age / cur.nodDown)) / 2
-        : (1 + Math.cos(Math.PI * (age - cur.nodDown) / cur.nodUp)) / 2;
-    };
+    periodic(nodGesture, "nod", cur, dt);
+    const nodClock = nodGesture.clock, nodInterval = nodGesture.interval;
     const nodAmount = nodDip(nodClock) + cur.nodSecond * nodDip(nodClock - cur.nodDown - cur.nodUp - cur.nodGap);
     const nod = nodAmount * cur.nod;
     nodPose = motion ? nodPose + (nod - nodPose) * (1 - Math.exp(-dt * 16)) : 0;
-    // A held peek uses the same entry-relative scheduling and pose easing as the nod.
-    if (cur.yaw > .001 || target.yaw) yawClock += dt;
-    if (cur.yaw > .001 && yawClock >= yawInterval) {
-      yawClock -= yawInterval;
-      yawInterval = cur.yawInterval + (Math.random() * 2 - 1) * cur.yawJitter;
-    }
+    periodic(yawGesture, "yaw", cur, dt);
+    const yawClock = yawGesture.clock, yawInterval = yawGesture.interval;
     const yawDuration = cur.yawIn + cur.yawHold + cur.yawOut;
     let yawAmount = 0;
     if (yawClock >= 0 && yawClock < yawDuration) {
@@ -242,33 +252,29 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     const beatDip = beatPose * 2.8;
     const lift = -hop;
     const breath = Math.sin(breathPhase) * cur.breathe;
-    const body = {
-      sx:1 + motion * (-breath * .28 + hop * .003 + (nod + beatDip) * .01 / 5.5 - yawWidth * .035),
-      sy:1 + motion * (breath - hop * .003 - (nod + beatDip) * .02 / 5.5),
-      rot:motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2),
-      ty:motion * (nod + beatDip + lift),
-    };
+    body.sx = 1 + motion * (-breath * .28 + hop * .003 + (nod + beatDip) * .01 / 5.5 - yawWidth * .035);
+    body.sy = 1 + motion * (breath - hop * .003 - (nod + beatDip) * .02 / 5.5);
+    body.rot = motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2);
+    body.ty = motion * (nod + beatDip + lift);
     let tx = motion * (Math.sin(phase) * cur.sway + shake * 2 + yawPose * 1.8);
-    // Ease pose targets while the independent entry gestures finish continuously.
-    const bodyTarget = { ...body, tx, lift:motion * lift };
-    for (const key in pose) pose[key] = motion ? pose[key] + (bodyTarget[key] - pose[key]) * (1 - Math.exp(-dt * 16)) : bodyTarget[key];
+    body.tx = tx; body.lift = motion * lift;
+    for (const key in pose) pose[key] = motion ? pose[key] + (body[key] - pose[key]) * (1 - Math.exp(-dt * 16)) : body[key];
     for (const key in body) body[key] = pose[key];
     tx = pose.tx;
-    set(P.char, { transform:`translate(${tx} ${body.ty}) translate(100 160) rotate(${body.rot} 0 -60) scale(${body.sx} ${body.sy}) translate(-100 -160)` });
-    set(P.shadow, { cx:100 + yawPose * 1.2, rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2 + (nodPose + beatDip) * .6, opacity:1 + pose.lift * .04, fill:`rgba(54,5,115,${.18 + (nodPose + beatDip) * .006})` });
+    set(P.char, "transform", `translate(${fmt(tx)} ${fmt(body.ty)}) translate(100 160) rotate(${fmt(body.rot)} 0 -60) scale(${fmt(body.sx)} ${fmt(body.sy)}) translate(-100 -160)`);
+    set(P.shadow, "cx", 100 + yawPose * 1.2); set(P.shadow, "rx", 48 * (1 - motion * breath * .28) + pose.lift * 1.2 + (nodPose + beatDip) * .6); set(P.shadow, "opacity", 1 + pose.lift * .04); set(P.shadow, "fill", `rgba(54,5,115,${fmt(.18 + (nodPose + beatDip) * .006)})`);
     const faceDip = nodPose * cur.nodFace / 5.5 + beatPose * 1.5;
-    set(P.highlight, { cx:72 - yawPose * 1.5, cy:62 + (nodPose + beatDip) * 1.5 / 5.5 });
-    for (const side of ["L", "R"]) set(P["blush" + side], { cx:(side === "L" ? 66 : 134) + yawPose * 4.5, cy:118 + faceDip });
-    P.blushL.setAttribute("opacity", cur.blush * .8); P.blushR.setAttribute("opacity", cur.blush * .8);
+    set(P.highlight, "cx", 72 - yawPose * 1.5); set(P.highlight, "cy", 62 + (nodPose + beatDip) * 1.5 / 5.5);
+    const blushVisible = cur.blush > .001 || target.blush;
+    set(P.blush, "display", blushVisible ? "inline" : "none");
+    if (blushVisible) for (const side of SIDES) { set(P["blush" + side], "cx", (side === "L" ? 66 : 134) + yawPose * 4.5); set(P["blush" + side], "cy", 118 + faceDip); }
+    set(P.blushL, "opacity", cur.blush * .8); set(P.blushR, "opacity", cur.blush * .8);
 
     blinkT += dt; let blink = 1;
     if (!motion) { blinkT = 0; blinkDuration = 0; }
-    else if (!blinkDuration && cur.yaw > .01 && (yawInterval - yawClock < cur.blinkDuration + .05 || yawClock < yawDuration + .1)) {
-      // Let the eyes stay open through the peek and finish any blink before entry.
-      if (blinkT > nextBlink) nextBlink = blinkT + .1;
-    }
-    else if (!blinkDuration && cur.nod > .01 && (nodInterval - nodClock < cur.blinkDuration + .05 || nodClock < cur.nodDown + cur.nodUp + (cur.nodSecond > .01 ? cur.nodGap + cur.nodDown + cur.nodUp : 0) + .1)) {
-      // Keep a new blink out of the gesture; an existing blink finishes before the dip.
+    else if (!blinkDuration && (blocksBlink(yawGesture, cur.yaw, yawDuration) ||
+      blocksBlink(nodGesture, cur.nod, cur.nodDown + cur.nodUp + (cur.nodSecond > .01 ? cur.nodGap + cur.nodDown + cur.nodUp : 0)))) {
+      // Finish an existing blink before entry; keep new blinks out of either gesture.
       if (blinkT > nextBlink) nextBlink = blinkT + .1;
     }
     else if (blinkT > nextBlink) {
@@ -282,7 +288,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     }
     nextSaccade -= dt;
     if (nextSaccade < 0) {
-      saccade = { x:Math.random() - .5, y:(Math.random() - .5) * .5 };
+      saccade.x = Math.random() - .5; saccade.y = (Math.random() - .5) * .5;
       nextSaccade = 2 + Math.random() * 3;
     }
     gaze.x += (saccade.x - gaze.x) * k;
@@ -290,8 +296,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     if (target.gazeStep && motion) {
       nextEngagedGaze -= dt;
       if (nextEngagedGaze <= 0) {
-        const points = [[-1.4,0], [.9,-.45], [0,.35], [-.6,-.4]];
-        const point = points[Math.floor(Math.random() * points.length)];
+        const point = GAZES[Math.floor(Math.random() * GAZES.length)];
         engagedTarget.x = point[0]; engagedTarget.y = point[1];
         nextEngagedGaze = .8 + Math.random() * 1.2;
       }
@@ -301,39 +306,134 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     engagedGaze.y += (engagedTarget.y - engagedGaze.y) * gazeEase;
     const gx = motion * (cur.gazeStep * engagedGaze.x + yawPose * 1.8 * cur.gazeStep) + (cur.gx + motion * cur.glance * (gaze.x + Math.sin(phase * 2))) * 9;
     const gy = motion * cur.gazeStep * engagedGaze.y + (cur.gy + motion * cur.glance * gaze.y) * 7;
-    for (const side of ["L", "R"]) {
+    for (const side of SIDES) {
       const sign = side === "L" ? -1 : 1;
       const far = Math.max(0, -sign * yawPose), near = Math.max(0, sign * yawPose);
       const cx = 100 + sign * 23 + gx + yawPose * 4.5 - sign * far * 1.5, cy = 101 + gy + cur["y" + side] + faceDip;
       const pulse = 1 + motion * (beatPose * cur.beatRaise + cur.pulse * Math.sin(phase * 2) + cur.speech * level);
       const w = 11 * cur.size * cur["w" + side] * (1 - far * .15 + near * .05);
       const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (1 - nodPose * .06 / 5.5) * (blink + (1 - blink) * cur.smile);
-      set(P["eye" + side], { cx, cy, rx:w, ry:Math.max(.3,h) });
+      set(P["eye" + side], "cx", cx); set(P["eye" + side], "cy", cy); set(P["eye" + side], "rx", w); set(P["eye" + side], "ry", Math.max(.3,h));
       const lidY = cy - h + cur["lid" + side] * 2 * h;
-      set(P["lid" + side], { x:cx - 30, y:lidY - 40, width:60, height:40,
-        transform:`rotate(${cur["angle" + side]} ${cx} ${lidY})` });
+      set(P["lid" + side], "x", cx - 30); set(P["lid" + side], "y", lidY - 40); set(P["lid" + side], "width", 60); set(P["lid" + side], "height", 40); set(P["lid" + side], "transform", `rotate(${fmt(cur["angle" + side])} ${fmt(cx)} ${fmt(lidY)})`);
       const r = w * 1.25;
-      set(P["low" + side], { cx, cy:cy + h + r - cur.smile * h * 1.3, r });
+      set(P["low" + side], "cx", cx); set(P["low" + side], "cy", cy + h + r - cur.smile * h * 1.3); set(P["low" + side], "r", r);
     }
-    for (let i = 0; i < 3; i++) {
+    const dotsVisible = cur.dots > .001 || target.dots || dotOpacity[0] > .001 || dotOpacity[1] > .001 || dotOpacity[2] > .001;
+    set(P.dots, "display", dotsVisible ? "inline" : "none");
+    if (dotsVisible) for (let i = 0; i < 3; i++) {
       const reveal = motion ? Math.min(1, Math.max(0, (t - dotsEnteredAt - i * .22) * 4)) : 1;
       const wanted = cur.dots * (target.dots ? reveal : 1);
       dotOpacity[i] += (wanted - dotOpacity[i]) * k;
-      set(P.dots.children[i], { cx:158 + i * 11, cy:35 - i * 10,
-        opacity:dotOpacity[i] * (motion ? .7 + .3 * Math.sin(t * 3 - i) : 1) });
+      set(P.dots.children[i], "cx", 158 + i * 11); set(P.dots.children[i], "cy", 35 - i * 10); set(P.dots.children[i], "opacity", dotOpacity[i] * (motion ? .7 + .3 * Math.sin(t * 3 - i) : 1));
     }
-    sparkles.forEach((s,i) => {
+    const starsVisible = cur.sparkles > .001 || target.sparkles;
+    set(P.sparkles, "display", starsVisible ? "inline" : "none");
+    if (starsVisible) for (let i = 0; i < sparkles.length; i++) {
+      const s = sparkles[i];
       const twinkle = motion ? .75 + .25 * Math.sin(t * 2.5 - i * 1.3) : 1;
-      set(s.el, { opacity:cur.sparkles * twinkle, transform:`translate(${s.x} ${s.y}) scale(${s.scale * twinkle})` });
-    });
-    onFrame?.({ emotion, level, cur, body });
+      set(s.el, "opacity", cur.sparkles * twinkle); set(s.el, "transform", `translate(${fmt(s.x)} ${fmt(s.y)}) scale(${fmt(s.scale * twinkle)})`);
+    }
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
+  function resume() {
+    cancelAnimationFrame(raf); last = performance.now();
+    if (visible && !destroyed) raf = requestAnimationFrame(frame);
+  }
+  const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; resume(); });
+  observer.observe(host);
+  reducedMotion.addEventListener("change", resume);
+  let activity = "idle";          // what the conversation is doing when nobody speaks
+  let playing = null;             // playbackId currently audible
+  let replyEmotion = "neutral";   // tone of the current / upcoming reply
+  const finished = [];            // ended or cancelled playbackIds
+  let relaxTimer = 0;
+  let emotionChangedAt = -Infinity, pendingEmotion = null, pendingTimer = 0;
+
+  const isFinished = (id) => id != null && finished.includes(id);
+  function finish(id) {
+    if (id == null || finished.includes(id)) return;
+    finished.push(id); if (finished.length > MAX_FINISHED_IDS) finished.shift();
+  }
+
+  function setReplyEmotion(emotion) {
+    clearTimeout(pendingTimer); pendingEmotion = null;
+    if (emotion !== replyEmotion) emotionChangedAt = Date.now();
+    replyEmotion = emotion;
+    render();
+  }
+  function clearPending() { clearTimeout(pendingTimer); pendingEmotion = null; }
+
+  function render() {
+    clearTimeout(relaxTimer);
+    let face;
+    if (playing) face = replyEmotion;
+    else if (activity === "listening" || activity === "thinking") face = activity;
+    else face = replyEmotion;
+    setEmotion(face);
+  }
+
+  /** Returns false when the event was ignored. */
+  function handle(ev) {
+    if (destroyed) return false;
+    switch (ev?.type) {
+      case "activity":
+        if (!["idle", "listening", "thinking"].includes(ev.state)) return false;
+        if (ev.state === "listening" && activity === "idle" && !playing) { replyEmotion = "neutral"; clearPending(); }   // a new turn starts from neutral
+        activity = ev.state;
+        render();
+        return true;
+
+      case "emotion":
+        if (!REPLY_EMOTIONS.includes(ev.emotion) || isFinished(ev.playbackId)) return false;
+        // While the user speaks or the advisor thinks, keep that face; render() shows it at playback start.
+        if (activity !== "idle") { setReplyEmotion(ev.emotion); return true; }
+        if (ev.emotion === replyEmotion) { clearPending(); return true; }
+        if (ev.emotion === "neutral") return true;   // sticky: no drop to neutral mid-reply
+        const wait = EMOTION_HOLD_MS - (Date.now() - emotionChangedAt);
+        if (wait <= 0) { setReplyEmotion(ev.emotion); return true; }
+        pendingEmotion = ev.emotion; clearTimeout(pendingTimer);
+        pendingTimer = setTimeout(() => {
+          if (pendingEmotion && activity === "idle") setReplyEmotion(pendingEmotion);
+        }, wait);
+        return true;
+
+      case "playback":
+        if (isFinished(ev.playbackId)) return false;
+        if (ev.event === "started") {
+          playing = ev.playbackId; activity = "idle";
+          render();
+        } else {
+          if (playing && playing !== ev.playbackId) return false;   // not the audible one
+          finish(ev.playbackId); playing = null;
+          if (ev.event === "cancelled") { clearPending(); activity = "listening"; render(); return true; }
+          render();
+          relaxTimer = setTimeout(() => {
+            if (!playing && activity === "idle") { clearPending(); replyEmotion = "neutral"; render(); }
+          }, HOLD_AFTER_REPLY_MS);
+        }
+        return true;
+    }
+    return false;
+  }
+
   return {
-    setEmotion, replay, attachStream, setLevelSource,
-    get emotion() { return emotion; },
-    destroy() { cancelAnimationFrame(raf); host.innerHTML = ""; },
+    handle, attachAudio,
+    show(face) {
+      if (destroyed || !Object.hasOwn(EMOTIONS, face)) return;
+      entries.length = 0;
+      setEmotion(face, true);
+    },
+    reset() { if (destroyed) return; clearPending(); activity = "idle"; playing = null; replyEmotion = "neutral"; emotionChangedAt = -Infinity; finished.length = 0; render(); },
+    get state() { return { face:emotion, activity, playing, replyEmotion, level }; },
+    destroy() {
+      destroyed = true; cancelAnimationFrame(raf); clearTimeout(relaxTimer); clearTimeout(pendingTimer);
+      observer.disconnect(); reducedMotion.removeEventListener("change", resume);
+      audioNode?.disconnect(); analyser?.disconnect();
+      for (const node of mediaNodes.values()) node.disconnect();
+      mediaNodes.clear(); audioCtx?.close().catch(() => {}); host.innerHTML = "";
+    },
   };
 }

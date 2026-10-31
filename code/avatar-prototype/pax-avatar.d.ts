@@ -1,6 +1,3 @@
-// PROTOTYPE — types for pax-avatar.js (rig + shared types). Controller: pax-avatar-controller.d.ts.
-// Contract: see AVATAR-INTERFACE.md.
-
 export type ReplyEmotion = "neutral" | "acknowledging" | "curious" | "explaining" | "reassuring" | "empathetic" | "pleased" | "recovering" | "presenting_offer";
 export type Face = ReplyEmotion | "listening" | "thinking";
 
@@ -14,17 +11,20 @@ export interface AvatarState {
   activity: "idle" | "listening" | "thinking";
   playing: string | null;
   replyEmotion: ReplyEmotion;
+  level: number;
 }
 
-export interface PaxAvatarRig {
-  setEmotion(face: Face): boolean;
-  /** Re-trigger the current expression’s entry animation. */
-  replay(): void;
-  attachStream(source: MediaStream | HTMLMediaElement): void;
-  setLevelSource(fn: ((dt: number) => number) | null): void;
-  readonly emotion: Face;
+export interface PaxAvatar {
+  /** False for ignored events, including finished playback IDs. */
+  handle(event: AvatarEvent): boolean;
+  attachAudio(source: MediaStream | HTMLMediaElement | (() => number) | null): void;
+  /** Design/demo override; always plays the expression's entry gesture. */
+  show(face: Face): void;
+  reset(): void;
+  readonly state: AvatarState;
   destroy(): void;
 }
 
 export const EMOTIONS: Readonly<Record<Face, { label: string; subtitle: string }>>;
-export function mountPaxAvatar(host: HTMLElement, options?: { onFrame?: (frame: unknown) => void }): PaxAvatarRig;
+export const REPLY_EMOTIONS: readonly ReplyEmotion[];
+export function createPaxAvatar(host: HTMLElement): PaxAvatar;

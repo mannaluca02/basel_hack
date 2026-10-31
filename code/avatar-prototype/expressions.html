@@ -36,7 +36,7 @@ body.focused .avatar { max-width:560px; }
 <main id="gallery" aria-label="Expression gallery"></main>
 <a class="back" href="index.html">Open interactive demo</a>
 <script type="module">
-import { mountPaxAvatar, EMOTIONS } from './pax-avatar.js';
+import { createPaxAvatar, EMOTIONS } from './pax-avatar.js';
 const only = new URLSearchParams(location.search).get('only');
 const focused = Object.hasOwn(EMOTIONS, only);
 document.body.classList.toggle('focused', focused);
@@ -46,10 +46,10 @@ for (const [name, expression] of Object.entries(EMOTIONS)) {
   tile.dataset.emotion = name;
   tile.innerHTML = `<a href="index.html?emotion=${name}"><div class="avatar"></div><h2>${expression.label}</h2><p class="subtitle">${expression.subtitle}</p><code>${name}</code></a><button type="button" aria-label="Replay ${expression.label}">Replay</button>`;
   document.getElementById('gallery').appendChild(tile);
-  const rig = mountPaxAvatar(tile.querySelector('.avatar'));
+  const avatar = createPaxAvatar(tile.querySelector('.avatar'));
   tile.querySelector('svg').setAttribute('viewBox', '25 15 150 170');
-  rig.setEmotion(name);
-  tile.querySelector('button').onclick = () => rig.replay();
+  avatar.show(name);
+  tile.querySelector('button').onclick = () => avatar.show(name);
 }
 </script>
 </body>
