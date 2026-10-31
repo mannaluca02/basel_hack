@@ -12,7 +12,7 @@
     "risks": "Risiken",
     "chat": "Chat",
     "info": "Info",
-    "openRisks": "{{count}} offen"
+    "unread": "Neues seit dem letzten Besuch"
   },
   "graphics": {
     "title": "Grafiken",

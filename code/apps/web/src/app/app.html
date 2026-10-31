@@ -27,7 +27,7 @@
 
     <nav class="tabs" [attr.aria-label]="'nav.label' | transloco">
       @for (tab of tabs; track tab.id) {
-        @let badge = tab.id === 'risks' ? openRisks() : 0;
+        @let fresh = unread()[tab.id] > 0;
         <a
           class="tab"
           [routerLink]="tab.path"
@@ -38,13 +38,13 @@
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path [attr.d]="tab.icon" />
             </svg>
-            @if (badge > 0) {
-              <span class="badge" aria-hidden="true">{{ badge > 99 ? '99+' : badge }}</span>
+            @if (fresh) {
+              <span class="dot" aria-hidden="true"></span>
             }
           </span>
           <span class="label">{{ tab.label | transloco }}</span>
-          @if (badge > 0) {
-            <span class="visually-hidden">{{ 'nav.openRisks' | transloco: { count: badge } }}</span>
+          @if (fresh) {
+            <span class="visually-hidden">{{ 'nav.unread' | transloco }}</span>
           }
         </a>
       }

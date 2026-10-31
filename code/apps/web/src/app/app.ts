@@ -7,6 +7,7 @@ import {
   computed,
   effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -88,10 +89,10 @@ export class App {
   protected readonly reviewEnabled =
     inject(APP_ENVIRONMENT).dataSource === 'api' && !inject(APP_ENVIRONMENT).demoStart;
 
-  /** Risks not yet addressed: the count badge on the Risks tab. */
-  protected readonly openRisks = computed(
-    () => this.store.risks().filter((risk) => risk.status !== 'addressed').length,
-  );
+  /** The tab the router shows; `null` while the URL names no tab (before the first redirect). */
+  private readonly activeTab = signal<WorkspaceTab | null>(null);
+  /** Items added or changed per tab since it was last shown: the live update dots (FE-21). */
+  protected readonly unread = this.store.unread;
 
   /** Data capture for the ring around the avatar. */
   protected readonly progress = this.store.progress;
@@ -101,7 +102,10 @@ export class App {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll
     // offset, and all tabs share one scroll container. Save it on leave, restore it on return.
     const router = inject(Router);
+    this.activeTab.set(this.tabAt(router.url));
     router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      // Before consent there is no Dynamic View, but the requested tab is already known.
+      if (event instanceof NavigationEnd) this.activeTab.set(this.tabAt(event.urlAfterRedirects));
       const view = this.view()?.nativeElement;
       if (!view) return;
       if (event instanceof NavigationStart) {
@@ -131,6 +135,13 @@ export class App {
       onCleanup(() => this.scroller.detach());
     });
 
+    // Showing a tab marks it read, and keeps it read while news for it arrives. New data never
+    // switches the tab; the dots on the other tabs point to it instead.
+    effect(() => {
+      const tab = this.activeTab();
+      if (tab && this.unread()[tab] > 0) this.store.markRead(tab);
+    });
+
     // Consent lasts the browser session, so after a reload the call resumes right away.
     if (this.consented()) this.store.connect();
   }
@@ -143,6 +154,11 @@ export class App {
       { write: () => this.view()?.nativeElement.focus() },
       { injector: this.injector },
     );
+  }
+
+  private tabAt(url: string): WorkspaceTab | null {
+    const path = pathOf(url);
+    return this.tabs.find((tab) => tab.path === path)?.id ?? null;
   }
 }
 
