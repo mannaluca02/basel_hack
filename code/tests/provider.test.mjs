@@ -16,11 +16,11 @@ test('all 24 source examples remain identifiable synthetic archives, not live te
   const names=(await readdir(archiveDir)).filter(n=>n.endsWith('.json'));assert.equal(names.length,24);
   for(const name of names){const x=JSON.parse(await readFile(new URL(name,archiveDir),'utf8'));assert.match(x.dataset,/synthetic/);assert.ok(Object.hasOwn(x,'request'));assert.ok(Object.hasOwn(x,'response'));}
 });
-test('all six implemented operations replay their exact archive with provenance',async()=> {
+test('all implemented operations replay their exact archive with provenance',async()=> {
   const replay=await ReplayProvider.load();
   for(const op of Object.keys(Operations)) {
     const r=await replay.execute(op,replay.exampleRequest(op));assert.equal(r.provenance.mode,'replay');assert.equal(r.provenance.capturedAt,'2026-10-30');
-    assert.ok(r.metrics.length>0||r.metadata.ageLimits);
+    assert.ok(r.metrics.length>0||Object.keys(r.metadata).length>0);
   }
 });
 test('replay fails for changed financial inputs and accepts equivalent JSON key order',async()=> {

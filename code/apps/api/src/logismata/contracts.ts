@@ -10,7 +10,28 @@ const retirementPerson=z.object({Sex:z.union([z.literal(1),z.literal(2)]),BirthY
   DesiredRetirementAge:z.number().int().min(18).max(100).optional(),
   RetirementPillar2:z.object({Pension:chf,CurrentCapital:chf.optional()}).strict().optional()}).strict();
 const common={Relationship:z.number().int().min(1).max(4),RelationshipSinceYear:year,NumberOfChildren:z.number().int().min(0).max(30).optional()};
+const confession=z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(9)]);
+const taxCommon={IncomeType:z.number().int().min(1).max(3),Income:chf,TaxLocationID:z.number().int().positive(),Relationship:z.number().int().min(1).max(4),
+  Confession1:confession,Confession2:confession.optional(),NumberOfChildren:z.number().int().min(0).max(30),BirthYear:year};
 export const RequestSchemas={
+  incomeFortuneTax:z.object({...taxCommon,Fortune:chf.optional()}).strict(),
+  saving3a:z.object({...taxCommon,Sex:z.union([z.literal(1),z.literal(2)]),Duration:z.number().int().min(1).max(100),
+    InitialInvestment:chf,YearlyInvestment:chf,InterestRate:z.number().min(-50).max(20)}).strict(),
+  capitalTax:z.object({CapitalPayment:chf,PaymentAge:z.number().int().min(18).max(100),TaxLocationID:z.number().int().positive(),
+    Relationship:z.number().int().min(1).max(4),Confession1:confession,Confession2:confession.optional(),NumberOfChildren:z.number().int().min(0).max(30),
+    Sex:z.union([z.literal(1),z.literal(2)]),BirthYear:year}).strict(),
+  purchaseP2:z.object({...taxCommon,Sex:z.union([z.literal(1),z.literal(2)]),Investment:chf,PaymentDuration:z.number().int().min(1).max(50),
+    InterestRate:z.number().min(-50).max(20),ConversionRate:z.number().min(0).max(20).optional()}).strict(),
+  income:z.object({TaxLocationID:z.number().int().positive(),Relationship:z.number().int().min(1).max(4),NumberOfChildren:z.number().int().min(0).max(30),
+    BirthYear:year,Income:chf,IncomeType:z.number().int().min(1).max(3),CalculateIncomeType:z.number().int().min(1).max(3)}).strict(),
+  budgetProposal:z.object({BudgetMonthly:z.boolean(),IncomeType:z.number().int().min(1).max(3),Income:chf,Relationship:z.number().int().min(1).max(4),
+    NumberOfChildren:z.number().int().min(0).max(30),UseEffectiveTax:z.boolean(),Language:z.number().int().min(1).max(4)}).strict(),
+  saving:z.object({SavingGoal:z.number().int().min(1).max(3),Duration:z.number().int().min(1).max(100),InitialInvestment:chf,
+    InvestmentMonthly:z.boolean(),PeriodicInvestment:chf,InterestRate:z.number().min(-50).max(20),EndCapital:chf.optional()}).strict(),
+  consumption:z.object({ConsumptionGoal:z.number().int().min(1).max(3),StartCapital:chf,InterestRate:z.number().min(-50).max(20),
+    WithdrawalMonthly:z.boolean(),Withdrawal:chf,Duration:z.number().int().min(1).max(100),EndCapital:chf}).strict(),
+  searchLocation:z.object({Search:z.string().min(2).max(80),Language:z.number().int().min(1).max(4)}).strict(),
+  location:z.object({TaxLocationID:z.number().int().positive()}).strict(),
   saving3aLimits:z.object({}).strict(),
   ageLimits:z.object({Sex:z.union([z.literal(1),z.literal(2)]),BirthYear:year}).strict(),
   riskBase:z.object({...common,Person1:riskPerson,Person2:riskPerson.optional()}).strict(),
@@ -22,6 +43,16 @@ export const RequestSchemas={
 };
 export type Operation=keyof typeof RequestSchemas;
 export const Operations:Record<Operation,{id:string;archive:string}>={
+  incomeFortuneTax:{id:'APICalc_calculateIncomeFortuneTax',archive:'einkommens-vermoegenssteuer'},
+  saving3a:{id:'APICalc_calculateSaving3a',archive:'saeule-3a'},
+  capitalTax:{id:'APICalc_calculateCapitalTax',archive:'kapitalleistungssteuer'},
+  purchaseP2:{id:'APICalc_calculatePurchaseP2',archive:'pk-einkauf'},
+  income:{id:'APICalc_calculateIncome',archive:'einkommen-umrechnen'},
+  budgetProposal:{id:'APICalc_calculateBudgetProposal',archive:'budget'},
+  saving:{id:'APICalc_calculateSaving',archive:'sparen'},
+  consumption:{id:'APICalc_calculateConsumption',archive:'entnahme'},
+  searchLocation:{id:'APICalc_searchLocation',archive:'standort-suche'},
+  location:{id:'APICalc_getLocation',archive:'standort'},
   saving3aLimits:{id:'APICalc_getSaving3aLimits',archive:'3a-limiten'},
   ageLimits:{id:'APICalc_getAgeLimits',archive:'altersgrenzen'},
   riskBase:{id:'APICalc_calculateRiskBase',archive:'risiko-grunddaten'},

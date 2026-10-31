@@ -193,3 +193,4 @@ export function simulateCapital(input:{initialCents:number;monthlyContributionCe
     guaranteed:false,periods,finalCapital:money(capital,'once'),
     firstUnfundedMonth:periods.find(p=>p.unfundedWithdrawalCents>0)?.month??null};
 }
+export * from './life-insurance.js';

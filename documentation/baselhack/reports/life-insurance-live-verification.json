@@ -1,0 +1,295 @@
+{
+  "dataClassification": "synthetic",
+  "providerMode": "live",
+  "automatedReviewer": "test-only role simulation; no real Pax expert approval",
+  "capturedAt": "2026-10-31T01:44:39.690Z",
+  "stages": [
+    "profile_confirmed",
+    "recommendation_explained",
+    "reviewer_role_gate_exercised",
+    "demo_quote",
+    "demo_application",
+    "idempotent_submission",
+    "demo_acceptance",
+    "demo_policy",
+    "matching_summary_snapshots",
+    "portal_after_restart"
+  ],
+  "scenarioRuns": [
+    {
+      "scenario": "baseline",
+      "status": "current",
+      "providerFailures": [],
+      "providerStatuses": [
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "saving3aLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "riskBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirementBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "risk",
+          "status": "requires_review"
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirement",
+          "status": "valid"
+        },
+        {
+          "operation": "location",
+          "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "saving",
+          "status": "estimated"
+        },
+        {
+          "operation": "consumption",
+          "status": "estimated"
+        }
+      ],
+      "timelinePhases": 0
+    },
+    {
+      "scenario": "family",
+      "status": "current",
+      "providerFailures": [],
+      "providerStatuses": [
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "saving3aLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "riskBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirementBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "risk",
+          "status": "requires_review"
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirement",
+          "status": "valid"
+        },
+        {
+          "operation": "location",
+          "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "saving",
+          "status": "estimated"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "consumption",
+          "status": "estimated"
+        }
+      ],
+      "timelinePhases": 0
+    },
+    {
+      "scenario": "home",
+      "status": "current",
+      "providerFailures": [],
+      "providerStatuses": [
+        {
+          "operation": "saving3aLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "riskBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirementBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "risk",
+          "status": "requires_review"
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirement",
+          "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "location",
+          "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "saving",
+          "status": "estimated"
+        }
+      ],
+      "timelinePhases": 0
+    },
+    {
+      "scenario": "retirement",
+      "status": "current",
+      "providerFailures": [],
+      "providerStatuses": [
+        {
+          "operation": "saving3aLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "ageLimits",
+          "status": "valid"
+        },
+        {
+          "operation": "riskBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "retirementBase",
+          "status": "estimated"
+        },
+        {
+          "operation": "risk",
+          "status": "requires_review"
+        },
+        {
+          "operation": "retirement",
+          "status": "valid"
+        },
+        {
+          "operation": "budgetProposal",
+          "status": "estimated"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "location",
+          "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
+        },
+        {
+          "operation": "saving",
+          "status": "estimated"
+        },
+        {
+          "operation": "consumption",
+          "status": "estimated"
+        }
+      ],
+      "timelinePhases": 4
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "family",
+      "metrics": 16,
+      "cashflowDeltaCents": -4320000
+    },
+    {
+      "scenario": "home",
+      "metrics": 16,
+      "cashflowDeltaCents": -3120000
+    },
+    {
+      "scenario": "retirement",
+      "metrics": 16,
+      "cashflowDeltaCents": 0
+    }
+  ],
+  "operations": [
+    "ageLimits",
+    "budgetProposal",
+    "capitalTax",
+    "consumption",
+    "income",
+    "incomeFortuneTax",
+    "location",
+    "purchaseP2",
+    "retirement",
+    "retirementBase",
+    "risk",
+    "riskBase",
+    "saving",
+    "saving3a",
+    "saving3aLimits",
+    "searchLocation"
+  ],
+  "coverageInForce": false,
+  "estimateErrors": [],
+  "estimateBlocked": [],
+  "status": "passed"
+}

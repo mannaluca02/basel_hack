@@ -9,9 +9,11 @@
   "scripts": {
     "build": "tsc -b",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "start": "npm run build && node apps/api/dist/main.js",
+    "start": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env apps/api/dist/main.js",
+    "start:demo": "npm run build && node scripts/start-demo.mjs",
     "demo": "npm run build && node scripts/demo.mjs",
-    "test:live": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-smoke.mjs"
+    "test:live": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-journey.mjs",
+    "test:live:metadata": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-smoke.mjs"
   },
   "devDependencies": { "@types/node": "^22.0.0", "typescript": "5.9.3" }
 }

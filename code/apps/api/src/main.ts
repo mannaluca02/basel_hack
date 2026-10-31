@@ -5,6 +5,7 @@ import { DemoAppModule } from './app.module.js';
 import { SafeDemoErrorFilter } from './demo/error.filter.js';
 import { pathToFileURL } from 'node:url';
 import type { IncomingMessage,ServerResponse } from 'node:http';
+import { createLifeInsuranceApp } from './insurance/app.js';
 
 export async function createDemoApp() {
   const app=await NestFactory.create<NestExpressApplication>(DemoAppModule,{logger:false,bodyParser:false});
@@ -17,6 +18,8 @@ export async function createDemoApp() {
 if(process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port=Number(process.env.PORT??3000);
   if(!Number.isInteger(port)||port<1||port>65535) throw new Error('Invalid PORT');
-  const app=await createDemoApp();await app.listen(port,'127.0.0.1');
-  console.info(`Pax synthetic calculation demo: http://127.0.0.1:${port}/api/demo/health`);
+  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',token:process.env.LOGISMATA_BEARER_TOKEN??''});
+  try{await app.listen(port,'127.0.0.1');}catch(error){await runtime.close();throw error;}
+  console.info(`Pax life-insurance backend (live calculator): http://127.0.0.1:${port}/api/status`);
+  console.info(`Local demo access codes: ${runtime.store.directory}/access-codes.json`);
 }

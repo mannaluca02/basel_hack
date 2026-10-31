@@ -1,5 +1,6 @@
 import type { MoneyMetric,Status,Issue } from '@pax/contracts';
 import { money } from '@pax/contracts';
+import { z } from 'zod';
 import { ProviderEnvelope,RiskResponse,RetirementResponse,LimitsResponse,AgeResponse,BaseResponse,type Operation } from './contracts.js';
 
 export type ProviderMetric=MoneyMetric & {id:string;status:Status;scenario?:number};
@@ -23,8 +24,12 @@ export function normalizeResponse(operation:Operation,request:unknown,envelope:u
   } else if(operation==='ageLimits') {
     const data=AgeResponse.parse(raw);
     if(data.BirthYear!==req.BirthYear || data.MinimumAHVAge>data.MaximumAHVAge) throw new Error('Invalid age metadata');
-    metadata.ageLimits={BirthYear:data.BirthYear,RegularPensionAge:data.RegularPensionAge,
+    const ageLimits:Record<string,number|boolean>={BirthYear:data.BirthYear,RegularPensionAge:data.RegularPensionAge,
       MinimumAHVAge:data.MinimumAHVAge,MaximumAHVAge:data.MaximumAHVAge};
+    for(const key of ['CurrentAge','MinimumPensionAge','MaximumPensionAge','MaximumSaving3aAge','MinimumSaving3aAge'])
+      if(data[key]!==undefined)ageLimits[key]=z.number().int().min(0).max(150).parse(data[key]);
+    if(data.AllowedForSaving3a!==undefined)ageLimits.AllowedForSaving3a=z.boolean().parse(data.AllowedForSaving3a);
+    metadata.ageLimits=ageLimits;
   } else if(operation==='risk') {
     const data=RiskResponse.parse(raw);const statuses:Status[]=[];
     for(const row of data.RiskScenarioSummaries) {
@@ -84,6 +89,49 @@ export function normalizeResponse(operation:Operation,request:unknown,envelope:u
     for(const key of ['AvailableFortune','CapitalNeed','CapitalGap'] as const)
       add(key,!known&&key!=='AvailableFortune'?null:data[key],'once',status);
     metadata.returnAndCapitalAssumptionsUnverified=true;
+  } else if(['incomeFortuneTax','saving3a','capitalTax','purchaseP2'].includes(operation)) {
+    const data=z.record(z.string(),z.unknown()).parse(raw);status='estimated';
+    const keys:Record<string,{annual:string[];capital:string[]}>={
+      incomeFortuneTax:{annual:['CommunityTax','ChurchTax','StateTax','FederalTax','FortuneTax','PollTax','TotalTaxes'],capital:[]},
+      saving3a:{annual:['YearlyTaxBefore','YearlyTaxAfter','YearlyTaxSavings'],capital:['OverallTaxSavings','Deposits','GrossCapital','CapitalTax','NetCapital']},
+      capitalTax:{annual:[],capital:['CapitalTaxes','NetCapital']},
+      purchaseP2:{annual:['AdditionalPension'],capital:['TaxSavings','NetInvestment','AdditionalCapital']},
+    };
+    for(const [period,names] of [['year',keys[operation]!.annual],['once',keys[operation]!.capital]] as const)
+      for(const name of names)add(name,z.number().finite().min(-1e10).max(1e10).parse(data[name]),period,status);
+    metadata.taxAndEligibilityAssumptionsRequireReview=true;
+  } else if(operation==='income') {
+    const amount=z.number().finite().nonnegative().max(1e10).parse(raw);
+    status='estimated';
+    if(Number(req.Income)===0&&amount!==0){status='requires_review';problem('INCOME_FLOOR_APPLIED','Income','A zero income was transformed into a non-zero estimate.');}
+    if(req.IncomeType===1&&req.CalculateIncomeType===3&&amount>Number(req.Income)) {
+      status='requires_review';problem('INCOME_CONVERSION_FLOOR_OR_BASIS_REVIEW','Income','Net estimate exceeds the supplied gross income.');
+    }
+    add('convertedIncome',amount,'year',status);metadata.incomeType=req.CalculateIncomeType;
+    metadata.incomeTaxNotDeducted=true;
+  } else if(operation==='budgetProposal') {
+    const category=z.object({Description:z.string().max(200),Amount:z.number().finite().nonnegative().max(1e10),Details:z.array(z.unknown()).max(100)});
+    const data=z.object({Categories:z.array(category).max(80),SumExpenses:z.number().finite().nonnegative(),IncomeNet:z.number().finite().nonnegative(),SavingQuote:z.number().finite()}).parse(raw);
+    // Archive's monthly flag is ambiguous: only explicit annual requests can be used as annual suggestions.
+    status=req.BudgetMonthly===false?'estimated':'requires_review';
+    if(req.BudgetMonthly!==false)problem('BUDGET_PERIOD_UNVERIFIED','BudgetMonthly','Monthly/annual units require confirmation for this provider response.');
+    if(req.BudgetMonthly===false){add('proposedExpenses',data.SumExpenses,'year',status);add('proposedNetIncome',data.IncomeNet,'year',status);}
+    metadata.categorySuggestions=data.Categories.map(c=>({label:c.Description,valueCents:cents(c.Amount),period:req.BudgetMonthly===false?'year':'unverified'}));
+    metadata.requiresCustomerConfirmation=true;
+  } else if(operation==='saving') {
+    const data=z.object({Deposits:z.number().finite().nonnegative(),Interest:z.number().finite(),GrossCapital:z.number().finite().nonnegative(),
+      PeriodicInvestment:z.number().finite().nonnegative(),DurationYears:z.number().int().nonnegative(),DurationMonths:z.number().int().nonnegative()}).parse(raw);
+    status='estimated';add('deposits',data.Deposits,'once',status);add('projectedCapital',data.GrossCapital,'once',status);
+    add('periodicInvestment',data.PeriodicInvestment,req.InvestmentMonthly===true?'month':'year',status);
+    metadata.durationMonths=data.DurationYears*12+data.DurationMonths;metadata.guaranteed=false;
+  } else if(operation==='consumption') {
+    const data=z.object({Withdrawal:z.number().finite().nonnegative(),EndCapital:z.number().finite().nonnegative(),DurationYears:z.number().int().nonnegative(),DurationMonths:z.number().int().nonnegative()}).parse(raw);
+    status='estimated';add('withdrawal',data.Withdrawal,req.WithdrawalMonthly===true?'month':'year',status);add('endCapital',data.EndCapital,'once',status);
+    metadata.durationMonths=data.DurationYears*12+data.DurationMonths;metadata.guaranteed=false;
+  } else if(operation==='searchLocation'||operation==='location') {
+    const location=z.object({LocationID:z.number().int().positive(),ZipCode:z.union([z.string(),z.number()]),City:z.string(),Canton:z.string(),Location:z.string().optional()});
+    const locations=operation==='searchLocation'?z.array(location).max(200).parse(raw):[location.parse(raw)];
+    metadata.locations=locations;
   } else {
     const data=BaseResponse.parse(raw);status='estimated';
     for(const [person,values] of Object.entries(data)) for(const [key,value] of Object.entries(values??{}))

@@ -1,44 +1,52 @@
-# Logik-Backend – Implementierungsstand Valentin
+# Logik-Backend – implementierter Lebensversicherungs-PoC
 
-Stand: 31.10.2026. Erster lauffähiger Teil des Workshop-Plans; die Gesamtjourney wird vom Team integriert.
+Stand: 31.10.2026 · Valentin · Modell `lifemap-life-insurance-0.2.0` · Feature `feature/life-insurance-live-backend`.
 
-## Vorhandener Code
+Der ausdrücklich bestätigte Backend-Umfang LOG-01–LOG-07 ist implementiert und automatisch geprüft. Der [Start-/Integrationsleitfaden](../../../code/README.md), die [Requirements-Matrix](life-insurance-requirements.md) und der [Live-Nachweis](life-insurance-live-verification.json) bilden die Übergabe. Der frühere reine Fixture-Demonstrator bleibt separat verfügbar; `npm start` startet jetzt die geschützte Live-Rechner-Anwendung.
 
-Die [Start- und Integrationsanleitung](../../../code/README.md) beschreibt den lokalen NestJS-Server, gemeinsame TypeScript-/Zod-Verträge und konkrete API-Aufrufe. Der Code liegt unter `code/`, die bestehenden Quellen bleiben unter `documentation/`.
+## Verhalten
 
-| Bereich | Tatsächlicher Stand |
-|---|---|
-| LOG-01 | Finanzsnapshot, Geld/Herkunft/Bestätigung/Review, I03/I04 und GraphContext zur Laufzeit validiert; sechs definierte Aufnahmengruppen |
-| LOG-02 | Sechs Provideroperationen, exakter Replay, feste Live-Zieladresse, begrenzte Fehler-/Retry-/Parallelitätsregeln, Normalisierung |
-| LOG-03 | Budget mit Steuer-/Ausgabendopplungsprüfung, verfügbare/gebundene Mittel, Zuordnungsledger, getrennte Säulen/Personen/Ereignisse |
-| LOG-04 | Erster Familien-Cashflow und monatliche endliche Kapitalrechnung; vollständige Pensionierungsphasen noch offen |
-| LOG-05 | Illustrativer Eigenheimvergleich mit Reserve, Finanzierungslücke und tatsächlich reservierten verfügbaren Mitteln |
-| LOG-06 | Weiterhin offen: State Machine auf gespeicherten Offerten/Anträgen/Policen und passende Reviewrollen |
-| LOG-07 | Automatisierte Fach-/Adapter-/HTTP-Prüfungen; Fachklärung mit Pax und Gesamtjourney-Abnahme offen |
+Ein Kunde eröffnet eine anonyme synthetische Sitzung, sieht den Datenschutzhinweis und erfasst Ziele, Familie/Partnerschaft, Einkommen/Ausgaben, alle drei Vorsorgesäulen, Schulden, Kinder, bestehende Risikoabsicherung und eigenen finanziellen Spielraum. Ein Entwurf wird erst nach Pflichtfragen und ausdrücklicher Bestätigung zu einem unveränderlichen Profil. Fehlende Werte bleiben unbekannt.
 
-## Integrationsgrenzen
+Der Server ruft echte Logismata-Rechner auf und normalisiert nur an der API-Grenze von CHF in ganze CHF-Rappen. Lokale Budget-/Kapitalregeln, ereignisspezifische EU-/Todesfallbedarfe und die endliche Kapitalisierung ergänzen die Providerdaten. Vorhandene private Risiko-Renten, bereits im Provider berücksichtigter Partnerlohn, bestehendes Todesfallkapital und bestätigte freie-Mittel-Strategie werden nachvollziehbar behandelt. Sparvorschläge berücksichtigen bereits laufende Beiträge, die gelieferte 3a-Grenze und persönliche sowie Haushaltsmittel.
 
-Earnie übernimmt Authentifizierung, Fallberechtigung, autorisierten gemeinsamen JSON-Fallstore, Bestätigungen, Persistenz und I10-/SSE-Veröffentlichung. `CalculationModule` liefert Rechnung und Fakten, ohne einen zweiten Fallstore anzulegen. Eine finanzielle Änderung erzeugt einen anderen Eingabehash; eine rein technische Fallrevision tut das nicht.
+Familien-, Eigenheim- und Pensionierungsvarianten bleiben separate Läufe desselben Profils. Die Pensionierungsprojektion trennt Erwerbsende, Überbrückung und Rentenbeginn je Person; gebundenes Kapital und gebundene zusätzliche Sparbeträge werden erst zum ausdrücklich angenommenen Zeitpunkt verfügbar. Kapitalerschöpfung bleibt sichtbar. Variantenvergleiche sind gespeichert und an beide Eingabehashes gebunden. Veraltete Rückläufe ersetzen nie einen neueren Profil-/Szenariostand.
 
-Luca kann die drei festen Demo-Varianten schon über HTTP abrufen. Dario erhält später Earnies Antwort auf die referenzierten Ergebnisfakten, Lukas die getrennten Progress-/Playbackdaten. Gesundheits-/Kundendaten oder Modellaufrufe werden durch den lokalen Demo-Server nicht eingerichtet.
+Erst danach entstehen regelbasierte Pax-Produktfamilien mit Gründen und Quellen. Eine Empfehlung ist keine echte Offerte. Der aktuelle Lauf und eine getrennte Reviewer-Freigabe sind Vorbedingungen für die vom Kunden gewählte Demo-Konfiguration. Dokumentbestätigung, Antrag, Einreichung, Prüfung, Demo-Annahme und Demo-Police sind getrennte gespeicherte Zustände. Identische Befehle erzeugen keine doppelten Anträge/Policen. Das Portal lädt sie nach Neustart wieder. Die zwei Summary-Sichten verwenden dieselbe bestätigte Datenbasis und Snapshot-ID.
 
-Die Demo ist an Loopback gebunden und nimmt ausschließlich Fixture-/Varianten-IDs an. Allgemeine Kundenendpunkte sind Aufgabe der geschützten gemeinsamen Anwendung. Die Vorlage enthält ein erfundenes Paar, aktuelle annualisierte Cashflows und ausdrücklich illustrative Szenarien; sie ist keine verifizierte gesetzliche Pensionsprognose.
+## Architektur und Schutz
 
-## Prüfung
+- Geteilte Zod-Verträge für Aufnahme, Profil, Szenario, GraphContext und vollständige Analyseausgabe; reine Fachfunktionen in `packages/domain`.
+- NestJS-HTTP-API und OpenAPI 3.1 unter `/api/openapi.json`, auflösbare Komponentenreferenzen und gemeinsame TypeScript-Verträge für Angular/Earnie.
+- Ein zentraler JSON-Fall mit Entwurf, unveränderlichen Bestätigungen, ursprünglichen Läufen, Review-Aufgaben, Empfehlung/Vertrag/Portal, Vorschlägen, Vergleichen und Ereignissen. Explizite Fallrevision schützt konkurrierende Schreibzugriffe.
+- Lokaler AES-256-GCM-Speicher mit zufälligem Nonce, Integritätsprüfung, atomarem Austausch, privaten Dateirechten, Größen-/Objektgrenzen und Prozesssperre. Ein Node-Prozess; keine produktive Mehrinstanz-Datenbankmigration behauptet.
+- Rollen aus serverseitig erzeugten getrennten Codes; Besitzerbindung, gehashte Sitzungstoken, Ablauf, Login-/Schreibgrenzen, HttpOnly-/SameSite-Cookies und CSRF bei Cookie-Schreibzugriffen. Loopback-Bindung und begrenzte Angular-Origins.
+- Fallgebundener 15-Minuten-Agentzugang zu minimalem Kontext, SSE und erlaubten Vorschlägen. Kundenbestätigung bleibt zwingend; ein Transkript bestätigt weder Betrag noch Profil. Widerruf beendet offene SSE-Streams; Kunden-Logout widerruft auch die zugehörigen Agentzugänge.
+- Öffentlicher Hinweis vor Datenaufnahme; ausschließlich synthetische Daten, keine Gesundheitsrohdaten, keine externen Modellaufrufe. Audit speichert IDs/Aktionen statt vollständiger Finanzprofile. Fallablauf nach 24 Stunden, regelmäßige Bereinigung und explizite Besitzerlöschung einschließlich Feedback/Agentzugängen.
+- Optionale NPS-Aufnahme und Reviewer-Aggregate ohne Freitext oder Finanzbeträge. Inaktivität wird als Signal beschrieben, nicht als belegter Abbruch.
 
-Im tatsächlichen Repo ausgeführt: `npm ci --ignore-scripts`, TypeScript-Build und `npm test`: **57 automatisierte Tests bestanden, 0 fehlgeschlagen**. Geprüft wurden Fachinvarianten, I03/I04, GraphContext/Versionsschutz, synthetischer Replay, Providerfehler/Timeout/Parallelität und lokale HTTP-Endpunkte. Die HTTP-Tests haben kurz einen Loopback-Port geöffnet; Providerzugriffe waren dabei synthetisch injiziert.
+Das sind geprüfte PoC-Schutzmaßnahmen. Rechtskonformität im Produktivbetrieb, echte Kundenidentität, TLS/KMS, Aufbewahrungsrecht und behördliche/vertragliche Pflichten erfordern Pax-Freigabe.
 
-Ein expliziter Live-Smoke hat ausschließlich die 3a-Metadaten mit leerer Anfrage `{}` abgerufen: Status `valid`, Modus `live`, zwei normalisierte Kennzahlen. Es wurden keine Kunden-/Gesundheitsdaten übertragen. Der vorhandene Token wurde aus der geschützten lokalen Serverumgebung gelesen und nicht kopiert oder ausgegeben.
+## Rechen-APIs und tatsächliche Prüfung
 
-`npm audit --omit=dev --audit-level=high` meldete am 31.10.2026 keine bekannten Laufzeit-Abhängigkeitslücken. Die vollständige geplante Abnahmematrix, insbesondere Vertrag/Portal und menschliche Prüfung, bleibt offen.
+16 Operationen sind mit strikten Requests und normalisierten Antworten implementiert und live ausgeführt: `saving3aLimits`, `ageLimits`, `riskBase`, `risk`, `retirementBase`, `retirement`, `income`, `budgetProposal`, `saving`, `consumption`, `searchLocation`, `location`, `incomeFortuneTax`, `saving3a`, `capitalTax`, `purchaseP2`.
 
-Der bestehende Quellenkatalog lässt sich im aktuellen Checkout nicht vollständig neu bauen: Commit `6bf72c6` hat die 16 Videodateien entfernt, während die bisherigen Medienreferenzen weiterhin darauf verweisen. Die Quellen-/Medieninventare bleiben daher auf ihrem bisherigen Stand. Die Implementierung benötigt ausschließlich die vorhandenen synthetischen API-Beispiele; Videos werden durch diese Arbeit nicht wiederhergestellt.
+Der Live-Client verwendet einen festen Host/Pfad, keine Redirects, maximal zwei parallele Requests, begrenzte Queue, fünf Sekunden Timeout je Versuch und höchstens einen Retry bei vorübergehenden Fehlern. Authentisierungsfehler werden nicht wiederholt, Payloads/Tokens nicht in Fehlermeldungen gespiegelt. Es gibt keinen stillen Replay-Fallback. Der Replay-Provider benötigt einen exakt identischen vollständigen Request-Hash.
 
-## Nächste Fach- und Integrationsschritte
+**Automatische Suite:** 100 Tests, 0 Fehler. Sie umfasst die bisherigen Fach-/Adaptertests und neue Lebensversicherungs-, Persistenz-, Review-, Vertrags-, Rollen-, HTTP-, CSRF-, Dokument-, SSE-, OpenAPI-, Vergleichs- und NPS-Negativfälle. Provider in normalen Tests sind synthetisch injiziert; reale Requests sind dem ausdrücklichen Live-Test vorbehalten.
 
-1. Mit Earnie den hier implementierten finanziellen Snapshot in das umfassendere gemeinsame Fallmodell aufnehmen; Besitz und Kundenbestätigung serverseitig nachweisen.
-2. Request/Result nur an den passenden aktuellen Profil-/Szenariostand speichern und I10 aus dem Fallservice veröffentlichen; veraltete Rückläufe nicht übernehmen.
-3. Risiko-Code 0 mit Pax/Logismata klären. Bis dahin bleibt er `requires_review`; unbekannter Bedarf bleibt von einer Null-Lücke getrennt.
-4. Zwei-Personen-Prozentbedarf der Pensionierungsoperation fachlich bestätigen; aktuell prüfpflichtig. Budget-/Steuer-/Einkommenskonvertierungsmapping ergänzen.
-5. Echte Leistungs-/Erwerbs-/Überbrückungsphasen, Preisbasis und personenbezogene PK-Folgen für LOG-04 ergänzen; keine lineare Fortschreibung von PK-Leistungen.
-6. LOG-06 erst mit gespeichertem Empfehlungs-/Review-/Vertragsmodell anbinden.
+**Echter Live-Durchstich:** 16 Operationen erfolgreich; Baseline, Familie, Eigenheim, Pensionierung ohne Providerfehler, drei Vergleiche. Empfehlung, separate Test-Reviewer-Rolle, Demo-Konfiguration mit archivierten Dokumentnachweisen, Antrag, idempotente Einreichung, Demo-Annahme, Demo-Police, identische Summary-Snapshots und Portal nach Server-Neustart durchlaufen. Alle verwendeten Angaben waren erfunden. Temporäre Testdaten wurden anschließend gelöscht. Zugangsdaten wurden weder kopiert noch ausgegeben.
+
+Die Risikoantworten mit Code `0` bleiben `requires_review`; die Testrolle legitimiert keine fachlich ungeklärte Providersemantik. Keine Gleichsetzung mit vlot-/Studienfallwerten ohne identische Annahmen. Geburtsmonat, PK-Folgen, Kapitalfreigabe, Steuern, Begünstigung und Produkttauglichkeit bleiben ausdrücklich fachlich prüfpflichtig.
+
+## Team-Übergabe und echte Abschlussgrenzen
+
+Luca bindet die geschützte API über Angular-Proxy an. Earnie verwendet denselben Fallservice und liest vor jeder Antwort `/advisor/context`. Dario/Earnie reagieren auf `/advisor/events`, prüfen Kontext-/Run-/Profilreferenzen und unterbrechen veraltete Antwort-/Audiostände. Lukas erhält den getrennten Datenaufnahme-Fortschritt für den vereinbarten Ring. Die Benutzeroberfläche, LLM-Antwort, STT/TTS und Avatar-Animation sind nicht Bestandteil dieser Implementierung.
+
+Es wurden keine echten Pax-Tarifierungs-, Underwriting-, Identitäts-/AML-, Signatur-, Annahme- oder Policierungs-APIs bereitgestellt. Deshalb bleiben alle Konfigurationen und Policen explizite lokale Demo-Objekte. `premiumCents:null`, `premiumStatus:pax_tariff_api_unavailable`, `coverageInForce:false` und `legalEffect:none` verhindern eine irreführende Deckungsbehauptung. Ein echter Abschluss bleibt gesperrt. Die [Requirements-Matrix](life-insurance-requirements.md) führt alle Release-Gates und gemeinsame Abnahmen auf.
+
+## Quellen und bestehender Archivzustand
+
+Die Produktfamilien sind anhand der offiziellen [Pax-Produktübersicht](https://www.pax.ch/de/private-vorsorge) und der vorhandenen archivierten Broschüren/Bedingungen nachvollziehbar hinterlegt. Dokumente tragen SHA-256 und Archivstand, jedoch keine unbelegte Aktualitätsfreigabe. Aktuelle fachliche Eignung und konkrete Tarife sind mit Pax zu bestätigen. Für die Transparenzanforderungen ist die [EDÖB-Information zur Informationspflicht](https://www.edoeb.admin.ch/de/informationspflicht) eine relevante Primärquelle; der Demo-Hinweis ersetzt keine rechtliche Freigabe.
+
+Der bestehende vollständige Quellenkatalog-Build scheitert weiterhin an den im Commit `6bf72c6` bewusst entfernten 16 Videodateien. Diese Änderung wird respektiert; Videos werden nicht wiederhergestellt. Quellen-/Medieninventare bleiben historisch. Die vorliegende Implementierung und ihre Tests benötigen die vorhandenen API-Spezifikationen/-Beispiele und Produkt-PDFs, keine Videodateien. Neue Dokumentlinks werden separat geprüft.

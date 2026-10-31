@@ -2,7 +2,7 @@
   "plan_date": "2026-10-31",
   "plan_version": "2.0-workshop",
   "supersedes_plan_version": "1.0",
-  "implementation_status": "not_started",
+  "implementation_status": "logic_backend_implemented_team_acceptance_pending",
   "team_confirmed_by_user": true,
   "team_roles": {
     "Luca": "UI",
@@ -728,7 +728,7 @@
       "owner": "Valentin",
       "title": "Fachvertrag, GraphContext und Fortschrittsdaten",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [],
       "deliverable": "Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.",
@@ -751,15 +751,15 @@
         "I09",
         "I10"
       ],
-      "implementation_note": "Gemeinsame Laufzeitschemas, GraphContext und Datenreife implementiert; Einbindung in den autorisierten Fallstore noch offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "Autorisierter gemeinsamer Fall, unveränderliche bestätigte Profile, Schemas für vollständige Analyse, GraphContext, Kontextrevision und Fortschrittsgruppen implementiert und automatisch geprüft. UI-/Voice-/Avatar-Anschluss gemeinsam abnehmen.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-02",
       "owner": "Valentin",
       "title": "Logismata-Baseline und Antwortnormalisierung",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 3,
       "dependencies": [
         "LOG-01",
@@ -779,15 +779,15 @@
         "I03",
         "I04"
       ],
-      "implementation_note": "Sechs Operationen mit Replay-/Live-Adapter implementiert; Metadaten-Smoke erfolgreich. Weitere priorisierte Mapper und Fachfreigaben offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "16 echte Logismata-Operationen mit validierten Requests, Normalisierung und begrenztem Client implementiert; vollständiger synthetischer Live-Test bestanden. Risiko-Code 0 bleibt fachlich offen und requires_review.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-03",
       "owner": "Valentin",
       "title": "Budget und Kapitalzuordnung ohne Doppelzählung",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [
         "LOG-01",
@@ -807,15 +807,15 @@
         "I04",
         "I09"
       ],
-      "implementation_note": "Budget, explizite Kapitalzuordnung und getrennte Säulenübersicht mit Quellen implementiert; Integration in den gemeinsamen Fall bleibt offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "Budget, Netto-/Steuerbasis, Beiträge, Schulden, Kapital-Ledger und drei Säulen im gemeinsamen bestätigten Fall integriert; unbekannte Werte und Doppelzählungsfälle automatisch geprüft.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-04",
       "owner": "Valentin",
       "title": "Familien- und Pensionierungsphasen",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 3,
       "dependencies": [
         "LOG-03"
@@ -834,15 +834,15 @@
         "I03",
         "I04"
       ],
-      "implementation_note": "Familien-Cashflow und endliches Spar-/Entnahmemodell vorhanden; mehrphasige Pensionierung und bestätigte Leistungsfolgen offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "Familienvariante und mehrphasige Pensionierung mit getrennten Erwerbs-/Rentenzeitpunkten, endlichem Kapital, gebundenen Sparbeträgen und gespeicherten Vergleichen implementiert; automatisierte und echte synthetische Variantenläufe bestanden. PK-Sonderfolgen bleiben fachlich prüfpflichtig.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-05",
       "owner": "Valentin",
       "title": "Eigenheimvergleich und Reserven",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [
         "LOG-03"
@@ -861,15 +861,15 @@
         "I03",
         "I04"
       ],
-      "implementation_note": "Eigenmittelvergleich, Kostenszenario, Reserve und Zuordnungsledger vorhanden; Speicherung/Vergleich am gemeinsamen Fall offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "Eigenmittellücke, explizite Kosten/Reserve, Kapitalzuordnungen und gespeicherter Vergleich im gemeinsamen Fall implementiert; gebundene Mittel bleiben ausgeschlossen. Automatisch und live geprüft, keine Kreditzusage.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-06",
       "owner": "Valentin",
       "title": "Demo-Vertragsstatus und Regeln für Übergänge",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 1.5,
       "dependencies": [
         "LOG-03",
@@ -889,14 +889,16 @@
       "interface_contracts": [
         "I02",
         "I08"
-      ]
+      ],
+      "implementation_note": "Vollständige gespeicherte Demo-State-Machine mit aktueller Empfehlung, getrenntem Review, Dokumenthash/Bestätigung, idempotenter Einreichung, Annahme, Demo-Police und Portal nach Neustart implementiert und geprüft. Keine echte Abschluss-API verfügbar.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-07",
       "owner": "Valentin",
       "title": "Fachtests, Quellenreview und Domain-Klärung",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2.5,
       "dependencies": [
         "LOG-04",
@@ -921,8 +923,8 @@
         "I08",
         "I10"
       ],
-      "implementation_note": "Automatisierte Fach-, Adapter- und HTTP-Tests angelegt; Fachreview und die vollständige Journey-Abnahme bleiben offen.",
-      "implementation_report": "documentation/baselhack/reports/logic-backend-implementation.md"
+      "implementation_note": "100 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "AI-01",
@@ -1198,5 +1200,13 @@
   ],
   "interface_spec": "documentation/baselhack/catalog/interface-contracts.json",
   "planned_acceptance_cases": 55,
-  "implementation_report_path": "documentation/baselhack/reports/logic-backend-implementation.md"
+  "implementation_report_path": "documentation/baselhack/reports/logic-backend-implementation.md",
+  "logic_backend_verification": {
+    "date": "2026-10-31",
+    "automated_tests_passed": 100,
+    "live_operations_verified": 16,
+    "data_classification": "synthetic",
+    "real_coverage_enabled": false,
+    "report": "documentation/baselhack/reports/life-insurance-requirements.md"
+  }
 }
