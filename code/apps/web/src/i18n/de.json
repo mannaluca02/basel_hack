@@ -16,8 +16,7 @@
       "extractionUnavailable": "Live-Extraktion ist im Backend deaktiviert oder nicht erreichbar. Starte das aktuelle Debug-Backend mit PAX_SYNTHETIC_VOICE_ENABLED=1 und OPENAI_API_KEY; eine Sprachverbindung allein füllt keine Angaben ab.",
       "extractionReady": "Live-Extraktion aktiv: Gesprächslogs → KI → Feldvorschläge",
       "handover": "Der menschliche Berater ist angefordert. Gib den digitalen Dialog hier ausdrücklich wieder frei, bevor du ein neues Gespräch startest.",
-      "liveReady": "3. Bereit: Starte das Live-Gespräch und erlaube dem Browser den Mikrofonzugriff.",
-      "replayReady": "Bereit: Der synthetische Replay benötigt weder Mikrofon noch Voice-Zustimmung."
+      "liveReady": "3. Bereit: Starte das Live-Gespräch und erlaube dem Browser den Mikrofonzugriff."
     },
     "error": {
       "microphoneDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Website-Einstellungen deines Browsers und klicke danach erneut auf «Live-Gespräch starten».",
@@ -26,22 +25,15 @@
       "recover": "Der Vorgang konnte nicht abgeschlossen werden. Prüfe den API-Trace und versuche die Vorbereitung oder «Fall neu laden» erneut."
     },
     "avatarNotice": "Avatar: lokale Audiopegel-Visualisierung. Kein Nachweis von Finalität oder abgeschlossener Wiedergabe.",
-    "confirmedGross": "Letztes bestätigtes Jahresbrutto",
     "canonicalUnits": "Rohwert: Geld in CHF-Cent (100 Cent = 1 CHF)",
     "title": "Voice Lab",
-    "syntheticOnly": "Nur erfundene Daten",
     "description": "Paxi im Gespräch: verfolge echte API-Payloads vom Transkript über den kanonischen Fall bis zur sichtbaren Store-Projektion.",
     "apiRequired": "Bitte mit npm --prefix code/apps/web run start:api starten. Dieses Labor braucht das Fall-Backend auf Port 3000.",
     "demoCode": "Der vorbelegte öffentliche Demo-Code gilt nur beim dedizierten start:voice-lab-Server. Sonst den lokalen Kundenzugang verwenden.",
     "baselineNotice": "Die Ausgangslage enthält erfundene Personen und Beträge. Sie wird als unbestätigter Entwurf geladen.",
     "connection": "Gespräch & Avatar",
-    "synthetic": "Synthetischer Replay",
     "live": "Live · Mikrofon",
     "speaker": "Sprechende Person (explizite Zuordnung)",
-    "replayNotice": "Verfasste Konversation über alle acht Felder, echte Backend-Schreibvorgänge. Kein Mikrofon, keine Sprachausgabe, kein Modellaufruf. Der Avatar zeigt simulierte Gesprächsaktivität.",
-    "replay": "Ganze Konversation abspielen",
-    "correction": "Korrektur",
-    "smalltalk": "Smalltalk / kein Treffer",
     "configured": "konfiguriert (kein Gesundheitscheck)",
     "unconfigured": "nicht konfiguriert",
     "voiceConsent": "Ich verwende ausschliesslich erfundene Angaben und stimme dem Audio-/Gesprächstransfer an OpenAI für diese Sprachdemo zu.",
@@ -109,7 +101,6 @@
       "evaluating": "wertet aus",
       "yes": "ja",
       "no": "nein",
-      "done": "Danke, damit habe ich alle Angaben. Du kannst sie jetzt im Review prüfen.",
       "extractionConsent": "Ich stimme zu, dass ein kleiner, erfundener Gesprächsausschnitt für die KI-Extraktion an OpenAI übertragen wird (gesonderte Zustimmung).",
       "extractionBlocker": "Bestätige die gesonderte KI-Zustimmung, sonst würde das Labor still auf starre Sätze zurückfallen.",
       "status": {

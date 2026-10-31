@@ -16,8 +16,7 @@
       "extractionUnavailable": "L’estrazione live è disattivata o irraggiungibile. Avvia il backend attuale con PAX_SYNTHETIC_VOICE_ENABLED=1 e OPENAI_API_KEY; la sola connessione vocale non raccoglie i dati.",
       "extractionReady": "Estrazione live attiva: registro → IA → proposte",
       "handover": "È stata richiesta una consulenza umana. Consenti di nuovo esplicitamente il dialogo digitale qui prima di iniziare una nuova conversazione.",
-      "liveReady": "3. Pronto: avvia il dialogo live e autorizza il microfono nel browser.",
-      "replayReady": "Pronto: il replay sintetico non richiede né microfono né consenso vocale."
+      "liveReady": "3. Pronto: avvia il dialogo live e autorizza il microfono nel browser."
     },
     "error": {
       "microphoneDenied": "Accesso al microfono negato. Autorizzalo nelle impostazioni del sito del browser, poi avvia di nuovo il dialogo live.",
@@ -26,22 +25,15 @@
       "recover": "Impossibile completare l’operazione. Controlla la traccia API, poi ripeti la preparazione o ricarica il caso."
     },
     "avatarNotice": "Avatar: visualizzazione locale del livello audio. Non prova la trascrizione finale né la fine della riproduzione.",
-    "confirmedGross": "Ultimo reddito annuo lordo confermato",
     "canonicalUnits": "Valore grezzo: denaro in centesimi CHF (100 centesimi = 1 CHF)",
     "title": "Voice Lab",
-    "syntheticOnly": "Solo dati inventati",
     "description": "Dialoga con Paxi e segui i veri payload API, dalla trascrizione al caso canonico e alla proiezione dello store.",
     "apiRequired": "Avvia con npm --prefix code/apps/web run start:api. Il laboratorio richiede il backend dei casi sulla porta 3000.",
     "demoCode": "Il codice pubblico precompilato funziona solo con il server start:voice-lab. Altrimenti usa il codice cliente locale.",
     "baselineNotice": "La situazione iniziale contiene persone e importi inventati. Viene caricata come bozza non confermata.",
     "connection": "Dialogo e avatar",
-    "synthetic": "Replay sintetico",
     "live": "Live · microfono",
     "speaker": "Persona che parla (attribuzione esplicita)",
-    "replayNotice": "Conversazione scritta su tutti gli otto campi, vere operazioni backend. Nessun microfono, riproduzione vocale o chiamata al modello. L’attività dell’avatar è simulata.",
-    "replay": "Riproduci l’intera conversazione",
-    "correction": "Correzione",
-    "smalltalk": "Conversazione / nessun risultato",
     "configured": "configurato (non è un controllo di disponibilità)",
     "unconfigured": "non configurato",
     "voiceConsent": "Uso solo dati inventati e acconsento al trasferimento di audio e conversazione a OpenAI per questa demo.",
@@ -109,7 +101,6 @@
       "evaluating": "analisi in corso",
       "yes": "sì",
       "no": "no",
-      "done": "Grazie, ho tutti i dati. Ora puoi verificarli nella revisione.",
       "extractionConsent": "Accetto che un piccolo estratto fittizio della conversazione sia trasmesso a OpenAI per l’estrazione con IA (consenso separato).",
       "extractionBlocker": "Conferma il consenso separato per l’IA, altrimenti il laboratorio tornerebbe in silenzio a frasi rigide.",
       "status": {

@@ -1,8 +1,8 @@
 import { DigitalTasks } from './digital-tasks.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { CaseSnapshotSchema,CreateInsuranceCaseSchema,DraftSchema,DraftPatchSchema,ConfirmProfileSchema,
-  DEFAULT_HUMAN_HANDOVER,PAX_HUMAN_ADVISOR_CONTACT,RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft,type LifeScenario } from '@pax/contracts';
+import { CreateInsuranceCaseSchema,DraftSchema,DraftPatchSchema,ConfirmProfileSchema,
+  DEFAULT_HUMAN_HANDOVER,PAX_HUMAN_ADVISOR_CONTACT,RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft } from '@pax/contracts';
 import { calculateBudget,calculateCapital,intakeQuestions,retirementTimeline,simulateScenario,calculateProgress } from '@pax/domain';
 import { CalculationService,createAnalysisRequest } from '../calculation/calculation.service.js';
 import { sha256Json } from '../calculation/hash.js';

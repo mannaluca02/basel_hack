@@ -1,7 +1,6 @@
 import {VoiceIntegrationService} from '../voice/service.js';
 import type {VoiceOptions} from '../voice/providers.js';
 import { HumanHandoverService } from './human-handover.js';
-import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { EncryptedCaseStore,type BootstrapCredentials } from './store.js';
 import { SessionService } from './auth.js';

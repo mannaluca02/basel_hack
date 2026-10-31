@@ -26,7 +26,7 @@ import { PaxiCaseVoice } from './paxi-case-voice';
 import { VoiceActivity } from './voice-activity';
 import { VoiceLabApi } from './voice-lab-api';
 
-export interface LiveTurnResult {
+interface LiveTurnResult {
   mode: 'synthetic' | 'live';
   source: { text: string };
   extraction: TurnExtraction & {
@@ -35,24 +35,24 @@ export interface LiveTurnResult {
     result: { proposalBatch?: unknown; issues?: { code: string }[] };
   };
 }
-export interface DialogueLine {
+interface DialogueLine {
   id: number;
   speaker: 'customer' | 'agent';
   text: string;
   origin: 'live';
 }
-export interface ExtractionNotice {
+interface ExtractionNotice {
   enabled: boolean;
   version: string;
   noticeHash: string;
   text: string;
 }
-export interface PromptSkill {
+interface PromptSkill {
   id: string;
   name: string;
   description: string;
 }
-export type VoiceAvatarEvent = { type: 'activity'; state: 'idle' | 'listening' | 'thinking' };
+type VoiceAvatarEvent = { type: 'activity'; state: 'idle' | 'listening' | 'thinking' };
 
 /**
  * Earnie's live voice over the case backend, shared by the app and the Voice Lab (debug): GPT-Live
@@ -113,7 +113,10 @@ export class LiveVoice {
   });
   readonly active = computed(() => this.state() === 'connecting' || this.state() === 'connected');
   readonly caseReady = computed(
-    () => this.apiMode && !!this.customer.session() && this.store.canonical()?.id === this.customer.session()?.caseId,
+    () =>
+      this.apiMode &&
+      !!this.customer.session() &&
+      this.store.canonical()?.id === this.customer.session()?.caseId,
   );
   /** Persons with financial data: the extraction proposes per person. */
   readonly persons = computed(() => {
@@ -123,7 +126,9 @@ export class LiveVoice {
       financial.some((p) => p.id === person.personId),
     );
   });
-  readonly validPerson = computed(() => this.persons().some((person) => person.personId === this.personId()));
+  readonly validPerson = computed(() =>
+    this.persons().some((person) => person.personId === this.personId()),
+  );
   readonly handoverControl = new HandoverControl(this.customer.session, () => {
     const c = this.store.canonical();
     return c ? { caseId: c.id, handover: c.handover } : null;
@@ -147,7 +152,11 @@ export class LiveVoice {
       case 'connecting':
         return 'thinking';
       case 'connected':
-        return this.evaluating() ? 'thinking' : this.voiceActivity() === 'idle' ? 'listening' : this.voiceActivity();
+        return this.evaluating()
+          ? 'thinking'
+          : this.voiceActivity() === 'idle'
+            ? 'listening'
+            : this.voiceActivity();
     }
   });
 
@@ -350,11 +359,14 @@ export class LiveVoice {
     void this.loadExtractionNotice();
     void this.loadPromptSettings();
     try {
-      const privacy = await this.api.get<{ text: string; providers: { provider: string; available: boolean }[] }>(
-        `voice/privacy?locale=${this.language.language()}`,
-      );
+      const privacy = await this.api.get<{
+        text: string;
+        providers: { provider: string; available: boolean }[];
+      }>(`voice/privacy?locale=${this.language.language()}`);
       this.notice.set(privacy.text);
-      this.providerAvailable.set(privacy.providers.some((p) => p.provider === 'gpt-live' && p.available));
+      this.providerAvailable.set(
+        privacy.providers.some((p) => p.provider === 'gpt-live' && p.available),
+      );
     } catch {
       this.providerAvailable.set(false);
       this.error.set('BACKEND_UNAVAILABLE');
@@ -408,7 +420,8 @@ export class LiveVoice {
   /** A sign-out or a new session in between supersedes the work. */
   async forSession<T>(session: CustomerSession, work: () => Promise<T>): Promise<T> {
     const assertCurrent = () => {
-      if (this.destroyed || this.customer.session() !== session) throw new SupersededCaseOperation();
+      if (this.destroyed || this.customer.session() !== session)
+        throw new SupersededCaseOperation();
     };
     assertCurrent();
     try {
@@ -422,12 +435,22 @@ export class LiveVoice {
   }
 
   /** Only a failed extraction is non-fatal; a vanished session still ends the conversation. */
-  private async extractLive(sid: string, messageId: string, personId: string, epoch: number): Promise<void> {
+  private async extractLive(
+    sid: string,
+    messageId: string,
+    personId: string,
+    epoch: number,
+  ): Promise<void> {
     const asked = nextIntakeField(this.rows());
     this.evaluating.set(true);
     this.extractionFailed.set(false);
     const post = () =>
-      this.api.post<LiveTurnResult>('voice-lab/turns', { mode: 'live', voiceSessionId: sid, messageId, personId });
+      this.api.post<LiveTurnResult>('voice-lab/turns', {
+        mode: 'live',
+        voiceSessionId: sid,
+        messageId,
+        personId,
+      });
     try {
       let result: LiveTurnResult;
       try {
@@ -435,12 +458,10 @@ export class LiveVoice {
       } catch (error) {
         // A customer accept racing this turn changes revision/draft: read fresh and retry once
         // with the same id, without counting an attempt.
-        if (
-          !(
-            error instanceof HttpErrorResponse &&
-            ['VERSION_CONFLICT', 'STALE_PROPOSAL', 'STALE_CONTEXT'].includes(error.error?.code)
-          )
-        )
+        if (!(
+          error instanceof HttpErrorResponse &&
+          ['VERSION_CONFLICT', 'STALE_PROPOSAL', 'STALE_CONTEXT'].includes(error.error?.code)
+        ))
           throw error;
         this.store.refresh();
         await this.customer.loadCase(this.caseId());
@@ -452,12 +473,19 @@ export class LiveVoice {
       // A disabled/failing extractor and smalltalk are not answers to a question. In particular,
       // never advance the plan or mark fields skipped on infrastructure errors.
       if (result.extraction.result.issues?.length) this.extractionFailed.set(true);
-      else if (result.extraction.clarifications?.length || result.extraction.request?.observations?.length)
+      else if (
+        result.extraction.clarifications?.length ||
+        result.extraction.request?.observations?.length
+      )
         this.intake.update((memory) => afterCustomerTurn(memory, asked, result.extraction));
     } catch (error) {
-      if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 410)) throw error;
+      if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 410))
+        throw error;
       if (epoch !== this.epoch) return;
-      this.trace.add('local', 'voice-lab/turns', { code: 'EXTRACTION_FAILED', conversationContinues: true });
+      this.trace.add('local', 'voice-lab/turns', {
+        code: 'EXTRACTION_FAILED',
+        conversationContinues: true,
+      });
       this.extractionFailed.set(true);
     } finally {
       this.evaluating.set(false);
@@ -473,7 +501,9 @@ export class LiveVoice {
     return steeringContext(
       rows,
       (id) => this.question(id),
-      nextIntakeField(rows) === 'annual_gross_income_chf' ? this.transloco.translate('lab.intake.clarify') : undefined,
+      nextIntakeField(rows) === 'annual_gross_income_chf'
+        ? this.transloco.translate('lab.intake.clarify')
+        : undefined,
     );
   }
 
@@ -489,7 +519,10 @@ export class LiveVoice {
   }
 
   private append(speaker: DialogueLine['speaker'], text: string): void {
-    this.dialogue.update((lines) => [...lines.slice(-39), { id: ++this.sequence, speaker, text, origin: 'live' }]);
+    this.dialogue.update((lines) => [
+      ...lines.slice(-39),
+      { id: ++this.sequence, speaker, text, origin: 'live' },
+    ]);
   }
 
   private caseId(): string {
@@ -501,7 +534,9 @@ export class LiveVoice {
   /** Live requires model extraction; an unavailable notice must block starting, not silently use rules. */
   private async loadExtractionNotice(): Promise<void> {
     try {
-      this.extractionNotice.set(await this.api.get(`extraction/privacy?locale=${this.language.language()}`));
+      this.extractionNotice.set(
+        await this.api.get(`extraction/privacy?locale=${this.language.language()}`),
+      );
     } catch {
       this.extractionNotice.set(null);
     }
@@ -509,14 +544,18 @@ export class LiveVoice {
 
   private async loadPromptSettings(): Promise<void> {
     try {
-      const settings = await this.api.get<{ skills: PromptSkill[]; defaultTimeBudgetMinutes: number }>(
-        'voice/settings',
-      );
+      const settings = await this.api.get<{
+        skills: PromptSkill[];
+        defaultTimeBudgetMinutes: number;
+      }>('voice/settings');
       this.promptSkills.set(settings.skills);
       if (!this.promptSettingsReady()) {
         this.selectedSkills.set(settings.skills.map((skill) => skill.id));
         this.timeBudget.set(settings.defaultTimeBudgetMinutes);
-      } else this.selectedSkills.update((ids) => ids.filter((id) => settings.skills.some((skill) => skill.id === id)));
+      } else
+        this.selectedSkills.update((ids) =>
+          ids.filter((id) => settings.skills.some((skill) => skill.id === id)),
+        );
       this.promptSettingsReady.set(true);
     } catch {
       this.promptSettingsReady.set(false);
@@ -525,4 +564,4 @@ export class LiveVoice {
 }
 
 /** Work of a former session or a destroyed app; dropped silently. */
-export class SupersededCaseOperation extends Error {}
+class SupersededCaseOperation extends Error {}

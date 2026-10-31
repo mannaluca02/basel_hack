@@ -16,8 +16,7 @@
       "extractionUnavailable": "L’extraction en direct est désactivée ou inaccessible. Démarrez le backend actuel avec PAX_SYNTHETIC_VOICE_ENABLED=1 et OPENAI_API_KEY ; la connexion vocale seule ne recueille pas les données.",
       "extractionReady": "Extraction en direct active : journal → IA → propositions",
       "handover": "Un conseil humain a été demandé. Réautorisez explicitement le dialogue numérique ici avant de démarrer une nouvelle conversation.",
-      "liveReady": "3. Prêt : démarrez le dialogue en direct et autorisez le microphone dans le navigateur.",
-      "replayReady": "Prêt : le replay fictif ne nécessite ni microphone ni consentement vocal."
+      "liveReady": "3. Prêt : démarrez le dialogue en direct et autorisez le microphone dans le navigateur."
     },
     "error": {
       "microphoneDenied": "L’accès au microphone a été refusé. Autorisez-le dans les paramètres du site du navigateur, puis redémarrez le dialogue en direct.",
@@ -26,22 +25,15 @@
       "recover": "L’opération n’a pas abouti. Consultez la trace API, puis relancez la préparation ou rechargez le dossier."
     },
     "avatarNotice": "Avatar : visualisation locale du niveau audio. Ni preuve de transcription finale ni de lecture terminée.",
-    "confirmedGross": "Dernier revenu annuel brut confirmé",
     "canonicalUnits": "Valeur brute : montants en centimes CHF (100 centimes = 1 CHF)",
     "title": "Voice Lab",
-    "syntheticOnly": "Données fictives uniquement",
     "description": "Dialoguez avec Paxi et suivez les vrais échanges API, de la transcription au dossier canonique et à la projection du store.",
     "apiRequired": "Démarrez avec npm --prefix code/apps/web run start:api. Le laboratoire nécessite le backend de dossiers sur le port 3000.",
     "demoCode": "Le code public prérempli fonctionne uniquement avec le serveur start:voice-lab. Sinon, utilisez votre code client local.",
     "baselineNotice": "La situation initiale contient des personnes et montants fictifs. Elle est chargée comme brouillon non confirmé.",
     "connection": "Dialogue et avatar",
-    "synthetic": "Replay fictif",
     "live": "Direct · microphone",
     "speaker": "Personne qui parle (attribution explicite)",
-    "replayNotice": "Conversation rédigée sur les huit champs, vraies écritures backend. Aucun microphone, son ou appel de modèle. L’activité de l’avatar est simulée.",
-    "replay": "Rejouer toute la conversation",
-    "correction": "Correction",
-    "smalltalk": "Conversation / sans résultat",
     "configured": "configuré (sans test de disponibilité)",
     "unconfigured": "non configuré",
     "voiceConsent": "J’utilise uniquement des informations fictives et j’accepte leur transfert audio/conversation à OpenAI pour cette démonstration.",
@@ -109,7 +101,6 @@
       "evaluating": "analyse en cours",
       "yes": "oui",
       "no": "non",
-      "done": "Merci, j’ai toutes les informations. Vous pouvez les vérifier dans la revue.",
       "extractionConsent": "J’accepte qu’un petit extrait fictif de la conversation soit transmis à OpenAI pour l’extraction par IA (accord séparé).",
       "extractionBlocker": "Confirmez l’accord séparé pour l’IA, sinon le labo reviendrait silencieusement à des phrases rigides.",
       "status": {

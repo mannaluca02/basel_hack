@@ -9,7 +9,6 @@ Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller S
 - [API, Speicher und Datenbank-Ausbau](documentation/baselhack/plans/persistence-and-api.md)
 - [Logik-Backend: Start, API und Team-Integration](code/README.md)
 - [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)
-- [Backend-Requirements und Live-Nachweise](documentation/baselhack/reports/life-insurance-requirements.md)
 - [Implementierungsstand und offene Fachfragen](documentation/baselhack/reports/logic-backend-implementation.md)
 - [Bestätigte Workshop-Entscheide und Rollen](documentation/baselhack/plans/workshop-decisions.md)
 - [Workflow und Schnittstellen aus dem Workshop](documentation/baselhack/plans/interface-contracts.md)

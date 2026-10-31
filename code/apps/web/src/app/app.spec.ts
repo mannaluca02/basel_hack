@@ -313,6 +313,65 @@ describe('App review stand', () => {
   });
 });
 
+describe('App voice per configuration', () => {
+  async function renderWith(environment: Record<string, unknown>) {
+    localStorage.clear();
+    sessionStorage.clear();
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AdvisorDataSource, useValue: new FakeDataSource() },
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', ...environment },
+        },
+        provideI18nTesting(),
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('drives the scripted call from the call bar in the mock', async () => {
+    const root = await renderWith({ dataSource: 'mock' });
+
+    expect(root.querySelector('app-call-controls')).not.toBeNull();
+  });
+
+  it('leaves the call to the live voice against the backend, without a call bar', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true });
+
+    expect(root.querySelector('app-call-controls')).toBeNull();
+  });
+
+  it('shows the call bar for Paxi in its own window in the paxi configuration', async () => {
+    const root = await renderWith({
+      dataSource: 'api',
+      demoStart: true,
+      voiceAgentUrl: 'http://localhost:3100',
+    });
+
+    expect(root.querySelector('app-call-controls')).not.toBeNull();
+  });
+
+  it('links the Voice Lab only in the debug configurations', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true });
+
+    expect(root.querySelector('.rail a[href="/voice-lab"]')).toBeNull();
+  });
+
+  it('adds the Voice Lab tab to the rail with debugVoice', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true, debugVoice: true });
+
+    expect(root.querySelector('.rail a[href="/voice-lab"]')).not.toBeNull();
+  });
+});
+
 describe('App before consent', () => {
   let source: FakeDataSource;
 

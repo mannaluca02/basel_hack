@@ -16,8 +16,7 @@
       "extractionUnavailable": "Live extraction is disabled or unreachable in the backend. Start the current debug backend with PAX_SYNTHETIC_VOICE_ENABLED=1 and OPENAI_API_KEY; a voice connection alone does not capture details.",
       "extractionReady": "Live extraction active: conversation logs → AI → field proposals",
       "handover": "Human advice has been requested. Explicitly allow digital dialogue again here before starting another conversation.",
-      "liveReady": "3. Ready: start the live conversation and allow microphone access in your browser.",
-      "replayReady": "Ready: synthetic replay needs neither a microphone nor voice consent."
+      "liveReady": "3. Ready: start the live conversation and allow microphone access in your browser."
     },
     "error": {
       "microphoneDenied": "Microphone access was denied. Allow it in your browser’s site settings, then click Start live conversation again.",
@@ -26,22 +25,15 @@
       "recover": "The operation could not finish. Check the API trace, then retry preparation or Reload case."
     },
     "avatarNotice": "Avatar: local audio-level visualization. Not evidence of transcript finality or completed playback.",
-    "confirmedGross": "Last confirmed annual gross income",
     "canonicalUnits": "Raw value: money in CHF cents (100 cents = CHF 1)",
     "title": "Voice Lab",
-    "syntheticOnly": "Invented data only",
     "description": "Talk with Paxi and follow real API payloads from transcripts through the canonical case to the visible store projection.",
     "apiRequired": "Start with npm --prefix code/apps/web run start:api. This lab needs the case backend on port 3000.",
     "demoCode": "The prefilled public demo code works only with the dedicated start:voice-lab server. Otherwise use your local customer access code.",
     "baselineNotice": "The baseline contains invented people and amounts. It is loaded as an unconfirmed draft.",
     "connection": "Dialogue & avatar",
-    "synthetic": "Synthetic replay",
     "live": "Live · microphone",
     "speaker": "Speaking person (explicit attribution)",
-    "replayNotice": "Authored conversation across all eight fields, real backend writes. No microphone, speech playback or model call. Avatar activity is simulated.",
-    "replay": "Replay whole conversation",
-    "correction": "Correction",
-    "smalltalk": "Smalltalk / no match",
     "configured": "configured (not a health check)",
     "unconfigured": "not configured",
     "voiceConsent": "I will use invented details only and consent to sending audio/conversation data to OpenAI for this voice demo.",
@@ -109,7 +101,6 @@
       "evaluating": "evaluating",
       "yes": "yes",
       "no": "no",
-      "done": "Thank you, that is everything I need. You can now check it in the review.",
       "extractionConsent": "I agree that a small, invented conversation excerpt is sent to OpenAI for AI extraction (separate consent).",
       "extractionBlocker": "Confirm the separate AI consent, otherwise the lab would silently fall back to rigid sentences.",
       "status": {
