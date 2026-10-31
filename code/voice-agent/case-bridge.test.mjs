@@ -131,3 +131,22 @@ test("an answer whose quote is in no customer turn is not proposed", async () =>
   await settle();
   assert.equal(fake.requests.length, 0);
 });
+
+test("a percentage spoken as words stays exact, an amount spoken as words is asked back", async () => {
+  const fake = backend();
+  const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl: fake.fetchImpl, log: quiet });
+  const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+  const log = conversation(
+    {
+      employment_rate_percent: { status: "captured", value: 100, quote: "hundert Prozent" },
+      annual_gross_income_chf: { status: "captured", value: 100000, quote: "hunderttausend brutto" },
+    },
+    [{ speaker: "user", text: "Ich arbeite hundert Prozent und verdiene hunderttausend brutto." }],
+  );
+  bridge.answersChanged(linkId, log);
+  await settle();
+  assert.deepEqual(fake.requests[0].observations.map((o) => [o.fieldId, o.precision]), [
+    ["employment_rate_percent", "exact"],
+    ["annual_gross_income_chf", "approximate"],
+  ]);
+});

@@ -94,8 +94,9 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console }) {
       turns.set(turn.messageId, { messageId: turn.messageId, turnId: turn.messageId, text: turn.text.slice(0, 4000) });
       const money = MONEY[fieldId];
       const value = answer.value;
-      // A value the person did not say in these digits ("rund zweitausend") is asked back, not taken.
-      const digits = typeof value === "number" ? String(value) : null;
+      // An amount the person did not say in these digits ("rund zweitausend") is asked back, not
+      // taken. Years and percentages are often spoken as words ("hundert Prozent") and stay exact.
+      const digits = money && typeof value === "number" ? String(value) : null;
       const exact = digits === null || quote.replace(/['’\s]/g, "").includes(digits);
       result.push({
         fieldId,
