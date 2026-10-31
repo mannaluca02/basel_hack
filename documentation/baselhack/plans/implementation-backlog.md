@@ -506,7 +506,7 @@ P0 · geplant · 1 Personenstunden · M5
 
 ### LOG-01 – Fachvertrag, GraphContext und Fortschrittsdaten
 
-P0 · geplant · 2 Personenstunden · M0
+P0 · in Arbeit · 2 Personenstunden · M0
 
 **Ergebnis:** Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.
 
@@ -522,9 +522,12 @@ P0 · geplant · 2 Personenstunden · M0
 - [ ] GraphContext enthält Run, Profil-/Szenarioversion, Person, Kennzahl und Periode.
 - [ ] Fortschritt basiert auf erledigten Pflichtgruppen, nicht auf Risikolücken.
 
+**Implementierungsstand (31.10.2026):** Gemeinsame Laufzeitschemas, GraphContext und Datenreife implementiert; Einbindung in den autorisierten Fallstore noch offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
+
+
 ### LOG-02 – Logismata-Baseline und Antwortnormalisierung
 
-P0 · geplant · 3 Personenstunden · M1
+P0 · in Arbeit · 3 Personenstunden · M1
 
 **Ergebnis:** Serverseitiger Adapter für geeignete Baseline-/Grenz-/Metadatenpfade.
 
@@ -540,9 +543,12 @@ P0 · geplant · 3 Personenstunden · M1
 - [ ] Risiko-Code 0 bis zur Klärung reviewpflichtig; HTTP 200 ist nicht alleinige Freigabe.
 - [ ] Begrenzte Fehlerpfade und Replay nur bei passendem vollständigem Input-Hash.
 
+**Implementierungsstand (31.10.2026):** Sechs Operationen mit Replay-/Live-Adapter implementiert; Metadaten-Smoke erfolgreich. Weitere priorisierte Mapper und Fachfreigaben offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
+
+
 ### LOG-03 – Budget und Kapitalzuordnung ohne Doppelzählung
 
-P0 · geplant · 2 Personenstunden · M2
+P0 · in Arbeit · 2 Personenstunden · M2
 
 **Ergebnis:** Drei-Säulen-/Budgetausgabe mit Herkunft und verfügbarer Liquidität.
 
@@ -558,9 +564,12 @@ P0 · geplant · 2 Personenstunden · M2
 - [ ] Bedarf unbekannt erzeugt keine falsche Null-Lücke.
 - [ ] Kapital wird nicht gleichzeitig vollständig mehreren Zielen zugeordnet.
 
+**Implementierungsstand (31.10.2026):** Budget, explizite Kapitalzuordnung und getrennte Säulenübersicht mit Quellen implementiert; Integration in den gemeinsamen Fall bleibt offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
+
+
 ### LOG-04 – Familien- und Pensionierungsphasen
 
-P0 · geplant · 3 Personenstunden · M3
+P0 · in Arbeit · 3 Personenstunden · M3
 
 **Ergebnis:** Gespeicherte Szenarioänderungen mit berechenbaren Differenzen und Fachgrenzen.
 
@@ -576,9 +585,12 @@ P0 · geplant · 3 Personenstunden · M3
 - [ ] Erwerbsende, Rentenbeginn und Überbrückung getrennt.
 - [ ] Phasen und Kapitalerschöpfung sichtbar; nicht unterstützte Regeln bleiben offen.
 
+**Implementierungsstand (31.10.2026):** Familien-Cashflow und endliches Spar-/Entnahmemodell vorhanden; mehrphasige Pensionierung und bestätigte Leistungsfolgen offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
+
+
 ### LOG-05 – Eigenheimvergleich und Reserven
 
-P0 · geplant · 2 Personenstunden · M3
+P0 · in Arbeit · 2 Personenstunden · M3
 
 **Ergebnis:** Beispiel-Eigenmittellücke und Auswirkungen auf andere Ziele.
 
@@ -593,6 +605,9 @@ P0 · geplant · 2 Personenstunden · M3
 - [ ] Quoten/Zinsen sind sichtbare Annahmen, keine Kreditentscheidung.
 - [ ] Gebundene Vorsorgemittel werden nicht still als freie Mittel gerechnet.
 - [ ] Unfinanziertes Ziel und Reserveverzehr bleiben erkennbar.
+
+**Implementierungsstand (31.10.2026):** Eigenmittelvergleich, Kostenszenario, Reserve und Zuordnungsledger vorhanden; Speicherung/Vergleich am gemeinsamen Fall offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
+
 
 ### LOG-06 – Demo-Vertragsstatus und Regeln für Übergänge
 
@@ -614,7 +629,7 @@ P0 · geplant · 1.5 Personenstunden · M4
 
 ### LOG-07 – Fachtests, Quellenreview und Domain-Klärung
 
-P0 · geplant · 2.5 Personenstunden · M5
+P0 · in Arbeit · 2.5 Personenstunden · M5
 
 **Ergebnis:** Nachvollziehbare Domain-Invarianten und offene Pax-Fragen mit tatsächlichem Status.
 
@@ -629,6 +644,9 @@ P0 · geplant · 2.5 Personenstunden · M5
 - [ ] Provider-/Muster-/vlot-Werte werden nicht ohne identische Annahmen gleichgesetzt.
 - [ ] Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.
 - [ ] Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich.
+
+
+**Implementierungsstand (31.10.2026):** Automatisierte Fach-, Adapter- und HTTP-Tests angelegt; Fachreview und die vollständige Journey-Abnahme bleiben offen. Siehe [Code-/Prüfnachweis](../reports/logic-backend-implementation.md).
 
 
 ## Earnie – KI-Backend

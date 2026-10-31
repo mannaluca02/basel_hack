@@ -1,0 +1,17 @@
+{
+  "name": "pax-lifemap",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=22 <25" },
+  "packageManager": "npm@10.9.8",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "start": "npm run build && node apps/api/dist/main.js",
+    "demo": "npm run build && node scripts/demo.mjs",
+    "test:live": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-smoke.mjs"
+  },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "5.9.3" }
+}

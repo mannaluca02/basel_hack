@@ -200,8 +200,9 @@ plan.write_text(body + '\n\n<!-- GENERATED SOURCE APPENDIX -->\n\n' + source_app
 
 (ROOT / 'README.md').write_text(f'''# Pax BaselHack – Teamgrundlage
 
-Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; die Advisor-App ist noch nicht implementiert.
+Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; ein erster Logik-Backend-Baustein ist implementiert, die vollständige Advisor-Journey bleibt offen.
 
+- [Logik-Backend: Implementierung und Prüfnachweis](reports/logic-backend-implementation.md)
 - [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
 - [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)

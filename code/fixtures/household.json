@@ -1,0 +1,35 @@
+{
+  "schemaVersion":"1.0","caseId":"case_demo_household","caseRevision":1,"profileVersion":1,
+  "dataClassification":"synthetic","valuationDate":"2026-10-31","priceBasis":"nominal",
+  "persons":[
+    {"id":"person_demo_1","birthYear":1985,"employmentRateBps":10000,"incomeBasis":"net_after_income_tax",
+      "income":{"value":8400000,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:person1-net-income"}},
+    {"id":"person_demo_2","birthYear":1987,"employmentRateBps":8000,"incomeBasis":"net_after_income_tax",
+      "income":{"value":4800000,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:person2-net-income"}}
+  ],
+  "expenses":[
+    {"id":"housing","category":"housing","amount":{"value":240000,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:rent"}},
+    {"id":"living","category":"living","amount":{"value":300000,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:living"}},
+    {"id":"tax","category":"tax","amount":{"value":0,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:tax-already-in-net"}},
+    {"id":"provision","category":"provision","amount":{"value":50000,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:existing-contributions"}},
+    {"id":"debt","category":"debt","amount":{"value":0,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:no-debt-service"}},
+    {"id":"reserve","category":"reserve","amount":{"value":80000,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:regular-reserve-saving"}}
+  ],
+  "safetyBuffer":{"value":50000,"currency":"CHF","unit":"cent","period":"month","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:chosen-buffer"},
+  "assetsConfirmed":true,
+  "assets":[
+    {"id":"cash","liquidity":"free","availableFrom":"2026-10-31","pillar":"none",
+      "amount":{"value":10000000,"currency":"CHF","unit":"cent","period":"once","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:cash"},
+      "allocations":[{"goalId":"existing_emergency_reserve","amountCents":1000000}]},
+    {"id":"pillar3_account","liquidity":"restricted","availableFrom":"2026-10-31","pillar":"3",
+      "amount":{"value":5000000,"currency":"CHF","unit":"cent","period":"once","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:restricted-3a"},"allocations":[]}
+  ],
+  "provisions":[
+    {"id":"p1_person1","personId":"person_demo_1","pillar":"1","event":"retirement","amount":{"value":2800000,"currency":"CHF","unit":"cent","period":"year","origin":"estimate","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:illustrative-pillar1-person1"}},
+    {"id":"p2_person1","personId":"person_demo_1","pillar":"2","event":"retirement","amount":{"value":3600000,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:illustrative-pillar2-person1"}},
+    {"id":"p3_person1","personId":"person_demo_1","pillar":"3","event":"retirement","amount":{"value":0,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:no-pillar3-annuity-person1"}},
+    {"id":"p1_person2","personId":"person_demo_2","pillar":"1","event":"retirement","amount":{"value":2400000,"currency":"CHF","unit":"cent","period":"year","origin":"estimate","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:illustrative-pillar1-person2"}},
+    {"id":"p2_person2","personId":"person_demo_2","pillar":"2","event":"retirement","amount":{"value":1800000,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:illustrative-pillar2-person2"}},
+    {"id":"p3_person2","personId":"person_demo_2","pillar":"3","event":"retirement","amount":{"value":0,"currency":"CHF","unit":"cent","period":"year","origin":"synthetic","confirmation":"confirmed","review":"unreviewed","sourceRef":"demo:no-pillar3-annuity-person2"}}
+  ]
+}
