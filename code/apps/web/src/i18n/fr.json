@@ -161,7 +161,8 @@
     "risks": "Risques",
     "chat": "Chat",
     "info": "Infos",
-    "unread": "Nouveautés depuis votre dernière visite"
+    "unread": "Nouveautés depuis votre dernière visite",
+    "journey": "Contrat"
   },
   "graphics": {
     "title": "Graphiques",
@@ -504,5 +505,171 @@
     "accept": "Reprendre et recalculer",
     "accepting": "Reprise en cours …",
     "acceptFailed": "La reprise n’a pas fonctionné. Veuillez réessayer."
+  },
+  "journey": {
+    "title": "Contrat",
+    "intro": "De la recommandation à la police dans le portail client, en passant par l’offre et la proposition. Tout est une démo avec des données fictives : aucun contrat, aucune couverture d’assurance.",
+    "steps": {
+      "label": "Progression",
+      "recommendation": "Recommandation",
+      "quote": "Offre",
+      "application": "Proposition",
+      "review": "Examen par Pax",
+      "policy": "Police"
+    },
+    "stepState": {
+      "done": "terminé"
+    },
+    "locked": "La recommandation suit dès que ta situation de vie, tes finances et les trois piliers sont saisis et confirmés.",
+    "noContract": "Ta situation ne nécessite pas de nouveau contrat pour le moment.",
+    "adviceReview": "Un ou une spécialiste Pax examine le conseil avant que tu puisses demander une offre.",
+    "waitingReview": "En attente de l’examen par un ou une spécialiste Pax.",
+    "simulateReview": "Simuler l’examen Pax (démo)",
+    "simulatedNote": "Dans la démo, un compte spécialiste Pax simulé effectue cette étape. En réalité, un ou une spécialiste Pax l’examine.",
+    "choose": "Choisis les solutions pour lesquelles tu souhaites une offre.",
+    "need": "Besoin",
+    "why": "Pourquoi",
+    "requestQuote": "Demander une offre",
+    "quoteTitle": "Ton offre",
+    "premium": "Prime : calculée avec le tarif Pax (non connecté dans la démo).",
+    "validUntil": "Valable jusqu’à {{time}}",
+    "documents": "Documents du produit",
+    "readDocuments": "J’ai lu tous les documents du produit.",
+    "createApplication": "Créer la proposition",
+    "applicationTitle": "Ta proposition",
+    "compliance": "Nécessaire pour un vrai contrat, non effectué dans la démo :",
+    "submit": "Envoyer la proposition",
+    "submitted": "Ta proposition est envoyée.",
+    "needsInformation": "Pax a besoin d’informations supplémentaires. Contacte ton ou ta spécialiste Pax.",
+    "declined": "La proposition a été refusée.",
+    "portal": "Portail client",
+    "noPolicy": "Pas encore de police.",
+    "policyDemo": "Démo – aucune couverture d’assurance",
+    "issued": "Émise le {{date}}",
+    "contextChanged": "Tes données ont changé depuis. La police se rapporte au conseil précédent.",
+    "dossier": "Ouvrir le dossier de conseil",
+    "dossierNote": "Toutes les données, hypothèses, justifications et sources de ton conseil, prêtes à imprimer.",
+    "working": "En cours …",
+    "error": "Cela n’a pas fonctionné.",
+    "insightsLink": "Pour Pax : aperçus pour la gestion des produits (démo)",
+    "document": {
+      "terms": "Conditions d’assurance",
+      "brochure": "Brochure",
+      "kid": "Feuille d’information de base"
+    },
+    "suitability": {
+      "title": "Examen d’adéquation pour {{product}}",
+      "intro": "Les produits liés à des fonds nécessitent d’abord un examen d’adéquation selon le formulaire Pax. Le résultat n’engage pas ; un ou une spécialiste Pax effectue l’examen contraignant et la signature.",
+      "annualPremium": "Prime annuelle souhaitée (CHF)",
+      "singleInvestment": "Versement unique souhaité (CHF)",
+      "amountHint": "Remplis au moins l’un des deux champs.",
+      "netIncome": "Revenu net par an",
+      "netWorth": "Fortune",
+      "savingCapacity": "Capacité d’épargne par an",
+      "investmentCapacity": "Montant unique possible",
+      "goal": "Objectif de placement",
+      "horizon": "Horizon de placement",
+      "experience": "Expérience avec les titres",
+      "lossReaction": "Si ton placement perdait 30 %, tu …",
+      "guarantee": "Part garantie (%)",
+      "strategy": "Stratégie de placement choisie",
+      "confirm": "Je confirme que ces réponses sont les miennes.",
+      "submit": "Évaluer l’examen",
+      "suitable": "Adapté : la stratégie choisie correspond à ton profil.",
+      "advisedAgainst": "Déconseillé :",
+      "reason": {
+        "NOT_AFFORDABLE": "Le montant dépasse ta capacité d’épargne ou de placement.",
+        "STRATEGY_DOES_NOT_MATCH_PROFILE": "La stratégie choisie ne correspond pas à ton profil de placement.",
+        "HORIZON_TOO_SHORT": "L’horizon de placement est inférieur à dix ans."
+      },
+      "option": {
+        "netIncome": {
+          "under_75k": "moins de CHF 75 000",
+          "75k_150k": "CHF 75 000–150 000",
+          "150k_250k": "CHF 150 000–250 000",
+          "over_250k": "plus de CHF 250 000"
+        },
+        "asset": {
+          "under_10k": "moins de CHF 10 000",
+          "10k_50k": "CHF 10 000–50 000",
+          "50k_150k": "CHF 50 000–150 000",
+          "150k_300k": "CHF 150 000–300 000",
+          "over_300k": "plus de CHF 300 000"
+        },
+        "saving": {
+          "under_1k": "moins de CHF 1 000",
+          "1k_3k": "CHF 1 000–3 000",
+          "3k_7k": "CHF 3 000–7 000",
+          "over_7k": "plus de CHF 7 000"
+        },
+        "goal": {
+          "low_risk": "Le moins de risque possible",
+          "moderate_risk": "Un peu de risque pour plus de rendement",
+          "high_risk": "Plus de risque pour un rendement élevé"
+        },
+        "horizon": {
+          "under_10_years": "moins de 10 ans",
+          "10_to_15_years": "10 à 15 ans",
+          "over_15_years": "plus de 15 ans"
+        },
+        "experience": {
+          "none": "Aucune",
+          "knowledge_only": "Connaissances seulement",
+          "experience": "Un peu d’expérience",
+          "extensive": "Beaucoup d’expérience"
+        },
+        "loss": {
+          "sell_all": "… vendrais tout",
+          "sell_part": "… vendrais une partie",
+          "hold": "… attendrais",
+          "buy_more": "… achèterais davantage"
+        },
+        "strategy": {
+          "conservative": "Conservatrice",
+          "balanced": "Équilibrée",
+          "dynamic": "Dynamique"
+        }
+      }
+    },
+    "nps": {
+      "question": "Quelle est la probabilité que tu recommandes Pax à une amie ou à un collègue ?",
+      "low": "0 = pas du tout",
+      "high": "10 = très probable",
+      "thanks": "Merci pour ton avis !",
+      "score": "{{score}} sur 10"
+    },
+    "errors": {
+      "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "Cette personne n’a ni revenu ni fortune propres pour payer la prime. Choisis les solutions pour l’autre personne ou parle à un ou une spécialiste Pax.",
+      "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "Aucun montant n’est encore saisi que cette personne souhaite consacrer elle-même aux primes.",
+      "HOUSEHOLD_AFFORDABILITY_NOT_ESTABLISHED": "Le budget du ménage ne permet pas de prime supplémentaire pour le moment.",
+      "ALTERNATIVE_PRODUCTS_CANNOT_BE_STACKED": "Choisis une seule des solutions d’épargne ; elles sont des alternatives.",
+      "SUITABILITY_CHECK_REQUIRED": "L’examen d’adéquation pour le produit lié à des fonds manque encore.",
+      "SUITABILITY_ADVISED_AGAINST": "L’examen d’adéquation déconseille ce produit.",
+      "QUOTE_EXPIRED": "L’offre a expiré. Demande-en une nouvelle.",
+      "HUMAN_REVIEW_REQUIRED": "Un ou une spécialiste Pax doit d’abord examiner le conseil."
+    }
+  },
+  "insights": {
+    "title": "Aperçus pour la gestion des produits",
+    "intro": "Signaux agrégés de tous les cas de démo : aucun montant, aucun texte libre, aucune donnée personnelle.",
+    "cases": "Cas",
+    "stages": "Étape actuelle",
+    "dropoffs": "Abandons possibles",
+    "dropoffNote": "Aucune police et aucun changement depuis dix minutes : un indice, pas un abandon confirmé.",
+    "nps": "NPS",
+    "responses": "{{count}} réponses",
+    "noNps": "Pas encore de réponses",
+    "handover": "Demandes d’un ou une spécialiste Pax",
+    "reasons": "Motifs d’examen les plus fréquents",
+    "unavailable": "Cette vue n’existe que dans le démarrage démo.",
+    "back": "Retour au contrat",
+    "stage": {
+      "intake": "Saisie",
+      "profile_confirmed": "Profil confirmé",
+      "analysis": "Analyse",
+      "recommendation": "Recommandation",
+      "application_submitted": "Proposition envoyée",
+      "demo_policy": "Police de démo"
+    }
   }
 }

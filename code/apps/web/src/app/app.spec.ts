@@ -359,6 +359,14 @@ describe('App voice per configuration', () => {
     expect(root.querySelector('app-call-controls')).not.toBeNull();
   });
 
+  it('links the contract journey against the backend, not in the scripted mock', async () => {
+    const api = await renderWith({ dataSource: 'api', demoStart: true });
+    expect(api.querySelector('.rail a[href="/journey"]')).not.toBeNull();
+    TestBed.resetTestingModule();
+    const mock = await renderWith({ dataSource: 'mock' });
+    expect(mock.querySelector('.rail a[href="/journey"]')).toBeNull();
+  });
+
   it('links the Voice Lab only in the debug configurations', async () => {
     const root = await renderWith({ dataSource: 'api', demoStart: true });
 

@@ -1,0 +1,246 @@
+<section class="journey" aria-labelledby="journey-title">
+  <h1 id="journey-title">{{ 'journey.title' | transloco }}</h1>
+  <p class="intro">{{ 'journey.intro' | transloco }}</p>
+
+  <ol class="stages" [attr.aria-label]="'journey.steps.label' | transloco">
+    @for (stage of stages; track stage.id; let i = $index) {
+      <li
+        class="stage"
+        [class.stage--done]="i < stageIndex()"
+        [class.stage--current]="i === stageIndex()"
+        [attr.aria-current]="i === stageIndex() ? 'step' : null"
+      >
+        <span class="marker" aria-hidden="true">{{ i + 1 }}</span>
+        <span class="name">{{ stage.label | transloco }}</span>
+        @if (i < stageIndex()) {
+          <span class="visually-hidden">{{ 'journey.stepState.done' | transloco }}</span>
+        }
+      </li>
+    }
+  </ol>
+
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ 'journey.error' | transloco }} {{ message }}</p>
+  }
+
+  @if (!loading()) {
+    <div class="panel" aria-live="polite">
+      @switch (step()) {
+        @case ('locked') {
+          <p>{{ 'journey.locked' | transloco }}</p>
+        }
+        @case ('none') {
+          <p>{{ 'journey.noContract' | transloco }}</p>
+        }
+        @case ('review') {
+          <p>{{ 'journey.adviceReview' | transloco }}</p>
+          <ng-container *ngTemplateOutlet="simulate" />
+        }
+        @case ('select') {
+          @if (recommendation(); as rec) {
+            <p>{{ 'journey.choose' | transloco }}</p>
+            <ul class="candidates">
+              @for (candidate of rec.candidates; track candidate.id) {
+                <li class="candidate">
+                  <label class="pick">
+                    <input
+                      type="checkbox"
+                      [checked]="selected().has(candidate.id)"
+                      (change)="toggle(candidate, $any($event.target).checked)"
+                    />
+                    <span class="product">{{ candidate.productName }}</span>
+                    @if (personNumber(candidate.personId); as number) {
+                      <span class="person">{{ 'review.person' | transloco: { number } }}</span>
+                    }
+                  </label>
+                  <p class="need">{{ 'journey.need' | transloco }}: {{ need(candidate) }}</p>
+                  <details>
+                    <summary>{{ 'journey.why' | transloco }}</summary>
+                    <p>{{ candidate.explanation }}</p>
+                    @if (candidate.reasonDetails.length) {
+                      <ul>
+                        @for (reason of candidate.reasonDetails; track reason.code) {
+                          <li>{{ reason.text }}</li>
+                        }
+                      </ul>
+                    }
+                  </details>
+                </li>
+              }
+            </ul>
+            <p class="note">{{ rec.disclaimer }}</p>
+            @for (candidate of pendingSuitability(); track candidate.id) {
+              <app-suitability-form
+                [caseId]="caseId()!"
+                [productId]="$any(candidate.productId)"
+                [productName]="candidate.productName"
+                [personId]="candidate.personId ?? firstPerson()"
+                (checked)="suitabilityChecked($event)"
+              />
+            }
+            <button
+              type="button"
+              class="action action--primary"
+              data-action="quote"
+              [disabled]="busy() || !selected().size || pendingSuitability().length > 0"
+              (click)="requestQuote()"
+            >
+              {{ (busy() ? 'journey.working' : 'journey.requestQuote') | transloco }}
+            </button>
+          }
+        }
+        @case ('quote') {
+          @if (quote(); as q) {
+            <h2>{{ 'journey.quoteTitle' | transloco }}</h2>
+            <ul class="configuration">
+              @for (item of q.configurations; track item.id) {
+                <li>
+                  <strong>
+                    {{ item.productName }}
+                    @if (personNumber(item.personId); as number) {
+                      · {{ 'review.person' | transloco: { number } }}
+                    }
+                  </strong>
+                  <span>{{ 'journey.need' | transloco }}: {{ need($any(item)) }}</span>
+                </li>
+              }
+            </ul>
+            <p class="note">{{ 'journey.premium' | transloco }}</p>
+            <p class="note">{{ 'journey.validUntil' | transloco: { time: time(q.expiresAt) } }}</p>
+            <h3>{{ 'journey.documents' | transloco }}</h3>
+            <ul class="documents">
+              @for (doc of q.documents; track doc.id) {
+                <li>
+                  <a [href]="documentUrl(doc.id)" target="_blank" rel="noopener">
+                    {{ documentLabel(doc.id, q) }} – {{ documentKind(doc.id) | transloco }}
+                  </a>
+                </li>
+              }
+            </ul>
+            @if (recommendation()?.documentsLanguageNotice; as notice) {
+              <p class="note">{{ notice }}</p>
+            }
+            <label class="confirm">
+              <input
+                type="checkbox"
+                [checked]="documentsRead()"
+                (change)="documentsRead.set($any($event.target).checked)"
+              />
+              <span>{{ 'journey.readDocuments' | transloco }}</span>
+            </label>
+            <button
+              type="button"
+              class="action action--primary"
+              data-action="apply"
+              [disabled]="busy() || !documentsRead()"
+              (click)="createApplication()"
+            >
+              {{ (busy() ? 'journey.working' : 'journey.createApplication') | transloco }}
+            </button>
+          }
+        }
+        @case ('application') {
+          <h2>{{ 'journey.applicationTitle' | transloco }}</h2>
+          <ng-container *ngTemplateOutlet="compliance" />
+          <button
+            type="button"
+            class="action action--primary"
+            data-action="submit"
+            [disabled]="busy()"
+            (click)="submit()"
+          >
+            {{ (busy() ? 'journey.working' : 'journey.submit') | transloco }}
+          </button>
+        }
+        @case ('submitted') {
+          <p>{{ 'journey.submitted' | transloco }} {{ 'journey.waitingReview' | transloco }}</p>
+          <ng-container *ngTemplateOutlet="simulate" />
+        }
+        @case ('needsInformation') {
+          <p>{{ 'journey.needsInformation' | transloco }}</p>
+        }
+        @case ('declined') {
+          <p>{{ 'journey.declined' | transloco }}</p>
+        }
+        @case ('policy') {
+          <ng-container *ngTemplateOutlet="compliance" />
+        }
+      }
+    </div>
+
+    <section class="portal" aria-labelledby="journey-portal">
+      <h2 id="journey-portal">{{ 'journey.portal' | transloco }}</h2>
+      @for (policy of portal()?.policies ?? []; track policy.id) {
+        <article class="policy">
+          <span class="badge">{{ 'journey.policyDemo' | transloco }}</span>
+          <h3>{{ policy.displayLabel }}</h3>
+          <ul>
+            @for (item of policy.configuration; track item.id) {
+              <li>
+                {{ item.productName }}
+                @if (personNumber(item.personId); as number) {
+                  · {{ 'review.person' | transloco: { number } }}
+                }
+              </li>
+            }
+          </ul>
+          <p class="note">{{ 'journey.issued' | transloco: { date: date(policy.issuedAt) } }}</p>
+          @if (policy.adviceContextChanged) {
+            <p class="note note--warning">{{ 'journey.contextChanged' | transloco }}</p>
+          }
+        </article>
+      } @empty {
+        <p class="note">{{ 'journey.noPolicy' | transloco }}</p>
+      }
+      @if (caseId()) {
+        <p>
+          <a class="link" [href]="dossierUrl()" target="_blank" rel="noopener">{{
+            'journey.dossier' | transloco
+          }}</a>
+        </p>
+        <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
+      }
+    </section>
+
+    @if (caseId(); as id) {
+      @for (stage of npsStage() ? [npsStage()!] : []; track stage) {
+        <app-nps-card [caseId]="id" [stage]="stage" />
+      }
+    }
+
+    @if (demoStart) {
+      <p class="pm">
+        <a class="link" routerLink="/insights">{{ 'journey.insightsLink' | transloco }}</a>
+      </p>
+    }
+  }
+</section>
+
+<ng-template #simulate>
+  @if (demoStart) {
+    <button
+      type="button"
+      class="action"
+      data-action="review"
+      [disabled]="busy()"
+      (click)="simulateReview()"
+    >
+      {{ (busy() ? 'journey.working' : 'journey.simulateReview') | transloco }}
+    </button>
+    <p class="note">{{ 'journey.simulatedNote' | transloco }}</p>
+  }
+</ng-template>
+
+<ng-template #compliance>
+  @if (portal()?.complianceSteps; as steps) {
+    <p class="note">{{ 'journey.compliance' | transloco }}</p>
+    <ul class="compliance">
+      @for (item of steps; track item.id) {
+        <li>
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.explanation }}</span>
+        </li>
+      }
+    </ul>
+  }
+</ng-template>

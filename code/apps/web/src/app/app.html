@@ -60,6 +60,16 @@
           }
         </a>
       }
+      @if (liveVoice) {
+        <a class="tab" routerLink="/journey" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
+          <span class="glyph">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 3h7l5 5v13H7ZM14 3v5h5M10 14.5l1.8 1.8L15.5 12.5" />
+            </svg>
+          </span>
+          <span class="label">{{ 'nav.journey' | transloco }}</span>
+        </a>
+      }
       @if (debugVoice) {
         <a class="tab" routerLink="/voice-lab" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
           <span class="glyph">
@@ -79,8 +89,10 @@
       }
     }
 
-    <!-- Lukas's avatar renderer goes inside, as projected content. -->
-    <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()" />
+    <!-- Lukas's avatar renderer, projected into the dock's circle. -->
+    <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()">
+      <app-dock-avatar [activity]="activity()" />
+    </app-agent-dock>
   </div>
 
   <app-summary-dialog />

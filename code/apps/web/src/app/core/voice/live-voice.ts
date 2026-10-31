@@ -72,6 +72,7 @@ export class LiveVoice {
   private readonly api = inject(VoiceLabApi);
   private readonly language = inject(AppLanguage);
   private readonly transloco = inject(TranslocoService);
+  private readonly ring = inject(VoiceActivity);
   private readonly avatarEvents = new Subject<VoiceAvatarEvent>();
   private sessionId: string | null = null;
   private sequence = 0;
@@ -195,6 +196,7 @@ export class LiveVoice {
     },
     onAudio: (stream) => {
       this.audio.set(stream);
+      this.ring.audio.set(stream);
       this.trace.add('local', 'avatar output-energy visualization', {
         enabled: stream !== null,
         signal: 'local heuristic',
@@ -248,8 +250,7 @@ export class LiveVoice {
   });
 
   constructor() {
-    const ring = inject(VoiceActivity);
-    effect(() => ring.live.set(this.active() ? this.activity() : null));
+    effect(() => this.ring.live.set(this.active() ? this.activity() : null));
     this.store.digitalStops.pipe(takeUntilDestroyed()).subscribe((command) => {
       if (command.reason === 'session-ended') {
         this.handoverControl.synchronizeSession();

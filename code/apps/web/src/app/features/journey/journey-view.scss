@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.journey {
+  display: grid;
+  gap: 1rem;
+  max-width: 48rem;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+}
+
+h3 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+}
+
+p {
+  margin: 0;
+}
+
+.intro,
+.note {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.note--warning {
+  color: var(--text-warning);
+}
+
+// Progress: five stages, numbered; done ones filled, the current one outlined.
+.stages {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.marker {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: var(--stroke-m) solid var(--border-default);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-bold);
+}
+
+.stage--done .marker {
+  border-color: transparent;
+  color: var(--text-on-brand);
+  background: var(--bg-brand);
+}
+
+.stage--current {
+  color: var(--text-default);
+  font-weight: var(--font-weight-bold);
+
+  .marker {
+    border-color: var(--border-focusring);
+    color: var(--text-brand);
+  }
+}
+
+.panel,
+.portal {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: var(--stroke-border) solid var(--border-soft);
+  border-radius: var(--radius-m);
+}
+
+.candidates,
+.configuration,
+.documents,
+.compliance {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.candidate {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
+
+  details p,
+  details ul {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+  }
+}
+
+.pick,
+.confirm {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.product {
+  font-weight: var(--font-weight-bold);
+}
+
+.person {
+  color: var(--text-muted);
+}
+
+.need {
+  font-size: 0.875rem;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--text-brand);
+  font-size: 0.875rem;
+}
+
+.configuration li,
+.compliance li {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.compliance span {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.link,
+.documents a {
+  color: var(--text-brand);
+}
+
+.policy {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-left: var(--stroke-m) solid var(--border-focusring);
+  background: var(--bg-muted);
+
+  h3 {
+    margin: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+}
+
+.badge {
+  justify-self: start;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  color: var(--text-inverse);
+  background: var(--bg-brand-purple);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.action {
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: var(--stroke-s) solid var(--border-default);
+  border-radius: var(--radius-full);
+  color: var(--text-default);
+  background: var(--bg-default);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.action--primary {
+  border-color: transparent;
+  color: var(--text-on-brand);
+  background: var(--bg-brand);
+}
+
+.error {
+  padding: 0.5rem 0.75rem;
+  border-left: var(--stroke-m) solid var(--border-error);
+  color: var(--text-error);
+  background: var(--bg-error);
+}
+
+.pm {
+  font-size: 0.875rem;
+}

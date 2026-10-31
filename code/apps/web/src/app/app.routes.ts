@@ -37,6 +37,18 @@ export const routes: Routes = [
     data: keepAlive,
     loadComponent: () => import('./features/workspace/info/info-tab').then((m) => m.InfoTab),
   },
+  {
+    // Recommendation → quote → application → demo policy in the customer portal.
+    path: 'journey',
+    title: 'journey.title',
+    loadComponent: () => import('./features/journey/journey-view').then((m) => m.JourneyView),
+  },
+  {
+    // Product management insights; reached from the journey in the demo start.
+    path: 'insights',
+    title: 'insights.title',
+    loadComponent: () => import('./features/journey/insights-view').then((m) => m.InsightsView),
+  },
   ...debugRoutes,
   { path: '**', redirectTo: 'graphics' },
 ];
