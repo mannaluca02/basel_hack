@@ -80,6 +80,8 @@ export class ProtectedLifeController {
   @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}
   @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return localizedCase(this.r.engine.caseFor(req.actor,uuid(id)));}
   @Patch('cases/:caseId/draft') async patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.patchDraft(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-profile') async demoProfile(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.demo.loadPersona(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/standard-analyses') standardAnalyses(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.demo.runStandardAnalyses(req.actor,uuid(id),body);}
   @Post('cases/:caseId/confirmations') async confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.confirm(req.actor,uuid(id),body));}
   @Get('cases/:caseId/questions') questions(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.questions(req.actor,uuid(id));}
   @Post('cases/:caseId/calculations') analyze(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.analyze(req.actor,uuid(id),body);}
