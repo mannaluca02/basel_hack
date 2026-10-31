@@ -421,6 +421,7 @@ app.post("/api/conversations/:sessionId/transcript", sameOrigin, async (request,
     }
   }
   if (fragments.some((fragment) => fragment.speaker === "user")) scheduleExtraction(log);
+  if (fragments.length && log.caseLink) bridge.turnsChanged(log.caseLink.linkId, log);
   await persist(log);
   response.status(204).end();
 });

@@ -6,7 +6,9 @@ export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuot
 export type Actor = { id:string;role:'customer'|'reviewer'|'advisor';caseId?:string;sessionHash:string;expiresAt:string;csrfHash?:string };
 export type AuditEvent = {id:string;at:string;actorId:string;action:string;caseId:string|null;profileVersion:number|null;outcome:string};
 export type InsuranceCase = InsuranceCaseState & {
-  ownerId:string;voiceSessions:StoredVoiceSession[];confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];modelExtractionConsent:(ModelExtractionConsent & {acceptedBy:string})|null;idempotency:Record<string,{fingerprint:string;result:unknown}>;
+  ownerId:string;voiceSessions:StoredVoiceSession[];confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];modelExtractionConsent:(ModelExtractionConsent & {acceptedBy:string})|null;
+  /** Final turns of a separately running voice agent (Paxi), owner-readable only, never in the case DTO. */
+  agentTurns:AgentVoiceTurn[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
 };
 export type Database = {
   version:1;sessions:Record<string,Actor>;cases:Record<string,InsuranceCase>;audit:AuditEvent[];
@@ -17,5 +19,6 @@ export class WorkflowError extends Error {
   constructor(public readonly code:string,public readonly status=409,public readonly fields:string[]=[]){super(code);}
 }
 
+export type AgentVoiceTurn={messageId:string;conversationId:string;speaker:'customer'|'agent';text:string;at:string;receivedAt:string};
 export type StoredVoiceSession=VoiceSession & {handoverRevision:number;sessionHash:string;messageId:string;requestHash:string;providerSessionId:string|null;
   turns:StoredVoiceTurn[];extractions:Record<string,{requestHash:string;proposalId:string|null;issues:VoiceMappingIssue[];mappingVersion:string;transcriptRevision:number;observations:VoiceObservation[]}>};

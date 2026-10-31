@@ -30,7 +30,16 @@ const DIRECT = new Set([...Object.keys(MONEY), ...Object.keys(UNITS)]);
 const PARTNER_FIELDS = new Set(["partner_annual_gross_income_chf", "partner_birth_year"]);
 const MAIN_PERSON_FIELDS = new Set(["annual_gross_income_chf", "birth_date", "sex", "employment_rate_percent", "has_pension_fund", "desired_retirement_age"]);
 
-export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console }) {
+// A turn keeps its first start time while more speech is added, unlike its position.
+function turnId(conversationId, turn, index) {
+  return Number.isFinite(turn.start_ms)
+    ? `${conversationId}_${turn.speaker === "user" ? "c" : "a"}${Math.round(turn.start_ms)}`.slice(0, 120)
+    : `${conversationId}_t${index}`.slice(0, 120);
+}
+
+const TURN_DEBOUNCE_MS = 800;
+
+export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console, turnDebounceMs = TURN_DEBOUNCE_MS }) {
   const links = new Map(); // linkId -> { caseId, token, expiresAt }
   const state = new Map(); // conversationId -> { openBatchId, sent, accepted, count, running, again }
   const stateOf = (conversationId) => {
@@ -78,7 +87,7 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console }) {
   /** One observation per captured answer the backend can map; the quote must be in a person's turn. */
   function observations(conversationLog, personIds, pending) {
     const userTurns = conversationLog.transcript
-      .map((turn, index) => ({ ...turn, messageId: `${conversationLog.conversationId}_t${index}` }))
+      .map((turn, index) => ({ ...turn, messageId: turnId(conversationLog.conversationId, turn, index) }))
       .filter((turn) => turn.speaker === "user" && turn.text.trim());
     const turns = new Map();
     const result = [];
@@ -174,5 +183,36 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console }) {
     })();
   }
 
-  return { register, linkFor, answersChanged };
+  /**
+   * Sends the conversation's turns that are new or grew since the last call, for the call history
+   * in the app. Waits for a short pause, so a turn is not sent fragment by fragment.
+   */
+  function turnsChanged(linkId, conversationLog) {
+    const s = stateOf(conversationLog.conversationId);
+    s.sentTurns ??= new Map();
+    clearTimeout(s.turnTimer);
+    s.turnTimer = setTimeout(async () => {
+      const link = links.get(linkId);
+      if (!link || link.expiresAt <= Date.now()) return;
+      const started = Date.parse(conversationLog.startedAt ?? "") || Date.now();
+      const turns = conversationLog.transcript
+        .map((turn, index) => ({
+          messageId: turnId(conversationLog.conversationId, turn, index),
+          speaker: turn.speaker === "user" ? "customer" : "agent",
+          text: turn.text.trim().slice(0, 4000),
+          at: new Date(started + (Number.isFinite(turn.start_ms) ? turn.start_ms : 0)).toISOString(),
+        }))
+        .filter((turn) => turn.text && s.sentTurns.get(turn.messageId) !== turn.text)
+        .slice(-50);
+      if (!turns.length) return;
+      try {
+        await call(link, "POST", `/api/cases/${link.caseId}/voice/agent-turns`, { conversationId: conversationLog.conversationId, turns });
+        for (const turn of turns) s.sentTurns.set(turn.messageId, turn.text);
+      } catch (error) {
+        log.error?.(`case bridge: recording the call history failed (${error.code ?? error.message})`);
+      }
+    }, turnDebounceMs);
+  }
+
+  return { register, linkFor, answersChanged, turnsChanged };
 }

@@ -1,9 +1,9 @@
 import type { AdvisorContext, InsuranceCaseDto } from '@pax/contracts';
 import { describe, expect, it } from 'vitest';
-import type { EventImpactChart, IncomeTimelineChart, LifeEventsChart } from '../ui-models';
-import { CHART_IMPACT, CHART_INCOME, CHART_LIFE_EVENTS, projectCase } from './case-projection';
+import type { EventImpactChart, IncomeTimelineChart, LifeEventsChart, Pillar3aGrowthChart } from '../ui-models';
+import { CHART_IMPACT, CHART_INCOME, CHART_LIFE_EVENTS, CHART_PILLAR3A, projectCase } from './case-projection';
 // Backend output for the Mueller persona after the standard analyses (synthetic calculator),
-// trimmed to the baseline and retirement runs and one month per year.
+// trimmed to the baseline and retirement runs, one month per year and the 3a estimate.
 import mueller from './mueller-case.testing.json';
 
 const dto = mueller.case as unknown as InsuranceCaseDto;
@@ -14,12 +14,27 @@ describe('projectCase', () => {
   const projection = projectCase(dto, context, 'de', AT);
   const chart = <T>(id: string) => projection.charts.find((c) => c.chartId === id) as T;
 
-  it('shows life events, the income timeline and the event impact of the current runs', () => {
+  it('shows life events, the income timeline, the event impact and the 3a growth', () => {
     expect(projection.charts.map((c) => c.chartId)).toEqual([
       CHART_LIFE_EVENTS,
       CHART_INCOME,
       CHART_IMPACT,
+      CHART_PILLAR3A,
     ]);
+  });
+
+  it('takes the 3a growth from the calculator estimate until the first retirement', () => {
+    const growth = chart<Pillar3aGrowthChart>(CHART_PILLAR3A);
+    expect(growth.years).toEqual([2026, 2049]);
+    expect(growth.payoutYear).toBe(2049);
+    expect(growth.series.withoutContributions.values).toEqual([0, 0]);
+    const gross = dto.estimates[0]!.results[0]!.metrics.find((m) => m.id === 'GrossCapital')!.value;
+    expect(growth.series.withContributions.values).toEqual([0, gross]);
+  });
+
+  it('keeps revision and time of a chart when the same data is loaded again', () => {
+    const later = projectCase({ ...dto, contextRevision: dto.contextRevision + 5 }, context, 'de', AT);
+    expect(later.charts).toEqual(projection.charts);
   });
 
   it('turns the monthly retirement timeline into yearly household amounts', () => {
@@ -82,5 +97,6 @@ describe('projectCase', () => {
     );
     expect(empty.risks).toEqual([]);
     expect(empty.charts.map((c) => c.chartId)).toEqual([CHART_LIFE_EVENTS]);
+    expect(projectCase({ ...dto, estimates: [] }, context, 'de', AT).charts.map((c) => c.chartId)).not.toContain(CHART_PILLAR3A);
   });
 });

@@ -7,6 +7,7 @@ import type {
   EventImpactScenario,
   IncomeTimelineChart,
   LifeEvent,
+  Pillar3aGrowthChart,
   LifeEventsChart,
   MoneySeries,
   RiskItem,
@@ -22,6 +23,7 @@ import type {
 export const CHART_INCOME = 'chart_income_timeline';
 export const CHART_IMPACT = 'chart_event_impact';
 export const CHART_LIFE_EVENTS = 'chart_life_events';
+export const CHART_PILLAR3A = 'chart_pillar3a_growth';
 
 export interface CaseProjection {
   readonly charts: readonly ChartResult[];
@@ -102,8 +104,10 @@ export function projectCase(
   const charts: ChartResult[] = [];
   const events = lifeEvents(dto, t, at);
   if (events) charts.push(events);
-  if (retirement) charts.push(incomeTimeline(retirement, dto.contextRevision, at));
-  if (baseline) charts.push(eventImpact(baseline, retirement, profile?.draft ?? null, dto.contextRevision, at));
+  if (retirement) charts.push(incomeTimeline(retirement));
+  if (baseline) charts.push(eventImpact(baseline, retirement, profile?.draft ?? null));
+  const pillar3a = profile ? pillar3aGrowth(dto, profile.version, profile.draft) : null;
+  if (pillar3a) charts.push(pillar3a);
 
   return {
     charts,
@@ -118,6 +122,14 @@ function last<T>(items: readonly T[], match: (item: T) => boolean): T | undefine
 
 // --- Charts ------------------------------------------------------------------------------------
 
+/**
+ * A chart only changes with a new run, profile or estimate, which also brings new version refs;
+ * so revision and time come from its source and a reload of unchanged data stays a duplicate.
+ */
+function stable(updatedAt: string) {
+  return { revision: 1, updatedAt };
+}
+
 function refs(run: LifeAnalysis) {
   return { profileVersion: run.profileVersion, scenarioVersionId: run.scenarioVersionId, runId: run.id };
 }
@@ -126,7 +138,7 @@ function status(value: string): ResultStatus {
   return value === 'unsupported' ? 'requires_review' : (value as ResultStatus);
 }
 
-function incomeTimeline(run: LifeAnalysis, revision: number, at: string): IncomeTimelineChart {
+function incomeTimeline(run: LifeAnalysis): IncomeTimelineChart {
   const timeline = run.timeline!;
   const byYear = new Map<number, (typeof timeline.periods)[number][]>();
   for (const period of timeline.periods) {
@@ -151,8 +163,7 @@ function incomeTimeline(run: LifeAnalysis, revision: number, at: string): Income
     chartId: CHART_INCOME,
     type: 'income_timeline',
     status: timeline.status,
-    revision,
-    updatedAt: at,
+    ...stable(run.createdAt),
     reviewReasons: run.reviewReasons,
     ...refs(run),
     unit: YEARLY_NET,
@@ -190,8 +201,6 @@ function eventImpact(
   baseline: LifeAnalysis,
   retirement: LifeAnalysis | null,
   draft: InsuranceCaseDto['draft'] | null,
-  revision: number,
-  at: string,
 ): EventImpactChart {
   const incomeBefore = baseline.local.metrics.find((m) => m.id === 'incomeAnnual')?.value ?? null;
   const scenarios: EventImpactScenario[] = [];
@@ -240,8 +249,7 @@ function eventImpact(
     chartId: CHART_IMPACT,
     type: 'event_impact',
     status: status(baseline.local.statusByArea.pillars ?? 'estimated'),
-    revision,
-    updatedAt: at,
+    ...stable(baseline.createdAt),
     reviewReasons: baseline.reviewReasons,
     ...refs(baseline),
     unit: YEARLY_NET,
@@ -285,14 +293,55 @@ function lifeEvents(dto: InsuranceCaseDto, t: (text: Text) => string, at: string
     chartId: CHART_LIFE_EVENTS,
     type: 'life_events',
     status: profile ? 'valid' : 'needs_input',
-    revision: dto.contextRevision,
-    updatedAt: at,
+    ...stable(profile?.confirmedAt ?? dto.createdAt),
     reviewReasons: [],
     profileVersion: profile?.version ?? 0,
     scenarioVersionId: 'profile',
     fromYear: events[0]!.year - 1,
     toYear: events.at(-1)!.year + 1,
     events,
+  };
+}
+
+/**
+ * The newest 3a estimate of the calculator, from today to the first retirement. With a return of
+ * 0 % the growth is linear, so the two ends are the whole line; without contributions the capital
+ * stays the starting value. With a return the line without contributions is not known.
+ */
+function pillar3aGrowth(
+  dto: InsuranceCaseDto,
+  profileVersion: number,
+  draft: InsuranceCaseDto['draft'],
+): Pillar3aGrowthChart | null {
+  const estimate = last(dto.estimates, (e) => e.results.some((r) => r.operation === 'saving3a'));
+  const result = estimate?.results.find((r) => r.operation === 'saving3a');
+  const first = draft.insurance?.persons[0];
+  const person = draft.financial?.persons.find((p) => p.id === first?.personId);
+  if (!estimate || !result || !first?.desiredWorkStopAge || !person) return null;
+  const metric = (id: string) => result.metrics.find((m) => m.id === id)?.value ?? null;
+  const now = Number(estimate.at.slice(0, 4));
+  const payoutYear = person.birthYear + first.desiredWorkStopAge;
+  const initial = (draft.financial?.assets ?? [])
+    .filter((a) => a.pillar === '3')
+    .reduce((sum, a) => sum + (a.amount.value ?? 0), 0);
+  const flat = (draft.insurance?.annualReturnBps ?? 0) === 0;
+  const taxSaving = metric('YearlyTaxSavings');
+  return {
+    chartId: CHART_PILLAR3A,
+    type: 'pillar3a_growth',
+    status: status(result.status),
+    ...stable(estimate.at),
+    reviewReasons: [],
+    profileVersion,
+    scenarioVersionId: `estimate_${estimate.id}`,
+    unit: { currency: 'CHF', unit: 'cent', period: 'once', basis: 'capital' },
+    years: [now, payoutYear],
+    series: {
+      withContributions: { values: [initial, metric('GrossCapital')], status: status(result.status) },
+      withoutContributions: { values: [initial, flat ? initial : null], status: flat ? 'valid' : 'needs_input' },
+    },
+    taxSaving: taxSaving === null ? null : { ...YEARLY_NET, amount: taxSaving },
+    payoutYear,
   };
 }
 

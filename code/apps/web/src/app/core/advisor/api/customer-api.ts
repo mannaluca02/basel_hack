@@ -8,15 +8,18 @@ import type {
   ConfirmationOutcome,
   CreateConfirmationInput,
   CustomerConfirmation,
+  HumanHandoverView,
   InsuranceCaseDto,
   PresentConfirmationInput,
   PrivacyNoticeResponse,
   SessionResponse,
+  SummaryBundle as CaseSummaries,
 } from '@pax/contracts';
 import { firstValueFrom } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { CONSENT_NOTICE_VERSION, sessionStorageOf } from '../../consent/consent';
 import { AppLanguage, Language } from '../../i18n/language';
+import type { AgentTurn } from './summary-projection';
 
 export const CUSTOMER_SESSION_KEY = 'pax.customer-session';
 
@@ -90,6 +93,33 @@ export class CustomerApi {
 
   loadContext(caseId: string): Promise<AdvisorContext> {
     return firstValueFrom(this.http.get<AdvisorContext>(`${this.caseUrl(caseId)}/advisor/context`));
+  }
+
+  /** Customer and advisor projection of one snapshot, in the case's language. */
+  loadSummaries(caseId: string): Promise<CaseSummaries> {
+    return firstValueFrom(this.http.get<CaseSummaries>(`${this.caseUrl(caseId)}/summaries`));
+  }
+
+  /** The call history a linked voice agent recorded. */
+  loadAgentTurns(caseId: string): Promise<readonly AgentTurn[]> {
+    return firstValueFrom(
+      this.http.get<{ turns: AgentTurn[] }>(`${this.caseUrl(caseId)}/voice/agent-turns`),
+    ).then(({ turns }) => turns);
+  }
+
+  loadHandover(caseId: string): Promise<HumanHandoverView> {
+    return firstValueFrom(this.http.get<HumanHandoverView>(`${this.caseUrl(caseId)}/handover`));
+  }
+
+  /** `request` stops voice, AI and graphics work and asks for a human advisor; `resume` returns. */
+  async handover(caseId: string, action: 'request' | 'resume'): Promise<HumanHandoverView> {
+    const { caseRevision } = await this.loadCase(caseId);
+    return this.post(`${this.caseUrl(caseId)}/handover`, {
+      action,
+      messageId: `handover_${crypto.randomUUID()}`,
+      expectedCaseRevision: caseRevision,
+      source: 'ui',
+    });
   }
 
   /** The backend answers and asks in the case's language. Invalidates an open question. */
