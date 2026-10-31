@@ -1,10 +1,9 @@
 <!doctype html>
 <!--
-  PROTOTYPE — throwaway. Question: what should the Pax Beratercharakter look like?
-  A square mascot in the spirit of the ChatGPT voice dot: eyes only, no mouth.
-  Emotions come from the conversation, speech is shown by squash & stretch driven by audio level.
-  Design: "Soft Block". ?emotion=<key> sets the start emotion. Rig lives in pax-avatar.js.
-  Open this file directly in a browser. No build, no server. Live voice: see realtime.html.
+  PROTOTYPE — throwaway. Pax Beratercharakter: a square mascot, eyes only, no mouth.
+  Left buttons set the face directly (design check). "Beratung abspielen" sends the same AvatarEvents
+  a voice adapter sends (see AVATAR-INTERFACE.md), including a false barge-in that must not interrupt.
+  ?emotion=<key> sets the start face. Served by server.mjs (ES modules do not load from file://).
 -->
 <html lang="de">
 <head>
@@ -21,7 +20,7 @@
 </main>
 
 <aside id="panel">
-  <h3>Emotion</h3>
+  <h3>Gesicht direkt setzen</h3>
   <div class="grid" id="emotions"></div>
 
   <h3>Sprechen (Audio → Squash & Stretch)</h3>
@@ -31,37 +30,45 @@
   </div>
   <div style="margin-top:8px" class="meter"><div id="meter"></div></div>
 
-  <h3>Gesprächs-Demo</h3>
+  <h3>Gesprächs-Demo (AvatarEvents)</h3>
   <div class="grid"><button class="wide" id="btnScript">▶ Beratung abspielen</button></div>
 
   <h3>Zustand</h3>
   <pre id="state"></pre>
+
+  <h3>AvatarEvents</h3>
+  <pre id="log"></pre>
 </aside>
 
-<script src="pax-avatar.js"></script>
-<script>
+<script type="module">
+import { mountPaxAvatar, EMOTIONS } from "./pax-avatar.js";
+import { createAvatarController } from "./pax-avatar-controller.js";
+
 const $ = (id) => document.getElementById(id);
 let source = "none";      // none | sim | mic
 
-const avatar = PaxAvatar.mount($("avatar"), { onFrame: ({ emotion, level, cur, body }) => {
+const rig = mountPaxAvatar($("avatar"), { onFrame: ({ emotion, level, cur, body }) => {
   $("meter").style.width = (level * 100).toFixed(0) + "%";
+  const s = avatar.state;
   $("state").textContent =
-    `emotion   ${emotion}\naudio     ${source}  level ${level.toFixed(2)}\n` +
+    `face      ${emotion}\nactivity  ${s.activity}  playing ${s.playing ?? "–"}\naudio     ${source}  level ${level.toFixed(2)}\n` +
     `eyes      gaze ${cur.gx.toFixed(2)},${cur.gy.toFixed(2)} open ${cur.open.toFixed(2)}\n` +
     `          lid ${cur.lidA.toFixed(1)}° drop ${cur.lidD.toFixed(2)} smile ${cur.smile.toFixed(2)}\n` +
     `body      sx ${body.sx.toFixed(3)} sy ${body.sy.toFixed(3)} rot ${body.rot.toFixed(1)}° ty ${body.ty.toFixed(1)}`;
+  document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === emotion));
 } });
+const avatar = createAvatarController(rig);
 
-// ---------- Emotion buttons ----------
-for (const key in PaxAvatar.EMOTIONS) {
-  const b = document.createElement("button");
-  b.textContent = PaxAvatar.EMOTIONS[key].label; b.dataset.emo = key;
-  b.onclick = () => setEmotion(key);
-  $("emotions").appendChild(b);
+function log(line) {
+  $("log").textContent = `${line}\n` + $("log").textContent.slice(0, 4000);
 }
-function setEmotion(key) {
-  avatar.setEmotion(key);
-  document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === avatar.emotion));
+
+// ---------- Direct face buttons (design check, bypasses the controller) ----------
+for (const key in EMOTIONS) {
+  const b = document.createElement("button");
+  b.textContent = EMOTIONS[key].label; b.dataset.emo = key;
+  b.onclick = () => rig.setEmotion(key);
+  $("emotions").appendChild(b);
 }
 
 // ---------- Audio ----------
@@ -81,34 +88,49 @@ function setSource(next) {
 $("btnSim").onclick = () => setSource(source === "sim" ? "none" : "sim");
 $("btnMic").onclick = async () => {
   if (source === "mic") return setSource("none");
-  avatar.attachStream(await navigator.mediaDevices.getUserMedia({ audio: true }));
+  avatar.attachAudio(await navigator.mediaDevices.getUserMedia({ audio: true }));
   setSource("mic");
 };
 
-// ---------- Scripted conversation ----------
+// ---------- Scripted conversation: exactly what a voice adapter would send ----------
+const say = (text) => ({ say: text });
 const SCRIPT = [
-  [0,    "happy",       true,  "Grüezi! Ich bin Pax, Ihr digitaler Vorsorge-Berater."],
-  [3200, "listening",   false, "(Kunde erzählt von Familie und Job …)"],
-  [6400, "thinking",    false, "(Vorsorgebild wird berechnet …)"],
-  [8800, "surprised",   true,  "Oh – Sie planen ein Eigenheim? Spannend!"],
-  [11200,"concerned",   true,  "Bei Erwerbsunfähigkeit sehe ich eine Vorsorgelücke."],
-  [14400,"empathetic",  true,  "Ich verstehe, das Thema Tod ist nicht einfach."],
-  [17800,"listening",   false, "(Kunde stellt eine Frage …)"],
-  [20200,"happy",       true,  "Mit Säule 3a schliessen wir die Lücke gut."],
-  [23400,"celebrating", false, "Antrag abgeschlossen!"],
-  [26400,"neutral",     false, ""],
+  [0,     { type: "emotion", emotion: "happy", playbackId: "p1" }],
+  [100,   { type: "playback", event: "started", playbackId: "p1" }, say("Grüezi! Ich bin Pax, Ihr digitaler Vorsorge-Berater.")],
+  [1500,  { type: "activity", state: "listening" }, say("(Geräusch im Raum – Voice ignoriert es, kein Abbruch)")],
+  [3000,  { type: "playback", event: "ended", playbackId: "p1" }, say("")],
+  [3600,  { type: "activity", state: "listening" }, say("(Kunde erzählt von Familie und Job …)")],
+  [6400,  { type: "activity", state: "thinking" }, say("(Vorsorgebild wird berechnet …)")],
+  [8600,  { type: "emotion", emotion: "concerned", playbackId: "p2" }],
+  [8700,  { type: "playback", event: "started", playbackId: "p2" }, say("Bei Erwerbsunfähigkeit sehe ich eine Vorsorgelücke …")],
+  [10600, { type: "activity", state: "listening" }, say("(Kunde unterbricht wirklich)")],
+  [10700, { type: "playback", event: "cancelled", playbackId: "p2" }],
+  [10900, { type: "playback", event: "ended", playbackId: "p2" }, say("(verspätetes Event von p2 – wird ignoriert)")],
+  [13000, { type: "activity", state: "thinking" }, say("")],
+  [14500, { type: "emotion", emotion: "empathetic", playbackId: "p3" }],
+  [14600, { type: "playback", event: "started", playbackId: "p3" }, say("Ich verstehe, das Thema Tod ist nicht einfach.")],
+  [17600, { type: "playback", event: "ended", playbackId: "p3" }],
+  [19600, { type: "activity", state: "listening" }, say("(Kunde: «Dann machen wir das so.»)")],
+  [21400, { type: "activity", state: "thinking" }, say("")],
+  [22400, { type: "emotion", emotion: "celebrating", playbackId: "p4" }],
+  [22500, { type: "playback", event: "started", playbackId: "p4" }, say("Antrag abgeschlossen!")],
+  [25000, { type: "playback", event: "ended", playbackId: "p4" }],
+  [27500, { type: "activity", state: "idle" }, say("")],
 ];
 let timers = [];
 $("btnScript").onclick = () => {
-  timers.forEach(clearTimeout); timers = [];
-  SCRIPT.forEach(([t, emo, speak, text]) => timers.push(setTimeout(() => {
-    setEmotion(emo); $("say").textContent = text;
-    if (source !== "mic") setSource(speak ? "sim" : "none");
+  timers.forEach(clearTimeout); timers = []; $("log").textContent = "";
+  avatar.reset();
+  SCRIPT.forEach(([t, ev, extra]) => timers.push(setTimeout(() => {
+    const used = avatar.handle(ev);
+    log(`${(t / 1000).toFixed(1).padStart(5)}s ${used ? "" : "(ignored) "}${JSON.stringify(ev)}`);
+    if (extra) $("say").textContent = extra.say;
+    if (source !== "mic") setSource(avatar.state.playing ? "sim" : "none");
   }, t)));
 };
 
-window.pax = avatar;
-setEmotion(new URLSearchParams(location.search).get("emotion") || "neutral");
+window.pax = { rig, avatar };
+rig.setEmotion(new URLSearchParams(location.search).get("emotion") || "neutral");
 </script>
 </body>
 </html>

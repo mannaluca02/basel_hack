@@ -1,13 +1,8 @@
 <!doctype html>
 <!--
-  PROTOTYPE — throwaway. Question: how do we sync the Pax avatar to OpenAI Realtime voice output?
+  PROTOTYPE — throwaway. Live test: OpenAI Realtime voice driving the Pax avatar.
   Run: node code/avatar-prototype/server.mjs  →  http://localhost:8787/realtime.html
-  Sync model:
-    body motion  ← loudness of the remote WebRTC audio track (same stream the speaker plays)
-    listening    ← input_audio_buffer.speech_started
-    thinking     ← input_audio_buffer.speech_stopped (until the reply starts)
-    emotion      ← set_emotion tool call the model makes at the start of each reply
-    playback     ← output_audio_buffer.started / stopped / cleared  (→ I06 VoicePlaybackEvent)
+  Wiring: openai-realtime-adapter.js (voice, Dario) → AvatarEvents → pax-avatar-controller.js (avatar, Lukas)
 -->
 <html lang="de">
 <head>
@@ -30,122 +25,72 @@
   </div>
   <div style="margin-top:8px" class="meter"><div id="meter"></div></div>
 
+  <h3>Test: Emotion auslösen</h3>
+  <div class="grid" id="emotions"></div>
+
   <h3>Zustand</h3>
   <pre id="state"></pre>
 
-  <h3>Ereignisse</h3>
+  <h3>AvatarEvents</h3>
   <pre id="log"></pre>
 </aside>
 
 <audio id="remote" autoplay></audio>
-<script src="pax-avatar.js"></script>
-<script>
-const $ = (id) => document.getElementById(id);
-const status = { connection: "idle", playback: "–", emotion: "neutral", responseId: "–" };
+<script type="module">
+import { mountPaxAvatar, EMOTIONS } from "./pax-avatar.js";
+import { createAvatarController } from "./pax-avatar-controller.js";
+import { connectOpenAIRealtime } from "./openai-realtime-adapter.js";
 
-const avatar = PaxAvatar.mount($("avatar"), { onFrame: ({ emotion, level }) => {
+const $ = (id) => document.getElementById(id);
+let connection = "idle", call = null, lastReply = null;
+
+const rig = mountPaxAvatar($("avatar"), { onFrame: ({ level }) => {
   $("meter").style.width = (level * 100).toFixed(0) + "%";
-  status.emotion = emotion;
-  $("state").textContent = Object.entries(status).map(([k, v]) => `${k.padEnd(11)}${v}`).join("\n");
+  const s = avatar.state;
+  document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === s.face));
+  $("state").textContent = `connection ${connection}\nface       ${s.face}\nactivity   ${s.activity}\nplaying    ${s.playing ?? "–"}\nreply      ${s.replyEmotion}`;
 } });
+const avatar = createAvatarController(rig);
+
+// Test buttons: sent as AvatarEvents through the controller, the same path the voice adapter uses.
+// Reply emotions are queued while listening/thinking and stabilised during a reply,
+// so the test resets the controller first to show each emotion immediately.
+for (const key in EMOTIONS) {
+  const ev = key === "listening" || key === "thinking" ? { type: "activity", state: key } : { type: "emotion", emotion: key };
+  const b = document.createElement("button");
+  b.textContent = EMOTIONS[key].label; b.dataset.emo = key;
+  b.onclick = () => { avatar.reset(); log(`${avatar.handle(ev) ? "" : "(ignored) "}test ${JSON.stringify(ev)}`); };
+  $("emotions").appendChild(b);
+}
 
 function log(line) {
-  const el = $("log");
-  el.textContent = `${new Date().toLocaleTimeString()}  ${line}\n` + el.textContent.slice(0, 6000);
+  $("log").textContent = `${new Date().toLocaleTimeString()}  ${line}\n` + $("log").textContent.slice(0, 6000);
 }
-
-// I06 VoicePlaybackEvent (Dario → Lukas). Here just logged; in the app this goes to the AgentRenderer.
-function playback(event, responseId) {
-  status.playback = event;
-  log(`I06 VoicePlaybackEvent ${event} (${responseId || "?"})`);
-}
-
-let pc, dc, followUps = 0;
-let currentResponse = null;
 
 $("btnConnect").onclick = async () => {
-  if (pc) { pc.close(); pc = null; status.connection = "closed"; $("btnConnect").textContent = "🎙 Gespräch starten"; avatar.setEmotion("neutral"); return; }
-  status.connection = "connecting";
+  if (call) { call.close(); call = null; connection = "closed"; $("btnConnect").textContent = "🎙 Gespräch starten"; return; }
+  connection = "connecting";
   try {
-    const session = await fetch("/session", { method: "POST" });
-    if (!session.ok) throw new Error(`/session ${session.status}: ${await session.text()}`);
-    const { value: ephemeralKey } = await session.json();
-
-    pc = new RTCPeerConnection();
-    pc.ontrack = (e) => {
-      $("remote").srcObject = e.streams[0];      // the speaker plays it …
-      avatar.attachStream(e.streams[0]);          // … and the avatar listens to the very same stream
-    };
-    const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
-    pc.addTrack(mic.getTracks()[0]);
-
-    dc = pc.createDataChannel("oai-events");
-    dc.onmessage = (e) => onServerEvent(JSON.parse(e.data));
-    dc.onopen = () => { status.connection = "connected"; log("data channel open"); };
-
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    const answer = await fetch("https://api.openai.com/v1/realtime/calls", {
-      method: "POST",
-      body: offer.sdp,
-      headers: { Authorization: `Bearer ${ephemeralKey}`, "Content-Type": "application/sdp" },
+    call = await connectOpenAIRealtime({
+      sessionUrl: "/session",
+      audioElement: $("remote"),
+      onAudioStream: (stream) => avatar.attachAudio(stream),
+      onAvatarEvent: (ev) => {
+        const used = avatar.handle(ev);
+        log(`${used ? "" : "(ignored) "}${JSON.stringify(ev)}`);
+      },
+      onTranscript: (delta, replyId) => {
+        if (replyId !== lastReply) { lastReply = replyId; $("say").textContent = ""; }
+        $("say").textContent += delta;
+      },
+      onLog: log,
     });
-    if (!answer.ok) throw new Error(`/v1/realtime/calls ${answer.status}: ${await answer.text()}`);
-    await pc.setRemoteDescription({ type: "answer", sdp: await answer.text() });
+    connection = "connected";
     $("btnConnect").textContent = "⏹ Gespräch beenden";
   } catch (err) {
-    status.connection = "error"; log(`ERROR ${err.message}`); pc?.close(); pc = null;
+    connection = "error"; log(`ERROR ${err.message}`);
   }
 };
-
-function send(event) { dc?.readyState === "open" && dc.send(JSON.stringify(event)); }
-
-function onServerEvent(ev) {
-  switch (ev.type) {
-    case "input_audio_buffer.speech_started":
-      followUps = 0;
-      avatar.setEmotion("listening"); log("user speaking → listening");
-      break;
-    case "input_audio_buffer.speech_stopped":
-      avatar.setEmotion("thinking"); log("user done → thinking");
-      break;
-    case "response.created":
-      currentResponse = ev.response.id; status.responseId = currentResponse; $("say").textContent = "";
-      break;
-    case "response.function_call_arguments.done":
-      if (ev.name === "set_emotion") {
-        let emotion = "neutral";
-        try { emotion = JSON.parse(ev.arguments).emotion; } catch {}
-        avatar.setEmotion(emotion); log(`set_emotion → ${emotion}`);
-        send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: ev.call_id, output: JSON.stringify({ ok: true }) } });
-      }
-      break;
-    case "response.done": {
-      // If the model only called set_emotion and has not spoken yet, ask it to continue with the actual reply.
-      const out = ev.response.output || [];
-      const onlyTools = out.length > 0 && out.every((i) => i.type === "function_call");
-      if (onlyTools && followUps < 2) { followUps++; send({ type: "response.create" }); log("tool-only response → response.create"); }
-      if (ev.response.status !== "completed") log(`response ${ev.response.status}`);
-      break;
-    }
-    case "output_audio_buffer.started":
-      if (["listening", "thinking"].includes(avatar.emotion)) avatar.setEmotion("neutral");
-      playback("started", ev.response_id);
-      break;
-    case "output_audio_buffer.stopped":
-      playback("ended", ev.response_id);
-      break;
-    case "output_audio_buffer.cleared":
-      playback("cancelled", ev.response_id);
-      break;
-    case "response.output_audio_transcript.delta":
-      $("say").textContent += ev.delta;
-      break;
-    case "error":
-      log(`ERROR ${ev.error?.message || JSON.stringify(ev.error)}`);
-      break;
-  }
-}
 </script>
 </body>
 </html>

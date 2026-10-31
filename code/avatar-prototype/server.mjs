@@ -1,7 +1,7 @@
 // PROTOTYPE — tiny dev server for realtime.html. No dependencies.
 //   OPENAI_API_KEY=sk-... node code/avatar-prototype/server.mjs   →  http://localhost:8787/realtime.html
 // Also reads OPENAI_API_KEY from the repo-root .env. The real key never reaches the browser:
-// POST /session mints a short-lived client secret for one WebRTC call.
+// POST /session exchanges a WebRTC offer with the Live API; no browser credential is needed.
 // In the Angular/NestJS app this endpoint belongs to the backend (Dario's VoiceAdapter).
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -19,54 +19,89 @@ if (existsSync(ENV_FILE)) {
 }
 const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || "127.0.0.1";   // expose via `tailscale serve`, not on all interfaces
-const MODEL = process.env.OPENAI_REALTIME_MODEL || "gpt-live-1";
+const MODEL = "gpt-live-1";
 const VOICE = process.env.OPENAI_REALTIME_VOICE || "marin";
-
-// Emotions the model may choose. listening/thinking are driven by conversation state, not by the model.
-const MODEL_EMOTIONS = ["neutral", "happy", "empathetic", "concerned", "surprised", "celebrating"];
+const EMOTION_CHOICES = [
+  { value: "neutral", description: "Sachliche Information und ruhige Vorsorgeberatung." },
+  { value: "happy", description: "Begrüssung, gute Nachricht oder Zustimmung." },
+  { value: "empathetic", description: "Tod, Krankheit, Erwerbsunfähigkeit oder Trennung: mitfühlend reagieren." },
+  { value: "concerned", description: "Ein erkanntes Risiko oder eine mögliche Vorsorgelücke." },
+  { value: "surprised", description: "Eine unerwartete oder neue Information." },
+  { value: "celebrating", description: "Ein Ziel wurde erreicht oder ein Vertrag abgeschlossen." },
+];
 
 const INSTRUCTIONS = `Du bist Pax, ein KI-Vorsorgeberater der Pax Versicherung (klar als KI erkennbar).
 Sprich freundlich, kurz und auf Hochdeutsch, ausser der Kunde wählt eine andere Sprache.
 Dies ist ein Avatar-Test: Führe ein lockeres Vorsorgegespräch, nenne keine konkreten Beträge oder Produktempfehlungen.
-
-Dein Avatar zeigt Gefühle. Rufe am Anfang JEDER Antwort zuerst das Tool set_emotion auf und sprich direkt danach weiter:
-- neutral: sachliche Information
-- happy: Begrüssung, gute Nachricht, Zustimmung
-- empathetic: schwierige Themen wie Tod, Krankheit, Erwerbsunfähigkeit, Trennung
-- concerned: du erkennst ein Risiko oder eine mögliche Vorsorgelücke
-- surprised: der Kunde erzählt etwas Unerwartetes oder Neues
-- celebrating: ein Ziel ist erreicht oder ein Abschluss ist erfolgt`;
+Delegiere, wenn der Kunde sein Vorsorgebild sehen möchte oder einen menschlichen Berater wünscht.
+Warte für diese Aktion auf das Ergebnis der Anwendung und erkläre es natürlich. Die Aktionen sind nur Demos;
+behaupte nie, dass ein Bild wirklich angezeigt oder ein Berater wirklich kontaktiert wurde.
+Bei einem Fehler führe das Gespräch freundlich weiter.`;
 
 const SESSION = {
-  type: "realtime",
   model: MODEL,
   instructions: INSTRUCTIONS,
   audio: { output: { voice: VOICE } },
-  tools: [{
-    type: "function",
-    name: "set_emotion",
-    description: "Sets the facial expression of the Pax avatar for the reply you are about to speak.",
-    parameters: {
-      type: "object",
-      properties: { emotion: { type: "string", enum: MODEL_EMOTIONS } },
-      required: ["emotion"],
+  delegation: {
+    type: "decisions",
+    decisions: {
+      model: "gpt-6-luna",
+      questions: [{
+        type: "choice",
+        name: "ui_action",
+        instructions: "Wähle show_pension_picture bei einer Bitte um das Vorsorgebild, request_human_advisor beim Wunsch nach einem menschlichen Berater, sonst none.",
+        choices: [{ value: "show_pension_picture" }, { value: "request_human_advisor" }, { value: "none" }],
+      }],
     },
-  }],
-  tool_choice: "auto",
+  },
+  triggers: [
+    { type: "decisions", event_type: "session.input_transcript.delta", decisions: { questions: [{
+      type: "choice", name: "reply_emotion",
+      instructions: "Welche Emotion soll der Vorsorgeberater in seiner Antwort auf die aktuellen Worte des Kunden zeigen?",
+      choices: EMOTION_CHOICES,
+    }] } },
+    { type: "decisions", event_type: "session.output_transcript.delta", decisions: { questions: [{
+      type: "choice", name: "emotion",
+      instructions: "Welche Emotion passt zu dem, was der Vorsorgeberater gerade sagt?",
+      choices: EMOTION_CHOICES,
+    }] } },
+  ],
 };
 
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".md": "text/markdown; charset=utf-8", ".ts": "text/plain; charset=utf-8", ".css": "text/css", ".png": "image/png" };
 
 createServer(async (req, res) => {
   try {
     if (req.method === "POST" && req.url === "/session") {
       if (!process.env.OPENAI_API_KEY) { res.writeHead(500).end("OPENAI_API_KEY missing"); return; }
-      const r = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
+      let body = "";
+      for await (const chunk of req) {
+        body += chunk;
+        if (Buffer.byteLength(body) > 65536) { res.writeHead(413).end("SDP offer too large"); return; }
+      }
+      let offer;
+      try { offer = JSON.parse(body); } catch { res.writeHead(400).end("Expected JSON with an SDP offer"); return; }
+      if (typeof offer?.sdp !== "string" || !offer.sdp.trim()) { res.writeHead(400).end("SDP offer required"); return; }
+      const createSession = (session) => fetch("https://api.openai.com/v1/live/sessions", {
         method: "POST",
         headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ session: SESSION }),
+        body: JSON.stringify({ session, transport: { type: "webrtc", sdp: offer.sdp } }),
       });
-      res.writeHead(r.status, { "Content-Type": "application/json" }).end(await r.text());
+      let r = await createSession(SESSION);
+      let result = await r.text();
+      let disabled = false;
+      if (r.status >= 400 && r.status < 500 && /trigger|delegation|decision/i.test(result)) {
+        console.warn(`Live decisions configuration rejected (${r.status}): ${result.replaceAll(process.env.OPENAI_API_KEY, "[redacted]")}`);
+        const { triggers, delegation, ...voiceSession } = SESSION;
+        voiceSession.instructions = INSTRUCTIONS.replace(/Delegiere,[\s\S]*$/, "Führe das Vorsorgegespräch freundlich weiter. UI-Aktionen stehen gerade nicht zur Verfügung.");
+        r = await createSession(voiceSession);
+        result = await r.text();
+        disabled = true;
+      }
+      res.writeHead(r.status, {
+        "Content-Type": "application/json", "Cache-Control": "no-store",
+        "X-Avatar-Decisions": disabled ? "disabled" : "enabled",
+      }).end(result);
       return;
     }
     const path = normalize(decodeURIComponent(new URL(req.url, "http://x").pathname));
