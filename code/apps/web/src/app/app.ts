@@ -22,6 +22,7 @@ import { CaseStore } from './core/advisor/store/case-store';
 import { WorkspaceTab } from './core/advisor/store/case-state';
 import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
+import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
 
 interface TabLink {
@@ -41,6 +42,7 @@ interface TabLink {
     TranslocoPipe,
     LanguageSwitcher,
     ConsentScreen,
+    AgentDock,
   ],
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +77,10 @@ export class App {
   protected readonly openRisks = computed(
     () => this.store.risks().filter((risk) => risk.status !== 'addressed').length,
   );
+
+  /** Data capture for the ring around the avatar. */
+  protected readonly progress = this.store.progress;
+  protected readonly activity = computed(() => this.store.agent().activity);
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll

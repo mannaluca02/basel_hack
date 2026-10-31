@@ -4,7 +4,10 @@
     <span aria-hidden="true">{{ 'demo.badge' | transloco }}</span>
     <span class="visually-hidden">{{ 'demo.label' | transloco }}</span>
   </span>
-  <app-language-switcher />
+  <!-- Before consent there is no rail, so the switcher stays in the header until then. -->
+  @if (!consented()) {
+    <app-language-switcher />
+  }
 </header>
 
 @if (!consented()) {
@@ -17,6 +20,8 @@
   </main>
 
   <div class="rail">
+    <app-language-switcher placement="rail" />
+
     <nav class="tabs" [attr.aria-label]="'nav.label' | transloco">
       @for (tab of tabs; track tab.id) {
         @let badge = tab.id === 'risks' ? openRisks() : 0;
@@ -42,7 +47,7 @@
       }
     </nav>
 
-    <!-- Reserved slot for the agent with its progress ring (FE-09); tapping it opens the summary. -->
-    <div class="dock" aria-hidden="true"></div>
+    <!-- Lukas's avatar renderer goes inside, as projected content. -->
+    <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()" />
   </div>
 }

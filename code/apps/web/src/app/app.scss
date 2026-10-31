@@ -7,7 +7,8 @@
   --tab-gap: 1rem;
   --icon-size: 1.5rem;
   --rail-width: calc(var(--tab-size) + 4 * var(--stroke-focusring));
-  --dock-size: 2.75rem;
+  // The avatar with its ring: as wide as a tab, so the rail stays narrow.
+  --dock-size: var(--tab-size);
 
   display: grid;
   grid-template:
@@ -30,7 +31,6 @@
     --tab-size: 3.25rem;
     --tab-gap: 1.25rem;
     --icon-size: 1.75rem;
-    --dock-size: 3rem;
   }
 }
 
@@ -218,6 +218,4 @@
   flex: none;
   width: var(--dock-size);
   height: var(--dock-size);
-  border: var(--stroke-m) dashed var(--border-subtle);
-  border-radius: var(--radius-full);
 }

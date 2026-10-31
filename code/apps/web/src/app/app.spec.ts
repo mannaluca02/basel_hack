@@ -4,7 +4,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { FakeDataSource, event, risk } from './core/advisor/store/case-testing';
+import { FakeDataSource, event, progress, risk } from './core/advisor/store/case-testing';
 import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/consent';
 import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
@@ -66,11 +66,36 @@ describe('App', () => {
     expect(current()).toEqual(['/chat']);
   });
 
-  it('reserves the agent dock in the rail, outside the Dynamic View', async () => {
+  it('places the agent dock in the rail, outside the Dynamic View', async () => {
     const { root } = await renderShell();
 
-    expect(root.querySelector('.rail > .dock')).not.toBeNull();
+    expect(root.querySelector('.rail > app-agent-dock.dock')).not.toBeNull();
     expect(root.querySelector('main .dock')).toBeNull();
+  });
+
+  it('puts the language switcher at the top of the rail, not in the header', async () => {
+    const { root } = await renderShell();
+
+    expect(root.querySelector('.rail > app-language-switcher.in-rail:first-child')).not.toBeNull();
+    expect(root.querySelector('header app-language-switcher')).toBeNull();
+  });
+
+  it('feeds live progress and agent activity into the dock', async () => {
+    const { fixture, root } = await renderShell();
+    const dock = root.querySelector('app-agent-dock') as HTMLElement;
+    const fill = () => (dock.querySelector('.fill') as SVGCircleElement).style.strokeDashoffset;
+    expect(dock.classList).toContain('unknown');
+    expect(dock.getAttribute('data-activity')).toBe('idle');
+
+    source.emit(
+      event('progress', progress({ percent: 43.5 })),
+      event('agent', { activity: 'thinking', at: '2026-10-31T10:00:01.000Z' }),
+    );
+    await fixture.whenStable();
+
+    expect(fill()).toBe('56.5');
+    expect(dock.classList).not.toContain('unknown');
+    expect(dock.getAttribute('data-activity')).toBe('thinking');
   });
 
   it('shows the number of open risks on the Risks tab, also for screen readers', async () => {
@@ -206,6 +231,8 @@ describe('App before consent', () => {
     ]);
     expect(root.querySelector('.rail')).toBeNull();
     expect(root.querySelector('router-outlet')).toBeNull();
+    // No rail yet, so the language can be chosen in the header before consenting.
+    expect(root.querySelector('header app-language-switcher:not(.in-rail)')).not.toBeNull();
     expect(source.connectionState.value).toBe('disconnected');
   });
 

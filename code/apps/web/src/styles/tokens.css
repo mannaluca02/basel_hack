@@ -113,6 +113,8 @@
   --border-default: var(--color-neutral-black);
   --border-soft: var(--color-neutral-gray-3);
   --border-subtle: var(--color-neutral-gray-4);
+  /* Unfilled part of a progress ring; must stay apart from the --icon-brand-contrast fill. */
+  --border-track: var(--color-neutral-gray-3);
   --border-focusring: var(--color-brand-pax-green);
   --border-success: var(--color-system-success);
   --border-warning: var(--color-system-warning);
@@ -162,6 +164,8 @@
     --border-default: var(--color-neutral-white);
     --border-soft: var(--color-neutral-gray-4);
     --border-subtle: var(--color-neutral-gray-3);
+    /* Pax Green on gray-4 is 1.16:1; on gray-7 it is 7.62:1. */
+    --border-track: var(--color-neutral-gray-7);
     --border-warning: var(--color-neutral-white);
   }
 }
