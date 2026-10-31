@@ -1,10 +1,13 @@
 // Demo page: wires paxi-voice.js to Lukas's avatar and a small test UI.
-import { setupIntro } from "./intro.js";
+import { requestMicrophonePermission, setupIntro } from "./intro.js";
 import { createPaxiVoice } from "./paxi-voice.js";
 import { createPaxAvatar, EMOTIONS } from "/avatar/pax-avatar.js";
 
 const $ = (id) => document.getElementById(id);
 const TURN_GAP_MS = 1200;
+
+// The sleeping dot only shows its closed eyes once the microphone is allowed.
+requestMicrophonePermission().then((allowed) => allowed && document.documentElement.classList.add("mic-ready"));
 
 const questionnaire = await fetch("/api/questionnaire").then((response) => response.json());
 $("questionnaire-title").textContent = questionnaire.title;

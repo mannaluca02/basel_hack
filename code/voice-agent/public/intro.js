@@ -1,3 +1,15 @@
+export async function requestMicrophonePermission() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Only warm up permission; the conversation owns its own microphone stream.
+    stream.getTracks().forEach((track) => track.stop());
+    return true;
+  } catch {
+    // Browsers that require a gesture, or a denied prompt, retry through the normal start flow.
+    return false;
+  }
+}
+
 export function setupIntro(startConversation) {
   const root = document.documentElement;
   const overlay = document.getElementById("intro");
@@ -63,28 +75,49 @@ export function setupIntro(startConversation) {
     const dy = top - logoRect.top - (dot.top - logoRect.top) * sy;
     const morph = document.createElement("span");
     morph.id = "intro-morph";
-    Object.assign(morph.style, { left: `${dot.left}px`, top: `${dot.top}px`, width: `${dot.width}px`, height: `${dot.height}px` });
+    // Laid out at its landing size and scaled down to the dot, so it is drawn sharp and only ever
+    // shrinks; growing a dot-sized box blurs the eye edges on high-DPI screens.
+    Object.assign(morph.style, { left: `${left}px`, top: `${top}px`, width: `${size}px`, height: `${size}px` });
+    const eyes = document.createElement("span");
+    eyes.className = "intro-eyes";
+    eyes.innerHTML = "<i></i><i></i>";
+    const shine = document.createElement("span");
+    shine.className = "intro-shine";
+    morph.append(shine, eyes);
     overlay.append(morph);
+    // Wake-up: a rapid double blink in place, a short pause, then the eyes slowly open all the way
+    // while we zoom in.
+    const zoom = 625;
+    const eyesOpen = zoom + 1000;
+    animate(eyes, [
+      { transform: "scaleY(.2)", easing: "ease-out" },
+      { transform: "scaleY(.85)", offset: 125 / eyesOpen, easing: "ease-in" },
+      { transform: "scaleY(.08)", offset: 250 / eyesOpen, easing: "ease-out" },
+      { transform: "scaleY(.85)", offset: 375 / eyesOpen, easing: "ease-in" },
+      { transform: "scaleY(.08)", offset: 500 / eyesOpen },
+      { transform: "scaleY(.08)", offset: zoom / eyesOpen, easing: "cubic-bezier(.3, 0, .2, 1)" },
+      { transform: "scaleY(1)" },
+    ], eyesOpen, 0, "linear");
+    if (!root.classList.contains("mic-ready")) animate(eyes, [{ opacity: 0 }, { opacity: 1 }], 140);
 
     const easing = "cubic-bezier(.65, 0, .2, 1)";
-    animate(logo, [{ transform: "none" }, { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` }], 1450, 0, easing);
-    animate(document.getElementById("intro-letters"), [{ opacity: 1 }, { opacity: 0 }], 650, 350);
+    animate(logo, [{ transform: "none" }, { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` }], 1270, zoom, easing);
+    animate(document.getElementById("intro-letters"), [{ opacity: 1 }, { opacity: 0 }], 650, zoom + 170);
     animate(morph, [
-      { transform: "none", borderRadius: "0" },
-      { transform: `translate(${left - dot.left}px, ${top - dot.top}px) scale(${sx}, ${sy})`, borderRadius: `${dot.width * 34 / 120}px / ${dot.height * 34 / 120}px` },
-    ], 1450, 0, easing);
-    // Purple holds through the first half of the zoom, then gives way to the page; at the end the
-    // overlay turns see-through so the avatar, already shown under the green square, takes over.
+      { transform: `translate(${dot.left - left}px, ${dot.top - top}px) scale(${1 / sx}, ${1 / sy})`, borderRadius: "0" },
+      { transform: "none", borderRadius: `${size * 34 / 120}px` },
+    ], 1270, zoom, easing);
+    // Hold purple through the wake-up, then reveal the avatar beneath the landing square.
     animate(overlay, [
       { backgroundColor: "#360573" },
       { backgroundColor: "#360573", offset: .45 },
       { backgroundColor: "#f5f3f8", offset: .9 },
       { backgroundColor: "rgb(245 243 248 / 0)" },
-    ], 1450, 0, "linear");
-    handoffTimer = setTimeout(() => root.classList.add("intro-landing"), 850);
-    animate(avatar, [{ opacity: 0 }, { opacity: 1 }], 1, 1300);
-    // Same body, same place: fading the square out only reveals the eyes, no ghosting.
-    animate(morph, [{ opacity: 1 }, { opacity: 0 }], 260, 1450);
-    animate(aside, [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }], 250, 1600).finished.then(finish, () => {});
+    ], 1450, zoom - 180, "linear");
+    handoffTimer = setTimeout(() => root.classList.add("intro-landing"), zoom + 670);
+    animate(avatar, [{ opacity: 0 }, { opacity: 1 }], 1, zoom + 1120);
+    // Crossfade the waking face into the live expression without changing conversation emotions.
+    animate(morph, [{ opacity: 1 }, { opacity: 0 }], 260, zoom + 1270);
+    animate(aside, [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }], 250, zoom + 1420).finished.then(finish, () => {});
   }, { once: true });
 }

@@ -48,19 +48,31 @@
   #intro:disabled { cursor: default; }
   #intro:focus-visible { outline: 4px solid #9bd509; outline-offset: -10px; }
   #intro-logo { width: min(70vw, 520px); height: auto; overflow: visible; transform-origin: 0 0; }
-  #intro-dot { animation: dot-invite 2.8s ease-in-out infinite; }
+  #intro-sleeper { transform-box: fill-box; transform-origin: center; animation: dot-shiver 4.6s ease-in-out infinite; }
+  .intro-eye { fill: var(--purple); transform-box: fill-box; transform-origin: center; transform: scaleY(.2); opacity: 0; transition: opacity 600ms ease; }
+  .mic-ready .intro-eye { opacity: 1; }
   #intro-morph { position: fixed; background: #fff; pointer-events: none; transform-origin: 0 0; }
   #intro-morph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at 35% 28%, #9bd509, #8bcb00 45%, #62a600); opacity: 0; }
   .intro-landing #intro-morph::after { opacity: 1; transition: opacity 500ms ease; }
-  .intro-running #intro-dot { animation: none; visibility: hidden; }
+  .intro-running #intro-sleeper { animation: none; visibility: hidden; }
+  .intro-eyes { position: absolute; inset: 0; z-index: 1; }
+  .intro-eyes i { position: absolute; top: 40%; left: 23%; width: 15.6%; height: 22%; border-radius: 999px; background: var(--purple); }
+  .intro-eyes i + i { left: 61.5%; }
+  /* Paxi's shine (ellipse 72/62, 22×11, −20° in the avatar), faded in before the handoff. */
+  .intro-shine { position: absolute; z-index: 1; left: 8.33%; top: 9.17%; width: 36.67%; height: 18.33%; border-radius: 50%; background: #fff; opacity: 0; transform: rotate(-20deg); }
+  .intro-landing .intro-shine { opacity: .35; transition: opacity 600ms ease-in-out; }
   .intro-skipped #intro { display: none; }
-  @keyframes dot-invite { 50% { filter: drop-shadow(0 0 5px #ffffff80); opacity: .72; } }
-  @media (prefers-reduced-motion: reduce) { #intro-dot { animation: none; } }
+  @keyframes dot-shiver {
+    0%, 38%, 52%, 100% { transform: translate(0, 0) rotate(0); }
+    40%, 44%, 48% { transform: translate(-.65px, .25px) rotate(-.8deg); }
+    42%, 46%, 50% { transform: translate(.65px, -.25px) rotate(.8deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { #intro-sleeper { animation: none; } }
 </style>
 </head>
 <body>
 <button id="intro" type="button" aria-label="Mit Paxi sprechen" disabled>
-<svg id="intro-logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 454.099 152.662"><path id="intro-letters" fill="#8ccd0f" d="m313.288 144.806 44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z"/><path id="intro-dot" fill="#fff" d="M5 104.29h39.373v40.517H5z"/></svg>
+<svg id="intro-logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 454.099 152.662"><path id="intro-letters" fill="#8ccd0f" d="m313.288 144.806 44.794-58.06-44.365-57.495h43.368l25.82 34.954 26.11-34.954h38.802L403.309 86.46l45.79 58.347h-44.936l-25.391-33.952-25.968 33.952zm-43.082-35.092V92.31c-4.992.71-9.416 1.425-22.111 3.566-13.41 2.283-17.835 7.418-17.835 13.84 0 7.131 3.995 12.266 14.269 12.266 7.704 0 18.402-5.278 25.677-12.267m4.99 35.092-2.712-11.842c-12.266 9.988-23.965 14.698-39.368 14.698-22.974 0-39.092-13.124-39.092-34.382 0-21.543 14.55-33.528 43.94-38.09 16.69-2.57 25.11-3.853 31.383-4.563V66.77c0-10.412-5.277-15.122-17.114-15.122-13.13 0-17.835 5.282-18.407 14.126h-34.81c2.569-29.529 24.966-39.373 55.782-39.373 37.518 0 50.786 16.118 50.786 47.787v39.092c0 12.839.286 18.545 3.137 31.526zM125.69 73.478c17.978 0 24.251-7.418 24.251-19.975 0-12.553-6.273-19.97-24.251-19.97h-18.83v39.945zm-56.207 71.328V5h59.344c41.233 0 59.348 20.256 59.348 48.503 0 28.251-18.115 48.507-59.348 48.507h-21.968v42.796H69.482z"/><g id="intro-sleeper"><path id="intro-dot" fill="#fff" d="M5 104.29h39.373v40.517H5z"/><rect class="intro-eye" x="14.06" y="120.5" width="6.14" height="8.91" rx="3.07"/><rect class="intro-eye" x="29.21" y="120.5" width="6.14" height="8.91" rx="3.07"/></g></svg>
 </button>
 <main id="stage" inert>
   <button id="avatar" aria-label="Gespräch mit Paxi starten"></button>
