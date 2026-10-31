@@ -1,4 +1,5 @@
 // Demo page: wires paxi-voice.js to Lukas's avatar and a small test UI.
+import { setupIntro } from "./intro.js";
 import { createPaxiVoice } from "./paxi-voice.js";
 import { createPaxAvatar, EMOTIONS } from "/avatar/pax-avatar.js";
 
@@ -117,7 +118,7 @@ const callbacks = {
 
 const paxi = createPaxiVoice({ ...callbacks, caseLink });
 
-$("avatar").addEventListener("click", () => {
+function startConversation() {
   if (paxi.running) return;
   const resume = resumable;
   if (!resume) {
@@ -129,5 +130,8 @@ $("avatar").addEventListener("click", () => {
   }
   avatar.reset();
   paxi.start({ resume, priorities: [...priorities] }).catch(() => {});
-});
+}
+
+$("avatar").addEventListener("click", startConversation);
+setupIntro(startConversation);
 $("stop").addEventListener("click", () => paxi.stop());
