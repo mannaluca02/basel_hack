@@ -17,6 +17,7 @@ import { extractAnswers } from "./answer-extractor.mjs";
 import { extractContext } from "./conversation-context.mjs";
 import { detectLanguage } from "./language-detect.mjs";
 import { customVoices } from "./paxi-voice.mjs";
+import { loadSkills, skillsPrompt } from "./skills.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 try {
@@ -79,6 +80,9 @@ async function loadConversation(conversationId) {
 }
 
 const persona = await readFile(resolve(here, "persona.md"), "utf8");
+// Skills assigned to Paxi (skills/*.md with "assigned: true"), added right after the persona.
+const skills = await loadSkills(resolve(here, "skills"));
+console.log(`Paxi skills: ${skills.map((skill) => skill.name).join(", ") || "none"}`);
 const welcomeText = (await readFile(resolve(here, "welcome.txt"), "utf8")).trim();
 
 // Recorded intro (public/intro.mp3). The browser plays it itself, so the person can
@@ -111,6 +115,8 @@ function paxiPrompt({ language, voicePrompt, priorities = [] }) {
     ? `Current conversation language: ${languages[language].name}, spoken with native pronunciation. If the person starts speaking another of your languages, follow them.`
     : `Languages: you speak German, French, Italian and English, each with native pronunciation. Continue in the language the person speaks.`;
   return `${persona}
+${skillsPrompt(skills)}
+
 ## Languages
 
 ${languageRule}

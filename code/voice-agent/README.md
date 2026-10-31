@@ -111,7 +111,19 @@ Typical errors are 400 for missing SDP or a non-array priority list, 403 for an 
 
 ## Persona and conversation style
 
+For research and proposed scripts, see [Friendly sales conversations for Paxi](../../documentation/baselhack/research/friendly-sales-conversation.md). This guide includes psychological mechanisms, a conversational opening, sample dialogue and evaluation criteria; it does not change the live prompt.
+
 `persona.md` is the opening prompt: who Paxi is, du-form, the broker approach and the topics to chat about (name, age, hobbies, work, living, plans). Edit it freely and restart the server. The server appends the questionnaire fields, the language rules and the delegation policies.
+
+## Skills
+
+Skills are Markdown files in `skills/` that extend Paxi's opening prompt. Each starts with a small front matter block (`name`, `description`, `source`, `assigned`); every skill with `assigned: true` is added right after `persona.md`, in file name order (`skills.mjs`). The server logs the loaded skills at startup (`Paxi skills: …`).
+
+| Skill | What it adds |
+|---|---|
+| [`friendly-conversation.md`](skills/friendly-conversation.md) | Consultative conversation technique from the [research on friendly sales conversations](../../documentation/baselhack/research/friendly-sales-conversation.md): clear purpose, responsive follow-ups, tentative reflection, a reason before sensitive data, real choices, a summary with corrections before the goodbye, answers to hesitation ("Willst du mir etwas verkaufen?", "Ich habe schon eine Versicherung"), stopping on request, and a list of pressure tactics Paxi never uses. |
+
+The skill is a concise translation of the research, not the research itself. Where the research proposes something the team decided differently (asking once more after a first refusal, "a colleague of mine will get in touch"), the persona's decision applies. To add a skill, create a new `skills/<name>.md` with the front matter and restart the server; set `assigned: false` to keep a draft out of the prompt.
 
 ## Customer portfolio (`questionnaire.json`)
 
