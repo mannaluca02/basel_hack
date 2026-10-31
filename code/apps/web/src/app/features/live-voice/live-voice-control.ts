@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, u
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CustomerApi } from '../../core/advisor/api/customer-api';
 import { VoiceAgentLink } from '../../core/advisor/api/voice-agent-link';
+import { CaseStore } from '../../core/advisor/store/case-store';
+import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { LiveVoice } from '../../core/voice/live-voice';
 
 /** Translation keys, written out in full for the i18n check. */
@@ -21,7 +23,8 @@ let nextId = 0;
  * proposals; the avatar ring shows its activity.
  *
  * Only shown when the backend offers GPT-Live and the model extraction, and not while Paxi talks
- * in its own window.
+ * in its own window. The demo start has no review stand: there a card next to the rail offers to
+ * accept what Paxi heard, which also recalculates the scenarios.
  */
 @Component({
   selector: 'app-live-voice-control',
@@ -91,6 +94,13 @@ let nextId = 0;
         @if (!open()) {
           <p class="error" role="alert">{{ error | transloco }}</p>
         }
+      } @else if (offerAccept() && !open()) {
+        <section class="card" role="status">
+          <p>{{ (acceptFailed() ? 'voice.acceptFailed' : 'voice.pending') | transloco }}</p>
+          <button type="button" class="action action--primary" data-action="accept" [disabled]="accepting()" (click)="accept()">
+            {{ (accepting() ? 'voice.accepting' : 'voice.accept') | transloco }}
+          </button>
+        </section>
       }
     }
   `,
@@ -177,7 +187,8 @@ let nextId = 0;
 
     // Opens next to the rail, over the Dynamic View.
     .panel,
-    .error {
+    .error,
+    .card {
       position: absolute;
       right: calc(100% + 0.5rem);
       bottom: 0;
@@ -197,6 +208,17 @@ let nextId = 0;
       border-color: var(--border-error);
       color: var(--text-error);
       font-size: 0.8125rem;
+    }
+
+    .card {
+      width: max-content;
+      max-width: 16rem;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+
+      p {
+        margin: 0 0 0.5rem;
+      }
     }
 
     h2 {
@@ -263,7 +285,17 @@ export class LiveVoiceControl {
   protected readonly live = inject(LiveVoice);
   private readonly paxi = inject(VoiceAgentLink);
 
+  private readonly customer = inject(CustomerApi);
+  private readonly store = inject(CaseStore);
+  private readonly demoStart = inject(APP_ENVIRONMENT).demoStart === true;
+
   protected readonly open = signal(false);
+  protected readonly accepting = signal(false);
+  protected readonly acceptFailed = signal(false);
+  /** Demo start: Paxi heard something that is not accepted yet. */
+  protected readonly offerAccept = computed(
+    () => this.demoStart && this.live.caseReady() && (this.store.projection()?.pending.length ?? 0) > 0,
+  );
   protected readonly panelId = `live-voice-panel-${nextId}`;
   protected readonly titleId = `live-voice-title-${nextId++}`;
 
@@ -290,9 +322,8 @@ export class LiveVoiceControl {
 
   constructor() {
     // Notices and settings belong to the case session (and its language, see LiveVoice).
-    const customer = inject(CustomerApi);
     effect(() => {
-      const session = customer.session();
+      const session = this.customer.session();
       untracked(() => {
         if (session && this.live.apiMode) void this.live.loadNotice();
       });
@@ -308,5 +339,21 @@ export class LiveVoiceControl {
     if (this.blocker()) return;
     this.open.set(false);
     await this.live.start();
+  }
+
+  protected async accept(): Promise<void> {
+    const caseId = this.customer.session()?.caseId;
+    if (!caseId || this.accepting()) return;
+    this.accepting.set(true);
+    this.acceptFailed.set(false);
+    try {
+      await this.customer.demoAccept(caseId);
+    } catch (error) {
+      console.error('LiveVoiceControl: accepting the proposals failed', error);
+      this.acceptFailed.set(true);
+    } finally {
+      this.accepting.set(false);
+      this.store.refresh();
+    }
   }
 }

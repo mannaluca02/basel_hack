@@ -150,6 +150,14 @@ export class CustomerApi {
     );
   }
 
+  /**
+   * Demo start only: accepts the open proposal packages, confirms the profile and recalculates
+   * the standard scenarios. The demo has no review stand, so this is the customer's acceptance.
+   */
+  demoAccept(caseId: string): Promise<unknown> {
+    return this.post(`${this.caseUrl(caseId)}/demo-accept`, {});
+  }
+
   loadHandover(caseId: string): Promise<HumanHandoverView> {
     return firstValueFrom(this.http.get<HumanHandoverView>(`${this.caseUrl(caseId)}/handover`));
   }

@@ -18,12 +18,14 @@ describe('LiveVoiceControl', () => {
   let microphone: ReturnType<typeof vi.fn>;
   let consents: unknown[];
   const caseUrl = `/api/cases/${CASE_ID}`;
-  const dto = reviewCase({ proposalBatches: [], ambiguities: [], confirmedVersions: [], handover: DEFAULT_HUMAN_HANDOVER });
+  const quietCase = () => reviewCase({ proposalBatches: [], ambiguities: [], confirmedVersions: [], handover: DEFAULT_HUMAN_HANDOVER });
   const element = () => fixture.nativeElement as HTMLElement;
   const mic = () => element().querySelector<HTMLButtonElement>('.mic');
   const start = () => element().querySelector<HTMLButtonElement>('[data-action="start"]');
 
-  async function setup(gptLive = true) {
+  let dto = quietCase();
+
+  async function setup(gptLive = true, demoStart = false) {
     consents = [];
     sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify({ caseId: CASE_ID, csrfToken: 'csrf_test' }));
     FakeEventSource.reset();
@@ -35,7 +37,7 @@ describe('LiveVoiceControl', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart } },
         { provide: AdvisorDataSource, useClass: ApiDataSource },
       ],
     });
@@ -81,6 +83,7 @@ describe('LiveVoiceControl', () => {
   }
 
   afterEach(() => {
+    dto = quietCase();
     fixture?.destroy();
     sessionStorage.clear();
     vi.unstubAllGlobals();
@@ -109,5 +112,27 @@ describe('LiveVoiceControl', () => {
     // The panel closed; the denied microphone is readable next to the rail.
     expect(start()).toBeNull();
     expect(element().querySelector('[role="alert"]')!.textContent).toContain('Website-Einstellungen');
+  });
+
+  it('offers the demo start to accept what Paxi heard, and recalculates', async () => {
+    dto = reviewCase({ handover: DEFAULT_HUMAN_HANDOVER });
+    await setup(true, true);
+    const accept = element().querySelector<HTMLButtonElement>('[data-action="accept"]')!;
+    expect(accept.textContent).toContain('Übernehmen');
+
+    accept.click();
+    const request = http.expectOne(`${caseUrl}/demo-accept`);
+    expect(request.request.headers.get('X-CSRF-Token')).toBe('csrf_test');
+    dto = quietCase();
+    request.flush({ accepted: ['batch'], skipped: [], profileVersion: 2, runs: [] });
+    await serve();
+
+    expect(element().querySelector('[data-action="accept"]')).toBeNull();
+  });
+
+  it('never offers the acceptance outside the demo start', async () => {
+    dto = reviewCase({ handover: DEFAULT_HUMAN_HANDOVER });
+    await setup();
+    expect(element().querySelector('[data-action="accept"]')).toBeNull();
   });
 });

@@ -448,6 +448,10 @@
     "title": "Mit Paxi sprechen",
     "begin": "Gespräch starten",
     "cancel": "Abbrechen",
-    "connected": "Paxi ist verbunden und hört zu"
+    "connected": "Paxi ist verbunden und hört zu",
+    "pending": "Paxi hat neue Angaben gehört.",
+    "accept": "Übernehmen und neu berechnen",
+    "accepting": "Wird übernommen …",
+    "acceptFailed": "Übernehmen hat nicht geklappt. Bitte nochmals versuchen."
   }
 }

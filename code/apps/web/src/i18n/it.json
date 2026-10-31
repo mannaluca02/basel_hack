@@ -448,6 +448,10 @@
     "title": "Parla con Paxi",
     "begin": "Avvia la conversazione",
     "cancel": "Annulla",
-    "connected": "Paxi è connesso e ascolta"
+    "connected": "Paxi è connesso e ascolta",
+    "pending": "Paxi ha sentito nuove informazioni.",
+    "accept": "Accetta e ricalcola",
+    "accepting": "Accettazione in corso …",
+    "acceptFailed": "L’accettazione non è riuscita. Riprova."
   }
 }

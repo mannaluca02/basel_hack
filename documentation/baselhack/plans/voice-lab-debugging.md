@@ -83,6 +83,8 @@ npm --prefix code test
 ```
 
 In der App: Demo starten → Mikrofon-Knopf → beide Häkchen → **Gespräch starten** → Mikrofon erlauben.
+Im Demo-Start gibt es kein Review: Neben der Tab-Leiste erscheint dann **Übernehmen und neu berechnen**
+(`POST demo-accept`), das die Vorschläge übernimmt, das Profil bestätigt und die Szenarien neu rechnet.
 Im Voice Lab (Debug): sprechende Person prüfen → Gesprächs-Skills, Zeitbudget und optional ein Thema
 einstellen → beide Zustimmungen → **Live-Gespräch starten**. Das Gespräch läuft beim Verlassen des
 Lab-Tabs weiter und lässt sich über den Knopf in der Tab-Leiste beenden.
