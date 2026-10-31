@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.mjs' --test-coverage-exclude='node_modules/**'"
   },
   "engines": {
     "node": ">=22"

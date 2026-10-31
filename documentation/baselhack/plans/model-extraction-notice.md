@@ -1,6 +1,6 @@
 # Verarbeitungshinweis und Zustimmung für Earnies synthetische OpenAI-Extraktion
 
-Stand: 31.10.2026. Gemeinsamer Backend-Teil aus [Ticket 02](../../../.scratch/ernest-ai-backend/issues/02-kundenclient-pruefstand-bestaetigung.md) und Abschnitt 2 der [Integrationsvereinbarung](../../../.scratch/ernest-ai-backend/integration-agreement.md). Implementierung: [Vertrag](../../../code/packages/contracts/src/model-extraction.ts), [Service](../../../code/apps/api/src/insurance/model-extraction.ts), [Tests](../../../code/tests/model-extraction.test.mjs).
+Stand: 31.10.2026. Gemeinsamer Backend-Teil aus [Ticket 02](../archive/ernest-ai-backend/issues/02-kundenclient-pruefstand-bestaetigung.md) und Abschnitt 2 der [Integrationsvereinbarung](../archive/ernest-ai-backend/integration-agreement.md). Implementierung: [Vertrag](../../../code/packages/contracts/src/model-extraction.ts), [Service](../../../code/apps/api/src/insurance/model-extraction.ts), [Tests](../../../code/tests/model-extraction.test.mjs).
 
 ## Was das Backend jetzt garantiert
 

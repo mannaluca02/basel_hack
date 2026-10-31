@@ -20,6 +20,7 @@
     "watch": "ng build web --watch --configuration development",
     "pretest": "node scripts/sync-voice-avatar.mjs",
     "test": "ng test web",
+    "test:coverage": "ng test web --watch=false --coverage",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:i18n": "node scripts/check-i18n.mjs"
   },
@@ -43,6 +44,7 @@
     "@angular/build": "^22.2.5",
     "@angular/cli": "^22.2.5",
     "@angular/compiler-cli": "^22.2.0",
+    "@vitest/coverage-v8": "^5.0.5",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
