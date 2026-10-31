@@ -31,7 +31,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Li
 | `{ type: "playback", event: "cancelled", playbackId }` | Audio was cut off (barge-in, stop, new turn) | `output_audio_buffer.cleared` |
 | `{ type: "playback", event: "error", playbackId }` | Playback failed | — |
 
-`emotion` values: `neutral`, `acknowledging`, `curious`, `explaining`, `reassuring`, `empathetic`, `pleased`, `recovering`, `presenting_offer`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
+`emotion` values: `neutral`, `acknowledging`, `curious`, `explaining`, `shocked`, `empathetic`, `pleased`, `recovering`, `presenting_offer`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
 
 ## What the avatar guarantees
 

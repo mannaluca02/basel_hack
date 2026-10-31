@@ -26,7 +26,7 @@ const EMOTION_CHOICES = [
   { value: "acknowledging", description: "Kurze Bestätigung oder Zusammenfassung: Ich habe Sie verstanden. Keine neue Erklärung oder Erfolgsmeldung." },
   { value: "curious", description: "Offene Rückfrage zu Wünschen, Lebenssituation oder fehlenden Angaben des Kunden." },
   { value: "explaining", description: "Der Berater erklärt Zusammenhänge, Berechnungen, Vorsorgelücken oder nächste Optionen sachlich und engagiert." },
-  { value: "reassuring", description: "Der Kunde ist besorgt oder überfordert; ruhig Zuversicht geben und Schritt für Schritt weiterhelfen." },
+  { value: "shocked", description: "Nur bei echtem Schock: etwas wirklich Unerwartetes oder Alarmierendes wurde gesagt. Nicht bei blosser Sorge, Überraschung oder Belastung." },
   { value: "empathetic", description: "Persönlicher Verlust, Krankheit oder Belastung: stilles Mitgefühl zeigen." },
   { value: "pleased", description: "Warme Begrüssung, Willkommen oder freundliche Freude über eine gute Nachricht." },
   { value: "recovering", description: "Der Berater hat etwas missverstanden, korrigiert sich oder muss einen Versuch beziehungsweise eine Erklärung wiederholen." },

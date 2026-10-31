@@ -29,12 +29,14 @@ const SVG = `
       <rect data-part="eyeL" mask="url(#paxMaskL)" />
       <rect data-part="eyeR" mask="url(#paxMaskR)" />
     </g>
+    <g data-part="glints" fill="#fff"><circle data-part="glintL" /><circle data-part="glintR" /></g>
     <g data-part="monocle" fill="none" stroke="#360573">
       <circle r="21" stroke-width="2.6" />
       <path d="M-14,-7 A15.5,15.5 0 0 1 -5,-14.8" stroke="#fff" stroke-opacity=".75" stroke-width="2.2" stroke-linecap="round" />
       <path d="M14.8,14.8 C25,23 35,27 31,43" stroke-width="1.6" stroke-dasharray="2 2.4" stroke-linecap="round" />
     </g>
   </g>
+  <g data-part="alarm" fill="#360573"><rect x="-3.2" y="-17" width="6.4" height="19" rx="3.2" /><circle cy="9.5" r="3.6" /></g>
   <g data-part="dots" fill="#360573"><circle r="3.2" /><circle r="4.2" /><circle r="5.4" /></g>
   <g data-part="sparkles" fill="#8bcb00"></g>
 </svg>`;
@@ -42,13 +44,13 @@ const SVG = `
 // Every pose and motion target is numeric, including independent eye geometry.
 // Eyes are pills: taller than wide by default; flat expressions become horizontal pills.
 const BASE = {
-  gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0, monocle:0,
+  gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0, monocle:0, alarm:0, back:0,
   wL:.85, wR:.85, hL:1.2, hR:1.2, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
   tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, glance:.08, pulse:0,
   nod:0, nodFace:0, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:0, nodInterval:3, nodJitter:.25, nodDelay:.2,
   yaw:0, yawDir:0, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4,
   beat:0, beatRefractory:.7, beatRaise:.15, gazeStep:0,
-  hop:0, shake:0, speech:0, blinkDuration:.18, blinkGap:4,
+  hop:0, shake:0, jolt:0, speech:0, blinkDuration:.18, blinkGap:4,
 };
 export const EMOTIONS = {
   neutral: { label:"Neutral", subtitle:"Calm and available" },
@@ -64,7 +66,9 @@ export const EMOTIONS = {
   explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.85, wR:.85, hL:1.46, hR:1.46, glance:0, speed:1.2, speech:.025,
     beat:1, beatRefractory:.7, beatRaise:.15, gazeStep:1, blinkDuration:.7,
     yaw:1, yawDir:-1, yawIn:.5, yawHold:1.2, yawOut:.6, yawInterval:6.5, yawJitter:.5, yawDelay:2 },
-  reassuring: { label:"Reassuring", subtitle:"We can take this step by step", wL:1.08, wR:1.08, hL:.78, hR:.78, breathe:.026, breathPeriod:5.5, speed:.4, glance:.025, blinkDuration:.38, blinkGap:5 },
+  // A frozen wide-eyed stare: the startle jolt is the only quick motion, then nearly no blinking.
+  shocked: { label:"Shocked", subtitle:"Wait, really?", wL:1.12, wR:1.12, hL:1.55, hR:1.55, gy:-.12, alarm:1, jolt:5, back:.15,
+    sway:.15, speed:.3, breathe:.01, glance:0, blinkDuration:.12, blinkGap:8 },
   empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.2, lidR:.2, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
   pleased: { label:"Pleased", subtitle:"A warm welcome", smile:1, blush:1, hop:3, sway:1, speed:.65 },
   recovering: { label:"Recovering", subtitle:"Let me try again", wR:.72, hR:1.02, yR:7, shake:1, glance:.04, speed:.5 },
@@ -72,7 +76,7 @@ export const EMOTIONS = {
 };
 let mountId = 0;
 
-export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "reassuring", "empathetic", "pleased", "recovering", "presenting_offer"];
+export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "shocked", "empathetic", "pleased", "recovering", "presenting_offer"];
 const HOLD_AFTER_REPLY_MS = 1500;
 const EMOTION_HOLD_MS = 2000;
 const MAX_FINISHED_IDS = 50;
@@ -95,7 +99,7 @@ export function createPaxAvatar(host) {
     .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
   const part = (name) => host.querySelector(`[data-part="${name}"]`);
   const P = {};
-  for (const n of ["shadow", "char", "highlight", "blush", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles", "monocle"]) P[n] = part(n);
+  for (const n of ["shadow", "char", "highlight", "blush", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles", "monocle", "alarm", "glints", "glintL", "glintR"]) P[n] = part(n);
 
   for (const el of host.querySelectorAll("*")) attributes.set(el, Object.create(null));
   let emotion = "neutral", destroyed = false, visible = true;
@@ -136,9 +140,9 @@ export function createPaxAvatar(host) {
   function replay() {
     const target = POSES[emotion];
     // Let an in-flight gesture finish; changing expressions cannot reset its envelope.
-    for (const kind of ["hop", "shake"]) {
+    for (const kind of ["hop", "shake", "jolt"]) {
       if (target[kind] && !entries.some(e => e.kind === kind)) {
-        entries.push({ kind, amount:target[kind], startedAt:t, duration:kind === "shake" ? .6 : .8 });
+        entries.push({ kind, amount:target[kind], startedAt:t, duration:kind === "shake" ? .6 : kind === "jolt" ? .55 : .8 });
       }
     }
   }
@@ -209,12 +213,14 @@ export function createPaxAvatar(host) {
     const motion = reducedMotion.matches ? 0 : 1;
     phase += dt * cur.speed;
     breathPhase += dt * 2 * Math.PI / cur.breathPeriod;
-    let hop = 0, shake = 0;
+    let hop = 0, shake = 0, jolt = 0;
     for (let i = entries.length - 1; i >= 0; i--) {
       const e = entries[i], age = t - e.startedAt;
       if (age >= e.duration) { for (let j = i; j < entries.length - 1; j++) entries[j] = entries[j + 1]; entries.pop(); continue; }
       const progress = age / e.duration;
       if (e.kind === "hop") hop += e.amount * Math.sin(progress * Math.PI) ** 2;
+      // Startle: snap up in the first 12%, then ease back down.
+      else if (e.kind === "jolt") jolt += e.amount * (progress < .12 ? Math.sin(progress / .12 * Math.PI / 2) : (1 - (progress - .12) / .88) ** 2);
       else shake += e.amount * Math.sin(progress * 5 * Math.PI) * Math.sin(progress * Math.PI) ** 2 * (1 - progress);
     }
     periodic(nodGesture, "nod", cur, dt);
@@ -256,10 +262,10 @@ export function createPaxAvatar(host) {
     const beatTarget = beatEnvelope * beatStrength * cur.beat * (1 - yawWidth * .2);
     beatPose = motion ? beatPose + (beatTarget - beatPose) * (1 - Math.exp(-dt * 24)) : 0;
     const beatDip = beatPose * 2.8;
-    const lift = -hop;
+    const lift = -hop - jolt;
     const breath = Math.sin(breathPhase) * cur.breathe;
-    body.sx = 1 + motion * (-breath * .28 + hop * .003 + (nod + beatDip) * .01 / 5.5 - yawWidth * .035);
-    body.sy = 1 + motion * (breath - hop * .003 - (nod + beatDip) * .02 / 5.5);
+    body.sx = 1 + motion * (-breath * .28 + hop * .003 + (nod + beatDip) * .01 / 5.5 - yawWidth * .035 - jolt * .004);
+    body.sy = 1 + motion * (breath - hop * .003 + jolt * .006 - (nod + beatDip) * .02 / 5.5);
     body.rot = motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2);
     body.ty = motion * (nod + beatDip + lift);
     let tx = motion * (Math.sin(phase) * cur.sway + shake * 2 + yawPose * 1.8);
@@ -267,8 +273,10 @@ export function createPaxAvatar(host) {
     for (const key in pose) pose[key] = motion ? pose[key] + (body[key] - pose[key]) * (1 - Math.exp(-dt * 16)) : body[key];
     for (const key in body) body[key] = pose[key];
     tx = pose.tx;
-    set(P.char, "transform", `translate(${fmt(tx)} ${fmt(body.ty)}) translate(100 160) rotate(${fmt(body.rot)} 0 -60) scale(${fmt(body.sx)} ${fmt(body.sy)}) translate(-100 -160)`);
-    set(P.shadow, "cx", 100 + yawPose * 1.2); set(P.shadow, "rx", 48 * (1 - motion * breath * .28) + pose.lift * 1.2 + (nodPose + beatDip) * .6); set(P.shadow, "opacity", 1 + pose.lift * .04); set(P.shadow, "fill", `rgba(54,5,115,${fmt(.18 + (nodPose + beatDip) * .006)})`);
+    // Stepping back is a pose, not decoration: it shrinks from the ground point even with reduced motion.
+    const depth = 1 - cur.back;
+    set(P.char, "transform", `translate(${fmt(tx)} ${fmt(body.ty)}) translate(100 160) rotate(${fmt(body.rot)} 0 -60) scale(${fmt(body.sx * depth)} ${fmt(body.sy * depth)}) translate(-100 -160)`);
+    set(P.shadow, "cx", 100 + yawPose * 1.2); set(P.shadow, "rx", (48 * (1 - motion * breath * .28) + pose.lift * 1.2 + (nodPose + beatDip) * .6) * depth); set(P.shadow, "ry", 7 * depth); set(P.shadow, "opacity", 1 + pose.lift * .04); set(P.shadow, "fill", `rgba(54,5,115,${fmt(.18 + (nodPose + beatDip) * .006)})`);
     const faceDip = nodPose * cur.nodFace / 5.5 + beatPose * 1.5;
     set(P.highlight, "cx", 72 - yawPose * 1.5); set(P.highlight, "cy", 62 + (nodPose + beatDip) * 1.5 / 5.5);
     const blushVisible = cur.blush > .001 || target.blush;
@@ -322,6 +330,7 @@ export function createPaxAvatar(host) {
       const eyeH = Math.max(.3, h), round = Math.min(w, eyeH);
       set(P["eye" + side], "x", cx - w); set(P["eye" + side], "y", cy - eyeH); set(P["eye" + side], "width", 2 * w); set(P["eye" + side], "height", 2 * eyeH);
       set(P["eye" + side], "rx", round); set(P["eye" + side], "ry", round);
+      if (cur.alarm > .001) { set(P["glint" + side], "cx", cx - w * .38); set(P["glint" + side], "cy", cy - eyeH * .5); set(P["glint" + side], "r", Math.min(3.2, eyeH * .3) * cur.alarm); }
       const lidY = cy - h + cur["lid" + side] * 2 * h;
       set(P["lid" + side], "x", cx - 30); set(P["lid" + side], "y", lidY - 40); set(P["lid" + side], "width", 60); set(P["lid" + side], "height", 40); set(P["lid" + side], "transform", `rotate(${fmt(cur["angle" + side])} ${fmt(cx)} ${fmt(lidY)})`);
       const r = w * 1.25;
@@ -341,6 +350,13 @@ export function createPaxAvatar(host) {
     if (monocleVisible) {
       set(P.monocle, "opacity", cur.monocle);
       set(P.monocle, "transform", `translate(${fmt(123 + yawPose * 4.5)} ${fmt(101 + cur.yR + faceDip)}) scale(${fmt(.6 + .4 * cur.monocle)})`);
+    }
+    const alarmVisible = cur.alarm > .001 || target.alarm;
+    set(P.glints, "display", alarmVisible ? "inline" : "none");
+    set(P.alarm, "display", alarmVisible ? "inline" : "none");
+    if (alarmVisible) {
+      set(P.alarm, "opacity", cur.alarm);
+      set(P.alarm, "transform", `translate(${fmt(100 + 72 * depth)} ${fmt(160 - 130 * depth)}) rotate(12) scale(${fmt(.4 + .6 * cur.alarm)})`);
     }
     const starsVisible = cur.sparkles > .001 || target.sparkles;
     set(P.sparkles, "display", starsVisible ? "inline" : "none");

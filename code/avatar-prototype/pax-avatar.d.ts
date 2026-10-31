@@ -1,4 +1,4 @@
-export type ReplyEmotion = "neutral" | "acknowledging" | "curious" | "explaining" | "reassuring" | "empathetic" | "pleased" | "recovering" | "presenting_offer";
+export type ReplyEmotion = "neutral" | "acknowledging" | "curious" | "explaining" | "shocked" | "empathetic" | "pleased" | "recovering" | "presenting_offer";
 export type Face = ReplyEmotion | "listening" | "thinking";
 
 export type AvatarEvent =
