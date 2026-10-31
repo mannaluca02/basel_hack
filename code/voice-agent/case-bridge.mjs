@@ -38,9 +38,40 @@ function turnId(conversationId, turn, index) {
 }
 
 const TURN_DEBOUNCE_MS = 800;
+const CASE_STATE_TTL_MS = 4000;
+
+const cents = (value) => (typeof value === "number" ? Math.round(value) / 100 : undefined);
+
+/**
+ * What the shared case already knows, as questionnaire answers, so Paxi never asks for it again.
+ * The reverse of the backend's direct voice mapping; anything else stays for the conversation.
+ */
+export function knownFromCase(draft) {
+  const financial = draft?.financial;
+  const insurance = draft?.insurance;
+  const [first, partner] = insurance?.persons ?? [];
+  const person = (id) => financial?.persons.find((p) => p.id === id);
+  const housing = financial?.expenses.filter((e) => e.category === "housing") ?? [];
+  const known = {
+    annual_gross_income_chf: cents(first?.grossAnnualIncomeCents),
+    partner_annual_gross_income_chf: cents(partner?.grossAnnualIncomeCents),
+    partner_birth_year: partner ? person(partner.personId)?.birthYear : undefined,
+    employment_rate_percent: first && person(first.personId) ? person(first.personId).employmentRateBps / 100 : undefined,
+    has_pension_fund: typeof first?.withPillar2 === "boolean" ? first.withPillar2 : undefined,
+    desired_retirement_age: first?.desiredWorkStopAge ?? undefined,
+    sex: first?.providerSex === 1 ? "male" : first?.providerSex === 2 ? "female" : undefined,
+    civil_status: insurance && insurance.relationship !== "unknown" ? insurance.relationship : undefined,
+    relationship_since_year: insurance?.relationshipSinceYear ?? undefined,
+    pillar_3a_annual_contribution_chf: cents(insurance?.existingAnnualPillar3aContributionCents),
+    monthly_housing_cost_chf: housing.length === 1 && housing[0].amount.period === "month" ? cents(housing[0].amount.value) : undefined,
+    risk_appetite: insurance && insurance.riskAppetite !== "unknown" ? insurance.riskAppetite : undefined,
+    children_count: insurance ? insurance.children.filter((c) => c.kind !== "expected").length : undefined,
+  };
+  return Object.fromEntries(Object.entries(known).filter(([, value]) => value !== undefined && value !== null));
+}
 
 export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console, turnDebounceMs = TURN_DEBOUNCE_MS }) {
-  const links = new Map(); // linkId -> { caseId, token, expiresAt }
+  const links = new Map(); // linkId -> { caseId, token, expiresAt, state, stateAt }
   const state = new Map(); // conversationId -> { openBatchId, sent, accepted, count, running, again }
   const stateOf = (conversationId) => {
     if (!state.has(conversationId)) {
@@ -59,6 +90,45 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console, tur
     links.set(linkId, { caseId, token: agentToken, expiresAt: until });
     for (const [id, link] of links) if (link.expiresAt <= Date.now()) links.delete(id);
     return { linkId, caseId, expiresAt: new Date(until).toISOString() };
+  }
+
+  /** A fresh grant for an existing link, so a long conversation keeps syncing. */
+  function renew(linkId, body) {
+    const link = links.get(linkId);
+    if (!link) throw new Error("Unknown link");
+    const { caseId, agentToken, expiresAt } = body ?? {};
+    if (caseId !== link.caseId) throw new Error("caseId does not match the link");
+    if (typeof agentToken !== "string" || !/^[A-Za-z0-9_-]{40,100}$/.test(agentToken)) throw new Error("agentToken is required");
+    const until = Date.parse(expiresAt);
+    if (!Number.isFinite(until) || until <= Date.now()) throw new Error("expiresAt must be in the future");
+    Object.assign(link, { token: agentToken, expiresAt: until });
+    return { linkId, caseId, expiresAt: new Date(until).toISOString() };
+  }
+
+  /**
+   * What Paxi needs from the case, read at most every few seconds: the answers it already knows,
+   * clarifications the backend still needs, and whether the digital advice was stopped for a
+   * human advisor. `null` once the grant expired.
+   */
+  async function caseState(linkId) {
+    const link = links.get(linkId);
+    if (!link || link.expiresAt <= Date.now()) return null;
+    if (link.state && Date.now() - link.stateAt < CASE_STATE_TTL_MS) return link.state;
+    const context = await call(link, "GET", `/api/cases/${link.caseId}/advisor/extractor-context`);
+    link.state = {
+      known: knownFromCase(context.draft),
+      questions: (context.ambiguities ?? []).filter((a) => a.dialogueStatus === "needs_answer").map((a) => a.question),
+      stop: context.handover?.stopDigitalConversation === true,
+    };
+    link.stateAt = Date.now();
+    return link.state;
+  }
+
+  /** An answer that came from the case is not proposed back to it. */
+  function markKnown(conversationId, fieldId, value) {
+    const s = stateOf(conversationId);
+    s.accepted.set(fieldId, value);
+    s.sent.set(fieldId, value);
   }
 
   /** The link of a conversation, as long as its grant is valid. Never returns the token. */
@@ -214,5 +284,5 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console, tur
     }, turnDebounceMs);
   }
 
-  return { register, linkFor, answersChanged, turnsChanged };
+  return { register, renew, linkFor, caseState, markKnown, answersChanged, turnsChanged };
 }

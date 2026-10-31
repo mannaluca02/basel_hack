@@ -184,3 +184,81 @@ test("the call history goes to the case once per turn, again only when a turn gr
   ]);
   assert.deepEqual(posted[1].body.turns.map((t) => [t.messageId, t.text]), [["conv_1_c1500", "Ich verdiene 105000 brutto."]]);
 });
+
+test("what the case already knows becomes questionnaire answers", async () => {
+  const { knownFromCase } = await import("./case-bridge.mjs");
+  const draft = {
+    financial: {
+      persons: [{ id: "p1", birthYear: 1984, employmentRateBps: 10000 }, { id: "p2", birthYear: 1986, employmentRateBps: 0 }],
+      expenses: [{ category: "housing", amount: { value: 220000, period: "month" } }],
+    },
+    insurance: {
+      relationship: "married", relationshipSinceYear: 2018, riskAppetite: "low", existingAnnualPillar3aContributionCents: 0,
+      children: [{ kind: "shared" }, { kind: "expected" }],
+      persons: [
+        { personId: "p1", providerSex: 1, grossAnnualIncomeCents: 10000000, withPillar2: true, desiredWorkStopAge: 65 },
+        { personId: "p2", providerSex: 2, grossAnnualIncomeCents: 0, withPillar2: false, desiredWorkStopAge: 64 },
+      ],
+    },
+  };
+  assert.deepEqual(knownFromCase(draft), {
+    annual_gross_income_chf: 100000,
+    partner_annual_gross_income_chf: 0,
+    partner_birth_year: 1986,
+    employment_rate_percent: 100,
+    has_pension_fund: true,
+    desired_retirement_age: 65,
+    sex: "male",
+    civil_status: "married",
+    relationship_since_year: 2018,
+    pillar_3a_annual_contribution_chf: 0,
+    monthly_housing_cost_chf: 2200,
+    risk_appetite: "low",
+    children_count: 1,
+  });
+  assert.deepEqual(knownFromCase({ financial: null, insurance: null }), {});
+});
+
+test("the case state carries clarifications and the stop for a human advisor, read at most every few seconds", async () => {
+  let reads = 0;
+  const fetchImpl = async () => {
+    reads += 1;
+    return json({
+      draft: { financial: null, insurance: null },
+      ambiguities: [
+        { question: "Meinen Sie 2000 Franken pro Monat?", dialogueStatus: "needs_answer" },
+        { question: "Schon beantwortet", dialogueStatus: "awaiting_customer_acceptance" },
+      ],
+      handover: { stopDigitalConversation: true },
+    });
+  };
+  const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl, log: quiet });
+  const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+  const state = await bridge.caseState(linkId);
+  assert.deepEqual(state, { known: {}, questions: ["Meinen Sie 2000 Franken pro Monat?"], stop: true });
+  await bridge.caseState(linkId);
+  assert.equal(reads, 1);
+});
+
+test("a renewed grant keeps the link; another case or an expired grant is refused", () => {
+  const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl: async () => json({}), log: quiet });
+  const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+  const later = new Date(Date.now() + 900_000).toISOString();
+  assert.equal(bridge.renew(linkId, { caseId: CASE_ID, agentToken: "b".repeat(43), expiresAt: later }).expiresAt, later);
+  assert.throws(() => bridge.renew(linkId, { caseId: "0b1c2d3e-4f50-4a61-8b72-9c83d4e5f699", agentToken: TOKEN, expiresAt: later }));
+  assert.throws(() => bridge.renew("unknown", { caseId: CASE_ID, agentToken: TOKEN, expiresAt: later }), /Unknown link/);
+});
+
+test("an answer taken from the case is not proposed back to it", async () => {
+  const fake = backend();
+  const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl: fake.fetchImpl, log: quiet });
+  const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+  const log = conversation(
+    { annual_gross_income_chf: { status: "captured", value: 100000, quote: "100000" } },
+    [{ speaker: "user", text: "Ja, 100000 stimmt." }],
+  );
+  bridge.markKnown("conv_1", "annual_gross_income_chf", 100000);
+  bridge.answersChanged(linkId, log);
+  await settle();
+  assert.equal(fake.requests.length, 0);
+});

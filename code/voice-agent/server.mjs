@@ -251,6 +251,8 @@ function findSession(request, response) {
 }
 
 async function persist(log) {
+  // A linked conversation lives in the encrypted case; no second, unencrypted copy on disk.
+  if (log.caseLink) return;
   try {
     await saveLog(logDirectory, log);
   } catch (error) {
@@ -270,7 +272,7 @@ function fromApp(request, response, next) {
   }
   response.setHeader("Access-Control-Allow-Origin", requestOrigin);
   response.setHeader("Vary", "Origin");
-  response.setHeader("Access-Control-Allow-Methods", "POST");
+  response.setHeader("Access-Control-Allow-Methods", "POST, PUT");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept-Language");
   if (request.method === "OPTIONS") {
     response.status(204).end();
@@ -279,6 +281,15 @@ function fromApp(request, response, next) {
   next();
 }
 app.options("/api/case-link", fromApp);
+app.options("/api/case-link/:linkId", fromApp);
+// The app renews the 15-minute grant while Paxi is open, so a long call keeps syncing.
+app.put("/api/case-link/:linkId", fromApp, (request, response) => {
+  try {
+    response.json(bridge.renew(request.params.linkId, request.body));
+  } catch (error) {
+    response.status(error.message === "Unknown link" ? 404 : 400).json({ error: error.message });
+  }
+});
 app.post("/api/case-link", fromApp, (request, response) => {
   try {
     response.status(201).json(bridge.register(request.body));
@@ -498,16 +509,47 @@ async function runExtraction(log) {
 }
 
 // The browser polls this to update the UI and to give Paxi a quiet note of what is missing.
-app.get("/api/conversations/:sessionId/progress", (request, response) => {
+app.get("/api/conversations/:sessionId/progress", async (request, response) => {
   const session = findSession(request, response);
   if (!session) return;
   const { log } = session;
+  const caseState = log.caseLink ? await caseStateFor(log) : null;
   const since = Number(request.query.since) || 0;
   const changes = Object.entries(log.answers)
     .filter(([, answer]) => (answer.version ?? 0) > since)
     .map(([fieldId, answer]) => ({ fieldId, value: answer.value, status: answer.status }));
-  response.json({ version: log.answersVersion ?? 0, changes, known: knownSummary(log), ...progress(log) });
+  response.json({
+    version: log.answersVersion ?? 0,
+    changes,
+    known: knownSummary(log),
+    ...progress(log),
+    ...(log.caseLink
+      ? { case_linked: caseState !== null, case_questions: caseState?.questions ?? [], stop: caseState?.stop === true }
+      : {}),
+  });
 });
+
+// Takes over what the shared case already knows, so Paxi does not ask for it again, and passes
+// on the case's open clarifications and the stop for a human advisor. `null` once the grant expired.
+async function caseStateFor(log) {
+  const state = await bridge.caseState(log.caseLink.linkId).catch((error) => {
+    console.error("Reading the linked case failed", error.code ?? error.message);
+    return null;
+  });
+  if (!state) return null;
+  const at = new Date().toISOString();
+  for (const [fieldId, raw] of Object.entries(state.known)) {
+    const field = fieldsById.get(fieldId);
+    const answer = log.answers[fieldId];
+    if (!field || !answer || answer.status === "captured") continue;
+    const result = validateAnswer(field, String(raw));
+    if (!result.ok) continue;
+    log.answersVersion = (log.answersVersion ?? 0) + 1;
+    log.answers[fieldId] = { ...answer, value: result.value, status: "captured", source: "case", updatedAt: at, version: log.answersVersion };
+    bridge.markKnown(log.conversationId, fieldId, result.value);
+  }
+  return state;
+}
 
 // "Name: Dario Roth; Wohnort: …" for Paxi's notes.
 function knownSummary(log) {

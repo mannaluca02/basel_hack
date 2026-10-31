@@ -25,10 +25,20 @@ export function isGoodbye(text) {
   return GOODBYE_PATTERN.test(text.replace(/[’]/g, "'"));
 }
 
+/** Clarifications the shared case needs, e.g. an amount said only roughly. */
+function caseQuestionNote(progress) {
+  const questions = progress.case_questions ?? [];
+  return questions.length
+    ? `Pax needs a clarification on what the person said: ${questions.join(" ")} Ask it at the next natural moment, in your own words and in the conversation language.`
+    : "";
+}
+
 /** The quiet note that tells Paxi what is known and what is still missing. */
 export function progressNote(progress) {
+  const clarification = caseQuestionNote(progress);
   if (progress.complete) {
     const planning = progress.open_planning ?? [];
+    if (clarification) return clarification;
     return planning.length
       ? `The core and extended details are complete. If the person has time, find out these details for the calculation, compactly and in plain words: ${planning.join(", ")}. If they want to finish: summarise, propose your plans, say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.`
       : "Everything is complete. Now summarise and check, propose your plans (skill \"Proposing plans\"), then say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.";
@@ -36,6 +46,7 @@ export function progressNote(progress) {
   const open = [...progress.open_core, ...progress.open_extended];
   const priority = progress.open_priority ?? [];
   return [
+    clarification,
     progress.known ? `Already known (never ask again): ${progress.known}.` : "",
     priority.length ? `The app especially needs these next: ${priority.join(", ")}. Steer the conversation there at the next natural moment.` : "",
     `Still open: ${open.join(", ")}. Find these out naturally in the conversation, in whatever order fits. Do not start wrapping up on your own yet. But if the person wants to end, respect it: summarise briefly, propose what you can, and say goodbye without asking anything else.`,
@@ -67,7 +78,7 @@ export async function postJson(baseUrl, path, body) {
  * Polls the server for answers the extractor found in the conversation. Calls onChanges
  * with new answers, and onNote whenever what is open changes, so Paxi gets a quiet note.
  */
-export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, intervalMs = 1500 }) {
+export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, onStop, intervalMs = 1500 }) {
   let version = 0;
   let lastNote = "";
   let latest = null;
@@ -79,9 +90,14 @@ export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, in
       latest = progress;
       if (progress.changes.length) onChanges(progress.changes);
       version = progress.version;
+      // The customer asked for a human advisor: the digital conversation ends right away.
+      if (progress.stop) {
+        onStop?.();
+        return;
+      }
       const note = progressNote(progress);
       // Only the open list matters for the note; known values alone do not trigger a new one.
-      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}|${progress.open_planning}`;
+      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}|${progress.open_planning}|${progress.case_questions}`;
       if (key !== lastNote) {
         lastNote = key;
         onNote(note);
