@@ -90,7 +90,31 @@
     "payout": "Versamento al pensionamento ({{year}})"
   },
   "risks": {
-    "title": "Rischi"
+    "title": "Rischi",
+    "empty": "I rischi compaiono qui non appena la conversazione ne rivela uno.",
+    "open": "Da gestire",
+    "addressed": "Coperti",
+    "pillars": "Pilastri interessati",
+    "gapAmount": {
+      "month": "{{amount}} al mese",
+      "year": "{{amount}} all'anno",
+      "once": "{{amount}} una tantum"
+    },
+    "showInGraphics": "Mostra in Grafici",
+    "severity": {
+      "high": "Rischio elevato",
+      "medium": "Rischio medio",
+      "low": "Rischio basso"
+    },
+    "status": {
+      "needs_data": "Dati mancanti",
+      "addressed": "Coperto"
+    },
+    "announce": {
+      "new": "Nuovo rischio: {{title}}",
+      "updated": "Rischio aggiornato: {{title}}"
+    },
+    "estimatedNote": "≈ stima"
   },
   "chat": {
     "title": "Chat"

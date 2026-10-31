@@ -6,7 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { FakeDataSource, event, progress, risk } from './core/advisor/store/case-testing';
+import { FakeDataSource, chart, event, progress, risk } from './core/advisor/store/case-testing';
 import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/consent';
 import { provideI18nTesting } from './core/i18n/i18n-testing';
@@ -149,6 +149,31 @@ describe('App', () => {
     expect(harness.routeDebugElement?.componentInstance).toBe(graphics);
     await harness.navigateByUrl('/risks');
     expect(harness.routeDebugElement?.componentInstance).toBe(risks);
+  });
+
+  it('jumps from a risk to its chart in the Graphics tab and highlights it', async () => {
+    const { fixture, root, navigate } = await renderShell();
+    const view = root.querySelector('main') as HTMLElement;
+    // jsdom does not lay out or scroll; record where the view is sent instead.
+    view.scrollTo = vi.fn() as typeof view.scrollTo;
+    await navigate('/graphics');
+    await navigate('/risks');
+    source.emit(
+      event('chart', chart({ chartId: 'chart_life' })),
+      event('risk', risk({ relatedChartId: 'chart_life' })),
+    );
+    await fixture.whenStable();
+
+    root.querySelector<HTMLButtonElement>('app-risk-row .toggle')?.click();
+    await fixture.whenStable();
+    root.querySelector<HTMLButtonElement>('app-risk-row .jump')?.click();
+    await fixture.whenStable();
+
+    const target = root.querySelector('app-chart-card[data-chart-id="chart_life"] article');
+    expect(TestBed.inject(Router).url).toBe('/graphics');
+    expect(target?.classList).toContain('targeted');
+    expect(document.activeElement).toBe(target);
+    expect(view.scrollTo).toHaveBeenCalled();
   });
 
   it('restores the scroll position of each tab', async () => {

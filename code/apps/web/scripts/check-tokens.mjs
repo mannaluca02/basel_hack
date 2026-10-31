@@ -22,6 +22,15 @@ const TEXT_PAIRS = [
   ['--text-warning', '--bg-warning'],
   ['--text-error', '--bg-error'],
   ['--text-info', '--bg-info'],
+  // Risk severity as coloured text on the plain and on the tinted (just updated) row.
+  ['--text-error', '--bg-default'],
+  ['--text-warning', '--bg-default'],
+  ['--text-info', '--bg-default'],
+  ['--text-success', '--bg-default'],
+  ['--text-error', '--bg-muted'],
+  ['--text-warning', '--bg-muted'],
+  ['--text-info', '--bg-muted'],
+  ['--text-success', '--bg-muted'],
 ];
 
 const failures = [];

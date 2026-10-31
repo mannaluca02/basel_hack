@@ -1,0 +1,157 @@
+:host {
+  // Width of the severity column; the open panel lines up with the title next to it.
+  --lead: 1.125rem;
+
+  display: block;
+  border-bottom: var(--stroke-border) solid var(--border-soft);
+  transition: background-color 600ms ease-out;
+}
+
+// A risk that just changed is tinted for a moment; the live region says what changed.
+:host(.updated) {
+  background: var(--bg-muted);
+}
+
+.heading {
+  margin: 0;
+  font: inherit;
+}
+
+// The whole row is the disclosure button.
+.toggle {
+  display: grid;
+  grid-template-columns: var(--lead) 1fr auto;
+  align-items: start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem 0.25rem;
+  border: 0;
+  color: var(--text-default);
+  background: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+// The number of filled bars carries the level; the colour only adds to it. The filled colours
+// are the text tokens, checked against --bg-default and --bg-muted (check:tokens).
+.severity {
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+}
+
+.meter {
+  width: var(--lead);
+  height: 1rem;
+}
+
+.meter rect {
+  fill: var(--border-subtle);
+}
+
+.meter rect.filled {
+  fill: currentColor;
+}
+
+.severity[data-severity='high'] {
+  color: var(--text-error);
+}
+
+.severity[data-severity='medium'] {
+  color: var(--text-warning);
+}
+
+.severity[data-severity='low'] {
+  color: var(--text-info);
+}
+
+.severity[data-severity='addressed'] {
+  color: var(--text-success);
+}
+
+.main {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.summary {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.icon,
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+  color: var(--text-muted);
+  transition: transform 200ms ease-out;
+}
+
+.toggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+// Aligned with the title, not with the severity column.
+.panel {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0 0.25rem 1rem calc(0.25rem + var(--lead) + 0.75rem);
+  font-size: 0.9375rem;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.explanation,
+.pillars {
+  margin: 0;
+}
+
+.pillars {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.jump {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  color: var(--text-brand);
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .chevron {
+    transition: none;
+  }
+}
