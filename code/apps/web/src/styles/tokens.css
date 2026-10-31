@@ -140,6 +140,15 @@
   --chart-6: var(--color-chart-red);
   --chart-7: var(--color-chart-silver);
   --chart-8: var(--color-chart-beige);
+
+  /* Pax logo letters in the intro: Pax Green. */
+  --logo-letters: var(--color-brand-pax-green);
+  /* Logo intro before consent: the negative logo on Pax Purple, in both themes. */
+  --intro-bg: var(--color-brand-pax-purple);
+  --intro-dot: var(--color-neutral-white);
+  --intro-eye: var(--color-brand-pax-purple);
+  /* The square the "." grows into on its way to Paxi; Paxi's body is Pax Green. */
+  --intro-paxi: var(--color-brand-pax-green);
 }
 
 @media (min-width: 1024px) {

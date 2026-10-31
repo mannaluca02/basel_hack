@@ -354,8 +354,17 @@
       "body": "You can ask for a human advisor at any time during the conversation: just say so. Complex or far-reaching cases are handed over to a specialist automatically."
     },
     "session": "Your consent applies to this browser tab only and ends when you close it.",
-    "agree": "I have read this notice and agree that my information is processed as described.",
-    "start": "Start advice"
+    "banner": {
+      "text": "Paxi advises you on your pension, with invented details only: please share no real data.",
+      "textVoice": "Paxi talks with you about your pension: microphone and conversation go to OpenAI. Invented details only, please.",
+      "details": "Privacy details",
+      "agree": "I agree",
+      "decline": "I decline",
+      "declined": "Without your consent Paxi cannot advise you."
+    },
+    "details": {
+      "close": "Close"
+    }
   },
   "dock": {
     "open": "Open summary",
@@ -666,5 +675,8 @@
       "application_submitted": "Application submitted",
       "demo_policy": "Demo policy"
     }
+  },
+  "paxi": {
+    "hint": "Tap the microphone at the bottom right to talk to Paxi."
   }
 }

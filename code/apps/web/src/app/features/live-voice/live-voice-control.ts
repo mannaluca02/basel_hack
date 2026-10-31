@@ -25,14 +25,15 @@ const ERROR_LABELS: Readonly<Record<string, string>> = {
 let nextId = 0;
 
 /**
- * The live conversation with Paxi right in the app, above the agent dock: a microphone button
- * that first asks for both consents (voice transfer, AI extraction), then talks over the case
- * backend (`LiveVoice`). While the call runs the same button ends it. What Paxi hears arrives as
- * proposals; the avatar ring shows its activity.
+ * The live conversation with Paxi right in the app, at the right end of the tab bar: a microphone
+ * button that first asks for both consents (voice transfer, AI extraction), then talks over the
+ * case backend (`LiveVoice`). While the call runs the same button ends it. What Paxi hears
+ * arrives as proposals; Paxi shows its activity. "I agree" on the consent banner starts the first
+ * call without this panel (`startPaxiWhenReady`); the button is for every later start and stop.
  *
  * Only shown when the backend offers GPT-Live and the model extraction, and not in the `paxi`
- * configuration, where Paxi talks in its own window. The demo start has no review stand: there a card next to the rail offers to
- * accept what Paxi heard, which also recalculates the scenarios.
+ * configuration, where Paxi talks in its own window. The demo start has no review stand: there a
+ * card above the tab bar offers to accept what Paxi heard, which also recalculates the scenarios.
  */
 @Component({
   selector: 'app-live-voice-control',
@@ -187,11 +188,11 @@ let nextId = 0;
       fill: currentColor;
     }
 
-    // Same tooltip as the rail tabs.
+    // Tooltip above the button, which sits at the right end of the tab bar.
     .label {
       position: absolute;
-      top: 50%;
-      right: calc(100% + 0.5rem);
+      right: 0;
+      bottom: calc(100% + 0.5rem);
       padding: 0.25rem 0.5rem;
       border: var(--stroke-border) solid var(--border-soft);
       border-radius: var(--radius-sm);
@@ -201,7 +202,6 @@ let nextId = 0;
       white-space: nowrap;
       opacity: 0;
       pointer-events: none;
-      transform: translateY(-50%);
       transition: opacity 120ms ease-out;
     }
 
@@ -215,14 +215,14 @@ let nextId = 0;
       }
     }
 
-    // Opens next to the rail, over the Dynamic View.
+    // Opens above the tab bar, over the Dynamic View.
     .panel,
     .error,
     .card {
       position: absolute;
-      right: calc(100% + 0.5rem);
-      bottom: 0;
-      width: min(22rem, calc(100vw - var(--rail-width) - 1.5rem));
+      right: 0;
+      bottom: calc(100% + 0.5rem);
+      width: min(22rem, calc(100vw - 2rem));
       margin: 0;
       padding: 1rem;
       border: var(--stroke-border) solid var(--border-soft);

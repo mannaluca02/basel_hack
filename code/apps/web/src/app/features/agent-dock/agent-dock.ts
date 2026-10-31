@@ -17,12 +17,13 @@ const ACTIVITY_LABELS: Readonly<Record<AgentActivity, string>> = {
 let nextId = 0;
 
 /**
- * The agent at the bottom of the tab rail. The ring around the avatar shows how much of the
- * information for the advice is captured (I09 `ProgressSnapshot`, data capture only, never an
- * insurance score); an outer dotted halo marks an agent error. Tapping the avatar opens the
+ * The agent, sized by its parent (Paxi's stage, FE-28). The ring around the avatar shows how much
+ * of the information for the advice is captured (I09 `ProgressSnapshot`, data capture only, never
+ * an insurance score); an outer dotted halo marks an agent error. Tapping the avatar opens the
  * summary sheet (FE-19).
  *
- * The avatar renderer is projected into the circular slot; until it exists, a placeholder shows.
+ * Paxi (`app-paxi-avatar`) is projected into the slot inside the ring; without projected content
+ * a placeholder shows.
  */
 @Component({
   selector: 'app-agent-dock',
@@ -152,6 +153,14 @@ let nextId = 0;
       border-radius: var(--radius-full);
       color: var(--icon-muted);
       background: var(--bg-muted);
+    }
+
+    // Paxi brings his own body and moves (tilt, nod, lift): no disc, no clipping. His rounded
+    // square stays inside the ring's inner edge at this inset.
+    .face:has(app-paxi-avatar) {
+      inset: 4%;
+      overflow: visible;
+      background: none;
     }
 
     .placeholder {

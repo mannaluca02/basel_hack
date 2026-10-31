@@ -23,6 +23,7 @@ import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/cons
 import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
+import { provideFakePaxAvatar } from './features/paxi/paxi-testing';
 import { stubChartCanvas } from './features/workspace/graphics/graphics-testing';
 
 describe('App', () => {
@@ -40,6 +41,7 @@ describe('App', () => {
         { provide: RouteReuseStrategy, useClass: KeepAliveRouteReuseStrategy },
         { provide: AdvisorDataSource, useValue: source },
         provideI18nTesting(),
+        provideFakePaxAvatar(),
       ],
     }).compileComponents();
   });
@@ -63,9 +65,9 @@ describe('App', () => {
     expect(root.querySelector('.bar source')?.getAttribute('media')).toBe('(prefers-color-scheme: dark)');
   });
 
-  it('renders one link per workspace tab in the rail, Graphics first', async () => {
+  it('renders one link per workspace tab in the tab bar at the bottom, Graphics first', async () => {
     const { root } = await renderShell();
-    const links = root.querySelectorAll('.rail nav a');
+    const links = root.querySelectorAll('.tabbar nav a');
 
     expect(Array.from(links, (a) => a.getAttribute('href'))).toEqual([
       '/graphics',
@@ -89,18 +91,82 @@ describe('App', () => {
     expect(current()).toEqual(['/chat']);
   });
 
-  it('places the agent dock in the rail, outside the Dynamic View', async () => {
+  it('places Paxi in the agent dock on his own layer, outside the Dynamic View', async () => {
     const { root } = await renderShell();
 
-    expect(root.querySelector('.rail > app-agent-dock.dock')).not.toBeNull();
-    expect(root.querySelector('main .dock')).toBeNull();
+    expect(root.querySelector('app-paxi-stage > app-agent-dock.paxi app-paxi-avatar')).not.toBeNull();
+    expect(root.querySelector('main app-agent-dock')).toBeNull();
+    expect(root.querySelector('.tabbar app-agent-dock')).toBeNull();
   });
 
-  it('puts the language switcher at the top of the rail, not in the header', async () => {
+  it('names the product next to the logo', async () => {
     const { root } = await renderShell();
 
-    expect(root.querySelector('.rail > app-language-switcher.in-rail:first-child')).not.toBeNull();
-    expect(root.querySelector('header app-language-switcher')).toBeNull();
+    expect(root.querySelector('header .brand .product')?.textContent).toBe('Digital Advisor');
+  });
+
+  it('offers the language switcher in the header only once Paxi is in the corner', async () => {
+    const { fixture, root, navigate } = await renderShell();
+    await navigate('/graphics');
+    expect(root.querySelector('app-language-switcher')).toBeNull();
+
+    source.emit(event('chart', chart()));
+    await fixture.whenStable();
+
+    expect(root.getAttribute('data-paxi')).toBe('corner');
+    expect(root.querySelector('header app-language-switcher')).not.toBeNull();
+    expect(root.querySelector('.tabbar app-language-switcher')).toBeNull();
+  });
+
+  describe('Paxi (FE-28)', () => {
+    const spot = (root: HTMLElement) => root.getAttribute('data-paxi');
+
+    it('talks in the centre until the shown tab has a chart, risk or info, then keeps the corner', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/chat');
+      expect(spot(root)).toBe('centre');
+
+      // News in another tab, or the conversation itself, does not move Paxi.
+      source.emit(event('transcript', line()), event('chart', chart()));
+      await fixture.whenStable();
+      expect(spot(root)).toBe('centre');
+
+      await navigate('/graphics');
+      expect(spot(root)).toBe('corner');
+
+      await navigate('/chat');
+      expect(spot(root)).toBe('corner');
+    });
+
+    it('moves to the corner for an info item in the Info tab too', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/info');
+      source.emit(event('info', info()));
+      await fixture.whenStable();
+
+      expect(spot(root)).toBe('corner');
+    });
+
+    it('is there right away after a reload with consent: no intro, no banner', async () => {
+      const { root } = await renderShell();
+
+      expect(root.querySelector('app-logo-intro')).toBeNull();
+      expect(root.querySelector('app-consent-banner')).toBeNull();
+      expect(root.querySelector('app-paxi-stage')?.classList).not.toContain('veiled');
+      expect(root.querySelector('app-paxi-stage')?.hasAttribute('inert')).toBe(false);
+      expect(source.connectionState.value).toBe('connected');
+    });
+
+    it("shows Paxi's latest line as a caption", async () => {
+      const { fixture, root } = await renderShell();
+      source.emit(
+        event('transcript', line({ entryId: 'entry_1', speaker: 'agent', text: 'Grüezi' })),
+        event('transcript', line({ entryId: 'entry_2', speaker: 'customer', text: 'Hallo' })),
+      );
+      await fixture.whenStable();
+
+      expect(root.querySelector('app-paxi-stage .caption')?.textContent).toBe('Grüezi');
+    });
   });
 
   it('feeds live progress and agent activity into the dock', async () => {
@@ -125,7 +191,7 @@ describe('App', () => {
     const link = (root: HTMLElement, path: string) =>
       root.querySelector(`a[href="${path}"]`) as HTMLElement;
     const dotted = (root: HTMLElement) =>
-      Array.from(root.querySelectorAll('.rail nav a:has(.dot)'), (a) => a.getAttribute('href'));
+      Array.from(root.querySelectorAll('.tabbar nav a:has(.dot)'), (a) => a.getAttribute('href'));
 
     it('marks news in another tab with a dot until that tab is shown', async () => {
       const { fixture, root, navigate } = await renderShell();
@@ -165,7 +231,7 @@ describe('App', () => {
       source.emit(event('risk', risk({ status: 'identified' })));
       await fixture.whenStable();
       expect(dotted(root)).toEqual(['/risks']);
-      // No count in the rail: the Risks tab lists open and addressed risks itself.
+      // No count in the tab bar: the Risks tab lists open and addressed risks itself.
       expect(link(root, '/risks').querySelector('.badge')).toBeNull();
 
       await navigate('/risks');
@@ -293,6 +359,7 @@ describe('App review stand', () => {
           useValue: { production: false, apiBaseUrl: '/api', dataSource },
         },
         provideI18nTesting(),
+        provideFakePaxAvatar(),
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(App);
@@ -330,6 +397,7 @@ describe('App voice per configuration', () => {
           useValue: { production: false, apiBaseUrl: '/api', ...environment },
         },
         provideI18nTesting(),
+        provideFakePaxAvatar(),
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(App);
@@ -361,24 +429,24 @@ describe('App voice per configuration', () => {
 
   it('links the contract journey against the backend, not in the scripted mock', async () => {
     const api = await renderWith({ dataSource: 'api', demoStart: true });
-    expect(api.querySelector('.rail a[href="/journey"]')).not.toBeNull();
+    expect(api.querySelector('.tabbar a[href="/journey"]')).not.toBeNull();
     TestBed.resetTestingModule();
     const mock = await renderWith({ dataSource: 'mock' });
-    expect(mock.querySelector('.rail a[href="/journey"]')).toBeNull();
+    expect(mock.querySelector('.tabbar a[href="/journey"]')).toBeNull();
   });
 
   it('links the Voice Lab only in the debug configurations', async () => {
     const root = await renderWith({ dataSource: 'api', demoStart: true });
 
-    expect(root.querySelector('.rail a[href="/voice-lab"]')).toBeNull();
-    expect(root.querySelector('.rail a[href="/insights"]')).toBeNull();
+    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).toBeNull();
+    expect(root.querySelector('.tabbar a[href="/insights"]')).toBeNull();
   });
 
-  it('adds the Voice Lab tab to the rail with debugVoice', async () => {
+  it('adds the Voice Lab tab to the tab bar with debugVoice', async () => {
     const root = await renderWith({ dataSource: 'api', demoStart: true, debugVoice: true });
 
-    expect(root.querySelector('.rail a[href="/voice-lab"]')).not.toBeNull();
-    expect(root.querySelector('.rail a[href="/insights"]')).not.toBeNull();
+    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).not.toBeNull();
+    expect(root.querySelector('.tabbar a[href="/insights"]')).not.toBeNull();
   });
 });
 
@@ -388,6 +456,13 @@ describe('App before consent', () => {
   beforeEach(async () => {
     localStorage.clear();
     sessionStorage.clear();
+    // jsdom has no modal dialogs; "Details" only needs the open state.
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      this.open = false;
+    };
     source = new FakeDataSource();
     await TestBed.configureTestingModule({
       imports: [App],
@@ -395,6 +470,7 @@ describe('App before consent', () => {
         provideRouter(routes),
         { provide: AdvisorDataSource, useValue: source },
         provideI18nTesting(),
+        provideFakePaxAvatar(),
       ],
     }).compileComponents();
   });
@@ -404,18 +480,42 @@ describe('App before consent', () => {
     await TestBed.inject(Router).navigateByUrl('/risks');
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
-    const checkbox = () => root.querySelector('app-consent-screen input') as HTMLInputElement;
-    const startButton = () => root.querySelector('app-consent-screen button') as HTMLButtonElement;
-    return { fixture, root, checkbox, startButton };
+    const banner = () => root.querySelector('app-consent-banner');
+    const button = (action: 'agree' | 'decline') =>
+      root.querySelector(`app-consent-banner [data-action="${action}"]`) as HTMLButtonElement;
+    const agree = async () => {
+      button('agree').click();
+      await fixture.whenStable();
+    };
+    return { fixture, root, banner, button, agree };
   }
 
-  it('shows only the privacy notice: no workspace, no tabs, no call', async () => {
-    const { root } = await render();
+  it('shows only the logo intro and the consent banner: no workspace, no tabs, no call', async () => {
+    const { root, banner, button } = await render();
 
-    expect(root.querySelector('h1')?.textContent).toBe('Bevor wir starten');
-    expect(
-      Array.from(root.querySelectorAll('app-consent-screen h2'), (h) => h.textContent),
-    ).toEqual([
+    expect(root.querySelector('app-logo-intro')).not.toBeNull();
+    expect(banner()?.querySelector('.text')?.textContent).toContain('erfundenen Angaben');
+    expect(button('agree').textContent?.trim()).toBe('Ich stimme zu');
+    expect(button('decline').textContent?.trim()).toBe('Ich lehne ab');
+    expect(root.querySelector('.tabbar')).toBeNull();
+    expect(root.querySelector('app-paxi-stage')).toBeNull();
+    expect(root.querySelector('router-outlet')).toBeNull();
+    // The language switcher waits until Paxi is in the corner.
+    expect(root.querySelector('app-language-switcher')).toBeNull();
+    expect(source.connectionState.value).toBe('disconnected');
+  });
+
+  it('opens the six sections of the privacy notice under "Details"', async () => {
+    const { fixture, banner } = await render();
+    const details = banner()?.querySelector('dialog') as HTMLDialogElement;
+    expect(details.open).toBe(false);
+
+    (banner()?.querySelector('.link') as HTMLButtonElement).click();
+    await fixture.whenStable();
+
+    expect(details.open).toBe(true);
+    expect(details.querySelector('h2')?.textContent).toBe('Bevor wir starten');
+    expect(Array.from(details.querySelectorAll('section h3'), (h) => h.textContent)).toEqual([
       'Was aufgezeichnet wird',
       'Eine KI ist beteiligt',
       'Erfundene Gesprächsausschnitte an OpenAI',
@@ -423,11 +523,26 @@ describe('App before consent', () => {
       'Dies ist eine Demo',
       'Ein Mensch ist jederzeit erreichbar',
     ]);
-    expect(root.querySelector('.rail')).toBeNull();
-    expect(root.querySelector('router-outlet')).toBeNull();
-    // No rail yet, so the language can be chosen in the header before consenting.
-    expect(root.querySelector('header app-language-switcher:not(.in-rail)')).not.toBeNull();
-    expect(source.connectionState.value).toBe('disconnected');
+  });
+
+  it('closes "Details" with ×, and with a click on the backdrop but not inside the notice', async () => {
+    const { fixture, banner } = await render();
+    const details = banner()?.querySelector('dialog') as HTMLDialogElement;
+    const open = async () => {
+      (banner()?.querySelector('.link') as HTMLButtonElement).click();
+      await fixture.whenStable();
+    };
+
+    await open();
+    (details.querySelector('.close') as HTMLButtonElement).click();
+    expect(details.open).toBe(false);
+
+    await open();
+    (details.querySelector('.section') as HTMLElement).click();
+    expect(details.open).toBe(true);
+    // The backdrop is part of the dialog's own box: the click targets the dialog itself.
+    details.click();
+    expect(details.open).toBe(false);
   });
 
   it.each([
@@ -438,12 +553,12 @@ describe('App before consent', () => {
   ] as const)(
     '%s: names OpenAI, invented content and extraction, apart from the calculator',
     async (lang, extraction, noRelease) => {
-      const { fixture, root } = await render();
+      const { fixture, banner } = await render();
       await TestBed.inject(AppLanguage).use(lang);
       await fixture.whenStable();
 
       const sections = Array.from(
-        root.querySelectorAll('app-consent-screen section'),
+        banner()?.querySelectorAll('dialog section') ?? [],
         (section) => section.textContent ?? '',
       );
       const model = sections.find((text) => text.includes('OpenAI'));
@@ -459,50 +574,49 @@ describe('App before consent', () => {
   it('asks again when the stored consent refers to an earlier notice', async () => {
     sessionStorage.setItem(CONSENT_STORAGE_KEY, '1');
 
-    const { root } = await render();
+    const { banner } = await render();
 
     expect(CONSENT_NOTICE_VERSION).not.toBe('1');
-    expect(root.querySelector('app-consent-screen')).not.toBeNull();
+    expect(banner()).not.toBeNull();
     expect(source.connectionState.value).toBe('disconnected');
   });
 
-  it('enables "Start advice" only while the box is ticked', async () => {
-    const { fixture, checkbox, startButton } = await render();
-    expect(startButton().textContent?.trim()).toBe('Beratung starten');
-    expect(startButton().disabled).toBe(true);
+  it('keeps the banner after "I decline", says why, and processes nothing', async () => {
+    const { fixture, banner, button } = await render();
 
-    checkbox().click();
+    button('decline').click();
     await fixture.whenStable();
-    expect(startButton().disabled).toBe(false);
 
-    checkbox().click();
-    await fixture.whenStable();
-    expect(startButton().disabled).toBe(true);
+    expect(banner()?.querySelector('.declined')?.textContent?.trim()).toBe(
+      'Ohne Ihre Einwilligung kann Paxi Sie nicht beraten.',
+    );
+    expect(banner()?.querySelector('.declined')?.getAttribute('role')).toBe('status');
     expect(sessionStorage.getItem(CONSENT_STORAGE_KEY)).toBeNull();
+    expect(source.connectionState.value).toBe('disconnected');
+
+    // Still possible to agree afterwards.
+    expect(button('agree').disabled).toBe(false);
   });
 
-  it('after consent stores it for the session, starts the call and opens the requested tab', async () => {
-    const { fixture, root, checkbox, startButton } = await render();
+  it('after "I agree" stores the consent, connects, wakes Paxi and opens the requested tab', async () => {
+    const { root, banner, agree } = await render();
 
-    checkbox().click();
-    await fixture.whenStable();
-    startButton().click();
-    await fixture.whenStable();
+    await agree();
 
     expect(sessionStorage.getItem(CONSENT_STORAGE_KEY)).toBe(CONSENT_NOTICE_VERSION);
     expect(localStorage.getItem(CONSENT_STORAGE_KEY)).toBeNull();
     expect(source.connectionState.value).toBe('connected');
-    expect(root.querySelector('app-consent-screen')).toBeNull();
+    expect(banner()).toBeNull();
+    // Without the Web Animations API the intro hands over at once.
+    expect(root.querySelector('app-logo-intro')).toBeNull();
+    expect(root.querySelector('app-paxi-stage')?.classList).not.toContain('veiled');
     expect(root.querySelector('main app-risks-tab h1')?.textContent).toBe('Risiken');
     expect(document.activeElement).toBe(root.querySelector('main'));
   });
 
   it('treats the tab requested before consent as shown: its news gets no dot', async () => {
-    const { fixture, root, checkbox, startButton } = await render();
-    checkbox().click();
-    await fixture.whenStable();
-    startButton().click();
-    await fixture.whenStable();
+    const { fixture, root, agree } = await render();
+    await agree();
 
     source.emit(event('risk', risk({ status: 'identified' })));
     await fixture.whenStable();
@@ -512,29 +626,63 @@ describe('App before consent', () => {
   });
 
   it('shows the Demo badge before and after consent', async () => {
-    const { fixture, root, checkbox, startButton } = await render();
+    const { root, agree } = await render();
     const badge = () => root.querySelector('header .demo');
     expect(badge()?.querySelector('[aria-hidden="true"]')?.textContent).toBe('Demo');
     expect(badge()?.querySelector('.visually-hidden')?.textContent).toBe(
       'Demo mit synthetischen Daten',
     );
 
-    checkbox().click();
-    await fixture.whenStable();
-    startButton().click();
-    await fixture.whenStable();
+    await agree();
 
     expect(badge()).not.toBeNull();
   });
 
-  it('translates the notice without reload', async () => {
-    const { fixture, root, startButton } = await render();
+  it('translates the banner and the notice without reload', async () => {
+    const { fixture, banner, button } = await render();
 
     await TestBed.inject(AppLanguage).use('it');
     await fixture.whenStable();
 
-    expect(root.querySelector('h1')?.textContent).toBe('Prima di iniziare');
-    expect(startButton().textContent?.trim()).toBe('Avvia la consulenza');
+    expect(banner()?.querySelector('dialog h2')?.textContent).toBe('Prima di iniziare');
+    expect(button('agree').textContent?.trim()).toBe('Accetto');
+  });
+
+  it('does not mention the microphone where "I agree" starts no live voice', async () => {
+    const { banner } = await render();
+
+    expect(banner()?.querySelector('.text')?.textContent).not.toContain('Mikrofon');
+  });
+});
+
+describe('App before consent, with the live voice', () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AdvisorDataSource, useValue: new FakeDataSource() },
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart: true },
+        },
+        provideI18nTesting(),
+        provideFakePaxAvatar(),
+      ],
+    }).compileComponents();
+  });
+
+  it('says that "I agree" sends microphone and conversation to OpenAI', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const text = (fixture.nativeElement as HTMLElement).querySelector('app-consent-banner .text');
+
+    expect(text?.textContent).toContain('Mikrofon und Gespräch gehen an OpenAI');
+    expect(text?.textContent).not.toContain('keine echten Daten');
   });
 });
 
@@ -562,6 +710,7 @@ describe('App during the scripted mock call', () => {
           useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
         },
         provideI18nTesting(),
+        provideFakePaxAvatar(),
       ],
     });
     // The scripted call fills the Graphics tab; ECharts cannot draw in jsdom.
@@ -593,7 +742,7 @@ describe('App during the scripted mock call', () => {
       await settle();
     };
     const marked = () =>
-      Array.from(root.querySelectorAll('.rail nav a:has(.dot)'), (a) => a.getAttribute('href'));
+      Array.from(root.querySelectorAll('.tabbar nav a:has(.dot)'), (a) => a.getAttribute('href'));
     await navigate('/graphics');
 
     // The call clock started with the App, which connects right away after consent.

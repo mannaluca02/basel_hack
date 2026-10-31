@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   ElementRef,
   Injector,
   afterNextRender,
@@ -28,12 +29,14 @@ import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { ViewScroller } from './core/layout/view-scroller';
-import { AgentDock } from './features/agent-dock/agent-dock';
-import { DockAvatar } from './features/agent-dock/dock-avatar';
-import { ConsentScreen } from './features/consent/consent-screen';
+import { PaxiPlacement, PaxiSpot } from './core/paxi/paxi-placement';
+import { ConsentBanner } from './features/consent/consent-banner';
 import { ConnectionBanner } from './features/connection/connection-banner';
 import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
 import { CallControls } from './features/call-controls/call-controls';
+import { LogoIntro } from './features/intro/logo-intro';
+import type { LogoIntro as Intro } from './features/intro/logo-intro';
+import { PaxiStage } from './features/paxi/paxi-stage';
 import { SummaryDialog } from './features/summary/summary-dialog';
 import { VoiceAgentLink } from './core/advisor/api/voice-agent-link';
 import { VoiceActivity } from './core/voice/voice-activity';
@@ -49,6 +52,12 @@ interface TabLink {
   readonly icon: string;
 }
 
+/**
+ * `intro`: the sleeping logo with the consent banner; `waking`: after "I agree", the "." flies
+ * onto Paxi; `ready`: the workspace with Paxi.
+ */
+type Phase = 'intro' | 'waking' | 'ready';
+
 @Component({
   imports: [
     RouterOutlet,
@@ -56,9 +65,9 @@ interface TabLink {
     RouterLinkActive,
     TranslocoPipe,
     LanguageSwitcher,
-    ConsentScreen,
-    AgentDock,
-    DockAvatar,
+    ConsentBanner,
+    LogoIntro,
+    PaxiStage,
     ConnectionBanner,
     HumanAdvisorStatus,
     CallControls,
@@ -68,7 +77,7 @@ interface TabLink {
   ],
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[class.gated]': '!consented()' },
+  host: { '[class.gated]': '!consented()', '[attr.data-paxi]': 'spot()' },
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
@@ -76,8 +85,14 @@ export class App {
   private readonly store = inject(CaseStore);
   private readonly consent = inject(Consent);
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
   private readonly scroller = inject(ViewScroller);
+  private readonly placement = inject(PaxiPlacement);
+  private readonly env = inject(APP_ENVIRONMENT);
   private readonly view = viewChild<ElementRef<HTMLElement>>('view');
+  // By name: a class locator would pull the deferred intro into the first bundle.
+  private readonly intro = viewChild<Intro>('intro');
+  private readonly stage = viewChild(PaxiStage);
   /** Scroll offset of the Dynamic View per tab path. */
   private readonly scrollTops = new Map<string, number>();
 
@@ -93,42 +108,65 @@ export class App {
     },
   ];
 
-  /** Until the user consents, only the privacy notice is shown: no workspace, no call. */
+  /** Until the user consents, only the logo intro and the consent banner show: no workspace, no call. */
   protected readonly consented = this.consent.granted;
+  /** Consent from earlier in this browser tab skips the intro: Paxi is there right away. */
+  private readonly phase = signal<Phase>(this.consented() ? 'ready' : 'intro');
+  protected readonly introShown = computed(() => this.phase() !== 'ready');
+  /** Paxi shows once the waking "." lands on him. */
+  protected readonly revealed = signal(this.consented());
 
   /**
    * The review stand needs the real case service; the scripted mock has no packages to decide,
    * and the demo start comes with an already confirmed case.
    */
-  protected readonly reviewEnabled =
-    inject(APP_ENVIRONMENT).dataSource === 'api' && !inject(APP_ENVIRONMENT).demoStart;
+  protected readonly reviewEnabled = this.env.dataSource === 'api' && !this.env.demoStart;
 
   /** The tab the router shows; `null` while the URL names no tab (before the first redirect). */
-  private readonly activeTab = signal<WorkspaceTab | null>(null);
+  private readonly activeTab = this.placement.tab;
   /** Items added or changed per tab since it was last shown: the live update dots (FE-21). */
   protected readonly unread = this.store.unread;
 
-  /** Data capture for the ring around the avatar. */
+  /** Data capture for the ring around Paxi. */
   protected readonly progress = this.store.progress;
   private readonly paxi = inject(VoiceAgentLink);
-  private readonly live = inject(VoiceActivity).live;
+  private readonly voice = inject(VoiceActivity);
   /** Paxi's activity while it talks here or in its own window, else the advisor's. */
   protected readonly activity = computed(
     () =>
-      this.live() ??
+      this.voice.live() ??
       (this.paxi.state() === 'opened' ? this.paxi.activity() : this.store.agent().activity),
+  );
+  protected readonly audio = this.voice.audio;
+  /** Paxi's latest line: from the running call, else from the conversation so far. */
+  protected readonly caption = computed(() => {
+    const live = this.voice.caption();
+    if (live) return live;
+    const said = [...this.store.transcript()].reverse().find((line) => line.speaker === 'agent');
+    return said?.text ?? null;
+  });
+  /** Paxi stays in the centre until the intro has landed, then makes room for the content. */
+  protected readonly spot = computed<PaxiSpot>(() =>
+    this.phase() === 'ready' ? this.placement.spot() : 'centre',
   );
 
   /** The live voice needs the case service; the scripted mock has no voice sessions. */
-  protected readonly liveVoice = inject(APP_ENVIRONMENT).dataSource === 'api';
+  protected readonly liveVoice = this.env.dataSource === 'api';
   /**
    * The call bar drives the scripted call (mock) or Paxi's window (`paxi` configuration); with the
    * backend otherwise, the live voice's microphone button is the call control.
    */
-  protected readonly callControls =
-    inject(APP_ENVIRONMENT).dataSource === 'mock' || !!inject(APP_ENVIRONMENT).voiceAgentUrl;
+  protected readonly callControls = this.env.dataSource === 'mock' || !!this.env.voiceAgentUrl;
+  /** "I agree" starts the live voice in the app; not in the `paxi` configuration (own window). */
+  protected readonly autoCall = this.liveVoice && !this.env.voiceAgentUrl;
+  /** "I agree" is about to start the call: no hint meanwhile. */
+  private readonly callPending = signal(false);
+  /** No call runs and none is about to start (after a reload, or a call ended): say how to start one. */
+  protected readonly hint = computed(
+    () => this.autoCall && !this.callPending() && this.voice.live() === null,
+  );
   /** Link to the Voice Lab, only in the debug configurations. */
-  protected readonly debugVoice = inject(APP_ENVIRONMENT).debugVoice === true;
+  protected readonly debugVoice = this.env.debugVoice === true;
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll
@@ -178,14 +216,59 @@ export class App {
     if (this.consented()) this.store.connect();
   }
 
+  /** "I agree": store the consent, connect, start the call in this click, wake Paxi. */
   protected start(): void {
+    // A second click before the banner is gone must not start a second call or wake-up.
+    if (this.phase() !== 'intro') return;
     this.consent.grant();
     this.store.connect();
-    // The consent screen and its button are gone: continue in the workspace, not on <body>.
+    if (this.autoCall) this.callPaxi();
+    this.phase.set('waking');
+    // The workspace with Paxi renders under the intro; then the "." knows where to land. The
+    // wake-up measures both and then animates, hence one mixed read/write callback.
+    afterNextRender(
+      () => {
+        const intro = this.intro();
+        const stage = this.stage();
+        if (!intro || !stage) return this.landed();
+        // Whatever happens to the animation, the app must not stay locked under the intro.
+        intro
+          .wake(stage.bodyRect(), () => this.revealed.set(true))
+          .catch(() => undefined)
+          .finally(() => this.landed());
+      },
+      { injector: this.injector },
+    );
+  }
+
+  private landed(): void {
+    this.revealed.set(true);
+    this.phase.set('ready');
+    // The banner and its button are gone: continue in the workspace, not on <body>.
     afterNextRender(
       { write: () => this.view()?.nativeElement.focus() },
       { injector: this.injector },
     );
+  }
+
+  /**
+   * The microphone prompt belongs to the click; the voice code loads in its own chunk and starts
+   * once the case is ready.
+   */
+  private callPaxi(): void {
+    this.callPending.set(true);
+    // Released at once, the call opens its own stream; a refusal shows when the call starts.
+    this.document.defaultView?.navigator.mediaDevices
+      ?.getUserMedia({ audio: true })
+      .then((stream) => stream.getTracks().forEach((track) => track.stop()))
+      .catch(() => undefined);
+    const done = () => this.callPending.set(false);
+    // Offline or replaced chunks: no call, but the hint points to the microphone button.
+    Promise.all([import('./core/voice/live-voice'), import('./core/paxi/paxi-call')])
+      .then(([{ LiveVoice }, { startPaxiWhenReady }]) =>
+        startPaxiWhenReady(this.injector.get(LiveVoice), this.injector, done),
+      )
+      .catch(done);
   }
 
   private tabAt(url: string): WorkspaceTab | null {

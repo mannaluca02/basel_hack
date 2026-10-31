@@ -147,7 +147,7 @@ describe('LiveVoiceControl', () => {
       expect.objectContaining({ noticeHash: 'hash', allowSyntheticModelExtraction: true }),
     ]);
     expect(microphone).toHaveBeenCalledOnce();
-    // The panel closed; the denied microphone is readable next to the rail.
+    // The panel closed; the denied microphone is readable above the tab bar.
     expect(start()).toBeNull();
     expect(element().querySelector('[role="alert"]')!.textContent).toContain(
       'Website-Einstellungen',

@@ -354,8 +354,17 @@
       "body": "Durante il colloquio può chiedere in qualsiasi momento una consulente o un consulente: basta dirlo. I casi complessi o con conseguenze importanti vengono trasmessi automaticamente a uno specialista."
     },
     "session": "Il suo consenso vale solo per questa scheda del browser e termina quando la chiude.",
-    "agree": "Ho letto questa informativa e accetto che i miei dati vengano trattati come descritto.",
-    "start": "Avvia la consulenza"
+    "banner": {
+      "text": "Paxi la consiglia sulla sua previdenza, solo con indicazioni inventate: non comunichi dati reali.",
+      "textVoice": "Paxi parla con lei della sua previdenza: microfono e colloquio vanno a OpenAI. Solo indicazioni inventate, per favore.",
+      "details": "Dettagli sulla protezione dei dati",
+      "agree": "Accetto",
+      "decline": "Rifiuto",
+      "declined": "Senza il suo consenso Paxi non può consigliarla."
+    },
+    "details": {
+      "close": "Chiudi"
+    }
   },
   "dock": {
     "open": "Apri il riepilogo",
@@ -666,5 +675,8 @@
       "application_submitted": "Proposta inviata",
       "demo_policy": "Polizza demo"
     }
+  },
+  "paxi": {
+    "hint": "Tocchi il microfono in basso a destra per parlare con Paxi."
   }
 }

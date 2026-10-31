@@ -1,9 +1,13 @@
 // Demo page: wires paxi-voice.js to Lukas's avatar and a small test UI.
+import { requestMicrophonePermission, setupIntro } from "./intro.js";
 import { createPaxiVoice } from "./paxi-voice.js";
 import { createPaxAvatar, EMOTIONS } from "/avatar/pax-avatar.js";
 
 const $ = (id) => document.getElementById(id);
 const TURN_GAP_MS = 1200;
+
+// The sleeping dot only shows its closed eyes once the microphone is allowed.
+const warmUpMicrophone = () => requestMicrophonePermission().then((allowed) => allowed && document.documentElement.classList.add("mic-ready"));
 
 const questionnaire = await fetch("/api/questionnaire").then((response) => response.json());
 $("questionnaire-title").textContent = questionnaire.title;
@@ -206,10 +210,12 @@ let noticeAccepted = false;
 $("notice-accept")?.addEventListener("click", () => {
   noticeAccepted = true;
   $("notice").hidden = true;
+  warmUpMicrophone();
 });
 if (noticeNeeded) $("notice").hidden = false;
+else warmUpMicrophone();
 
-$("avatar").addEventListener("click", () => {
+function startConversation() {
   if (paxi.running) return;
   if (noticeNeeded && !noticeAccepted) {
     $("notice").hidden = false;
@@ -226,7 +232,10 @@ $("avatar").addEventListener("click", () => {
   }
   avatar.reset();
   paxi.start({ resume, priorities: [...priorities] }).catch(() => {});
-});
+}
+
+$("avatar").addEventListener("click", startConversation);
+setupIntro(startConversation);
 $("stop").addEventListener("click", () => paxi.stop());
 
 // Simulates a chart from the calculation appearing mid-conversation: Paxi finishes the

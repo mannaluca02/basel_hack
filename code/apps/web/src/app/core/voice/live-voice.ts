@@ -251,6 +251,11 @@ export class LiveVoice {
 
   constructor() {
     effect(() => this.ring.live.set(this.active() ? this.activity() : null));
+    // Paxi in the shell shows his latest line, without loading this chunk.
+    effect(() => {
+      const said = [...this.dialogue()].reverse().find((line) => line.speaker === 'agent');
+      this.ring.caption.set(this.active() && said ? said.text : null);
+    });
     this.store.digitalStops.pipe(takeUntilDestroyed()).subscribe((command) => {
       if (command.reason === 'session-ended') {
         this.handoverControl.synchronizeSession();
