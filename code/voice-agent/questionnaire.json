@@ -1,19 +1,22 @@
 {
   "id": "pax-customer-portfolio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "locale": "de-CH",
   "title": "Pax Kundenportfolio – benötigte Angaben",
-  "description": "Everything Pax needs to know about a customer for the pension and risk analysis (LifeMap), collected in one place. Paxi collects the 'core' fields in the first conversation and 'extended' fields when they come up naturally. 'suitability' fields are the legally required suitability check (Angemessenheitsprüfung) before an investment-linked insurance; Paxi never asks them, a Pax colleague does. contractPath points to the shared contracts on feature/life-insurance-live-backend (code/packages/contracts).",
+  "description": "Everything Pax needs to know about a customer for the pension and risk analysis (LifeMap), collected in one place. Paxi collects the 'core' fields in the first conversation and 'extended' fields when they come up naturally. 'planning' fields are what the backend needs for the calculation; 'colleague' and 'suitability' fields are the legally required suitability check (Angemessenheitsprüfung) before an investment-linked insurance; Paxi never asks them, a Pax colleague does. contractPath points to the shared contracts on feature/life-insurance-live-backend (code/packages/contracts).",
   "tiers": {
     "core": "Paxi collects these in the first conversation.",
-    "extended": "Paxi picks these up when they fit the conversation; a colleague completes the rest.",
+    "extended": "Paxi picks these up when they fit the conversation; it does not wrap up before they are known or handed to a colleague.",
+    "planning": "Planning details the backend needs for the calculation (intakeQuestions in packages/domain on main). Paxi asks them after the core and extended details if the person has time; otherwise a colleague completes them.",
+    "colleague": "Technical calculation assumptions; a Pax colleague sets them together with the person. Paxi never asks them.",
     "suitability": "Only a Pax colleague asks these, before an investment-linked product."
   },
   "sources": {
     "contracts": "code/packages/contracts/src (feature/life-insurance-live-backend): InsuranceIntakeSchema, InsurancePersonSchema, PersonSchema, GoalSchema",
     "pension_analysis": "documentation/challenge_material/pax-vorsorgeanalyse-einzelperson.pdf (Personenangaben)",
     "public_analysis": "documentation/baselhack/references/public-pension-analysis/inputs/fictitious-family.json",
-    "suitability_check": "documentation/challenge_material/pax-angemessenheitspruefung.pdf (sections A to C)"
+    "suitability_check": "documentation/challenge_material/pax-angemessenheitspruefung.pdf (sections A to C)",
+    "main_intake": "code/packages/domain/src/life-insurance.ts intakeQuestions() and question.* texts in code/apps/api/src/insurance/messages.ts on main"
   },
   "sections": [
     {
@@ -67,10 +70,11 @@
       "type": "date",
       "question": "Wie alt bist du eigentlich? Danach: Und wann hast du Geburtstag?",
       "required": true,
-      "contractPath": "PersonSchema.birthYear",
+      "contractPath": "financial.persons.*.birthYear",
       "source": [
         "pension_analysis",
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -81,10 +85,11 @@
       "type": "string",
       "question": "Wo wohnst du eigentlich?",
       "required": true,
-      "contractPath": "InsuranceIntakeSchema.taxLocationId",
+      "contractPath": "insurance.taxLocationId",
       "source": [
         "public_analysis",
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -99,10 +104,11 @@
       ],
       "question": "Nur fürs Rechnen der Tarife: Soll ich dich als Frau oder als Mann erfassen?",
       "required": true,
-      "contractPath": "InsurancePersonSchema.providerSex",
+      "contractPath": "insurance.persons.*.providerSex",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -133,10 +139,11 @@
       ],
       "question": "Bist du in einer Beziehung, verheiratet oder single?",
       "required": true,
-      "contractPath": "InsuranceIntakeSchema.relationship",
+      "contractPath": "insurance.relationship",
       "source": [
         "pension_analysis",
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -149,10 +156,11 @@
       "max": 2100,
       "question": "Seit wann seid ihr zusammen?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.relationshipSinceYear",
+      "contractPath": "insurance.relationshipSinceYear",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -165,10 +173,11 @@
       "max": 2100,
       "question": "Wie alt ist dein Partner oder deine Partnerin?",
       "required": false,
-      "contractPath": "PersonSchema.birthYear (persons[1])",
+      "contractPath": "financial.persons.1.birthYear",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -179,10 +188,11 @@
       "type": "money",
       "question": "Arbeitet dein Partner oder deine Partnerin auch? Ungefähr wie viel verdient er oder sie im Jahr?",
       "required": false,
-      "contractPath": "InsurancePersonSchema.grossAnnualIncomeCents (persons[1])",
+      "contractPath": "insurance.persons.1.grossAnnualIncomeCents",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -195,10 +205,11 @@
       "max": 20,
       "question": "Hast du Kinder?",
       "required": true,
-      "contractPath": "InsuranceIntakeSchema.children",
+      "contractPath": "insurance.sharedChildren",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -209,10 +220,11 @@
       "type": "string",
       "question": "Wie alt sind deine Kinder?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.children[].birthYear",
+      "contractPath": "insurance.children.*.birthYear",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -223,9 +235,10 @@
       "type": "boolean",
       "question": "Ist Nachwuchs ein Thema bei euch?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.children[].kind = expected",
+      "contractPath": "insurance.children.* (kind expected)",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -270,9 +283,10 @@
       "max": 100,
       "question": "Arbeitest du Vollzeit oder Teilzeit?",
       "required": true,
-      "contractPath": "PersonSchema.employmentRateBps",
+      "contractPath": "financial.persons.*.employmentRateBps",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -283,11 +297,12 @@
       "type": "money",
       "question": "Ungefähr wie viel verdienst du im Jahr, brutto?",
       "required": true,
-      "contractPath": "InsurancePersonSchema.grossAnnualIncomeCents",
+      "contractPath": "insurance.persons.*.grossAnnualIncomeCents",
       "source": [
         "pension_analysis",
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -312,10 +327,11 @@
       "type": "boolean",
       "question": "Bist du bei deinem Arbeitgeber in einer Pensionskasse?",
       "required": true,
-      "contractPath": "InsurancePersonSchema.withPillar2",
+      "contractPath": "insurance.persons.*.withPillar2",
       "source": [
         "contracts",
-        "public_analysis"
+        "public_analysis",
+        "main_intake"
       ]
     },
     {
@@ -338,10 +354,11 @@
       "type": "money",
       "question": "Wie viel zahlst du ungefähr pro Jahr in die 3a ein?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.annualSavingCents",
+      "contractPath": "insurance.existingAnnualPillar3aContributionCents",
       "source": [
         "public_analysis",
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -353,8 +370,10 @@
       "question": "Hast du schon eine Lebensversicherung oder etwas, das deine Familie absichert?",
       "required": true,
       "source": [
-        "public_analysis"
-      ]
+        "public_analysis",
+        "main_intake"
+      ],
+      "contractPath": "insurance.existingPrivateRiskBenefitsConfirmed"
     },
     {
       "id": "free_assets_chf",
@@ -407,9 +426,10 @@
       "type": "money",
       "question": "Hast du eine Hypothek oder andere Kredite laufen?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.debts[].balanceCents",
+      "contractPath": "insurance.debts.*.balanceCents",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -421,9 +441,10 @@
       "question": "Was ist dir für die Zukunft wichtig? Familie absichern, Eigenheim, Pensionierung, Weiterbildung, Reisen …",
       "hint": "Free text; map later to GoalSchema.kind: family, home, retirement, child_protection, income_protection, survivor_protection.",
       "required": true,
-      "contractPath": "GoalSchema.kind",
+      "contractPath": "goals.*.kind",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -436,9 +457,10 @@
       "max": 75,
       "question": "Mit wie vielen Jahren möchtest du am liebsten aufhören zu arbeiten?",
       "required": false,
-      "contractPath": "InsurancePersonSchema.desiredWorkStopAge",
+      "contractPath": "insurance.persons.*.desiredWorkStopAge",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
       ]
     },
     {
@@ -469,9 +491,234 @@
       ],
       "question": "Wenn es ums Geld geht: Bist du eher vorsichtig oder darf es auch mal schwanken?",
       "required": false,
-      "contractPath": "InsuranceIntakeSchema.riskAppetite",
+      "contractPath": "insurance.riskAppetite",
       "source": [
-        "contracts"
+        "contracts",
+        "main_intake"
+      ]
+    },
+    {
+      "id": "children_support_until_year",
+      "section": "family",
+      "tier": "extended",
+      "label": "Unterstützung der Kinder bis (Jahr)",
+      "type": "integer",
+      "min": 2000,
+      "max": 2100,
+      "question": "Bis wann, denkst du, wirst du deine Kinder finanziell unterstützen, etwa bis zum Ende der Ausbildung?",
+      "required": true,
+      "contractPath": "insurance.children.*.supportUntilMonth",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "debt_annual_service_chf",
+      "section": "living",
+      "tier": "extended",
+      "label": "Zins und Amortisation pro Jahr (CHF)",
+      "type": "money",
+      "question": "Wie viel zahlst du pro Jahr ungefähr an Zinsen und Rückzahlungen?",
+      "required": true,
+      "contractPath": "insurance.debts.*.annualServiceCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "survivors_annual_need_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Bedarf der Familie im Todesfall pro Jahr (CHF)",
+      "type": "money",
+      "question": "Mal angenommen, dir passiert etwas: Mit wie viel im Jahr käme deine Familie gut weiter?",
+      "required": true,
+      "contractPath": "insurance.persons.*.deathNeedAnnualCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "disability_annual_need_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Bedarf bei Erwerbsunfähigkeit pro Jahr (CHF)",
+      "type": "money",
+      "question": "Und falls du länger nicht arbeiten könntest: Mit wie viel im Jahr würdet ihr über die Runden kommen?",
+      "required": true,
+      "contractPath": "insurance.persons.*.disabilityNeedAnnualCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "protection_term_years",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Gewünschte Dauer der Absicherung (Jahre)",
+      "type": "integer",
+      "min": 1,
+      "max": 50,
+      "question": "Wie lange sollte so eine Absicherung ungefähr reichen, zum Beispiel bis die Kinder selbständig sind?",
+      "required": true,
+      "contractPath": "insurance.persons.*.protectionTermMonths",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "existing_death_capital_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Bereits versichertes Todesfallkapital (CHF)",
+      "type": "money",
+      "question": "Gibt es schon eine Summe, die im Todesfall ausbezahlt würde, zum Beispiel über die Pensionskasse oder eine Police?",
+      "required": true,
+      "contractPath": "insurance.persons.*.existingDeathCapitalCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "death_one_off_costs_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Einmalige Kosten im Todesfall (CHF)",
+      "type": "money",
+      "question": "Gäbe es einmalige Kosten, die dann sofort anfallen würden, etwa für die Wohnung oder eine Ablösung?",
+      "required": true,
+      "contractPath": "insurance.persons.*.deathOneOffCostsCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "retirement_pension_annual_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Jährliche PK-Rente laut Vorsorgeausweis (CHF)",
+      "type": "money",
+      "question": "Weisst du, welche jährliche Rente auf deinem Pensionskassenausweis steht? Ungefähr reicht völlig.",
+      "required": true,
+      "contractPath": "insurance.persons.*.retirementPensionAnnualCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "retirement_need_annual_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Bedarf im Ruhestand pro Jahr (CHF)",
+      "type": "money",
+      "question": "Wenn du an später denkst: Mit wie viel im Jahr möchtest du im Ruhestand leben?",
+      "required": true,
+      "contractPath": "insurance.retirementNeedAnnualCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "existing_retirement_saving_annual_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Bisheriges Sparen für die Pension pro Jahr (CHF)",
+      "type": "money",
+      "question": "Legst du neben der 3a sonst noch regelmässig etwas für später zur Seite?",
+      "required": true,
+      "contractPath": "insurance.existingAnnualRetirementSavingCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "additional_saving_annual_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Zusätzliches Sparen pro Jahr (CHF)",
+      "type": "money",
+      "question": "Wie viel könntest du dir vorstellen, zusätzlich pro Jahr für dich zur Seite zu legen?",
+      "required": true,
+      "contractPath": "insurance.annualSavingCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "affordable_annual_premium_chf",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Tragbarer Jahresbetrag für Absicherung (CHF)",
+      "type": "money",
+      "question": "Und was wäre für dich ein Betrag pro Jahr, der für Absicherung gut drinliegt?",
+      "required": true,
+      "contractPath": "insurance.persons.*.personalAffordableAnnualPremiumCents",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "risk_capital_strategy",
+      "section": "goals",
+      "tier": "planning",
+      "label": "Erspartes zuerst für Absicherung einsetzen?",
+      "type": "enum",
+      "options": [
+        "use_free_assets_first",
+        "preserve_assets_for_other_goals"
+      ],
+      "question": "Würdest du Erspartes im Ernstfall eher zuerst für die Familie einsetzen oder lieber für andere Ziele behalten?",
+      "required": true,
+      "contractPath": "insurance.riskCapitalStrategy",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "debt_treatment",
+      "section": "goals",
+      "tier": "colleague",
+      "label": "Schulden: laufend oder separat abgelöst",
+      "type": "enum",
+      "options": [
+        "included_in_income_need",
+        "pay_off_separately"
+      ],
+      "question": "Soll die Schuld über laufende Zahlungen oder als separate Rückzahlung berücksichtigt werden?",
+      "required": false,
+      "contractPath": "insurance.persons.*.debtTreatment",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "annual_return_assumption_percent",
+      "section": "goals",
+      "tier": "colleague",
+      "label": "Angenommene Rendite pro Jahr (%)",
+      "type": "integer",
+      "min": -50,
+      "max": 20,
+      "question": "Mit welcher jährlichen Rendite sollen wir rechnen?",
+      "required": false,
+      "contractPath": "insurance.annualReturnBps",
+      "source": [
+        "main_intake"
+      ]
+    },
+    {
+      "id": "retirement_horizon_age",
+      "section": "goals",
+      "tier": "colleague",
+      "label": "Planungshorizont (Alter)",
+      "type": "integer",
+      "min": 50,
+      "max": 120,
+      "question": "Bis zu welchem Alter soll die Planung reichen?",
+      "required": false,
+      "contractPath": "insurance.retirementHorizonAge",
+      "source": [
+        "main_intake"
       ]
     },
     {

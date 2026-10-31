@@ -54,8 +54,9 @@ const languages = {
 };
 const logDirectory = resolve(here, "data/conversations");
 const questionnaire = JSON.parse(await readFile(resolve(here, "questionnaire.json"), "utf8"));
-// Paxi collects core and extended fields; suitability questions are left to a Pax colleague.
-const voiceFields = questionnaire.fields.filter((field) => field.tier !== "suitability");
+// Paxi collects core, extended and planning fields; colleague and suitability fields are
+// left to a Pax colleague.
+const voiceFields = questionnaire.fields.filter((field) => !["colleague", "suitability"].includes(field.tier));
 const fieldsById = new Map(voiceFields.map((field) => [field.id, field]));
 
 // Only sessions created by this server may write logs. Session ID -> { log, entry }.
@@ -129,6 +130,9 @@ ${topicList("core")}
 
 Also part of the picture; find these out too, whenever they fit:
 ${topicList("extended")}
+
+Once the above is known, and only if the person has time, the details the calculation needs. Ask them compactly, in plain words, and say once why (so a colleague of yours can calculate what fits them). Rough numbers are fine; if they do not know, move on, a colleague will complete them:
+${topicList("planning")}
 
 ${
     priorities.length
@@ -503,10 +507,12 @@ function progress(log) {
     [...ids].sort((a, b) => (priorities.indexOf(a) + 1 || Infinity) - (priorities.indexOf(b) + 1 || Infinity));
   const core = byPriority(openFields(log, "core"));
   const extended = byPriority(openFields(log, "extended"));
+  const planning = byPriority(openFields(log, "planning"));
   return {
-    open_priority: labelsOf([...core, ...extended].filter((id) => priorities.includes(id))),
+    open_priority: labelsOf([...core, ...extended, ...planning].filter((id) => priorities.includes(id))),
     open_core: labelsOf(core),
     open_extended: labelsOf(extended),
+    open_planning: labelsOf(planning),
     core_complete: core.length === 0,
     complete: core.length === 0 && extended.length === 0,
   };
@@ -585,7 +591,7 @@ Already saved: ${saved.length ? saved.join("; ") : "nothing yet"}.
 Still open: ${openLabels(log).join(", ") || "nothing"}.
 Now, in ${language} and using the informal form, ${
     firstSwitch
-      ? "say warmly in your own words that you would love to get to know them a bit (if the history shows you already confirmed the language, do not confirm it again). If they already said their name, use it; otherwise ask how you may call them."
+      ? "say warmly in your own words what this conversation is for (getting to know them so a colleague of yours can prepare ideas that fit their life) and that it takes about ten minutes; if the history shows you already confirmed the language, do not confirm it again. If they already said their name, use it; otherwise ask how you may call them."
       : "smoothly pick up the conversation where it left off."
   }`;
 }

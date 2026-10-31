@@ -60,7 +60,7 @@ avatar.handle({ type: "emotion", emotion: "empathetic", playbackId });
 - **No twitching on false barge-ins.** While a playback is running, `listening`/`thinking` do not change the face. Only `playback cancelled` interrupts the reply visually.
 - **Late events are ignored.** Events for the last 50 finished `playbackId`s (including ended/cancelled/error) are dropped (`handle()` returns `false`); `reset()` clears that history.
 - **Early emotions wait for the reply.** An `emotion` that arrives while the user speaks or the advisor thinks (e.g. from the input transcript trigger) is queued and shown when playback starts. Otherwise it is shown right away.
-- **No flicker from classifiers.** While the advisor has the turn, `neutral` never replaces a stronger emotion, and other changes apply at most every 2 s (the latest one wins). Send every answer; the avatar filters.
+- **No flicker from classifiers.** While the advisor has the turn, `neutral` never replaces a stronger emotion, and other changes apply at most every 4 s (`EMOTION_HOLD_MS`; the latest one wins). Send every answer; the avatar filters.
 - **Relax after the reply.** The emotion is held ~1.5 s after playback ends, then the face relaxes to neutral. A new user turn starts from neutral.
 - **Calm expression motion.** Each expression has a subtle tilt, breath, nod or sway; warm expressions lift once on entry and recovery briefly resets. Audio only adds tiny eye emphasis when explaining; it never drives body motion. Reduced-motion preferences suppress decorative motion and blinking while preserving all eye shapes and decorations.
 

@@ -78,7 +78,7 @@ let mountId = 0;
 
 export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "shocked", "empathetic", "pleased", "recovering", "presenting_offer"];
 const HOLD_AFTER_REPLY_MS = 1500;
-const EMOTION_HOLD_MS = 2000;
+const EMOTION_HOLD_MS = 4000;
 const MAX_FINISHED_IDS = 50;
 
 const POSES = Object.fromEntries(Object.entries(EMOTIONS).map(([key, value]) => [key, { ...BASE, ...value }]));

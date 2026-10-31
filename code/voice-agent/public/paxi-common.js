@@ -28,7 +28,10 @@ export function isGoodbye(text) {
 /** The quiet note that tells Paxi what is known and what is still missing. */
 export function progressNote(progress) {
   if (progress.complete) {
-    return "Everything is complete. When the conversation reaches a natural end, you may thank the person and say goodbye once.";
+    const planning = progress.open_planning ?? [];
+    return planning.length
+      ? `The core and extended details are complete. If the person has time, find out these details for the calculation, compactly and in plain words: ${planning.join(", ")}. If they want to finish, thank them, say a colleague of yours completes the rest, and say goodbye once.`
+      : "Everything is complete. When the conversation reaches a natural end, you may thank the person and say goodbye once.";
   }
   const open = [...progress.open_core, ...progress.open_extended];
   const priority = progress.open_priority ?? [];
@@ -78,7 +81,7 @@ export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, in
       version = progress.version;
       const note = progressNote(progress);
       // Only the open list matters for the note; known values alone do not trigger a new one.
-      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}`;
+      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}|${progress.open_planning}`;
       if (key !== lastNote) {
         lastNote = key;
         onNote(note);

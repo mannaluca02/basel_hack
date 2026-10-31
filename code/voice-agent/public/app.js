@@ -18,7 +18,7 @@ const captured = {};
 let turns = [];
 // Set when Paxi closed the call for inactivity; the next tap continues that conversation.
 let resumable = null;
-const tierTitles = { core: "Kernangaben", extended: "Wenn es passt" };
+const tierTitles = { core: "Kernangaben", extended: "Wenn es passt", planning: "Für die Berechnung" };
 // Fields another part of the app wants first. In the demo: tap a field, or ?priorities=id,id.
 const priorities = new Set(new URLSearchParams(location.search).get("priorities")?.split(",").filter(Boolean) ?? []);
 

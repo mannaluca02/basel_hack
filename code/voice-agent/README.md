@@ -115,15 +115,17 @@ Typical errors are 400 for missing SDP or a non-array priority list, 403 for an 
 
 ## Customer portfolio (`questionnaire.json`)
 
-`questionnaire.json` lists everything Pax needs to know about a customer: 37 fields in seven sections (person, family, work and income, living, provision and assets, goals, suitability check). Each field has a casual du-form question, a type (`string`, `date`, `integer`, `money`, `enum`, `boolean`), a tier and, where available, the matching path in the shared contracts (`contractPath`) and its source.
+`questionnaire.json` lists everything Pax needs to know about a customer: 53 fields in seven sections (person, family, work and income, living, provision and assets, goals, suitability check). It covers the backend's own intake list on `main` (`intakeQuestions()` in `packages/domain`); each field's `contractPath` names the backend path it maps to. Each field has a casual du-form question, a type (`string`, `date`, `integer`, `money`, `enum`, `boolean`), a tier and, where available, the matching path in the shared contracts (`contractPath`) and its source.
 
 | Tier | Fields | Who collects them |
 |---|---|---|
 | `core` | 14 | Paxi, in the first conversation. Paxi does not wrap up while one is open. |
-| `extended` | 15 | Paxi, when they fit the conversation; a colleague completes the rest. |
+| `extended` | 17 | Paxi, when they fit the conversation. Paxi does not wrap up before they are known or handed to a colleague. |
+| `planning` | 11 | What the calculation needs (needs in case of death or disability, protection term, pension fund pension, retirement need, savings, affordable premium). Paxi asks them compactly after the above if the person has time; otherwise a colleague completes them. |
+| `colleague` | 3 | Technical calculation assumptions (expected return, planning horizon, debt treatment). A colleague sets them with the person; Paxi never asks them. |
 | `suitability` | 8 | Only a Pax colleague (legally required suitability check before investment-linked insurance). Paxi never asks them. |
 
-Sources: the shared contracts (`InsuranceIntakeSchema`, `PersonSchema`, `GoalSchema` on `feature/life-insurance-live-backend`), the Pax pension analysis, the public pension analysis test inputs and the Pax suitability check. The prompts, the tool enums, the validation and the log are all built from this file, so changing it is enough to change what Paxi asks.
+Sources: the backend's intake list and question texts on `main`, the shared contracts (`InsuranceIntakeSchema`, `PersonSchema`, `GoalSchema`), the Pax pension analysis, the public pension analysis test inputs and the Pax suitability check. The prompts, the tool enums, the validation and the log are all built from this file, so changing it is enough to change what Paxi asks.
 
 ## Example conversations
 
@@ -203,6 +205,7 @@ ffmpeg -i w1.mp3 -i w2.mp3 -i w3.mp3 -i w4.mp3 -filter_complex "[0:a]apad=pad_du
 
 ## Conversation rules
 
+- **Paxi knows it is an agent and leads.** Paxi is open about being Pax's digital assistant (an AI), says at the start what the conversation is for and that it takes about ten minutes, and moves every turn towards something still open. Small talk gets at most one follow-up; off-topic remarks get a short, light answer and Paxi steers back in the same turn (`persona.md`, "Driving the conversation").
 - **A conversation, not a checklist.** Paxi asks open questions that invite a story, follows what the person brings up and never asks for what is already known (`persona.md`).
 - **Paxi takes the initiative.** After 8 seconds of silence, Paxi asks a light question, asks for an open detail or picks up an earlier topic (at most twice in a row); before a language is chosen, it asks again in all four languages.
 - **Today's date.** Every session gets today's date (Europe/Zurich) in the Live and backend prompts, so ages and durations are calculated correctly.
