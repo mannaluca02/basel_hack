@@ -126,7 +126,7 @@ Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundenda
 
 Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
 
-Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Es gibt keine externen Analytics-/Modellaufrufe.
+Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Diese Feedback-/Insights-Routen führen keine externen Analytics-/Modellaufrufe aus.
 
 
 ## Vollständige Tool-Abdeckung und vier Sprachen
@@ -169,8 +169,12 @@ Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm r
 
 Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
 
+Der erste vollständige Dialog-Moduldurchlauf ist über `npm run demo:erni-dialog` ohne externe Dienste und über `npm run demo:erni-dialog:openai` separat mit einem serverseitigen `OPENAI_API_KEY` ausführbar. Beide prüfen den Jahresbrutto-Pflichtfall und unverändertes Budget-Netto; der zweite sendet ausschließlich den eigens erfundenen Demo-Ausschnitt an OpenAI. [Startbefehle, Grenzen und Verarbeitungshinweis](apps/api/src/erni-dialog/README.md). Darios echter Voice-/Bestätigungsanschluss ist damit noch nicht abgenommen.
+
 Den Prüfstand im Angular-Client gegen den echten Fallservice startet `npm run demo:customer-review` mit synthetischen Daten; Details stehen im [Web-README](apps/web/README.md).
 
 Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.
+
+Die providerneutrale [Offline-Voice-Pipeline](apps/api/src/voice/README.md) prüft Audio → STT → Maskierung → Dialog → TTS → Wiedergabe über injizierte Adapter. `npm run test:voice` testet Ablauf, Abbruch und echte Runtime-Bestätigungen; `npm run evaluate:voice` liefert getrenntes Funktions-/Codequalitätsfeedback mit höchstens fünf Versuchen. Der verpflichtende Maskierungs-Hook bereitet die spätere Presidio-Mittelschicht vor. Echte STT-/TTS-Dienste und Browser-Audio sind damit noch nicht getestet.
 
 Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, Kontexten und SSE verfügbar. [Routen und Zuständigkeiten](../documentation/baselhack/plans/human-advisor-handover.md). `npm run demo:handover` prüft Request/Stoppsignal/Replay/Resume ohne Anruf oder externe API-Aufrufe.
