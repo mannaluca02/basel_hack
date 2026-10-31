@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "Pax Digital Advisor"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "nav": {
+    "label": "Workspace",
+    "graphics": "Graphics",
+    "risks": "Risks",
+    "chat": "Chat",
+    "info": "Info"
+  },
+  "graphics": {
+    "title": "Graphics"
+  },
+  "risks": {
+    "title": "Risks"
+  },
+  "chat": {
+    "title": "Chat"
+  },
+  "info": {
+    "title": "Info"
+  }
+}

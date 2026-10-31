@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "check:tokens": "node scripts/check-tokens.mjs"
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "private": true,
   "packageManager": "npm@11.19.1",
@@ -19,6 +20,7 @@
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@angular/service-worker": "^22.2.0",
+    "@jsverse/transloco": "^8.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
