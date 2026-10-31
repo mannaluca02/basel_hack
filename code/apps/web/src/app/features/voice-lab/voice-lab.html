@@ -1,0 +1,148 @@
+<section class="lab" aria-labelledby="lab-title">
+  <header class="intro">
+    <div><p class="eyebrow">PAX · ENGINEERING PREVIEW</p><h1 id="lab-title">{{ 'lab.title' | transloco }}</h1></div>
+    <span class="tag">{{ 'lab.live' | transloco }}</span>
+    <p>{{ 'lab.description' | transloco }}</p>
+  </header>
+  @if (!apiMode) {<p class="error" role="alert">{{ 'lab.apiRequired' | transloco }}</p>}
+  @if (error(); as error) {<p class="error" role="alert">{{ errorMessage() | transloco }} <code>{{ error }}</code></p>}
+
+  <div class="flow" aria-label="Data flow">
+    <span>GPT-Live</span><b>→</b><span>{{ 'lab.context.logs' | transloco }}</span><b>→</b><span>Case API · rules-v1 / model-v1</span><b>→</b><span>Canonical case</span><b>→</b><span>{{ 'lab.context.title' | transloco }}</span>
+  </div>
+
+  <div class="workspace">
+    <section class="panel controls" aria-labelledby="controls-title">
+      <h2 id="controls-title">{{ 'lab.connection' | transloco }}</h2>
+      <div #avatarHost class="avatar" aria-hidden="true"></div>
+      <p class="muted">{{ 'lab.avatarNotice' | transloco }}</p>
+      <p class="connection" role="status"><span class="dot" [class.active]="active()"></span>{{ state() }} · live@if (evaluating()) { · {{ 'lab.intake.evaluating' | transloco }}}</p>
+      <section aria-labelledby="lab-setup-title">
+        <h3 id="lab-setup-title">{{ 'lab.setup.title' | transloco }}</h3>
+        <p role="status">{{ setupMessage() | transloco }}</p>
+        @if (apiMode && !customer.session()) {
+          <form class="controls" (submit)="prepare($event)">
+            <label for="lab-code">{{ 'review.signIn.label' | transloco }}</label>
+            <input id="lab-code" type="password" autocomplete="off" [(ngModel)]="accessCode" name="accessCode" required />
+            <p class="muted">{{ 'lab.demoCode' | transloco }}</p>
+            <button type="submit" class="primary" data-action="prepare" [disabled]="busy() || active()">{{ (busy() ? 'lab.setup.working' : 'lab.setup.prepare') | transloco }}</button>
+            @if (review.error(); as error) {<p role="alert">{{ error.message ?? error.code }}</p>}
+          </form>
+        } @else if (apiMode && (setupState() === 'empty' || setupState() === 'loading')) {
+          <p class="muted">{{ 'lab.baselineNotice' | transloco }}</p>
+          <button type="button" class="primary" data-action="prepare" (click)="prepare()" [disabled]="busy() || active() || handoverActive()">{{ (busy() ? 'lab.setup.working' : 'lab.setup.prepare') | transloco }}</button>
+        }
+        @if (apiMode && customer.session()) {<button type="button" data-action="refresh-setup" (click)="refreshSetup()" [disabled]="busy() || active()">{{ 'lab.refresh' | transloco }}</button>}
+      </section>
+      @if (persons().length) {
+        <label for="lab-person">{{ 'lab.speaker' | transloco }}</label>
+        <select id="lab-person" [ngModel]="personId()" (ngModelChange)="personId.set($event)" [disabled]="active() || busy()">
+          @for (person of persons(); track person.personId; let i = $index) {<option [value]="person.personId">{{ 'review.person' | transloco: { number: i + 1 } }}</option>}
+        </select>
+      }
+        <p>{{ notice() }}</p>
+        <p class="tag">GPT-Live: {{ (providerAvailable() ? 'lab.configured' : 'lab.unconfigured') | transloco }}</p>
+        <p class="tag" data-status="extraction">{{ (extractionNotice()?.enabled ? 'lab.setup.extractionReady' : 'lab.setup.extractionUnavailable') | transloco }}</p>
+        <fieldset class="controls prompt-settings" [disabled]="active() || busy()">
+          <legend>{{ 'lab.settings.title' | transloco }}</legend>
+          <p class="muted">{{ 'lab.settings.source' | transloco }}</p>
+          @for (skill of promptSkills(); track skill.id) {
+            <label class="consent"><input type="checkbox" data-setting="skill" [checked]="selectedSkills().includes(skill.id)" (change)="selectSkill(skill.id,$any($event.target).checked)" /><span>{{ skill.name }}<small>{{ skill.description }}</small></span></label>
+          }
+          <label for="lab-time">{{ 'lab.settings.time' | transloco }}</label>
+          <select id="lab-time" [ngModel]="timeBudget()" (ngModelChange)="timeBudget.set(+$event)"><option [value]="5">5 min</option><option [value]="10">10 min</option><option [value]="20">20 min</option><option [value]="30">30 min</option></select>
+          <label for="lab-priority">{{ 'lab.settings.priority' | transloco }}</label>
+          <select id="lab-priority" [ngModel]="priority()" (ngModelChange)="priority.set($event)"><option value="">{{ 'lab.settings.natural' | transloco }}</option>@for (row of rows(); track row.fieldId) {<option [value]="row.fieldId">{{ intakeLabel(row.fieldId) | transloco }}</option>}</select>
+        </fieldset>
+        <label class="consent"><input type="checkbox" [checked]="consent()" (change)="consent.set($any($event.target).checked)" [disabled]="active()" />{{ 'lab.voiceConsent' | transloco }}</label>
+        @if (extractionNotice(); as extraction) {
+          @if (extraction.enabled) {
+            <p>{{ extraction.text }}</p>
+            <label class="consent"><input type="checkbox" data-action="extraction-consent" [checked]="extractionConsent()" (change)="extractionConsent.set($any($event.target).checked)" [disabled]="active()" />{{ 'lab.intake.extractionConsent' | transloco }}</label>
+          }
+        }
+        <p id="lab-live-help" role="status">{{ (liveBlocker() ?? 'lab.setup.liveReady') | transloco }}</p>
+        <button class="primary" data-action="start" aria-describedby="lab-live-help" (click)="startLive()" [disabled]="!!liveBlocker()">{{ 'lab.start' | transloco }}</button>
+        <p>{{ 'lab.liveNotice' | transloco }}</p>
+      <div class="actions">
+        <button data-action="stop" (click)="stop()" [disabled]="!active()">{{ 'lab.stop' | transloco }}</button>
+        @if (handoverActive()) {
+          <button data-action="resume" (click)="resume()" [disabled]="!caseReady() || busy()">{{ 'lab.resume' | transloco }}</button>
+        } @else {
+          <button data-action="handover" (click)="handover()" [disabled]="!caseReady() || busy()">{{ 'lab.handover' | transloco }}</button>
+        }
+      </div>
+    </section>
+
+    <section class="panel conversation" aria-labelledby="dialogue-title">
+      <h2 id="dialogue-title">{{ 'lab.dialogue' | transloco }}</h2>
+      <p class="muted">{{ 'lab.transcriptNotice' | transloco }}</p>
+      <ol #turns class="turns" aria-live="polite" aria-relevant="additions">
+        @for (line of dialogue(); track line.id) {
+          <li [class.customer]="line.speaker === 'customer'"><span class="meta">{{ line.speaker }} · {{ line.origin }}</span><p>{{ line.text }}</p></li>
+        } @empty {<li class="empty">{{ 'lab.noTurns' | transloco }}</li>}
+      </ol>
+    </section>
+
+    <section class="panel canonical" aria-labelledby="canonical-title">
+      <h2 id="canonical-title">{{ 'lab.canonical' | transloco }}</h2>
+      @if (store.projection(); as projection) {
+        <section class="conversation-context" aria-labelledby="context-title" aria-live="polite" aria-atomic="true" [attr.aria-busy]="evaluating()">
+          <h3 id="context-title">{{ 'lab.context.title' | transloco }}</h3>
+          <p class="muted">{{ 'lab.context.description' | transloco }}</p>
+          @if (evaluating()) {<p class="context-status" role="status">{{ 'lab.context.processing' | transloco }}</p>}
+          @else if (extractionFailed()) {<p class="context-unclear" role="status">{{ 'lab.context.failed' | transloco }}</p>}
+          @if (store.syncFailed()) {<p class="error">{{ 'review.offline' | transloco }}</p>}
+          @if (conversationContext(); as context) {
+            @if (context.proposed) {<p>{{ 'lab.context.proposed' | transloco }} {{ context.proposed }}</p>}
+            @if (context.accepted) {<p>{{ 'lab.context.accepted' | transloco }} {{ context.accepted }}</p>}
+            @if (!context.proposed && !context.accepted) {<p>{{ 'lab.context.empty' | transloco }}</p>}
+            @if (context.unclear) {<p class="context-unclear">{{ context.unclear }}</p>}
+            @if (context.open) {<p class="muted">{{ 'lab.context.open' | transloco: { fields: context.open } }}</p>}
+            @if (context.skipped) {<p class="muted">{{ 'lab.context.skipped' | transloco: { fields: context.skipped } }}</p>}
+          }
+          @if (latestSource()) {
+            <h3>{{ 'lab.context.source' | transloco }}</h3>
+            <blockquote>{{ latestSource() }}</blockquote>
+            @if (extractionOutcome(); as outcome) {<p class="muted">{{ outcome | transloco }}</p>}
+          }
+        </section>
+        <p class="intake-progress">{{ 'lab.intake.progress' | transloco }}: {{ captured() }}/{{ intakeTotal }}</p>
+        <p class="muted">{{ 'lab.confirmationNotice' | transloco }}</p>
+        <details class="technical-details"><summary>{{ 'lab.context.details' | transloco }}</summary>
+        <dl class="revisions"><dt>caseRevision</dt><dd>{{ projection.caseRevision }}</dd><dt>contextRevision</dt><dd>{{ projection.contextRevision }}</dd><dt>profileVersion</dt><dd>{{ projection.profileVersion ?? '—' }}</dd><dt>draftDirty</dt><dd>{{ projection.draftDirty }}</dd></dl>
+        <p class="meta">{{ projection.caseId }}</p>
+        <section class="intake" aria-labelledby="intake-title" aria-live="polite">
+          <h3 id="intake-title">{{ 'lab.intake.title' | transloco }}</h3>
+          <ul>
+            @for (row of rows(); track row.fieldId) {
+              <li [attr.data-field]="row.fieldId" [attr.data-status]="row.status">
+                <span>{{ intakeLabel(row.fieldId) | transloco }}</span>
+                <strong>{{ show(row) }}</strong>
+                <small class="tag">{{ intakeStatus[row.status] | transloco }}</small>
+              </li>
+            }
+          </ul>
+        </section>
+        <h3>{{ 'lab.pending' | transloco }} ({{ projection.pending.length }})</h3>
+        @for (batch of projection.pending; track batch.id) {<div class="proposal"><span class="tag">proposed</span>@for (change of batch.changes; track change.path) {<code>{{ change.path }}</code><strong>{{ change.value | json }}</strong><small>{{ 'lab.canonicalUnits' | transloco }}</small>}</div>}
+        <details><summary>{{ 'lab.storeProjection' | transloco }}</summary><pre>{{ projection | json }}</pre></details>
+        <details><summary>{{ 'lab.canonicalPayload' | transloco }}</summary><pre>{{ store.canonical() | json }}</pre></details>
+        </details>
+        <button (click)="store.refresh()">{{ 'lab.refresh' | transloco }}</button>
+      } @else {<p>{{ 'lab.noCase' | transloco }}</p>}
+    </section>
+  </div>
+
+  <section class="panel trace" aria-labelledby="trace-title">
+    <div class="section-heading"><h2 id="trace-title">{{ 'lab.trace' | transloco }} ({{ trace.entries().length }}/80)</h2><button (click)="trace.clear()">{{ 'lab.clearTrace' | transloco }}</button></div>
+    <p>{{ 'lab.traceNotice' | transloco }}</p>
+    @if (latestExtraction(); as extraction) {<details open><summary>{{ 'lab.extraction' | transloco }} · {{ extraction.adapter }}</summary><pre>{{ extraction | json }}</pre></details>}
+    <div class="trace-list">
+      @for (entry of traceRows(); track entry.id) {
+        <details><summary><span class="direction">{{ entry.direction }}</span><code>{{ entry.route }}</code><strong>{{ entry.status ?? '' }}</strong><time>{{ entry.at.slice(11, 23) }}</time></summary><small>{{ entry.correlation }}</small><pre>{{ entry.payload }}</pre></details>
+      } @empty {<p>{{ 'lab.noTrace' | transloco }}</p>}
+    </div>
+  </section>
+   @if (customer.session() && apiMode) {<details class="panel"><summary>{{ 'lab.review' | transloco }}</summary><app-review-panel /></details>}
+</section>

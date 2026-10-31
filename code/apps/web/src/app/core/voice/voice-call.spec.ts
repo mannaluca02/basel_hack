@@ -61,7 +61,9 @@ describe('VoiceCall', () => {
     await new Promise((resolve) => setTimeout(resolve));
     http.expectOne('http://localhost:3100/api/case-link').flush({ linkId: 'link_1' });
     await new Promise((resolve) => setTimeout(resolve));
-    expect(paxi.location.href).toBe('http://localhost:3100/?link=link_1');
+    expect(paxi.location.href).toBe(
+      `http://localhost:3100/?link=link_1&app=${encodeURIComponent(window.location.origin)}`,
+    );
     expect(call.state()).toBe('active');
 
     call.toggleMute();

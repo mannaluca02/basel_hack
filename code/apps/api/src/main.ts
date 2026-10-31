@@ -6,6 +6,7 @@ import { SafeDemoErrorFilter } from './demo/error.filter.js';
 import { pathToFileURL } from 'node:url';
 import type { IncomingMessage,ServerResponse } from 'node:http';
 import { createLifeInsuranceApp } from './insurance/app.js';
+import { openAiResponsesTransport } from './erni-dialog/responses.js';
 
 export async function createDemoApp() {
   const app=await NestFactory.create<NestExpressApplication>(DemoAppModule,{logger:false,bodyParser:false});
@@ -18,7 +19,10 @@ export async function createDemoApp() {
 if(process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port=Number(process.env.PORT??3000);
   if(!Number.isInteger(port)||port<1||port>65535) throw new Error('Invalid PORT');
-  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',demoStart:process.env.PAX_DEMO_START==='1',token:process.env.LOGISMATA_BEARER_TOKEN??'',modelExtraction:{enabled:process.env.PAX_SYNTHETIC_EXTRACTION_ENABLED==='1'},voice:{enabled:process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1',
+  // The live voice in the app needs the model extraction (model-v1); without a key it stays off.
+  const extraction=process.env.PAX_SYNTHETIC_EXTRACTION_ENABLED==='1'||process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1';
+  const modelExtraction=extraction&&process.env.OPENAI_API_KEY?{enabled:true,transport:openAiResponsesTransport(process.env.OPENAI_API_KEY)}:{enabled:process.env.PAX_SYNTHETIC_EXTRACTION_ENABLED==='1'};
+  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',demoStart:process.env.PAX_DEMO_START==='1',token:process.env.LOGISMATA_BEARER_TOKEN??'',modelExtraction,voice:{enabled:process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1',
     ...(process.env.OPENAI_API_KEY?{openAiApiKey:process.env.OPENAI_API_KEY}:{}),
     ...(process.env.ELEVENLABS_API_KEY?{elevenLabsApiKey:process.env.ELEVENLABS_API_KEY}:{}),
     ...(process.env.ELEVENLABS_AGENT_ID?{elevenLabsAgentId:process.env.ELEVENLABS_AGENT_ID}:{}),

@@ -20,4 +20,6 @@ export interface AppEnvironment {
    * synthetic case, so there is no sign-in and no review stand.
    */
   readonly demoStart?: boolean;
+  /** Debug configuration: the Voice Lab view with trace and raw payloads is reachable. */
+  readonly debugVoice?: boolean;
 }

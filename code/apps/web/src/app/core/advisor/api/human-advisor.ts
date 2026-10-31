@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { AdvisorDataSource } from '../advisor-data-source';
 import { CustomerApi } from './customer-api';
+import { VoiceAgentLink } from './voice-agent-link';
 
 /** Pax's public general contact, as the backend sends it (`PAX_HUMAN_ADVISOR_CONTACT`). */
 const PAX_CONTACT = { organization: 'Pax', displayPhone: '+41 61 277 66 66', phone: '+41612776666' } as const;
@@ -24,6 +25,7 @@ export class HumanAdvisor {
   private readonly failedState = signal(false);
   private readonly local = inject(APP_ENVIRONMENT).dataSource !== 'api';
   private readonly localRequested = signal(false);
+  private readonly paxi = inject(VoiceAgentLink);
 
   readonly view = this.viewState.asReadonly();
   readonly busy = this.busyState.asReadonly();
@@ -72,6 +74,8 @@ export class HumanAdvisor {
     this.failedState.set(false);
     try {
       this.viewState.set(await this.api.handover(caseId, action));
+      // A human takes over: the voice call ends right away, not only at Paxi's next poll.
+      if (action === 'request' && this.paxi.windowOpen) this.paxi.control('end');
     } catch {
       this.failedState.set(true);
       await this.load();

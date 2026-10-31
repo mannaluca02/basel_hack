@@ -7,6 +7,7 @@ import {
   computed,
   effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,6 +34,9 @@ import { ConnectionBanner } from './features/connection/connection-banner';
 import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
 import { CallControls } from './features/call-controls/call-controls';
 import { SummaryDialog } from './features/summary/summary-dialog';
+import { VoiceAgentLink } from './core/advisor/api/voice-agent-link';
+import { VoiceActivity } from './core/voice/voice-activity';
+import { LiveVoiceControl } from './features/live-voice/live-voice-control';
 import { ReviewPanel } from './features/review/review-panel';
 
 interface TabLink {
@@ -57,6 +61,7 @@ interface TabLink {
     HumanAdvisorStatus,
     CallControls,
     SummaryDialog,
+    LiveVoiceControl,
     ReviewPanel,
   ],
   selector: 'app-root',
@@ -96,20 +101,35 @@ export class App {
   protected readonly reviewEnabled =
     inject(APP_ENVIRONMENT).dataSource === 'api' && !inject(APP_ENVIRONMENT).demoStart;
 
-  /** Risks not yet addressed: the count badge on the Risks tab. */
-  protected readonly openRisks = computed(
-    () => this.store.risks().filter((risk) => risk.status !== 'addressed').length,
-  );
+  /** The tab the router shows; `null` while the URL names no tab (before the first redirect). */
+  private readonly activeTab = signal<WorkspaceTab | null>(null);
+  /** Items added or changed per tab since it was last shown: the live update dots (FE-21). */
+  protected readonly unread = this.store.unread;
 
   /** Data capture for the ring around the avatar. */
   protected readonly progress = this.store.progress;
-  protected readonly activity = computed(() => this.store.agent().activity);
+  private readonly paxi = inject(VoiceAgentLink);
+  private readonly live = inject(VoiceActivity).live;
+  /** Paxi's activity while it talks here or in its own window, else the advisor's. */
+  protected readonly activity = computed(
+    () =>
+      this.live() ??
+      (this.paxi.state() === 'opened' ? this.paxi.activity() : this.store.agent().activity),
+  );
+
+  /** The live voice needs the case service; the scripted mock has no voice sessions. */
+  protected readonly liveVoice = inject(APP_ENVIRONMENT).dataSource === 'api';
+  /** Link to the Voice Lab, only in the debug configurations. */
+  protected readonly debugVoice = inject(APP_ENVIRONMENT).debugVoice === true;
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll
     // offset, and all tabs share one scroll container. Save it on leave, restore it on return.
     const router = inject(Router);
+    this.activeTab.set(this.tabAt(router.url));
     router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      // Before consent there is no Dynamic View, but the requested tab is already known.
+      if (event instanceof NavigationEnd) this.activeTab.set(this.tabAt(event.urlAfterRedirects));
       const view = this.view()?.nativeElement;
       if (!view) return;
       if (event instanceof NavigationStart) {
@@ -139,6 +159,13 @@ export class App {
       onCleanup(() => this.scroller.detach());
     });
 
+    // Showing a tab marks it read, and keeps it read while news for it arrives. New data never
+    // switches the tab; the dots on the other tabs point to it instead.
+    effect(() => {
+      const tab = this.activeTab();
+      if (tab && this.unread()[tab] > 0) this.store.markRead(tab);
+    });
+
     // Consent lasts the browser session, so after a reload the call resumes right away.
     if (this.consented()) this.store.connect();
   }
@@ -151,6 +178,11 @@ export class App {
       { write: () => this.view()?.nativeElement.focus() },
       { injector: this.injector },
     );
+  }
+
+  private tabAt(url: string): WorkspaceTab | null {
+    const path = pathOf(url);
+    return this.tabs.find((tab) => tab.path === path)?.id ?? null;
   }
 }
 

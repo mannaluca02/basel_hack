@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { InsuranceDraft } from '@pax/contracts';
+import { QUALIFIED_PRODUCT_IDS,type InsuranceDraft } from '@pax/contracts';
 import type { LifeRun,ProductCandidate,Recommendation } from './types.js';
 
 export const PRODUCT_RULE_VERSION='pax-life-needs-2026-10-31-v1';
@@ -28,7 +28,8 @@ export function recommendLifeSolutions(draft:InsuranceDraft,run:LifeRun,reviewAp
     candidates.push({id:randomUUID(),productId,productName:product.name,personId,needAmountCents:amount,needPeriod:period,
       premiumCents:null,premiumStatus:'pax_tariff_api_unavailable',eligibility:reviewApproved?'ready_for_demo':'human_review_required',
       conditions:['No real premium or underwriting decision is available.','Product documents, age/term, beneficiary, exclusions and personal affordability require review.'],
-      rule:{ruleId,ruleVersion:PRODUCT_RULE_VERSION,runId:run.id,inputHash:run.inputHash,reasonCodes:reasons,
+      rule:{ruleId,ruleVersion:PRODUCT_RULE_VERSION,runId:run.id,inputHash:run.inputHash,
+        reasonCodes:(QUALIFIED_PRODUCT_IDS as readonly string[]).includes(productId)?[...reasons,'SUITABILITY_CHECK_REQUIRED']:reasons,
         sourceRefs:[...sources,product.sourceUrl,...product.documents.map(id=>`pax-document:${id}`)]}});
   };
   for(const person of draft.financial!.persons) {

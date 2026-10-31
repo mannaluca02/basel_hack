@@ -6,12 +6,24 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { FakeDataSource, chart, event, progress, risk } from './core/advisor/store/case-testing';
+import { MOCK_CALL_SCRIPT } from './core/advisor/mock/mock-call-script';
+import { provideAdvisorDataSource } from './core/advisor/provide-advisor-data-source';
+import { CaseStore } from './core/advisor/store/case-store';
+import {
+  FakeDataSource,
+  chart,
+  event,
+  info,
+  line,
+  progress,
+  risk,
+} from './core/advisor/store/case-testing';
 import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/consent';
 import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
+import { stubChartCanvas } from './features/workspace/graphics/graphics-testing';
 
 describe('App', () => {
   let source: FakeDataSource;
@@ -101,22 +113,61 @@ describe('App', () => {
     expect(dock.getAttribute('data-activity')).toBe('thinking');
   });
 
-  it('shows the number of open risks on the Risks tab, also for screen readers', async () => {
-    const { fixture, root } = await renderShell();
-    const risksLink = () => root.querySelector('a[href="/risks"]') as HTMLElement;
-    expect(risksLink().querySelector('.badge')).toBeNull();
+  describe('live update dots (FE-21)', () => {
+    const link = (root: HTMLElement, path: string) =>
+      root.querySelector(`a[href="${path}"]`) as HTMLElement;
+    const dotted = (root: HTMLElement) =>
+      Array.from(root.querySelectorAll('.rail nav a:has(.dot)'), (a) => a.getAttribute('href'));
 
-    source.emit(
-      event('risk', risk({ riskId: 'risk_a', status: 'identified' })),
-      event('risk', risk({ riskId: 'risk_b', status: 'needs_data' })),
-      event('risk', risk({ riskId: 'risk_c', status: 'addressed' })),
-    );
-    await fixture.whenStable();
+    it('marks news in another tab with a dot until that tab is shown', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/graphics');
 
-    const badge = risksLink().querySelector('.badge');
-    expect(badge?.textContent?.trim()).toBe('2');
-    expect(badge?.getAttribute('aria-hidden')).toBe('true');
-    expect(risksLink().querySelector('.visually-hidden')?.textContent).toBe('2 offen');
+      source.emit(event('chart', chart()), event('transcript', line()), event('info', info()));
+      await fixture.whenStable();
+
+      expect(dotted(root)).toEqual(['/chat', '/info']);
+      expect(link(root, '/chat').querySelector('.dot')?.getAttribute('aria-hidden')).toBe('true');
+      expect(link(root, '/chat').querySelector('.visually-hidden')?.textContent).toBe(
+        'Neues seit dem letzten Besuch',
+      );
+
+      await navigate('/chat');
+      expect(dotted(root)).toEqual(['/info']);
+      expect(link(root, '/chat').querySelector('.visually-hidden')).toBeNull();
+    });
+
+    it('keeps the shown tab free of a dot while news for it arrives', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/chat');
+
+      source.emit(event('transcript', line({ entryId: 'entry_1' })));
+      await fixture.whenStable();
+      source.emit(event('transcript', line({ entryId: 'entry_2' })));
+      await fixture.whenStable();
+
+      expect(dotted(root)).toEqual([]);
+      expect(TestBed.inject(CaseStore).unread().chat).toBe(0);
+    });
+
+    it('gives Risks a dot like every tab, also when a seen risk changes', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/graphics');
+
+      source.emit(event('risk', risk({ status: 'identified' })));
+      await fixture.whenStable();
+      expect(dotted(root)).toEqual(['/risks']);
+      // No count in the rail: the Risks tab lists open and addressed risks itself.
+      expect(link(root, '/risks').querySelector('.badge')).toBeNull();
+
+      await navigate('/risks');
+      expect(dotted(root)).toEqual([]);
+
+      await navigate('/graphics');
+      source.emit(event('risk', risk({ status: 'identified', title: 'Updated' })));
+      await fixture.whenStable();
+      expect(dotted(root)).toEqual(['/risks']);
+    });
   });
 
   it.each([
@@ -197,23 +248,22 @@ describe('App', () => {
   });
 
   it('switches shell, open tab and document title to another language without reload', async () => {
-    const harness = await RouterTestingHarness.create();
-    const fixture = TestBed.createComponent(App);
-    await harness.navigateByUrl('/risks');
-    await fixture.whenStable();
-    const root = fixture.nativeElement as HTMLElement;
+    // One router outlet only: a second one from RouterTestingHarness misses the tab on its first lazy load (FE-26).
+    const { fixture, root, navigate } = await renderShell();
+    await navigate('/risks');
     const navLabels = () => Array.from(root.querySelectorAll('nav .label'), (a) => a.textContent);
+    const heading = () => root.querySelector('main app-risks-tab h1')?.textContent;
 
     expect(navLabels()).toEqual(['Grafiken', 'Risiken', 'Chat', 'Info']);
+    expect(heading()).toBe('Risiken');
     expect(document.title).toBe('Risiken | Pax Digital Advisor');
 
     await TestBed.inject(AppLanguage).use('fr');
     await fixture.whenStable();
-    await harness.fixture.whenStable();
 
     expect(navLabels()).toEqual(['Graphiques', 'Risques', 'Chat', 'Infos']);
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Espace de travail');
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Risques');
+    expect(heading()).toBe('Risques');
     expect(document.title).toBe('Risques | Pax Digital Advisor');
   });
 });
@@ -370,6 +420,20 @@ describe('App before consent', () => {
     expect(document.activeElement).toBe(root.querySelector('main'));
   });
 
+  it('treats the tab requested before consent as shown: its news gets no dot', async () => {
+    const { fixture, root, checkbox, startButton } = await render();
+    checkbox().click();
+    await fixture.whenStable();
+    startButton().click();
+    await fixture.whenStable();
+
+    source.emit(event('risk', risk({ status: 'identified' })));
+    await fixture.whenStable();
+
+    expect(TestBed.inject(CaseStore).risks()).toHaveLength(1);
+    expect(root.querySelector('a[href="/risks"] .dot')).toBeNull();
+  });
+
   it('shows the Demo badge before and after consent', async () => {
     const { fixture, root, checkbox, startButton } = await render();
     const badge = () => root.querySelector('header .demo');
@@ -394,5 +458,87 @@ describe('App before consent', () => {
 
     expect(root.querySelector('h1')?.textContent).toBe('Prima di iniziare');
     expect(startButton().textContent?.trim()).toBe('Avvia la consulenza');
+  });
+});
+
+describe('App during the scripted mock call', () => {
+  beforeAll(async () => {
+    // Lazy tab chunks load on the real clock; the fake one below would run out before they arrive (FE-27).
+    await Promise.all(routes.map((route) => route.loadComponent?.()));
+  });
+
+  beforeEach(async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
+    // jsdom does not scroll; the Graphics tab scrolls to each new chart.
+    Element.prototype.scrollTo = vi.fn() as Element['scrollTo'];
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        { provide: RouteReuseStrategy, useClass: KeepAliveRouteReuseStrategy },
+        provideAdvisorDataSource(),
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
+        },
+        provideI18nTesting(),
+      ],
+    });
+    // The scripted call fills the Graphics tab; ECharts cannot draw in jsdom.
+    stubChartCanvas();
+    await TestBed.compileComponents();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (Element.prototype as Partial<Element>).scrollTo;
+  });
+
+  it('never switches the tab and clears each dot when its tab is shown', async () => {
+    const fixture = TestBed.createComponent(App);
+    const root = fixture.nativeElement as HTMLElement;
+    const router = TestBed.inject(Router);
+    // Angular renders on a timer too, so let the fake clock run in frames until it is stable.
+    const settle = async () => {
+      for (let frame = 0; frame < 50; frame++) {
+        await vi.advanceTimersByTimeAsync(16);
+        if (fixture.isStable()) return;
+      }
+      throw new Error('The app did not settle');
+    };
+    const navigate = async (url: string) => {
+      const done = router.navigateByUrl(url);
+      await settle();
+      await done;
+      await settle();
+    };
+    const marked = () =>
+      Array.from(root.querySelectorAll('.rail nav a:has(.dot)'), (a) => a.getAttribute('href'));
+    await navigate('/graphics');
+
+    // The call clock started with the App, which connects right away after consent.
+    const urls = new Set<string>();
+    let played = 0;
+    for (const step of MOCK_CALL_SCRIPT) {
+      await vi.advanceTimersByTimeAsync(step.atMs - played);
+      played = step.atMs;
+      await settle();
+      urls.add(router.url);
+      expect(marked()).not.toContain('/graphics');
+    }
+    await vi.advanceTimersByTimeAsync(1_000);
+    await settle();
+
+    expect([...urls]).toEqual(['/graphics']);
+    expect(marked()).toEqual(['/risks', '/chat', '/info']);
+
+    await navigate('/risks');
+    await navigate('/chat');
+    await navigate('/info');
+    expect(marked()).toEqual([]);
+    expect(TestBed.inject(CaseStore).unread()).toEqual({ graphics: 0, risks: 0, chat: 0, info: 0 });
   });
 });

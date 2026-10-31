@@ -417,6 +417,10 @@ export function createPaxiVoice({
       onNote: (note) => {
         if (current?.ready) send(current, { type: "session.thinking.append", delegation_id: null, content: note });
       },
+      onStop: () => {
+        poller?.stop();
+        if (running && !finishing) this_.stop();
+      },
     });
   }
 
@@ -667,7 +671,7 @@ export function createPaxiVoice({
     running = false;
   }
 
-  return {
+  const this_ = {
     /**
      * Starts a conversation. Call it from a click or tap: browsers require a user action.
      * Pass { resume: conversationId } to continue a conversation that was closed, for
@@ -772,7 +776,23 @@ export function createPaxiVoice({
     get running() {
       return running;
     },
+
+    /** Follows the app's language: switches Paxi to that language's native voice. */
+    async setLanguage(language) {
+      if (!current?.ready || switching) return;
+      let result;
+      try {
+        result = await postJson(`/api/conversations/${current.id}/language`, { language });
+      } catch (error) {
+        console.error("Language from the app failed", error);
+        return;
+      }
+      if (!result.ok) return;
+      languageChosen = true;
+      if (result.switch_voice && !switching) switchVoice(current, null, result.voice);
+    },
   };
+  return this_;
 }
 
 function waitForIceGathering(connection) {

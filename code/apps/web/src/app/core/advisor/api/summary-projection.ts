@@ -2,6 +2,7 @@ import type {
   AdvisorContext,
   InsuranceCaseDto,
   SummaryBundle as CaseSummaries,
+  SuitabilityView,
 } from '@pax/contracts';
 import type { Language } from '../../i18n/language';
 import type {
@@ -80,6 +81,7 @@ export function projectSummary(
   summaries: CaseSummaries | null,
   risks: readonly RiskItem[],
   language: Language,
+  suitability: SuitabilityView | null = null,
 ): SummaryBundle | null {
   const summary = summaries?.customer;
   if (!summary || summary.profileVersion === null || summary.runId === null) return null;
@@ -88,7 +90,6 @@ export function projectSummary(
   const progress = context?.progress.groups ?? [];
   const complete = (...ids: string[]) => ids.every((id) => progress.find((g) => g.id === id)?.complete === true);
   const reviewOpen = context?.progress.reviewOpen ?? summary.reviewTasks.some((task) => task.status === 'open');
-  const confirmed = dto.confirmedVersions.at(-1)?.draft;
 
   const keyFacts: SummaryFact[] = (summary.presentation?.metrics ?? []).slice(0, 6).map((metric) => ({
     factId: metric.id,
@@ -164,7 +165,10 @@ export function projectSummary(
       needsCaptured: complete('life_goals'),
       financesCaptured: complete('income', 'budget', 'capital'),
       allPillarsCaptured: complete('pillar_1', 'pillar_2', 'pillar_3'),
-      suitabilityCheckDone: confirmed?.insurance?.investmentKnowledgeConfirmed === true,
+      // A suitable pre-check for the current profile; the binding check stays with a Pax advisor.
+      suitabilityCheckDone: (suitability?.checks ?? []).some(
+        (check) => check.profileVersion === summary.profileVersion && check.result === 'suitable',
+      ),
     },
     products,
   };

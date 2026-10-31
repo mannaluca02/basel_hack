@@ -1,13 +1,15 @@
 // One command for the demo: the case backend with the demo start (live calculator) on 3000 and
 // the Angular app in its demo configuration on 4200. The app opens on a ready, calculated
 // synthetic case (Mueller persona); no access code. Ctrl+C stops both.
+// `--debug` serves the app in its debug configuration instead: the same, plus the Voice Lab view.
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const code = fileURLToPath(new URL('..', import.meta.url));
+const app = process.argv.includes('--debug') ? 'start:debug' : 'start:demo';
 const children = [
   spawn('npm', ['start'], { cwd: code, stdio: 'inherit', env: { ...process.env, PAX_DEMO_START: '1' } }),
-  spawn('npm', ['run', 'start:demo', '--', '--host', '127.0.0.1', '--port', '4200'], {
+  spawn('npm', ['run', app, '--', '--host', '127.0.0.1', '--port', '4200'], {
     cwd: `${code}apps/web`,
     stdio: 'inherit',
   }),

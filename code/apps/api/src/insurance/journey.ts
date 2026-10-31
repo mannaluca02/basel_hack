@@ -4,6 +4,7 @@ import { sha256Json } from '../calculation/hash.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { ProductDocuments } from './documents.js';
 import { PAX_PRODUCTS } from './products.js';
+import { assertSuitable } from './suitability.js';
 import { WorkflowError,type Actor,type InsuranceCase,type DemoQuote,type DemoApplication,type DemoPolicy } from './types.js';
 import { annual,usable } from '@pax/domain';
 
@@ -40,6 +41,8 @@ export class DemoJourneyService {
       const saving=selected.filter(p=>['pax_3a','pax_fondsstar','pax_lifestar'].includes(p.productId));
       if(saving.length>1)throw new WorkflowError('ALTERNATIVE_PRODUCTS_CANNOT_BE_STACKED',422);
       const profile=c.confirmedVersions.at(-1)!.draft;
+      // Fund-linked and capitalization products need a suitable pre-check of the person (Pax form 0054).
+      assertSuitable(c,run.profileVersion,selected,profile.insurance!.persons[0]!.personId);
       for(const p of selected)if(p.personId&&(profile.insurance!.persons.find(x=>x.personId===p.personId)?.personalAffordableAnnualPremiumCents??0)<=0)
         throw new WorkflowError('PERSONAL_AFFORDABILITY_NOT_ESTABLISHED',422);
       for(const p of selected)if(p.personId) {

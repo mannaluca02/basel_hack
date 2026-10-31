@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "caseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "formVersion": {
+      "type": "string",
+      "const": "0054/PMPV/03.2026"
+    },
+    "binding": {
+      "type": "boolean",
+      "const": false
+    },
+    "qualifiedProductIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "pax_fondsstar",
+          "pax_lifestar",
+          "pax_payout"
+        ]
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "formVersion": {
+            "type": "string",
+            "const": "0054/PMPV/03.2026"
+          },
+          "binding": {
+            "type": "boolean",
+            "const": false
+          },
+          "productId": {
+            "type": "string",
+            "enum": [
+              "pax_fondsstar",
+              "pax_lifestar",
+              "pax_payout"
+            ]
+          },
+          "personId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "profileVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "answers": {
+            "type": "object",
+            "properties": {
+              "annualPremiumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "singleInvestmentCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "netIncome": {
+                "type": "string",
+                "enum": [
+                  "under_75k",
+                  "75k_150k",
+                  "150k_250k",
+                  "over_250k"
+                ]
+              },
+              "netWorth": {
+                "type": "string",
+                "enum": [
+                  "under_10k",
+                  "10k_50k",
+                  "50k_150k",
+                  "150k_300k",
+                  "over_300k"
+                ]
+              },
+              "annualSavingCapacity": {
+                "type": "string",
+                "enum": [
+                  "under_1k",
+                  "1k_3k",
+                  "3k_7k",
+                  "over_7k"
+                ]
+              },
+              "singleInvestmentCapacity": {
+                "type": "string",
+                "enum": [
+                  "under_10k",
+                  "10k_50k",
+                  "50k_150k",
+                  "150k_300k",
+                  "over_300k"
+                ]
+              },
+              "investmentGoal": {
+                "type": "string",
+                "enum": [
+                  "low_risk",
+                  "moderate_risk",
+                  "high_risk"
+                ]
+              },
+              "horizon": {
+                "type": "string",
+                "enum": [
+                  "under_10_years",
+                  "10_to_15_years",
+                  "over_15_years"
+                ]
+              },
+              "securitiesExperience": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "knowledge_only",
+                  "experience",
+                  "extensive"
+                ]
+              },
+              "lossReaction": {
+                "type": "string",
+                "enum": [
+                  "sell_all",
+                  "sell_part",
+                  "hold",
+                  "buy_more"
+                ]
+              },
+              "guaranteedPercent": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "selectedStrategy": {
+                "type": "string",
+                "enum": [
+                  "conservative",
+                  "balanced",
+                  "dynamic"
+                ]
+              }
+            },
+            "required": [
+              "annualPremiumCents",
+              "singleInvestmentCents",
+              "netIncome",
+              "netWorth",
+              "annualSavingCapacity",
+              "singleInvestmentCapacity",
+              "investmentGoal",
+              "horizon",
+              "securitiesExperience",
+              "lossReaction",
+              "guaranteedPercent",
+              "selectedStrategy"
+            ],
+            "additionalProperties": false
+          },
+          "points": {
+            "type": "object",
+            "properties": {
+              "goal": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "horizon": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "experience": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "lossReaction": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "total": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "afterGuarantee": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "goal",
+              "horizon",
+              "experience",
+              "lossReaction",
+              "total",
+              "afterGuarantee"
+            ],
+            "additionalProperties": false
+          },
+          "profileStrategy": {
+            "type": "string",
+            "enum": [
+              "conservative",
+              "balanced",
+              "dynamic"
+            ]
+          },
+          "affordable": {
+            "type": "boolean"
+          },
+          "strategyMatches": {
+            "type": "boolean"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "suitable",
+              "advised_against"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "NOT_AFFORDABLE",
+                "STRATEGY_DOES_NOT_MATCH_PROFILE",
+                "HORIZON_TOO_SHORT"
+              ]
+            }
+          },
+          "humanConfirmationRequired": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "formVersion",
+          "binding",
+          "productId",
+          "personId",
+          "profileVersion",
+          "answers",
+          "points",
+          "profileStrategy",
+          "affordable",
+          "strategyMatches",
+          "result",
+          "reasons",
+          "humanConfirmationRequired"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "caseId",
+    "formVersion",
+    "binding",
+    "qualifiedProductIds",
+    "checks"
+  ],
+  "additionalProperties": false,
+  "title": "suitability-view-v1",
+  "description": "Pax synthetic-data PoC contract v1. Runtime Zod/domain reference checks and authorization remain authoritative; JSON Schema alone does not grant permission."
+}

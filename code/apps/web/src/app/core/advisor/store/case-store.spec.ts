@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
+import { DEFAULT_HUMAN_HANDOVER } from '@pax/contracts';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { Consent } from '../../consent/consent';
 import { provideI18nTesting } from '../../i18n/i18n-testing';
@@ -7,7 +8,7 @@ import { AdvisorDataSource, AdvisorSnapshot } from '../advisor-data-source';
 import { MOCK_CALL_SCRIPT } from '../mock/mock-call-script';
 import { provideAdvisorDataSource } from '../provide-advisor-data-source';
 import { CaseStore } from './case-store';
-import { CASE_ID, FakeDataSource, chart, event, info, risk, snapshot } from './case-testing';
+import { CASE_ID, FakeDataSource, chart, contextUpdate, event, info, risk, snapshot } from './case-testing';
 
 describe('CaseStore', () => {
   let source: FakeDataSource;
@@ -42,6 +43,26 @@ describe('CaseStore', () => {
     expect(store.caseId()).toBe(CASE_ID);
     expect(store.charts()).toEqual([chart()]);
     expect(store.unread()).toEqual({ graphics: 0, risks: 0, chat: 0, info: 0 });
+  });
+
+  it('delivers handover Stop synchronously through the store before a pending canonical snapshot', () => {
+    connectPending();
+    const stopMedia = vi.fn();
+    const seenContext = vi.fn();
+    store.digitalStops.subscribe(stopMedia);
+    store.contextUpdates.subscribe(seenContext);
+    const update = {
+      ...contextUpdate(8),
+      handover: { ...DEFAULT_HUMAN_HANDOVER, wantsHumanAdvisor: true, stopDigitalConversation: true },
+    };
+
+    source.emit(event('context', update));
+
+    // No render, promise, snapshot result, or change detection needed to stop browser media.
+    expect(stopMedia).toHaveBeenCalledExactlyOnceWith({ reason: 'human-handover', update });
+    expect(seenContext).toHaveBeenCalledExactlyOnceWith(update);
+    expect(store.loaded()).toBe(false);
+    expect(source.snapshotRequests).toBe(1);
   });
 
   it('does not let a late, older result overwrite a newer one', () => {

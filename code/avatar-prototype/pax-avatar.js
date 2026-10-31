@@ -105,6 +105,8 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
   let emotion = "neutral", destroyed = false, visible = true;
   const cur = { ...BASE };
   let level = 0, levelSource = silence, hasLevelSource = false;
+  // Opt-in visual heuristic, deliberately separate from authoritative playback IDs/events.
+  let localAudioVisual = false, localAudioActive = false, localAudioQuiet = 0;
   let slowLevel = 0, onsetReady = true, beatAge = Infinity, beatStrength = 0, beatPose = 0;
   let beatCooldown = 0, nextBeat = .8, nextEngagedGaze = 0;
   const engagedGaze = { x:0, y:0 }, engagedTarget = { x:0, y:0 };
@@ -184,6 +186,7 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
     if (destroyed) return;
     audioNode?.disconnect(); analyser?.disconnect(); audioNode = analyser = buf = null;
     setLevelSource(typeof source === "function" ? source : null);
+    if (!source) { localAudioVisual = localAudioActive = false; localAudioQuiet = 0; render(); }
     if (!source || typeof source === "function") return;
     audioCtx ||= new AudioContext();
     if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
@@ -202,13 +205,18 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
   function frame(now) {
     if (destroyed || !visible) return;
     const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
-    const target = POSES[emotion];
-    const k = 1 - Math.exp(-dt * 7);
-    for (const key in BASE) cur[key] += (target[key] - cur[key]) * k;
-
     // speech level with fast attack / slow release
     const raw = levelSource();
     level += (raw - level) * (1 - Math.exp(-dt * (raw > level ? 30 : 10)));
+    if (localAudioVisual) {
+      if (raw > (localAudioActive ? .04 : .1)) localAudioQuiet = 0;
+      else localAudioQuiet += dt;
+      const active = hasLevelSource && (raw > .1 || localAudioActive && localAudioQuiet < .25);
+      if (active !== localAudioActive) { localAudioActive = active; render(); }
+    }
+    const target = POSES[emotion];
+    const k = 1 - Math.exp(-dt * 7);
+    for (const key in BASE) cur[key] += (target[key] - cur[key]) * k;
 
     const motion = reducedMotion.matches ? 0 : 1;
     phase += dt * cur.speed;
@@ -401,6 +409,8 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
     clearTimeout(relaxTimer);
     let face;
     if (playing) face = replyEmotion;
+    // Transcript activity can arrive late. Silence must not leave the visual stuck thinking.
+    else if (localAudioVisual) face = localAudioActive ? "explaining" : "listening";
     else if (activity === "listening" || activity === "thinking") face = activity;
     else face = replyEmotion;
     setEmotion(face);
@@ -410,6 +420,13 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
   function handle(ev) {
     if (destroyed) return false;
     switch (ev?.type) {
+      case "local-audio-visual":
+        if (typeof ev.enabled !== "boolean") return false;
+        localAudioVisual = ev.enabled;
+        localAudioActive = false; localAudioQuiet = 0;
+        if (!ev.enabled) level = slowLevel = 0;
+        render();
+        return true;
       case "activity":
         if (!["idle", "listening", "thinking"].includes(ev.state)) return false;
         if (ev.state === "listening" && activity === "idle" && !playing) {
@@ -465,8 +482,8 @@ export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
       entries.length = 0;
       setEmotion(face, true);
     },
-    reset() { if (destroyed) return; clearPending(); activity = "idle"; playing = null; replyEmotion = "neutral"; emotionChangedAt = -Infinity; finished.length = 0; render(); },
-    get state() { return { face:emotion, activity, playing, replyEmotion, level }; },
+    reset() { if (destroyed) return; clearPending(); localAudioVisual = localAudioActive = false; localAudioQuiet = level = slowLevel = 0; activity = "idle"; playing = null; replyEmotion = "neutral"; emotionChangedAt = -Infinity; finished.length = 0; render(); },
+    get state() { return { face:emotion, activity, playing, replyEmotion, level, localAudioActive }; },
     destroy() {
       destroyed = true; cancelAnimationFrame(raf); clearTimeout(relaxTimer); clearTimeout(pendingTimer);
       observer.disconnect(); reducedMotion.removeEventListener("change", resume);
