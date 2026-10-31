@@ -1,0 +1,22 @@
+{
+  "id": "pax-intake-demo",
+  "version": "0.2.0",
+  "locale": "de-CH",
+  "title": "Pax Vorsorgecheck – Personalien (Beispiel)",
+  "fields": [
+    {
+      "id": "full_name",
+      "label": "Vor- und Nachname",
+      "type": "string",
+      "question": "Wie darf ich dich nennen? Später: Und wie heisst du mit vollem Namen?",
+      "required": true
+    },
+    {
+      "id": "birth_date",
+      "label": "Geburtsdatum",
+      "type": "date",
+      "question": "Wie alt bist du eigentlich? Danach: Und wann hast du Geburtstag?",
+      "required": true
+    }
+  ]
+}
