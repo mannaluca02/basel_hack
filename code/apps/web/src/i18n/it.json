@@ -293,5 +293,42 @@
     "reconnecting": "La connessione viene ristabilita …",
     "paused": "Fino ad allora non arrivano nuovi dati; quelli mostrati possono essere superati.",
     "retry": "Riconnetti"
+  },
+  "human": {
+    "request": "Parlare con un consulente Pax",
+    "requested": "La sua richiesta di consulenza personale è registrata, la consulenza digitale è in pausa. Può contattare Pax al",
+    "resume": "Continuare in digitale",
+    "failed": "Non ha funzionato. Riprovi o chiami Pax direttamente."
+  },
+  "summary": {
+    "title": "Riepilogo",
+    "draft": "Bozza",
+    "close": "Chiudere il riepilogo",
+    "reviewOpen": "Uno specialista Pax sta ancora verificando i valori; è uno stato provvisorio.",
+    "keyFacts": "L’essenziale",
+    "goals": "I suoi obiettivi",
+    "pillars": "I tre pilastri in vecchiaia",
+    "gaps": "Lacune principali",
+    "openQuestions": "Domande aperte",
+    "nextSteps": "Prossimi passi",
+    "products": "Soluzioni possibili",
+    "productsLocked": "Le raccomandazioni appaiono non appena l’analisi è completa: obiettivi, finanze e tutti e tre i pilastri.",
+    "productsDraft": "Provvisorio: uno specialista Pax sta ancora verificando queste proposte.",
+    "noProducts": "Per la sua situazione al momento non serve alcun contratto aggiuntivo.",
+    "need": "Fabbisogno",
+    "suitabilityRequired": "Verifica dell’adeguatezza necessaria",
+    "unknown": "ancora sconosciuto",
+    "empty": "Il riepilogo appare non appena si sa abbastanza sulla sua situazione.",
+    "human": "Consulenza personale",
+    "pillar": {
+      "pillar1": "1° pilastro (AVS)",
+      "pillar2": "2° pilastro (cassa pensione)",
+      "pillar3": "3° pilastro (privato)"
+    },
+    "period": {
+      "month": "al mese",
+      "year": "all’anno",
+      "once": "una tantum"
+    }
   }
 }

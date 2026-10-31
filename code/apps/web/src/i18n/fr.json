@@ -293,5 +293,42 @@
     "reconnecting": "La connexion est en cours de rétablissement …",
     "paused": "D’ici là, aucun nouveau chiffre n’arrive ; ceux affichés peuvent être dépassés.",
     "retry": "Se reconnecter"
+  },
+  "human": {
+    "request": "Parler à un·e conseiller·ère Pax",
+    "requested": "Votre demande de conseil personnel est enregistrée, le conseil numérique est en pause. Vous joignez Pax au",
+    "resume": "Continuer en numérique",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer ou appeler Pax directement."
+  },
+  "summary": {
+    "title": "Résumé",
+    "draft": "Brouillon",
+    "close": "Fermer le résumé",
+    "reviewOpen": "Un·e spécialiste Pax vérifie encore les valeurs ; il s’agit d’un état provisoire.",
+    "keyFacts": "L’essentiel",
+    "goals": "Vos objectifs",
+    "pillars": "Les trois piliers à la retraite",
+    "gaps": "Lacunes principales",
+    "openQuestions": "Questions ouvertes",
+    "nextSteps": "Prochaines étapes",
+    "products": "Solutions possibles",
+    "productsLocked": "Les recommandations apparaissent dès que l’analyse est complète : objectifs, finances et les trois piliers.",
+    "productsDraft": "Provisoire : un·e spécialiste Pax vérifie encore ces propositions.",
+    "noProducts": "Aucun contrat supplémentaire n’est nécessaire pour votre situation actuellement.",
+    "need": "Besoin",
+    "suitabilityRequired": "Vérification du caractère approprié requise",
+    "unknown": "encore inconnu",
+    "empty": "Le résumé apparaît dès que l’on en sait assez sur votre situation.",
+    "human": "Conseil personnel",
+    "pillar": {
+      "pillar1": "1er pilier (AVS)",
+      "pillar2": "2e pilier (caisse de pension)",
+      "pillar3": "3e pilier (privé)"
+    },
+    "period": {
+      "month": "par mois",
+      "year": "par an",
+      "once": "unique"
+    }
   }
 }

@@ -30,6 +30,9 @@ import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
 import { ConnectionBanner } from './features/connection/connection-banner';
+import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
+import { SummaryDialog } from './features/summary/summary-dialog';
+import { HumanAdvisor } from './core/advisor/api/human-advisor';
 import { ReviewPanel } from './features/review/review-panel';
 
 interface TabLink {
@@ -51,6 +54,8 @@ interface TabLink {
     ConsentScreen,
     AgentDock,
     ConnectionBanner,
+    HumanAdvisorStatus,
+    SummaryDialog,
     ReviewPanel,
   ],
   selector: 'app-root',
@@ -79,6 +84,8 @@ export class App {
       icon: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16M12 11v5M12 8h.01',
     },
   ];
+
+  protected readonly humanAdvisor = inject(HumanAdvisor);
 
   /** Until the user consents, only the privacy notice is shown: no workspace, no call. */
   protected readonly consented = this.consent.granted;

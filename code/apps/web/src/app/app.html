@@ -17,6 +17,7 @@
 } @else {
   <main class="view" #view tabindex="-1">
     <app-connection-banner />
+    <app-human-advisor-status />
     @if (reviewEnabled) {
       <app-review-panel />
     }
@@ -51,7 +52,25 @@
       }
     </nav>
 
+    <!-- Always reachable: a human advisor (FE-10, rule 5). -->
+    <button
+      type="button"
+      class="tab human"
+      [attr.aria-pressed]="humanAdvisor.requested()"
+      [disabled]="humanAdvisor.busy()"
+      (click)="humanAdvisor.requested() ? humanAdvisor.resume() : humanAdvisor.request()"
+    >
+      <span class="glyph">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8M4.5 21a7.5 7.5 0 0 1 15 0M18 8v3M20 9.5h-4" />
+        </svg>
+      </span>
+      <span class="label">{{ (humanAdvisor.requested() ? 'human.resume' : 'human.request') | transloco }}</span>
+    </button>
+
     <!-- Lukas's avatar renderer goes inside, as projected content. -->
     <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()" />
   </div>
+
+  <app-summary-dialog />
 }

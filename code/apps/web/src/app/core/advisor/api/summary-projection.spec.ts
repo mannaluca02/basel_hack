@@ -47,6 +47,14 @@ describe('projectSummary', () => {
     });
   });
 
+  it('lists the products of the current recommendation and marks unit-linked ones', () => {
+    expect(summary.products!.map((p) => [p.productId, p.unitLinked])).toEqual([
+      ['pax_disability', false],
+      ['pax_term_life', false],
+    ]);
+    expect(summary.products![0]!.need).toMatchObject({ amount: 2_200_000, period: 'year' });
+  });
+
   it('has no summary before the backend has an analysed snapshot', () => {
     expect(projectSummary(dto, context, null, risks, 'de')).toBeNull();
   });

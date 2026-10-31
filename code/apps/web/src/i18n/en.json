@@ -293,5 +293,42 @@
     "reconnecting": "Reconnecting …",
     "paused": "Until then no new figures arrive; the ones shown may be outdated.",
     "retry": "Reconnect"
+  },
+  "human": {
+    "request": "Talk to a Pax advisor",
+    "requested": "Your request for personal advice is saved and the digital advice is paused. You can reach Pax at",
+    "resume": "Continue digitally",
+    "failed": "That did not work. Please try again or call Pax directly."
+  },
+  "summary": {
+    "title": "Summary",
+    "draft": "Draft",
+    "close": "Close the summary",
+    "reviewOpen": "A Pax specialist is still reviewing the figures; this is a preliminary state.",
+    "keyFacts": "Key facts",
+    "goals": "Your goals",
+    "pillars": "The three pillars at retirement",
+    "gaps": "Main gaps",
+    "openQuestions": "Open questions",
+    "nextSteps": "Next steps",
+    "products": "Possible solutions",
+    "productsLocked": "Recommendations appear once the analysis is complete: goals, finances and all three pillars.",
+    "productsDraft": "Preliminary: a Pax specialist is still reviewing these proposals.",
+    "noProducts": "No additional contract is needed for your situation right now.",
+    "need": "Need",
+    "suitabilityRequired": "Suitability check required",
+    "unknown": "not known yet",
+    "empty": "The summary appears once enough is known about your situation.",
+    "human": "Personal advice",
+    "pillar": {
+      "pillar1": "Pillar 1 (AHV)",
+      "pillar2": "Pillar 2 (pension fund)",
+      "pillar3": "Pillar 3 (private)"
+    },
+    "period": {
+      "month": "per month",
+      "year": "per year",
+      "once": "once"
+    }
   }
 }
