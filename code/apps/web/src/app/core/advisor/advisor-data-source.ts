@@ -44,6 +44,23 @@ export interface AdvisorSnapshot {
   readonly summary: SummaryBundle | null;
 }
 
+/** A case before anything is known about it. */
+export function emptySnapshot(caseId: string): AdvisorSnapshot {
+  return {
+    caseId,
+    contextRevision: 0,
+    agent: { activity: 'idle', at: new Date(0).toISOString() },
+    progress: null,
+    transcript: [],
+    replies: [],
+    charts: [],
+    risks: [],
+    info: [],
+    analysis: null,
+    summary: null,
+  };
+}
+
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 
 /**
