@@ -59,7 +59,8 @@ const languages = {
   it: { name: "Italian", voiceKey: voiceByKey.has("paxi-it") ? "paxi-it" : voiceByKey.has("paxi") ? "paxi" : "juni" },
   en: { name: "English", voiceKey: "gleam" },
 };
-const logDirectory = resolve(here, "data/conversations");
+// PAXI_LOG_DIR moves the logs, e.g. for tests; the default stays in data/ (gitignored).
+const logDirectory = resolve(process.env.PAXI_LOG_DIR ?? resolve(here, "data/conversations"));
 // Valentin's case backend; Paxi proposes what it heard there once the app linked a case.
 const bridge = createCaseBridge({ apiUrl: process.env.PAX_API_URL ?? "http://127.0.0.1:3000" });
 // The customer app that may hand a case to Paxi (see /api/case-link).
