@@ -200,6 +200,18 @@
       "allFields": "Toutes les informations",
       "assumptions": "Hypothèses",
       "notice": "Note sur le traitement des données"
+    },
+    "demo": {
+      "emptyHint": "Le dossier est encore vide. Parle à Paxi ou charge la persona Pax.",
+      "loadPersona": "Charger la famille Müller (persona Pax, fictive)",
+      "calculate": "Calculer les scénarios",
+      "calculating": "Famille, logement, retraite et situation actuelle sont calculés avec le calculateur Pax …",
+      "voiceStart": "Parler avec Paxi",
+      "voiceAgree": "Compris, ouvrir Paxi",
+      "voiceDisabled": "Remarque : le traitement vocal est désactivé dans le backend. Paxi ne peut alors pas proposer de modifications.",
+      "voiceLinking": "Paxi est relié à ton dossier …",
+      "voiceOpened": "Paxi est ouvert dans une fenêtre séparée. Ce que tu racontes apparaît ici comme proposition à vérifier.",
+      "voiceFailed": "Impossible de relier Paxi. L'agent vocal est-il lancé ?"
     }
   }
 }

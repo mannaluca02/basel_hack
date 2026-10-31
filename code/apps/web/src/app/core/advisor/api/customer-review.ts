@@ -107,6 +107,15 @@ export class CustomerReview {
     return this.contextState()?.missingFields.length ? 'incomplete' : 'ready';
   });
 
+  /** The draft holds no household yet: a demo persona can fill it. */
+  readonly empty = computed(() => this.caseState()?.draft.financial === null);
+  /** Analyses for the newest confirmed profile exist. */
+  readonly calculated = computed(() => {
+    const dto = this.caseState();
+    const version = dto?.confirmedVersions?.at(-1)?.version;
+    return (dto?.runs ?? []).some((run) => run.profileVersion === version && run.status !== 'stale');
+  });
+
   constructor() {
     const source = inject(AdvisorDataSource);
     const destroyRef = inject(DestroyRef);
@@ -139,6 +148,24 @@ export class CustomerReview {
   signIn(accessCode: string): Promise<void> {
     return this.act(async () => {
       await this.api.signIn(accessCode);
+    });
+  }
+
+  /** Fills the empty draft with the synthetic Pax persona; it still needs both customer actions. */
+  loadPersona(): Promise<void> {
+    return this.act(async () => {
+      const caseId = this.caseId();
+      const { caseRevision } = await this.api.loadCase(caseId);
+      await this.api.loadPersona(caseId, caseRevision);
+    });
+  }
+
+  /** Runs the standard scenarios on the newest confirmed profile. */
+  calculate(): Promise<void> {
+    return this.act(async () => {
+      const caseId = this.caseId();
+      const version = (await this.api.loadCase(caseId)).confirmedVersions.at(-1)?.version;
+      if (version) await this.api.runStandardAnalyses(caseId, version);
     });
   }
 

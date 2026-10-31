@@ -12,6 +12,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { ProposalBatch } from '@pax/contracts';
 import { CustomerReview } from '../../core/advisor/api/customer-review';
+import { VoiceAgentLink } from '../../core/advisor/api/voice-agent-link';
 import { ChfPipe } from '../../core/i18n/locale-format';
 import { ChangeView, describeChange, describePersons, francs, profileRows } from './review-model';
 
@@ -106,6 +107,57 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
           </button>
         </form>
       } @else if (review.current()) {
+        <div class="demo">
+          @if (review.empty()) {
+            <p>{{ 'review.demo.emptyHint' | transloco }}</p>
+            <button type="button" class="action" [disabled]="review.busy()" (click)="review.loadPersona()">
+              {{ 'review.demo.loadPersona' | transloco }}
+            </button>
+          }
+          @if (review.profileState() === 'confirmed' && !review.calculated()) {
+            <button type="button" class="action action--primary" [disabled]="review.busy()" (click)="review.calculate()">
+              {{ 'review.demo.calculate' | transloco }}
+            </button>
+            @if (review.busy()) {
+              <p class="status" role="status">{{ 'review.demo.calculating' | transloco }}</p>
+            }
+          }
+          @if (voice.available) {
+            @switch (voice.state()) {
+              @case ('notice') {
+                @if (voice.notice(); as notice) {
+                  <div class="voice-notice">
+                    <p>{{ notice.text }}</p>
+                    @if (!notice.enabled) {
+                      <p class="status">{{ 'review.demo.voiceDisabled' | transloco }}</p>
+                    }
+                    <button type="button" class="action action--primary" (click)="voice.open()">
+                      {{ 'review.demo.voiceAgree' | transloco }}
+                    </button>
+                    <button type="button" class="action" (click)="voice.dismiss()">
+                      {{ 'review.question.cancel' | transloco }}
+                    </button>
+                  </div>
+                }
+              }
+              @case ('linking') {
+                <p class="status" role="status">{{ 'review.demo.voiceLinking' | transloco }}</p>
+              }
+              @default {
+                <button type="button" class="action" [disabled]="review.empty()" (click)="voice.showNotice()">
+                  {{ 'review.demo.voiceStart' | transloco }}
+                </button>
+                @if (voice.state() === 'opened') {
+                  <p class="status" role="status">{{ 'review.demo.voiceOpened' | transloco }}</p>
+                }
+                @if (voice.state() === 'failed') {
+                  <p class="message message--error" role="alert">{{ 'review.demo.voiceFailed' | transloco }}</p>
+                }
+              }
+            }
+          }
+        </div>
+
         @for (item of batches(); track item.id) {
           <article class="batch">
             <dl [id]="'batch-' + item.id">
@@ -321,6 +373,25 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
       margin: 0 0 0.25rem;
     }
 
+    .demo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .demo p {
+      margin: 0;
+    }
+
+    .voice-notice {
+      flex-basis: 100%;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-muted);
+    }
+
     .batch {
       margin-bottom: 0.75rem;
       padding: 0.75rem;
@@ -421,6 +492,7 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
 })
 export class ReviewPanel {
   protected readonly review = inject(CustomerReview);
+  protected readonly voice = inject(VoiceAgentLink);
 
   protected readonly batches = computed(() => {
     const draft = this.review.current()?.draft;

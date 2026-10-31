@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
 import type {
   AdvisorContext,
+  AgentAccessResponse,
   AnswerConfirmationInput,
   CancelConfirmationInput,
   ConfirmationOutcome,
@@ -21,6 +22,14 @@ export const CUSTOMER_SESSION_KEY = 'pax.customer-session';
 
 /** The conversation length the backend paces its questions by; nothing in the UI sets it yet. */
 const TIME_BUDGET_MINUTES = 30;
+
+/** The backend's separate notice for external voice processing. */
+export interface VoicePrivacyNotice {
+  readonly version: string;
+  readonly enabled: boolean;
+  /** In the language of the request. */
+  readonly text: string;
+}
 
 export interface CustomerSession {
   readonly csrfToken: string;
@@ -80,6 +89,29 @@ export class CustomerApi {
         { locale },
         { headers: { 'X-CSRF-Token': this.session()?.csrfToken ?? '' } },
       ),
+    );
+  }
+
+  /** Loads a synthetic Pax persona as an unconfirmed draft. */
+  loadPersona(caseId: string, expectedCaseRevision: number): Promise<InsuranceCaseDto> {
+    return this.post(`${this.caseUrl(caseId)}/demo-profile`, { persona: 'mueller', expectedCaseRevision });
+  }
+
+  /** Runs the standard scenarios of the confirmed profile and derives the recommendation. */
+  runStandardAnalyses(caseId: string, expectedProfileVersion: number): Promise<unknown> {
+    return this.post(`${this.caseUrl(caseId)}/standard-analyses`, { expectedProfileVersion });
+  }
+
+  /** A 15-minute grant for an agent acting on this case; hand it on, never keep or show it. */
+  agentAccess(caseId: string): Promise<AgentAccessResponse> {
+    return this.post(`${this.caseUrl(caseId)}/agent-access`, {});
+  }
+
+  voicePrivacy(): Promise<VoicePrivacyNotice> {
+    return firstValueFrom(
+      this.http.get<VoicePrivacyNotice>(`${this.base}/voice/privacy`, {
+        params: { locale: this.language.language() },
+      }),
     );
   }
 
