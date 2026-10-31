@@ -19,6 +19,8 @@
   #avatar:disabled { cursor: default; }
   #hint { font-size: 15px; color: var(--muted); text-align: center; min-height: 1.4em; }
   #caption { max-width: 560px; text-align: center; font-size: 17px; line-height: 1.45; min-height: 3em; }
+  #provider-label { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  #provider { font: inherit; font-size: 14px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--text); }
   #stop { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: inherit; cursor: pointer; }
   #stop[hidden] { display: none; }
   aside { border-left: 1px solid var(--line); padding: 20px 16px; overflow-y: auto; font-size: 14px; }
@@ -42,6 +44,9 @@
 <body>
 <main id="stage">
   <button id="avatar" aria-label="Gespräch mit Paxi starten"></button>
+  <label id="provider-label">KI-Quelle
+    <select id="provider" aria-label="KI-Quelle für das Gespräch"></select>
+  </label>
   <div id="hint">Tippe auf Paxi, um das Gespräch zu starten.</div>
   <div id="caption"></div>
   <button id="stop" hidden>Gespräch beenden</button>

@@ -2,7 +2,8 @@
 // Creates WebRTC sessions (API key stays here) and owns the JSON conversation log.
 import express from "express";
 import OpenAI from "openai";
-import { access, readFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { access, mkdir, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -13,7 +14,9 @@ import {
   saveLog,
   validateAnswer,
 } from "./conversation-log.mjs";
+import { extractAnswers } from "./answer-extractor.mjs";
 import { extractContext } from "./conversation-context.mjs";
+import { conversationToken, ELEVENLABS_VOICE_ID, ensureAgent } from "./elevenlabs.mjs";
 import { detectLanguage } from "./language-detect.mjs";
 import { customVoices } from "./paxi-voice.mjs";
 
@@ -83,13 +86,13 @@ const welcomeText = (await readFile(resolve(here, "welcome.txt"), "utf8")).trim(
 // interrupt it: a GPT-Live audio fixture would drop all input while it plays.
 const introUrl = await access(resolve(here, "public/intro.mp3")).then(() => "/intro.mp3", () => null);
 
-const questionList = (tier) =>
+const topicList = (tier) =>
   voiceFields
     .filter((field) => (field.tier ?? "core") === tier)
-    .map((field) => `- ${field.label} (${field.id}). Casual way to ask: ${field.question}`)
+    .map((field) => `- ${field.label}. For example: ${field.question}`)
     .join("\n");
 
-// How the backend passes each value to save_answer.
+// How the extractor returns each value.
 function valueFormat(field) {
   if (field.type === "date") return "Datum JJJJ-MM-TT";
   if (field.type === "integer") return `ganze Zahl${field.min !== undefined ? ` ${field.min} bis ${field.max}` : ""}`;
@@ -100,11 +103,11 @@ function valueFormat(field) {
 }
 
 const labelsOf = (ids) => ids.map((id) => fieldsById.get(id).label);
+const openLabels = (log) => labelsOf([...openFields(log, "core"), ...openFields(log, "extended")]);
 
-// persona.md is the opening prompt; the rest follows OpenAI's recommended GPT-Live
-// structure (backchannel, interruption and delegation policies). gpt-live-1 delegates
-// on <|SpawnThinking|>.
-function liveInstructions(voiceOption, language) {
+// Paxi's prompt, shared by all voice providers: persona.md, language, today's date and
+// what to find out. Saving happens by itself (answer-extractor.mjs), so Paxi only talks.
+function paxiPrompt({ language, voicePrompt }) {
   const languageRule = language
     ? `Current conversation language: ${languages[language].name}, spoken with native pronunciation. If the person starts speaking another of your languages, follow them.`
     : `Languages: you speak German, French, Italian and English, each with native pronunciation. Continue in the language the person speaks.`;
@@ -112,21 +115,30 @@ function liveInstructions(voiceOption, language) {
 ## Languages
 
 ${languageRule}
-${voiceOption.prompt ? `\n## Voice\n\n${voiceOption.prompt}\n` : ""}
+${voicePrompt ? `\n## Voice\n\n${voicePrompt}\n` : ""}
 ## Today
 
-Today is ${today()}. Use this date for anything time-related, for example to work out someone's age from their birthday or how many years are left until a plan.
+Today is ${today()}. Use this date for anything time-related, for example to work out someone's birth year from their age and birthday, or how long ago something was.
 
-## Questionnaire details to pick up during the chat
+## What you want to find out
 
-Core details: you need all of these before the conversation may end.
-${questionList("core")}
+The app listens along and fills in the questionnaire by itself from what the person says. You never need to say that you noted or saved something, and you do not need to confirm every detail. Only check back on things that are easy to mishear: names, dates and amounts.
 
-Extended details: pick them up when they fit naturally; a colleague completes the rest.
-${questionList("extended")}
+You will receive quiet notes from the app about what is already known and what is still open. Never ask for something that is already known, and do not follow the order of the list below: let it come up in the conversation.
 
-Before a detail is saved, repeat it naturally and let the person confirm it. Do not ask for something you can work out yourself: with the age and the birthday you know the birth year, so just confirm the full date.
-Never say goodbye or wrap up while core details are still open. If the person wants to stop early, tell them in one sentence that only a few quick questions are left and ask them right away, without small talk. If they still want to go, say that a colleague of yours will complete the rest with them.
+Important for the first conversation:
+${topicList("core")}
+
+Also part of the picture; find these out too, whenever they fit:
+${topicList("extended")}
+
+Only wrap up when the app's note says that everything is complete or handed to a colleague. If the person wants to stop before that, tell them in one sentence that only a few quick questions are left and ask them right away. If they still want to go, say that a colleague of yours will complete the rest with them.`;
+}
+
+// GPT-Live adds OpenAI's recommended policies (backchannel, interruption, delegation).
+// gpt-live-1 delegates on <|SpawnThinking|>; the only backend task left is the language.
+function liveInstructions(voiceOption, language) {
+  return `${paxiPrompt({ language, voicePrompt: voiceOption.prompt })}
 
 ## Policies
 
@@ -136,21 +148,15 @@ Interruption policy: Stop speaking when the person clearly starts talking to you
 
 Delegation policy:
 Backend tools:
-- Questionnaire: saves a confirmed detail and reports which details are still open, or why a value was rejected.
 - Language: switches to a native voice for the language the person speaks.
-- Declined: notes that the person does not want to give a detail, so a colleague can clarify it with them later.
 
 Generate <|SpawnThinking|> when:
 - The person speaks ${language ? `a language other than ${languages[language].name}` : "for the first time, also when they interrupt the welcome"} (they choose the conversation language just by speaking it).
-- The person has confirmed one of the questionnaire details.
-- The person corrects a detail that was already saved.
-- The person says they do not want to give one of the questionnaire details (each time they decline).
 
 Do not generate <|SpawnThinking|> when:
-- The person chats about their life, hobbies, work or plans. Just keep the conversation going; this context is picked up automatically afterwards.
-- A detail is not yet confirmed or you need a short clarification.
+- The person tells you about themselves or answers a question. Just keep the conversation going; the app picks up the details by itself.
 
-While the backend works, keep chatting naturally about the current topic instead of waiting in silence. Never mention tools, systems, saving or searching. Do not say that something is saved before the backend confirms it. If a value is rejected, explain why in one sentence and ask again casually.`;
+Never mention tools, systems, saving or searching.`;
 }
 
 // Swiss local date, so Paxi and the backend calculate ages and durations correctly.
@@ -161,16 +167,7 @@ function today() {
   return `${long} (${iso})`;
 }
 
-const backendInstructions = `Du speicherst bestätigte Angaben für den Fragebogen "${questionnaire.title}".
-Felder:
-${voiceFields.map((field) => `- ${field.id}: ${field.label} (${valueFormat(field)})`).join("\n")}
-Das Gespräch kann auf Deutsch, Französisch, Italienisch oder Englisch laufen; gespeichert wird immer im gleichen Format, unabhängig von der Sprache.
-Sprachwahl: Die Person wählt ihre Sprache, indem sie einfach in ihr spricht. Wenn sie nach der Begrüssung zum ersten Mal spricht oder in eine andere Sprache wechselt, rufe set_language mit dieser Sprache auf (de, fr, it oder en), bevor du sonst etwas tust. Spricht sie weiter in der bereits gesetzten Sprache, rufe set_language nicht erneut auf.
-Rufe save_answer genau einmal pro bestätigter Angabe auf.
-Lehnt die Person eine Angabe ab, rufe decline_answer für dieses Feld auf, jedes Mal wenn sie ablehnt. Die Antwort sagt dir, ob Paxi später noch einmal sanft nachfragen soll oder ob ein Kollege oder eine Kollegin von Paxi es persönlich klärt; gib das genau so weiter.
-- Datumswerte immer als JJJJ-MM-TT übergeben (z. B. "dritter März 1990" -> "1990-03-03"). Ein Alter allein ist kein Geburtsdatum.
-- Namen vollständig (Vor- und Nachname) und so übergeben, wie die Person sie bestätigt hat, mit korrekter Gross-/Kleinschreibung. Ein Spitzname oder nur ein Vorname ist noch kein vollständiger Name.
-Gib danach nur eine sehr knappe, sachliche Rückmeldung für Paxi (ohne Dank, ohne Begrüssung, nichts zum Vorlesen): gespeichert oder warum abgelehnt, und welche Kernangaben (open_core) noch fehlen.`;
+const backendInstructions = `Du hilfst Paxi bei der Sprachwahl. Die Person wählt ihre Sprache, indem sie einfach in ihr spricht. Wenn sie nach der Begrüssung zum ersten Mal spricht oder in eine andere Sprache wechselt, rufe set_language mit dieser Sprache auf (de, fr, it oder en). Spricht sie weiter in der bereits gesetzten Sprache, rufe set_language nicht erneut auf. Gib danach nur eine sehr knappe, sachliche Rückmeldung für Paxi, nichts zum Vorlesen.`;
 
 const setLanguageTool = {
   type: "function",
@@ -181,38 +178,6 @@ const setLanguageTool = {
     type: "object",
     properties: { language: { type: "string", enum: Object.keys(languages) } },
     required: ["language"],
-    additionalProperties: false,
-  },
-};
-
-const declineAnswerTool = {
-  type: "function",
-  name: "decline_answer",
-  description: "Hält fest, dass die Person eine Angabe auch nach erneutem Nachfragen nicht geben möchte. Eine Pax-Mitarbeiterin oder ein Pax-Mitarbeiter klärt sie später persönlich.",
-  strict: true,
-  parameters: {
-    type: "object",
-    properties: {
-      field_id: { type: "string", enum: voiceFields.map((field) => field.id) },
-      reason: { type: "string", description: "Kurz, warum die Person die Angabe nicht geben möchte, falls sie es gesagt hat; sonst leer." },
-    },
-    required: ["field_id", "reason"],
-    additionalProperties: false,
-  },
-};
-
-const saveAnswerTool = {
-  type: "function",
-  name: "save_answer",
-  description: "Speichert eine von der Person bestätigte Antwort zu einem Fragebogenfeld.",
-  strict: true,
-  parameters: {
-    type: "object",
-    properties: {
-      field_id: { type: "string", enum: voiceFields.map((field) => field.id) },
-      value: { type: "string", description: "Der bestätigte Wert im Format des Feldes (siehe Anweisungen)." },
-    },
-    required: ["field_id", "value"],
     additionalProperties: false,
   },
 };
@@ -298,10 +263,9 @@ app.post("/api/session", sameOrigin, async (request, response) => {
             model: backendModel,
             instructions: [
               backendInstructions,
-              `Heute ist ${today()}; rechne Alter und Zeiträume mit diesem Datum.`,
               ...(language ? [`Die Sprache ist bereits auf ${language} gesetzt; rufe set_language nur auf, wenn die Person in eine andere Sprache wechselt.`] : []),
             ].join("\n"),
-            tools: [setLanguageTool, saveAnswerTool, declineAnswerTool],
+            tools: [setLanguageTool],
             tool_choice: "auto",
             parallel_tool_calls: false,
           },
@@ -362,11 +326,180 @@ app.post("/api/conversations/:sessionId/transcript", sameOrigin, async (request,
       });
     }
   }
+  if (fragments.some((fragment) => fragment.speaker === "user")) scheduleExtraction(log);
   await persist(log);
   response.status(204).end();
 });
 
-// Called by the browser when the backend model calls set_language.
+// --- Filling the questionnaire from the conversation ------------------------------------
+
+const EXTRACTION_DEBOUNCE_MS = 1500;
+const extraction = new Map(); // conversation ID -> { timer, running, again }
+
+// Runs the extractor shortly after the person stopped talking, one run at a time.
+function scheduleExtraction(log) {
+  const state = extraction.get(log.conversationId) ?? { timer: null, running: false, again: false };
+  extraction.set(log.conversationId, state);
+  clearTimeout(state.timer);
+  state.timer = setTimeout(async () => {
+    if (state.running) {
+      state.again = true;
+      return;
+    }
+    state.running = true;
+    try {
+      await runExtraction(log);
+    } catch (error) {
+      console.error("Answer extraction failed", log.conversationId, error.message);
+    } finally {
+      state.running = false;
+      if (state.again) {
+        state.again = false;
+        scheduleExtraction(log);
+      }
+    }
+  }, EXTRACTION_DEBOUNCE_MS);
+}
+
+async function runExtraction(log) {
+  client ??= new OpenAI({ maxRetries: 0 });
+  const { updates, declines } = await extractAnswers({
+    client,
+    model: backendModel,
+    fields: voiceFields,
+    formatOf: valueFormat,
+    log,
+    today: today(),
+  });
+  const at = new Date().toISOString();
+  let changed = false;
+  const stamp = (fieldId, answer) => {
+    log.answersVersion = (log.answersVersion ?? 0) + 1;
+    log.answers[fieldId] = { ...log.answers[fieldId], ...answer, updatedAt: at, version: log.answersVersion };
+    changed = true;
+  };
+  for (const { field_id: fieldId, value, quote } of updates) {
+    const field = fieldsById.get(fieldId);
+    const result = field ? validateAnswer(field, value) : { ok: false };
+    if (!result.ok || log.answers[fieldId].value === result.value) continue;
+    stamp(fieldId, { value: result.value, status: "captured", quote });
+    log.events.push({ type: "answer_saved", at, fieldId, value: result.value, quote });
+  }
+  // One refusal: Paxi may ask once more later. A second one goes to a Pax colleague.
+  for (const { field_id: fieldId, times, reason } of declines) {
+    const answer = log.answers[fieldId];
+    if (!answer || answer.status === "captured" || answer.status === "declined") continue;
+    if (times >= 2) {
+      stamp(fieldId, { value: null, status: "declined", note: reason });
+      log.humanFollowUp = [...(log.humanFollowUp ?? []).filter((item) => item.fieldId !== fieldId), { fieldId, label: answer.label, reason, at }];
+      log.events.push({ type: "answer_declined", at, fieldId, reason });
+    } else if (answer.status !== "declined_once") {
+      stamp(fieldId, { value: null, status: "declined_once", note: reason });
+      log.events.push({ type: "answer_declined_once", at, fieldId, reason });
+    }
+  }
+  if (changed) await persist(log);
+}
+
+// The browser polls this to update the UI and to give Paxi a quiet note of what is missing.
+app.get("/api/conversations/:sessionId/progress", (request, response) => {
+  const session = findSession(request, response);
+  if (!session) return;
+  const { log } = session;
+  const since = Number(request.query.since) || 0;
+  const changes = Object.entries(log.answers)
+    .filter(([, answer]) => (answer.version ?? 0) > since)
+    .map(([fieldId, answer]) => ({ fieldId, value: answer.value, status: answer.status }));
+  response.json({ version: log.answersVersion ?? 0, changes, known: knownSummary(log), ...progress(log) });
+});
+
+// "Name: Dario Roth; Wohnort: …" for Paxi's notes.
+function knownSummary(log) {
+  return Object.values(log.answers)
+    .filter((answer) => answer.status === "captured")
+    .map((answer) => `${answer.label}: ${answer.value}`)
+    .join("; ");
+}
+
+// --- ElevenLabs ----------------------------------------------------------------------------
+
+const RESUME_GREETINGS = {
+  de: "Hey, schön, dass du wieder da bist! Machen wir dort weiter, wo wir aufgehört haben.",
+  fr: "Hey, content que tu sois de retour ! On reprend là où on s'était arrêtés.",
+  it: "Ehi, che bello che sei tornato! Riprendiamo da dove ci eravamo fermati.",
+  en: "Hey, good to have you back! Let's pick up where we left off.",
+};
+
+app.get("/api/providers", (_request, response) =>
+  response.json({
+    providers: [
+      { key: "gpt-live", label: "OpenAI GPT-Live", available: Boolean(process.env.OPENAI_API_KEY) },
+      { key: "elevenlabs", label: "ElevenLabs", available: Boolean(process.env.ELEVENLABS_API_KEY) },
+    ],
+  }),
+);
+
+// Starts (or resumes) a conversation with ElevenLabs. The answers are still filled in by
+// the extractor from the transcript, exactly like with GPT-Live.
+app.post("/api/elevenlabs/session", sameOrigin, async (request, response) => {
+  if (!process.env.ELEVENLABS_API_KEY) {
+    response.status(503).json({ error: "Set ELEVENLABS_API_KEY in the repo root .env" });
+    return;
+  }
+  const resumed = request.body?.resume ? await loadConversation(request.body.resume) : null;
+  if (request.body?.resume && (!resumed || resumed.status === "active")) {
+    response.status(404).json({ error: "Conversation cannot be resumed" });
+    return;
+  }
+  try {
+    await mkdir(resolve(here, "data"), { recursive: true });
+    const agentId = await ensureAgent(resolve(here, "data/elevenlabs-agent.json"));
+    const token = await conversationToken(agentId);
+    const sessionId = `el_${randomUUID()}`;
+    const log = resumed ?? createLog({ conversationId: sessionId, questionnaire, model: "elevenlabs" });
+    conversations.set(log.conversationId, log);
+    if (resumed) {
+      log.status = "active";
+      log.endedAt = null;
+      log.events.push({ type: "conversation_resumed", at: new Date().toISOString() });
+    }
+    const offsetMs = resumed ? Date.now() - Date.parse(log.startedAt) : 0;
+    const entry = addSession(log, { sessionId, voice: `elevenlabs:${ELEVENLABS_VOICE_ID}`, language: log.language, offsetMs });
+    sessions.set(sessionId, { log, entry });
+    await persist(log);
+
+    const opening = resumed
+      ? `${resumption(log)}
+
+The conversation so far:
+${log.transcript
+          .slice(-30)
+          .map((turn) => `${turn.speaker === "user" ? "Person" : "Paxi"}: ${turn.text.trim()}`)
+          .join("\n")}`
+      : "The welcome was played to the person as a recording. Wait for their first words; they choose the language. Use language detection to switch to their language right away.";
+    response.status(201).json({
+      provider: "elevenlabs",
+      token,
+      sessionId,
+      conversationId: log.conversationId,
+      offsetMs,
+      language: log.language,
+      prompt: `${paxiPrompt({ language: log.language })}
+
+## Now
+
+${opening}
+
+Never mention tools, systems or saving. Notes in square brackets that start with "App note" come from the app, not from the person: follow them, never read them out.`,
+      firstMessage: resumed ? RESUME_GREETINGS[log.language ?? "de"] : "",
+      intro: resumed || !introUrl ? null : { url: introUrl, text: welcomeText },
+    });
+  } catch (error) {
+    console.error("ElevenLabs session failed", error.status, error.message);
+    response.status(error.status === 401 ? 502 : (error.status ?? 502)).json({ error: error.message });
+  }
+});
+
 // Called by the browser when the backend model calls set_language ({ language }), or with
 // the person's first words ({ text }) so the voice switch does not depend on the model.
 app.post("/api/conversations/:sessionId/language", sameOrigin, async (request, response) => {
@@ -399,73 +532,14 @@ app.post("/api/conversations/:sessionId/language", sameOrigin, async (request, r
 // What is still missing; the browser also hands this to Paxi as quiet context.
 function progress(log) {
   const core = openFields(log, "core");
-  return { open_core: labelsOf(core), open_extended: labelsOf(openFields(log, "extended")), core_complete: core.length === 0 };
+  const extended = openFields(log, "extended");
+  return {
+    open_core: labelsOf(core),
+    open_extended: labelsOf(extended),
+    core_complete: core.length === 0,
+    complete: core.length === 0 && extended.length === 0,
+  };
 }
-
-// Called by the browser when the backend model calls decline_answer. The detail goes to a
-// Pax colleague for the final assessment instead of being asked again and again.
-app.post("/api/conversations/:sessionId/declined", sameOrigin, async (request, response) => {
-  const session = findSession(request, response);
-  if (!session) return;
-  const { log } = session;
-  const { field_id: fieldId, reason } = request.body ?? {};
-  const field = fieldsById.get(fieldId);
-  if (!field) {
-    response.json({ ok: false, reason: "Unbekanntes Feld." });
-    return;
-  }
-  const at = new Date().toISOString();
-  const note = typeof reason === "string" ? reason.slice(0, 300) : "";
-  // First refusal: Paxi may ask once more later. Only a second refusal goes to a colleague.
-  if (log.answers[fieldId].status !== "declined_once") {
-    log.answers[fieldId] = { ...log.answers[fieldId], value: null, status: "declined_once", note, updatedAt: at };
-    log.events.push({ type: "answer_declined_once", at, fieldId, reason: note });
-    await persist(log);
-    response.json({
-      ok: true,
-      field_id: fieldId,
-      handed_to_colleague: false,
-      next: "Nimm es leicht und wechsle das Thema. Frag später, wenn es passt, höchstens noch einmal sanft nach und sag kurz, warum es hilft. Erwähne noch keine Kollegin und keinen Kollegen.",
-    });
-    return;
-  }
-  log.answers[fieldId] = { ...log.answers[fieldId], value: null, status: "declined", note, updatedAt: at };
-  log.humanFollowUp = [...(log.humanFollowUp ?? []).filter((item) => item.fieldId !== fieldId), { fieldId, label: field.label, reason: note, at }];
-  log.events.push({ type: "answer_declined", at, fieldId, reason: note });
-  await persist(log);
-  response.json({ ok: true, field_id: fieldId, handed_to_colleague: true, ...progress(log) });
-});
-
-// Called by the browser when the backend model calls save_answer.
-app.post("/api/conversations/:sessionId/answers", sameOrigin, async (request, response) => {
-  const session = findSession(request, response);
-  if (!session) return;
-  const { log } = session;
-  const { field_id: fieldId, value, call_id: callId } = request.body ?? {};
-  const field = fieldsById.get(fieldId);
-  const at = new Date().toISOString();
-
-  const result = field ? validateAnswer(field, value) : { ok: false, reason: "Unbekanntes Feld." };
-  if (result.ok) {
-    log.answers[fieldId] = { ...log.answers[fieldId], value: result.value, status: "captured", updatedAt: at };
-  }
-  log.events.push({
-    type: result.ok ? "answer_saved" : "answer_rejected",
-    at,
-    callId: typeof callId === "string" ? callId : null,
-    fieldId: typeof fieldId === "string" ? fieldId : null,
-    value: typeof value === "string" ? value : null,
-    ...(result.ok ? {} : { reason: result.reason }),
-  });
-  await persist(log);
-
-  response.json({
-    saved: result.ok,
-    field_id: fieldId,
-    ...(result.ok ? { value: result.value } : { reason: result.reason }),
-    ...progress(log),
-  });
-});
 
 // status "handoff" ends only this session; the conversation continues in the next one.
 app.post("/api/conversations/:sessionId/close", sameOrigin, async (request, response) => {
@@ -510,7 +584,7 @@ function continuation(log) {
   const firstSwitch = log.sessions.length === 1;
   return `The conversation continues in a new voice because the person chose ${language}. Do not greet again and do not introduce yourself again.
 Already saved: ${saved.length ? saved.join("; ") : "nothing yet"}.
-Core details still open: ${labelsOf(openFields(log, "core")).join(", ") || "none"}.
+Still open: ${openLabels(log).join(", ") || "nothing"}.
 Now, in ${language} and using the informal form, ${
     firstSwitch
       ? "say warmly in your own words that you would love to get to know them a bit (if the history shows you already confirmed the language, do not confirm it again). If they already said their name, use it; otherwise ask how you may call them."
@@ -520,7 +594,7 @@ Now, in ${language} and using the informal form, ${
 
 function resumption(log) {
   const language = log.language ? languages[log.language].name : "the language they used before";
-  const open = labelsOf(openFields(log, "core"));
+  const open = openLabels(log);
   return `The person is back: the earlier call was closed after a while without activity, and they started it again. Do not introduce yourself again.
 Now, in ${language} and using the informal form, welcome them back warmly in one short sentence (use their name if you know it), say you will continue where you left off, and then ${
     open.length ? `continue with what is still open: ${open.join(", ")}.` : "continue the conversation naturally."

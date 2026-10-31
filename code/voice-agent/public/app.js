@@ -75,8 +75,9 @@ const statusText = {
   error: "Fehler",
 };
 
-const paxi = createPaxiVoice({
+const callbacks = {
   onAudioStream: (stream) => avatar.attachAudio(stream),
+  onLevelSource: (level) => avatar.setLevelSource(() => level()),
   onAvatarEvent: (event) => avatar.handle(event),
   onTranscript: showFragment,
   onAnswer: ({ fieldId, value, status }) => {
@@ -89,6 +90,7 @@ const paxi = createPaxiVoice({
     $("status").textContent = state === "error" ? `${statusText.error}: ${detail}` : statusText[inactive ? "inactive" : state];
     const active = state === "connecting" || state === "connected" || state === "switching";
     $("avatar").disabled = active;
+    $("provider").disabled = active;
     $("stop").hidden = !active;
     $("hint").textContent = active ? "" : inactive ? "Tippe auf Paxi, um weiterzumachen." : "Tippe auf Paxi, um das Gespräch zu starten.";
     if (paxi?.logUrl) {
@@ -96,6 +98,27 @@ const paxi = createPaxiVoice({
       $("download").hidden = false;
     }
   },
+};
+
+// The AI source is chosen before the call. The ElevenLabs client is only loaded when needed.
+const { providers } = await fetch("/api/providers").then((response) => response.json());
+for (const { key, label, available } of providers) {
+  $("provider").add(new Option(available ? label : `${label} (kein API-Key)`, key, false, false));
+  $("provider").lastElementChild.disabled = !available;
+}
+const clients = {};
+async function clientFor(provider) {
+  if (!clients[provider]) {
+    clients[provider] =
+      provider === "elevenlabs"
+        ? (await import("./paxi-voice-elevenlabs.js")).createPaxiElevenLabs(callbacks)
+        : createPaxiVoice(callbacks);
+  }
+  return clients[provider];
+}
+let paxi = await clientFor($("provider").value);
+$("provider").addEventListener("change", async () => {
+  paxi = await clientFor($("provider").value);
 });
 
 $("avatar").addEventListener("click", () => {
@@ -108,6 +131,7 @@ $("avatar").addEventListener("click", () => {
     for (const key of Object.keys(captured)) delete captured[key];
     renderAnswers();
   }
+  avatar.setLevelSource(null);
   paxi.start({ resume }).catch(() => {});
 });
 $("stop").addEventListener("click", () => paxi.stop());

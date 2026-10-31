@@ -1,0 +1,574 @@
+{
+  "example": "Pseudonymised real test conversation (Paxi demo, 31.10.2026). Name and personal details are replaced with demo values; structure, timings and Paxi's replies are unchanged.",
+  "schemaVersion": "1.1",
+  "conversationId": "example_gpt-live",
+  "status": "closed",
+  "startedAt": "2026-10-31T13:02:07.647Z",
+  "endedAt": "2026-10-31T13:05:04.597Z",
+  "model": "gpt-live-1",
+  "language": "de",
+  "sessions": [
+    {
+      "sessionId": "example_gpt-live",
+      "voice": "juni",
+      "language": null,
+      "offsetMs": 0,
+      "startedAt": "2026-10-31T13:02:07.647Z",
+      "endedAt": "2026-10-31T13:05:04.597Z",
+      "usage": {
+        "seconds": 175
+      }
+    }
+  ],
+  "questionnaire": {
+    "id": "pax-customer-portfolio",
+    "version": "1.0.0",
+    "locale": "de-CH"
+  },
+  "answers": {
+    "full_name": {
+      "label": "Vor- und Nachname",
+      "tier": "core",
+      "value": "Jonas",
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:03:04.897Z",
+      "quote": "Jonas",
+      "version": 1
+    },
+    "birth_date": {
+      "label": "Geburtsdatum",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "postal_code": {
+      "label": "Wohnort (PLZ und Ort)",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "sex": {
+      "label": "Geschlecht (für Tarife)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "smoker": {
+      "label": "Raucher/in",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "civil_status": {
+      "label": "Zivilstand",
+      "tier": "core",
+      "value": "married",
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:14.865Z",
+      "quote": "Ja, ich habe eine Frau und ein Kind",
+      "version": 6
+    },
+    "relationship_since_year": {
+      "label": "Zusammen bzw. verheiratet seit (Jahr)",
+      "tier": "extended",
+      "value": 2021,
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:32.186Z",
+      "quote": "Seit fünf Jahren",
+      "version": 8
+    },
+    "partner_birth_year": {
+      "label": "Geburtsjahr Partner/in",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "partner_annual_gross_income_chf": {
+      "label": "Bruttoeinkommen Partner/in pro Jahr (CHF)",
+      "tier": "extended",
+      "value": 0,
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:26.632Z",
+      "quote": "Nein, sie ist bei der Kleine",
+      "version": 7
+    },
+    "children_count": {
+      "label": "Anzahl Kinder",
+      "tier": "core",
+      "value": 1,
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:00.696Z",
+      "quote": "Ich habe eine Frau und ein Kind.",
+      "version": 4
+    },
+    "children_birth_years": {
+      "label": "Geburtsjahre der Kinder",
+      "tier": "extended",
+      "value": "2026",
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:00.696Z",
+      "quote": "Fünf Monate",
+      "version": 5
+    },
+    "expecting_child": {
+      "label": "Kind unterwegs oder geplant",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "employment_type": {
+      "label": "Erwerbsart",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "occupation": {
+      "label": "Beruf",
+      "tier": "core",
+      "value": "IT",
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:03:28.035Z",
+      "quote": "b-in der IT",
+      "version": 2
+    },
+    "employment_rate_percent": {
+      "label": "Arbeitspensum (%)",
+      "tier": "core",
+      "value": 100,
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:03:43.188Z",
+      "quote": "Hundert, hundert",
+      "version": 3
+    },
+    "annual_gross_income_chf": {
+      "label": "Bruttoeinkommen pro Jahr (CHF)",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "first_working_year_switzerland": {
+      "label": "Erstes Arbeitsjahr in der Schweiz",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "has_pension_fund": {
+      "label": "Pensionskasse (2. Säule) vorhanden",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "has_pillar_3a": {
+      "label": "Säule 3a vorhanden",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "pillar_3a_annual_contribution_chf": {
+      "label": "Einzahlung Säule 3a pro Jahr (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "existing_life_insurance": {
+      "label": "Bestehende Lebens- oder Risikoversicherung",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "free_assets_chf": {
+      "label": "Frei verfügbares Vermögen (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "housing": {
+      "label": "Wohnsituation",
+      "tier": "core",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "monthly_housing_cost_chf": {
+      "label": "Wohnkosten pro Monat (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "debts_chf": {
+      "label": "Schulden inkl. Hypothek (CHF)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "goals": {
+      "label": "Wichtigste Ziele",
+      "tier": "core",
+      "value": "Flexibel bleiben und die Familie absichern",
+      "status": "captured",
+      "updatedAt": "2026-10-31T13:04:54.770Z",
+      "quote": "flexibel sein, aber die Familie muss auch abgesichert sein",
+      "version": 9
+    },
+    "desired_retirement_age": {
+      "label": "Gewünschtes Pensionsalter",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "home_purchase_year": {
+      "label": "Geplanter Eigenheimkauf (Jahr)",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "risk_appetite": {
+      "label": "Risikobereitschaft",
+      "tier": "extended",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "net_income_band": {
+      "label": "A1 Jährliches Nettoeinkommen",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "net_worth_band": {
+      "label": "A2 Nettovermögen",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "annual_saving_capacity_band": {
+      "label": "A3 Jährlich zusätzlich sparbar",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "one_time_investment_band": {
+      "label": "A4 Möglicher Einmalbetrag",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "investment_goal": {
+      "label": "B1 Anlageziel",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "investment_horizon": {
+      "label": "B2 Anlagehorizont",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "securities_experience": {
+      "label": "C1 Kenntnisse und Erfahrung mit Wertschriften",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    },
+    "reaction_to_30_percent_loss": {
+      "label": "C2 Reaktion auf 30 % Kursverlust",
+      "tier": "suitability",
+      "value": null,
+      "status": "open",
+      "updatedAt": null
+    }
+  },
+  "transcript": [
+    {
+      "speaker": "agent",
+      "text": "Hi, ich bin Paxi! In welcher Sprache kann ich dir helfen? En quelle langue est-ce que je peux t'aider ? In quale lingua posso aiutarti? In which language can I help you?",
+      "start_ms": 10.699999928474426,
+      "end_ms": 9816.209999928475
+    },
+    {
+      "speaker": "user",
+      "text": " [clear throat",
+      "start_ms": 19400,
+      "end_ms": 19600
+    },
+    {
+      "speaker": "user",
+      "text": ". Hörst du mich",
+      "start_ms": 39600,
+      "end_ms": 40200
+    },
+    {
+      "speaker": "agent",
+      "text": " Ja, ich höre dich gut. Schön, dass du da bist. Ich würde dich gern ein bisschen kennenlernen. Wie darf ich dich nennen?",
+      "start_ms": 40600,
+      "end_ms": 47200
+    },
+    {
+      "speaker": "user",
+      "text": " Jonas",
+      "start_ms": 51400,
+      "end_ms": 51800
+    },
+    {
+      "speaker": "agent",
+      "text": " Hey, Jonas. Was hält dich im Moment so am meisten auf Trab im Alltag?",
+      "start_ms": 52000,
+      "end_ms": 56000
+    },
+    {
+      "speaker": "user",
+      "text": " Um. Boah! Nüt. Nur schaffe",
+      "start_ms": 63400,
+      "end_ms": 65400
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh, das klingt nach voll eingespannt. Was machst du denn genau beruflich?",
+      "start_ms": 65800,
+      "end_ms": 69800
+    },
+    {
+      "speaker": "user",
+      "text": " Äh, b-in der IT",
+      "start_ms": 73200,
+      "end_ms": 75000
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, spannend. Wie gefällt dir der Job so im Moment?",
+      "start_ms": 75600,
+      "end_ms": 78200
+    },
+    {
+      "speaker": "agent",
+      "text": " Das klingt doch gut. Und arbeitest du dort eher Vollzeit oder hast du ein kleineres Pensum?",
+      "start_ms": 81400,
+      "end_ms": 86600
+    },
+    {
+      "speaker": "user",
+      "text": " Hundert, hundert",
+      "start_ms": 90000,
+      "end_ms": 90400
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh wow, also voll drin. Wie sieht’s denn bei dir so außerhalb vom Job aus? Bist du in einer Beziehung oder lebt es sich gerade mehr,",
+      "start_ms": 90200,
+      "end_ms": 97800
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, ich habe eine Frau und ein Kind",
+      "start_ms": 98200,
+      "end_ms": 100800
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh, schön. Wie alt ist denn euer Kind?",
+      "start_ms": 101600,
+      "end_ms": 103200
+    },
+    {
+      "speaker": "user",
+      "text": " Fünf Monate",
+      "start_ms": 106200,
+      "end_ms": 106800
+    },
+    {
+      "speaker": "agent",
+      "text": " Oh, wow, das ist ja noch ganz frisch. Da ist bestimmt gerade viel los zuhause.",
+      "start_ms": 107400,
+      "end_ms": 110800
+    },
+    {
+      "speaker": "agent",
+      "text": " Und wie macht Mhm. Und wie macht ihr das mit der Betreuung, wenn du voll arbeitest?",
+      "start_ms": 112200,
+      "end_ms": 116800
+    },
+    {
+      "speaker": "user",
+      "text": " Also Freunde ist zuhause",
+      "start_ms": 120000,
+      "end_ms": 121000
+    },
+    {
+      "speaker": "agent",
+      "text": " Das hilft sicher, grad in der ersten Zeit. Und sie, arbeitet sie im Moment auch ein bisschen oder ist sie ganz beim Kleinen?",
+      "start_ms": 121600,
+      "end_ms": 128200
+    },
+    {
+      "speaker": "user",
+      "text": " Nein, sie ist bei der Kleine",
+      "start_ms": 129600,
+      "end_ms": 131400
+    },
+    {
+      "speaker": "agent",
+      "text": " Macht Sinn. Und seit wann seid ihr zwei denn zusammen?",
+      "start_ms": 131800,
+      "end_ms": 134800
+    },
+    {
+      "speaker": "user",
+      "text": " Seit fünf Jahren",
+      "start_ms": 137800,
+      "end_ms": 138600
+    },
+    {
+      "speaker": "agent",
+      "text": " Ah, schön. Danke dir. Und wenn du an die Zukunft denkst, was ist dir da wichtig? Familie absichern, vielleicht mal ein Eigenheim, oder eher flexibel bleiben für Dinge wie Weiterbildung oder Reisen? Was löst bei dir spontan mehr aus?",
+      "start_ms": 139200,
+      "end_ms": 155000
+    },
+    {
+      "speaker": "user",
+      "text": " Ja, also flexibel sein, aber die Familie muss auch abgesichert sein",
+      "start_ms": 157600,
+      "end_ms": 160800
+    },
+    {
+      "speaker": "agent",
+      "text": " Mhm, das kann ich gut nachvollziehen. Da steckt viel Verantwortung drin. Wohnt ihr zur Miete oder im Eigentum?",
+      "start_ms": 161800,
+      "end_ms": 168400
+    }
+  ],
+  "events": [
+    {
+      "type": "language_set",
+      "at": "2026-10-31T13:02:51.508Z",
+      "language": "de",
+      "source": "first_words"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:03:04.897Z",
+      "fieldId": "full_name",
+      "value": "Jonas",
+      "quote": "Jonas"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:03:28.035Z",
+      "fieldId": "occupation",
+      "value": "IT",
+      "quote": "b-in der IT"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:03:43.188Z",
+      "fieldId": "employment_rate_percent",
+      "value": 100,
+      "quote": "Hundert, hundert"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:00.696Z",
+      "fieldId": "children_count",
+      "value": 1,
+      "quote": "Ich habe eine Frau und ein Kind."
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:00.696Z",
+      "fieldId": "children_birth_years",
+      "value": "2026",
+      "quote": "Fünf Monate"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:14.865Z",
+      "fieldId": "civil_status",
+      "value": "married",
+      "quote": "Ja, ich habe eine Frau und ein Kind"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:26.632Z",
+      "fieldId": "partner_annual_gross_income_chf",
+      "value": 0,
+      "quote": "Nein, sie ist bei der Kleine"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:32.186Z",
+      "fieldId": "relationship_since_year",
+      "value": 2021,
+      "quote": "Seit fünf Jahren"
+    },
+    {
+      "type": "answer_saved",
+      "at": "2026-10-31T13:04:54.770Z",
+      "fieldId": "goals",
+      "value": "Flexibel bleiben und die Familie absichern",
+      "quote": "flexibel sein, aber die Familie muss auch abgesichert sein"
+    },
+    {
+      "type": "conversation_closed",
+      "at": "2026-10-31T13:05:04.597Z"
+    }
+  ],
+  "humanFollowUp": [],
+  "answersVersion": 9,
+  "context": {
+    "summary": "Jonas arbeitet Vollzeit in der IT. Er ist seit fünf Jahren mit seiner Frau zusammen; ihr gemeinsames Kind ist fünf Monate alt, und seine Frau ist derzeit beim Kind.",
+    "notes": [
+      {
+        "topic": "work",
+        "note": "Jonas arbeitet in der IT und ist zu 100 Prozent beschäftigt."
+      },
+      {
+        "topic": "family",
+        "note": "Jonas hat eine Frau und ein fünf Monate altes Kind."
+      },
+      {
+        "topic": "family",
+        "note": "Seine Frau ist derzeit beim Kind."
+      },
+      {
+        "topic": "family",
+        "note": "Jonas und seine Frau sind seit fünf Jahren zusammen."
+      },
+      {
+        "topic": "plans",
+        "note": "Jonas möchte flexibel bleiben und zugleich seine Familie abgesichert wissen."
+      }
+    ],
+    "possible_needs": [
+      "Möglichkeiten zur finanziellen Absicherung der Familie mit einem kleinen Kind besprechen.",
+      "Jonass Absicherung des Einkommens und der finanziellen Verpflichtungen als Vollzeitbeschäftigter erkunden.",
+      "Besprechen, wie sich Flexibilität und langfristige Vorsorge miteinander vereinbaren lassen."
+    ],
+    "extractedAt": "2026-10-31T13:05:10.387Z",
+    "model": "gpt-6-luna"
+  }
+}

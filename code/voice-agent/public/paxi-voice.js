@@ -7,6 +7,8 @@
 //   button.onclick = () => paxi.start();   // must run from a user action (microphone, audio)
 //   paxi.stop();
 
+import { createProgressPoller, isGoodbye, isSpeech, postJson as post, wordsOf } from "./paxi-common.js";
+
 const FLUSH_INTERVAL_MS = 1000;
 const HANDOFF_CLOSE_TIMEOUT_MS = 5000;
 const FINAL_CLOSE_TIMEOUT_MS = 15_000;
@@ -76,6 +78,10 @@ export function createPaxiVoice({
   let inactiveWarnedAt = null;
   let closingForInactivity = false;
   let resumeId = null;
+  let poller = null;
+  let agentTurnText = "";
+  let goodbyeTimer;
+  let lastGoodbyeNudge = 0;
 
   const emit = (callback, value) => {
     try {
@@ -86,15 +92,8 @@ export function createPaxiVoice({
   };
   const status = (state, detail) => emit(onStatus, { state, detail, conversationId });
 
-  async function postJson(path, body) {
-    const response = await fetch(`${baseUrl}${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok && response.status !== 204) throw new Error(await response.text());
-    return response.status === 204 ? null : response.json();
-  }
+  const postJson = (path, body) => post(baseUrl, path, body);
+
 
   // Fragments are posted per session; the server shifts them onto the conversation timeline.
   async function flushTranscript() {
@@ -173,29 +172,6 @@ export function createPaxiVoice({
   }
 
   // --- Tool calls -----------------------------------------------------------------
-
-  async function handleSaveAnswer(session, item) {
-    let output;
-    try {
-      const args = JSON.parse(item.arguments);
-      output = await postJson(`/api/conversations/${session.id}/answers`, { ...args, call_id: item.call_id });
-      if (output.saved) emit(onAnswer, { fieldId: output.field_id, value: output.value, status: "captured" });
-      noteProgress(session, output);
-    } catch (error) {
-      console.error("save_answer failed", error);
-      output = { saved: false, reason: "Technischer Fehler beim Speichern." };
-    }
-    returnToolResult(session, item.call_id, output);
-  }
-
-  // Quiet context for Paxi, so it never wraps up while core details are missing.
-  function noteProgress(session, output) {
-    if (!output.open_core) return;
-    const content = output.core_complete
-      ? "All core details are collected. Continue naturally; extended details are welcome if they fit."
-      : `Core details still open: ${output.open_core.join(", ")}. Do not wrap up or say goodbye before you have asked for them.`;
-    send(session, { type: "session.thinking.append", delegation_id: null, content });
-  }
 
   async function handleSetLanguage(session, item) {
     let result;
@@ -280,20 +256,6 @@ export function createPaxiVoice({
     session.peer.close();
     session.audio.srcObject = null;
     await postJson(`/api/conversations/${session.id}/close`, { status: "handoff", usage }).catch(console.error);
-  }
-
-  async function handleDeclineAnswer(session, item) {
-    let output;
-    try {
-      output = await postJson(`/api/conversations/${session.id}/declined`, JSON.parse(item.arguments));
-      // The first refusal only means "ask again later"; a second one goes to a colleague.
-      if (output.ok && output.handed_to_colleague) emit(onAnswer, { fieldId: output.field_id, value: null, status: "declined" });
-      noteProgress(session, output);
-    } catch (error) {
-      console.error("decline_answer failed", error);
-      output = { ok: false };
-    }
-    returnToolResult(session, item.call_id, output);
   }
 
   // --- Recorded intro ----------------------------------------------------------------------
@@ -387,6 +349,50 @@ export function createPaxiVoice({
   }
 
 
+  // --- Questionnaire progress and closing ---------------------------------------------------
+
+  // The server fills the questionnaire from the conversation; Paxi gets a quiet note of
+  // what is known and what is still open, so it never asks twice or wraps up too early.
+  function startProgress() {
+    poller = createProgressPoller({
+      baseUrl,
+      sessionId: () => current?.id,
+      onChanges: (changes) => {
+        for (const { fieldId, value, status: answerStatus } of changes) {
+          if (answerStatus === "captured" || answerStatus === "declined") emit(onAnswer, { fieldId, value, status: answerStatus });
+        }
+      },
+      onNote: (note) => {
+        if (current?.ready) send(current, { type: "session.thinking.append", delegation_id: null, content: note });
+      },
+    });
+  }
+
+  // Paxi sometimes starts to say goodbye while details are still open. Then it gets a
+  // spoken nudge to carry on. Once everything is complete, its goodbye ends the call.
+  function watchForGoodbye(text) {
+    agentTurnText += text;
+    clearTimeout(goodbyeTimer);
+    goodbyeTimer = setTimeout(() => {
+      const said = agentTurnText;
+      agentTurnText = "";
+      if (!isGoodbye(said) || !running || closingForInactivity) return;
+      if (poller?.latest?.complete) {
+        closingForInactivity = true;
+        setTimeout(() => finish("closed"), GOODBYE_MS);
+        return;
+      }
+      const open = [...(poller?.latest?.open_core ?? []), ...(poller?.latest?.open_extended ?? [])];
+      if (!open.length || performance.now() - lastGoodbyeNudge < 20_000) return;
+      lastGoodbyeNudge = performance.now();
+      send(current, {
+        type: "session.commentary.append",
+        delegation_id: null,
+        content: `You started to say goodbye, but the conversation is not finished yet. Still open: ${open.join(", ")}. Say in a light way that there is just a little more you would love to know, and continue naturally with one of these.`,
+      });
+    }, 1200);
+  }
+
   // --- Session events ------------------------------------------------------------------
 
   function handleEvent(session, event) {
@@ -413,12 +419,14 @@ export function createPaxiVoice({
         const accepted = speaker === "user" ? filterIntroEcho(session, fragment) : [fragment];
         for (const f of accepted) {
           lastActivity = performance.now();
-          if (speaker === "user") {
+          // Breathing or noise tags like "[sniff]" are logged, but do not count as activity.
+          if (speaker === "user" && isSpeech(f.text)) {
             nudges = 0;
             lastUserAt = performance.now();
             inactiveWarnedAt = null;
             collectFirstWords(session, f.text);
           }
+          if (speaker === "agent") watchForGoodbye(f.text);
           pendingFragments.push({ sessionId: session.id, fragment: f });
           emit(onTranscript, { speaker, text: f.text, startMs: f.start_ms + session.offsetMs, endMs: f.end_ms + session.offsetMs });
         }
@@ -430,9 +438,7 @@ export function createPaxiVoice({
         if (inner?.type !== "response.output_item.done" || item?.type !== "function_call") break;
         if (handledCalls.has(item.call_id)) break;
         handledCalls.add(item.call_id);
-        if (item.name === "save_answer") handleSaveAnswer(session, item);
-        else if (item.name === "set_language") handleSetLanguage(session, item);
-        else if (item.name === "decline_answer") handleDeclineAnswer(session, item);
+        if (item.name === "set_language") handleSetLanguage(session, item);
         break;
       }
       case "session.closed":
@@ -513,6 +519,10 @@ export function createPaxiVoice({
   }
 
   function cleanup() {
+    poller?.stop();
+    poller = null;
+    clearTimeout(goodbyeTimer);
+    agentTurnText = "";
     clearInterval(levelTimer);
     clearTimeout(firstWordsTimer);
     endPlayback("cancelled");
@@ -568,6 +578,7 @@ export function createPaxiVoice({
         idleTimer = setInterval(checkIdle, 1000);
         current = await connect({});
         flushTimer = setInterval(flushTranscript, FLUSH_INTERVAL_MS);
+        startProgress();
       } catch (error) {
         cleanup();
         status("error", error instanceof Error ? error.message : String(error));
@@ -612,8 +623,4 @@ function waitForIceGathering(connection) {
     }
     connection.addEventListener("icegatheringstatechange", onState);
   });
-}
-
-function wordsOf(text) {
-  return text.toLowerCase().match(/[\p{L}']+/gu) ?? [];
 }
