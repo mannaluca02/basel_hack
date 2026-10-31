@@ -63,7 +63,7 @@ export const EMOTIONS = {
     beat:1, beatRefractory:.7, beatRaise:.15, gazeStep:1, blinkDuration:.7,
     yaw:1, yawDir:-1, yawIn:.5, yawHold:1.2, yawOut:.6, yawInterval:6.5, yawJitter:.5, yawDelay:2 },
   reassuring: { label:"Reassuring", subtitle:"We can take this step by step", wL:1.08, wR:1.08, hL:.78, hR:.78, breathe:.026, breathPeriod:5.5, speed:.4, glance:.025, blinkDuration:.38, blinkGap:5 },
-  empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.34, lidR:.34, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
+  empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.2, lidR:.2, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
   pleased: { label:"Pleased", subtitle:"A warm welcome", smile:1, blush:1, hop:3, sway:1, speed:.65 },
   recovering: { label:"Recovering", subtitle:"Let me try again", wR:.85, hR:.85, yR:7, shake:1, glance:.04, speed:.5 },
   presenting_offer: { label:"Presenting an offer", subtitle:"Your offer is ready", smile:1, blush:1, sparkles:1, hop:4, sway:.8, speed:.6 },
