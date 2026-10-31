@@ -4,8 +4,10 @@ import { DraftSchema,type InsuranceDraft,type LifeScenario } from '@pax/contract
 import type { LifeInsuranceEngine } from './engine.js';
 import type { DraftEstimateService } from './estimates.js';
 import type { ExtractionWorkflow } from './extraction.js';
+import type { DemoJourneyService } from './journey.js';
 import type { SessionService } from './auth.js';
 import type { BootstrapCredentials } from './store.js';
+import { randomUUID } from 'node:crypto';
 import { WorkflowError,type Actor } from './types.js';
 
 /**
@@ -85,7 +87,8 @@ export class DemoJourney {
   /** `demoStart` is null unless the server was started with the explicit demo flag. */
   constructor(private readonly engine:LifeInsuranceEngine,private readonly estimates:DraftEstimateService,
     private readonly extraction:ExtractionWorkflow,
-    private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null){}
+    private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null,
+    private readonly journey:DemoJourneyService|null=null){}
 
   get startEnabled(){return this.demoStart!==null;}
 
@@ -123,6 +126,56 @@ export class DemoJourney {
         allowSyntheticCalculatorTransfer:true,operations:['saving3a'],saving3a:{years,initialCents,annualCents}});
       return {status:'calculated' as const,years,initialCents,annualCents};
     }catch(error){if(!(error instanceof WorkflowError))throw error;return {status:'failed' as const,code:error.code};}
+  }
+
+  /**
+   * Demo start only: the demo reviewer account, for a customer of the demo. Gives the demo the
+   * reviewer's views (simulated specialist review, aggregate insights) without a second sign-in.
+   */
+  async reviewer(actor:Actor):Promise<Actor> {
+    if(!this.demoStart)throw new WorkflowError('NOT_FOUND',404);
+    if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
+    const {sessions,credentials}=this.demoStart;
+    const login=await sessions.login(credentials.reviewerAccessCode,'demo-review');
+    return sessions.authenticate(login.sessionToken);
+  }
+
+  /**
+   * Demo start only: the Pax specialist's part, simulated, so the demo can show the whole way to
+   * the policy. A real Pax specialist reviews advice and application; here the demo reviewer
+   * account does what is pending, through the regular reviewer methods (roles, revisions,
+   * audit): approves the open review of the active analysis with every criterion, then accepts a
+   * submitted application for the demo and issues the demo policy. Nothing pending changes nothing.
+   */
+  async review(actor:Actor,caseId:string) {
+    if(!this.journey)throw new WorkflowError('NOT_FOUND',404);
+    this.engine.caseFor(actor,caseId);
+    const reviewer=await this.reviewer(actor);
+    const done:{adviceApproved:boolean;applicationsAccepted:string[];policiesIssued:string[]}={adviceApproved:false,applicationsAccepted:[],policiesIssued:[]};
+    let c=this.engine.caseFor(reviewer,caseId);
+    const run=c.runs.find(r=>r.id===c.activeRunId);
+    const task=run&&run.status==='current'?c.reviewTasks.find(t=>t.runId===run.id&&t.profileVersion===run.profileVersion&&t.status==='open'):undefined;
+    if(run&&task){
+      await this.engine.reviewDecision(reviewer,caseId,{runId:run.id,decision:'approved_for_demo',acknowledgedReasonCodes:task.reasons,
+        criteria:['data_sources_checked','need_and_units_checked','beneficiaries_checked','personal_affordability_checked','demo_only_understood']});
+      done.adviceApproved=true;
+    }
+    for(const application of this.engine.caseFor(reviewer,caseId).applications.filter(a=>a.runId===c.activeRunId&&['submitted','under_review','accepted_for_demo'].includes(a.status))) {
+      const action=()=>({expectedCaseRevision:this.engine.caseFor(reviewer,caseId).caseRevision,idempotencyKey:randomUUID(),applicationId:application.id,
+        demoAcknowledged:true as const,informationDocumentsAcknowledged:true});
+      if(application.status==='submitted')await this.journey.startReview(reviewer,caseId,action());
+      if(application.status!=='accepted_for_demo'){
+        await this.journey.decide(reviewer,caseId,{expectedCaseRevision:this.engine.caseFor(reviewer,caseId).caseRevision,idempotencyKey:randomUUID(),
+          applicationId:application.id,decision:'accepted_for_demo',demoChecks:{identity:'demo_only',health:'not_underwritten',aml:'not_cleared_for_real_business',information:true}});
+        done.applicationsAccepted.push(application.id);
+      }
+      c=this.engine.caseFor(reviewer,caseId);
+      if(!c.policies.some(p=>p.applicationId===application.id)){
+        const policy=await this.journey.issuePolicy(reviewer,caseId,action()) as {id:string};
+        done.policiesIssued.push(policy.id);
+      }
+    }
+    return {...done,simulated:true as const};
   }
 
   /**

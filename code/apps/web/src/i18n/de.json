@@ -16,8 +16,7 @@
       "extractionUnavailable": "Live-Extraktion ist im Backend deaktiviert oder nicht erreichbar. Starte das aktuelle Debug-Backend mit PAX_SYNTHETIC_VOICE_ENABLED=1 und OPENAI_API_KEY; eine Sprachverbindung allein füllt keine Angaben ab.",
       "extractionReady": "Live-Extraktion aktiv: Gesprächslogs → KI → Feldvorschläge",
       "handover": "Der menschliche Berater ist angefordert. Gib den digitalen Dialog hier ausdrücklich wieder frei, bevor du ein neues Gespräch startest.",
-      "liveReady": "3. Bereit: Starte das Live-Gespräch und erlaube dem Browser den Mikrofonzugriff.",
-      "replayReady": "Bereit: Der synthetische Replay benötigt weder Mikrofon noch Voice-Zustimmung."
+      "liveReady": "3. Bereit: Starte das Live-Gespräch und erlaube dem Browser den Mikrofonzugriff."
     },
     "error": {
       "microphoneDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Website-Einstellungen deines Browsers und klicke danach erneut auf «Live-Gespräch starten».",
@@ -26,22 +25,15 @@
       "recover": "Der Vorgang konnte nicht abgeschlossen werden. Prüfe den API-Trace und versuche die Vorbereitung oder «Fall neu laden» erneut."
     },
     "avatarNotice": "Avatar: lokale Audiopegel-Visualisierung. Kein Nachweis von Finalität oder abgeschlossener Wiedergabe.",
-    "confirmedGross": "Letztes bestätigtes Jahresbrutto",
     "canonicalUnits": "Rohwert: Geld in CHF-Cent (100 Cent = 1 CHF)",
     "title": "Voice Lab",
-    "syntheticOnly": "Nur erfundene Daten",
     "description": "Paxi im Gespräch: verfolge echte API-Payloads vom Transkript über den kanonischen Fall bis zur sichtbaren Store-Projektion.",
     "apiRequired": "Bitte mit npm --prefix code/apps/web run start:api starten. Dieses Labor braucht das Fall-Backend auf Port 3000.",
     "demoCode": "Der vorbelegte öffentliche Demo-Code gilt nur beim dedizierten start:voice-lab-Server. Sonst den lokalen Kundenzugang verwenden.",
     "baselineNotice": "Die Ausgangslage enthält erfundene Personen und Beträge. Sie wird als unbestätigter Entwurf geladen.",
     "connection": "Gespräch & Avatar",
-    "synthetic": "Synthetischer Replay",
     "live": "Live · Mikrofon",
     "speaker": "Sprechende Person (explizite Zuordnung)",
-    "replayNotice": "Verfasste Konversation über alle acht Felder, echte Backend-Schreibvorgänge. Kein Mikrofon, keine Sprachausgabe, kein Modellaufruf. Der Avatar zeigt simulierte Gesprächsaktivität.",
-    "replay": "Ganze Konversation abspielen",
-    "correction": "Korrektur",
-    "smalltalk": "Smalltalk / kein Treffer",
     "configured": "konfiguriert (kein Gesundheitscheck)",
     "unconfigured": "nicht konfiguriert",
     "voiceConsent": "Ich verwende ausschliesslich erfundene Angaben und stimme dem Audio-/Gesprächstransfer an OpenAI für diese Sprachdemo zu.",
@@ -109,7 +101,6 @@
       "evaluating": "wertet aus",
       "yes": "ja",
       "no": "nein",
-      "done": "Danke, damit habe ich alle Angaben. Du kannst sie jetzt im Review prüfen.",
       "extractionConsent": "Ich stimme zu, dass ein kleiner, erfundener Gesprächsausschnitt für die KI-Extraktion an OpenAI übertragen wird (gesonderte Zustimmung).",
       "extractionBlocker": "Bestätige die gesonderte KI-Zustimmung, sonst würde das Labor still auf starre Sätze zurückfallen.",
       "status": {
@@ -170,7 +161,8 @@
     "risks": "Risiken",
     "chat": "Chat",
     "info": "Info",
-    "unread": "Neues seit dem letzten Besuch"
+    "unread": "Neues seit dem letzten Besuch",
+    "journey": "Abschluss"
   },
   "graphics": {
     "title": "Grafiken",
@@ -513,5 +505,171 @@
     "accept": "Übernehmen und neu berechnen",
     "accepting": "Wird übernommen …",
     "acceptFailed": "Übernehmen hat nicht geklappt. Bitte nochmals versuchen."
+  },
+  "journey": {
+    "title": "Abschluss",
+    "intro": "Von der Empfehlung über Offerte und Antrag bis zur Police im Kundenportal. Alles ist eine Demo mit erfundenen Daten: kein Vertrag, kein Versicherungsschutz.",
+    "steps": {
+      "label": "Fortschritt",
+      "recommendation": "Empfehlung",
+      "quote": "Offerte",
+      "application": "Antrag",
+      "review": "Prüfung durch Pax",
+      "policy": "Police"
+    },
+    "stepState": {
+      "done": "erledigt"
+    },
+    "locked": "Die Empfehlung folgt, sobald deine Lebenssituation, Finanzen und alle drei Säulen erfasst und bestätigt sind.",
+    "noContract": "Für deine Situation ist im Moment kein neuer Vertrag nötig.",
+    "adviceReview": "Eine Pax-Fachperson prüft die Beratung, bevor du eine Offerte anfordern kannst.",
+    "waitingReview": "Wartet auf die Prüfung durch eine Pax-Fachperson.",
+    "simulateReview": "Pax-Prüfung simulieren (Demo)",
+    "simulatedNote": "In der Demo übernimmt ein simuliertes Pax-Fachkonto diesen Schritt. In echt prüft eine Pax-Fachperson.",
+    "choose": "Wähle die Lösungen, für die du eine Offerte möchtest.",
+    "need": "Bedarf",
+    "why": "Warum",
+    "requestQuote": "Offerte anfordern",
+    "quoteTitle": "Deine Offerte",
+    "premium": "Prämie: wird mit dem Pax-Tarif berechnet (in der Demo nicht angebunden).",
+    "validUntil": "Gültig bis {{time}}",
+    "documents": "Produktdokumente",
+    "readDocuments": "Ich habe alle Produktdokumente gelesen.",
+    "createApplication": "Antrag erstellen",
+    "applicationTitle": "Dein Antrag",
+    "compliance": "Für einen echten Vertrag nötig, in der Demo nicht durchgeführt:",
+    "submit": "Antrag einreichen",
+    "submitted": "Dein Antrag ist eingereicht.",
+    "needsInformation": "Pax braucht weitere Angaben. Bitte melde dich bei deiner Pax-Fachperson.",
+    "declined": "Der Antrag wurde abgelehnt.",
+    "portal": "Kundenportal",
+    "noPolicy": "Noch keine Police.",
+    "policyDemo": "Demo – kein Versicherungsschutz",
+    "issued": "Ausgestellt am {{date}}",
+    "contextChanged": "Deine Angaben haben sich seither geändert. Die Police bezieht sich auf die frühere Beratung.",
+    "dossier": "Beratungsdossier öffnen",
+    "dossierNote": "Alle Angaben, Annahmen, Begründungen und Quellen deiner Beratung, zum Ausdrucken.",
+    "working": "Wird bearbeitet …",
+    "error": "Das hat nicht geklappt.",
+    "insightsLink": "Für Pax: Produktmanagement-Einblicke (Demo)",
+    "document": {
+      "terms": "Versicherungsbedingungen",
+      "brochure": "Broschüre",
+      "kid": "Basisinformationsblatt"
+    },
+    "suitability": {
+      "title": "Eignungsprüfung für {{product}}",
+      "intro": "Fondsgebundene Produkte brauchen vorher eine Eignungsprüfung nach dem Pax-Formular. Das Ergebnis ist unverbindlich; die verbindliche Prüfung und Unterschrift macht eine Pax-Fachperson.",
+      "annualPremium": "Gewünschte Jahresprämie (CHF)",
+      "singleInvestment": "Gewünschte Einmaleinlage (CHF)",
+      "amountHint": "Mindestens eines der beiden Felder ausfüllen.",
+      "netIncome": "Nettoeinkommen pro Jahr",
+      "netWorth": "Vermögen",
+      "savingCapacity": "Sparfähigkeit pro Jahr",
+      "investmentCapacity": "Möglicher Einmalbetrag",
+      "goal": "Anlageziel",
+      "horizon": "Anlagehorizont",
+      "experience": "Erfahrung mit Wertschriften",
+      "lossReaction": "Wenn deine Anlage 30 % verliert, würdest du …",
+      "guarantee": "Garantierter Anteil (%)",
+      "strategy": "Gewählte Anlagestrategie",
+      "confirm": "Ich bestätige, dass diese Angaben von mir stammen.",
+      "submit": "Prüfung auswerten",
+      "suitable": "Passt: Die gewählte Strategie entspricht deinem Profil.",
+      "advisedAgainst": "Davon wird abgeraten:",
+      "reason": {
+        "NOT_AFFORDABLE": "Der Betrag übersteigt deine Spar- oder Anlagefähigkeit.",
+        "STRATEGY_DOES_NOT_MATCH_PROFILE": "Die gewählte Strategie passt nicht zu deinem Anlageprofil.",
+        "HORIZON_TOO_SHORT": "Der Anlagehorizont ist kürzer als zehn Jahre."
+      },
+      "option": {
+        "netIncome": {
+          "under_75k": "unter CHF 75 000",
+          "75k_150k": "CHF 75 000–150 000",
+          "150k_250k": "CHF 150 000–250 000",
+          "over_250k": "über CHF 250 000"
+        },
+        "asset": {
+          "under_10k": "unter CHF 10 000",
+          "10k_50k": "CHF 10 000–50 000",
+          "50k_150k": "CHF 50 000–150 000",
+          "150k_300k": "CHF 150 000–300 000",
+          "over_300k": "über CHF 300 000"
+        },
+        "saving": {
+          "under_1k": "unter CHF 1 000",
+          "1k_3k": "CHF 1 000–3 000",
+          "3k_7k": "CHF 3 000–7 000",
+          "over_7k": "über CHF 7 000"
+        },
+        "goal": {
+          "low_risk": "Möglichst wenig Risiko",
+          "moderate_risk": "Etwas Risiko für mehr Ertrag",
+          "high_risk": "Höheres Risiko für hohen Ertrag"
+        },
+        "horizon": {
+          "under_10_years": "unter 10 Jahren",
+          "10_to_15_years": "10 bis 15 Jahre",
+          "over_15_years": "über 15 Jahre"
+        },
+        "experience": {
+          "none": "Keine",
+          "knowledge_only": "Nur Kenntnisse",
+          "experience": "Etwas Erfahrung",
+          "extensive": "Viel Erfahrung"
+        },
+        "loss": {
+          "sell_all": "… alles verkaufen",
+          "sell_part": "… einen Teil verkaufen",
+          "hold": "… abwarten",
+          "buy_more": "… nachkaufen"
+        },
+        "strategy": {
+          "conservative": "Konservativ",
+          "balanced": "Ausgewogen",
+          "dynamic": "Dynamisch"
+        }
+      }
+    },
+    "nps": {
+      "question": "Wie wahrscheinlich ist es, dass du Pax einer Freundin oder einem Kollegen empfiehlst?",
+      "low": "0 = gar nicht",
+      "high": "10 = sehr wahrscheinlich",
+      "thanks": "Danke für deine Rückmeldung!",
+      "score": "{{score}} von 10"
+    },
+    "errors": {
+      "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "Für diese Person gibt es kein eigenes Einkommen oder Vermögen, das die Prämie tragen kann. Wähle die Lösungen für die andere Person oder sprich mit einer Pax-Fachperson.",
+      "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "Für diese Person ist noch kein Betrag erfasst, den sie selbst für Prämien aufwenden möchte.",
+      "HOUSEHOLD_AFFORDABILITY_NOT_ESTABLISHED": "Das Budget des Haushalts lässt im Moment keine zusätzliche Prämie zu.",
+      "ALTERNATIVE_PRODUCTS_CANNOT_BE_STACKED": "Wähle nur eine der Sparlösungen; sie sind Alternativen zueinander.",
+      "SUITABILITY_CHECK_REQUIRED": "Für das fondsgebundene Produkt fehlt noch die Eignungsprüfung.",
+      "SUITABILITY_ADVISED_AGAINST": "Die Eignungsprüfung rät von diesem Produkt ab.",
+      "QUOTE_EXPIRED": "Die Offerte ist abgelaufen. Fordere bitte eine neue an.",
+      "HUMAN_REVIEW_REQUIRED": "Zuerst muss eine Pax-Fachperson die Beratung prüfen."
+    }
+  },
+  "insights": {
+    "title": "Produktmanagement-Einblicke",
+    "intro": "Aggregierte Signale aller Demo-Fälle: keine Beträge, kein Freitext, keine Personendaten.",
+    "cases": "Fälle",
+    "stages": "Aktueller Schritt",
+    "dropoffs": "Mögliche Abbrüche",
+    "dropoffNote": "Kein Abschluss und seit zehn Minuten keine Änderung: ein Hinweis, kein bestätigter Abbruch.",
+    "nps": "NPS",
+    "responses": "{{count}} Antworten",
+    "noNps": "Noch keine Antworten",
+    "handover": "Wünsche nach einer Pax-Fachperson",
+    "reasons": "Häufigste Prüfgründe",
+    "unavailable": "Diese Ansicht gibt es nur im Demo-Start.",
+    "back": "Zurück zum Abschluss",
+    "stage": {
+      "intake": "Aufnahme",
+      "profile_confirmed": "Profil bestätigt",
+      "analysis": "Analyse",
+      "recommendation": "Empfehlung",
+      "application_submitted": "Antrag eingereicht",
+      "demo_policy": "Demo-Police"
+    }
   }
 }

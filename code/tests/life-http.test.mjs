@@ -108,6 +108,8 @@ test('OpenAPI exposes runtime request schemas and private financial data stays p
   const resolve=ref=>ref.slice(2).split('/').reduce((o,k)=>o[k.replace(/~1/g,'/').replace(/~0/g,'~')],spec.body);
   const requestSchema=spec.body.paths['/api/cases/{caseId}/calculations'].post.requestBody.content['application/json'].schema;
   assert.ok(resolve(requestSchema.$ref).properties.scenario);
+  // The summaries route answers with the summary bundle, not with its own description text.
+  assert.equal(spec.body.paths['/api/cases/{caseId}/summaries'].get.responses['200'].content['application/json'].schema.$ref,'#/components/schemas/SummaryBundle');
   const walk=value=>{if(!value||typeof value!=='object')return;if(value.$ref?.startsWith('#/'))assert.ok(resolve(value.$ref),value.$ref);for(const child of Object.values(value))walk(child);};
   walk(spec.body);
   assert.equal((await request('GET','/api/insights',customer.sessionToken)).status,403);

@@ -29,6 +29,7 @@ import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
+import { DockAvatar } from './features/agent-dock/dock-avatar';
 import { ConsentScreen } from './features/consent/consent-screen';
 import { ConnectionBanner } from './features/connection/connection-banner';
 import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
@@ -57,6 +58,7 @@ interface TabLink {
     LanguageSwitcher,
     ConsentScreen,
     AgentDock,
+    DockAvatar,
     ConnectionBanner,
     HumanAdvisorStatus,
     CallControls,

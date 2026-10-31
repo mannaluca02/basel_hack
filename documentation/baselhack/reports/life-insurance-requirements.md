@@ -99,3 +99,16 @@ Der vorherige Mehrsprachigkeitsstand umfasste nur Locale und einige Rückfragen.
 ## Gemeinsamer vollständiger Vertrag
 
 `InsuranceCaseDtoSchema` und alle Fachdaten-Untertypen liegen jetzt im gemeinsamen Paket `@pax/contracts`. Das Backend leitet seine Geschäftsobjekte aus denselben Typen ab und ergänzt ausschliesslich private Persistenz-/Berechtigungsfelder. Die Fallantworten, der minimale Agent-Kontext, die SSE-Daten, Portal und Summary werden vor Ausgabe gegen die gemeinsamen Schemas geprüft. Zehn JSON-Schema-Exporte und browserfähige kompilierte Beispiele unterstützen die anderen Teammodule. 121 Tests bestehen, darunter Querverweis-/Rollen-/Vertrags-/Parallelitätsprüfungen. Der [Team-Leitfaden](../plans/team-api-guide.md) und der [Speicher-/DB-Entscheid](../plans/persistence-and-api.md) unterscheiden vorhandene Schnittstellen von zukünftiger SQL-/Netzintegration.
+
+## Ergänzung: in der App sichtbar (31.10.2026)
+
+Die Backend-Anforderungen B13, B14, B21 und B23 sind jetzt auch in der Angular-App bedienbar:
+
+- **B13 Beratung → Empfehlung → Vertrag → Portal:** Tab „Abschluss“ (`features/journey`) mit Empfehlung je Produkt und Person, Fachprüfung, Offerte (keine erfundene Prämie), Antrag mit den vier für einen echten Vertrag nötigen Schritten, Einreichung, Fachprüfung und Demo-Police im Kundenportal. Im Demo-Start simuliert `POST /api/cases/{caseId}/demo-review` die Pax-Fachperson über das Demo-Prüfkonto und die normalen Prüfmethoden (Rollen, Revisionen, Audit); die Oberfläche kennzeichnet das. Ausserhalb des Demo-Starts wartet der Fall auf eine echte Prüfung.
+- **B14 Dokumente und Summary:** Produktdokumente der Offerte als Download (SHA-256-gebunden) mit Lesebestätigung; Beratungsdossier als druckbares HTML.
+- **Eignungsprüfung (Pax-Formular 0054):** Formular für fondsgebundene Produkte vor der Offerte.
+- **B21 Avatar:** Lukas' Renderer im Agent-Dock, gesteuert vom Aktivitätsring und dem Pegel der Live-Voice.
+- **B23 NPS und Abbruch-Insights:** NPS je erreichtem Schritt; Ansicht `/insights` mit Trichter, möglichen Abbrüchen, NPS und Übergabewünschen (`GET /api/demo/insights`, nur Aggregate).
+
+Nachweis: `code/tests/contract-journey.test.mjs` (HTTP-End-to-End), Angular-Specs unter `features/journey`, und ein Lauf gegen den Live-Rechner bis zur Demo-Police (Dossier, PDF, NPS, Insights). Eine Person ohne eigenes Einkommen oder Vermögen erhält für ihre Produkte keine Offerte; die App erklärt das.
+

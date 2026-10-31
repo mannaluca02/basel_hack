@@ -1,4 +1,4 @@
-import { Body,Controller,Get,Post,Put,Delete,Patch,Param,Query,Req,Res,UseGuards,Inject,Injectable,Module,
+import { Body,Controller,Get,Post,Delete,Patch,Param,Query,Req,Res,UseGuards,Inject,Injectable,Module,
   Catch,HttpException,Sse,type CanActivate,type ExecutionContext,type ArgumentsHost,type ExceptionFilter,type DynamicModule,type MessageEvent } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { z } from 'zod';
@@ -89,6 +89,8 @@ export class ProtectedLifeController {
   @Get('cases/:caseId/suitability') suitability(@Req() req:Request,@Param('caseId') id:string){return this.r.suitability.view(req.actor,uuid(id));}
   @Post('cases/:caseId/suitability') checkSuitability(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.suitability.check(req.actor,uuid(id),body);}
   @Post('cases/:caseId/demo-accept') demoAccept(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.demo.acceptPending(req.actor,uuid(id));}
+  @Get('demo/insights') async demoInsights(@Req() req:Request){return this.r.insights.aggregate(await this.r.demo.reviewer(req.actor));}
+  @Post('cases/:caseId/demo-review') demoReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.demo.review(req.actor,uuid(id));}
   @Post('cases/:caseId/demo-profile') async demoProfile(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.demo.loadPersona(req.actor,uuid(id),body));}
   @Post('cases/:caseId/standard-analyses') standardAnalyses(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.demo.runStandardAnalyses(req.actor,uuid(id),body);}
   @Post('cases/:caseId/confirmations') async confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.confirm(req.actor,uuid(id),body));}
