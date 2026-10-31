@@ -31,6 +31,10 @@
       "type": "string",
       "maxLength": 100
     },
+    "voiceSessionId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
     "contextRef": {
       "type": "string",
       "pattern": "^\\/api\\/cases\\/[A-Za-z0-9_-]+\\/advisor\\/context$"

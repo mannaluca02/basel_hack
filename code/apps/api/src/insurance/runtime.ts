@@ -1,3 +1,5 @@
+import {VoiceIntegrationService} from '../voice/service.js';
+import type {VoiceOptions} from '../voice/providers.js';
 import { HumanHandoverService } from './human-handover.js';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,6 +10,7 @@ import { DemoJourneyService } from './journey.js';
 import { DossierService } from './dossier.js';
 import { CustomerConfirmations } from './customer-confirmations.js';
 import { ExtractionWorkflow } from './extraction.js';
+import { ModelExtractionConsents,type ModelExtractionOptions } from './model-extraction.js';
 import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
 import { ProductDocuments } from './documents.js';
@@ -18,7 +21,7 @@ import { LiveLogismataProvider,ReplayProvider,type CalculationProvider } from '.
 
 export const LIFE_RUNTIME=Symbol('LIFE_RUNTIME');
 export type RuntimeOptions={dataDirectory?:string;provider?:CalculationProvider;providerMode?:'live'|'replay'|'test';
-  token?:string;credentials?:BootstrapCredentials;documents?:ProductDocuments};
+  voice?:VoiceOptions;modelExtraction?:ModelExtractionOptions;token?:string;credentials?:BootstrapCredentials;documents?:ProductDocuments};
 export async function createLifeRuntime(options:RuntimeOptions={}) {
   const mode=options.providerMode??'live';
   if(!options.provider&&mode==='live'&&!options.token)throw new Error('LOGISMATA_BEARER_TOKEN is required for live mode');
@@ -30,7 +33,9 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
     const engine=new LifeInsuranceEngine(store,sessions,provider,mode);
     const documents=options.documents??await ProductDocuments.load();
     const journey=new DemoJourneyService(engine,documents),dossier=new DossierService(engine,journey),extraction=new ExtractionWorkflow(engine);
-    const confirmations=new CustomerConfirmations(engine,extraction);
+    const confirmations=new CustomerConfirmations(engine,extraction),modelExtraction=new ModelExtractionConsents(engine,options.modelExtraction);
+    const voice=new VoiceIntegrationService(engine,extraction,options.voice);await voice.initialize();
+    const voiceCleanup=setInterval(()=>{void voice.sweep().catch(()=>{});},5000);voiceCleanup.unref();
     let closed=false;
     const cleanup=setInterval(()=>{
       if(closed)return;const instant=new Date().toISOString();
@@ -42,8 +47,8 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
         db.audit=db.audit.filter(a=>Date.parse(a.at)>Date.now()-86400_000);
       }).catch(()=>{});
     },60_000);cleanup.unref();
-    return {store,sessions,engine,documents,journey,dossier,extraction,confirmations,handover:new HumanHandoverService(engine),advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
-      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);engine.digitalTasks.close();await store.close();}}};
+    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
+      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
 export type LifeRuntime=Awaited<ReturnType<typeof createLifeRuntime>>;

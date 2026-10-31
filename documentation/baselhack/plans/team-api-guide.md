@@ -2,6 +2,10 @@
 
 Neu: [Gemeinsamer Übergabeschalter zur persönlichen Beratung](human-advisor-handover.md): Kundenaktion, persistierter Zustand und sofortiges SSE-Stoppsignal; ausschließlich Kontaktdaten, keine Anwahl.
 
+Neu: [Voice-Backend, Provider und Transkripte](voice-backend-integration.md).
+
+Neu: [Hinweis und Zustimmung für Earnies synthetische OpenAI-Extraktion](model-extraction-notice.md).
+
 Neu: [Voice-Bestätigung und Rückfragenstatus für Dario/Erni](voice-confirmation-and-dialogue.md).
 
 Aktuelle Erweiterung für Ernis Modul: [Extraktor-Projektion, atomare Vorschlagspakete, Korrekturen und Unklarheiten](erni-extractor-integration.md). Für neue Extraktion die dort beschriebene Paket-API verwenden.

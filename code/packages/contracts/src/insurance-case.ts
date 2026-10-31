@@ -33,7 +33,7 @@ export const DemoApplicationSchema=z.object({id:Id,quoteId:Id,runId:Id,profileVe
 export const DemoPolicySchema=z.object({id:Id,applicationId:Id,profileVersion:revision,runId:Id,issuedAt:timestamp,
   demo:z.literal(true),coverageInForce:z.literal(false),legalEffect:z.literal('none'),label:z.literal('DEMO – KEIN VERSICHERUNGSSCHUTZ'),
   configuration:z.array(ProductCandidateSchema).min(1).max(10)}).strict();
-export const CaseEventSchema=z.object({id:Id,contextRevision:revision,reason:z.string().min(1).max(100),at:timestamp}).strict();
+export const CaseEventSchema=z.object({id:Id,contextRevision:revision,reason:z.string().min(1).max(100),at:timestamp,voiceSessionId:Id.optional()}).strict();
 export const ScenarioComparisonSchema=z.object({id:Id,scope:z.literal('valuation_snapshot_local_metrics'),valuationDate:DateOnly,
   futureTimelineCompared:z.literal(false),profileVersion:revision,baselineRunId:Id,variantRunId:Id,baselineInputHash:hash,variantInputHash:hash,
   metrics:z.array(z.object({id:z.string().max(160),personId:Id.optional(),currency:z.literal('CHF'),unit:z.literal('cent'),period:z.enum(['month','year','once']),

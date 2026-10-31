@@ -55,7 +55,11 @@ export class PublicLifeController {
   @Get('status') status(){return {service:'pax-life-insurance-backend',modelVersion:'0.2.0',providerMode:this.r.providerMode,
     dataMode:'synthetic-only',paxContractApiAvailable:false,realCoverageCanBeActivated:false,supportedLocales:['de','fr','it','en'],translationCatalog:'/api/translations',operations:Object.keys(Operations)};}
   @Get('privacy') privacy(@Query('locale') selected:unknown,@Req() req:Request){const locale=selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected);
-    return {...PRIVACY_NOTICE,locale,display:{title:t(locale,'privacy.title'),purpose:t(locale,'privacy.purpose'),recipients:t(locale,'privacy.recipients'),storage:t(locale,'privacy.storage'),release:t(locale,'privacy.release')}};}
+    const voice=this.r.voice.enabled,extraction=this.r.modelExtraction.enabled,optionalModelExtraction=this.r.modelExtraction.notice(locale);
+    return {...PRIVACY_NOTICE,externalAiTransfer:voice||extraction,recipients:[...PRIVACY_NOTICE.recipients,...(voice?['Optional synthetic voice: selected OpenAI or ElevenLabs provider after separate consent']:[]),
+      ...(extraction?['Optional synthetic intake extraction: OpenAI Responses API with a minimal invented projection after separate consent']:[])],optionalVoiceProcessing:this.r.voice.privacy(locale),optionalModelExtraction,locale,
+      display:{title:t(locale,'privacy.title'),purpose:t(locale,'privacy.purpose'),recipients:[t(locale,'privacy.recipients'),...(voice?[this.r.voice.privacy(locale).text]:[]),...(extraction?[optionalModelExtraction.text]:[])].join(' '),storage:t(locale,'privacy.storage'),release:t(locale,'privacy.release')}};}
+  @Get('extraction/privacy') extractionPrivacy(@Query('locale') selected:unknown,@Req() req:Request){return this.r.modelExtraction.notice(selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected));}
   @Get('translations') translations(@Query('locale') selected:unknown,@Req() req:Request){return catalog(selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected));}
   @Get('openapi.json') openapi(){return lifeOpenApi();}
   @Post('sessions') async login(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
@@ -70,7 +74,7 @@ export class ProtectedLifeController {
   constructor(@Inject(LIFE_RUNTIME) private readonly r:LifeRuntime){}
   private async displayJourney(req:Request,id:string,result:unknown){return presentJourney(await result,this.r.engine.caseFor(req.actor,id).locale);}
   @Delete('sessions/current') async logout(@Req() req:Request,@Res({passthrough:true}) res:Response){
-    await this.r.sessions.revoke(req.actor);res.setHeader('Set-Cookie','pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0');return {revoked:true};
+    await this.r.sessions.revoke(req.actor);await this.r.voice.sweep();res.setHeader('Set-Cookie','pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0');return {revoked:true};
   }
   @Get('cases') list(@Req() req:Request){return this.r.engine.list(req.actor);}
   @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}
@@ -127,6 +131,9 @@ export class ProtectedLifeController {
   @Post('cases/:caseId/customer-confirmations/:confirmationId/presented') presentConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.presented(req.actor,uuid(id),requestId,body);}
   @Post('cases/:caseId/customer-confirmations/:confirmationId/answer') answerConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.answer(req.actor,uuid(id),requestId,body);}
   @Post('cases/:caseId/customer-confirmations/:confirmationId/cancel') cancelConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.cancel(req.actor,uuid(id),requestId,body);}
+  @Get('cases/:caseId/extraction/consent') extractionConsent(@Req() req:Request,@Param('caseId') id:string){return this.r.modelExtraction.permission(req.actor,uuid(id));}
+  @Post('cases/:caseId/extraction/consent') grantExtractionConsent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.modelExtraction.consent(req.actor,uuid(id),body);}
+  @Post('cases/:caseId/extraction/consent/revoke') revokeExtractionConsent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.modelExtraction.revoke(req.actor,uuid(id),body);}
   @Get('cases/:caseId/advisor/extractor-context') extractorContext(@Req() req:Request,@Param('caseId') id:string){return this.r.extraction.context(req.actor,uuid(id));}
   @Post('cases/:caseId/advisor/proposal-batches') batch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.extraction.proposeBatch(req.actor,uuid(id),body);}
   @Post('cases/:caseId/advisor/proposal-batches/:batchId/accept') acceptBatch(@Req() req:Request,@Param('caseId') id:string,@Param('batchId') batchId:string,@Body() body:unknown){return this.r.extraction.acceptBatch(req.actor,uuid(id),batchId,body);}
@@ -150,7 +157,7 @@ export class ProtectedLifeController {
           const handoverChanged=state.handover.revision>0&&state.handover.revision!==handoverRevision;handoverRevision=state.handover.revision;
           subscriber.next({type:'advisor.context.updated',id:eventId,data:AdvisorContextUpdatedSchema.parse({schemaVersion:'1.0',messageId:eventId,caseId:id,
             correlationId:eventId,eventId,contextRevision:version,reason,contextRef:`/api/cases/${id}/advisor/context`,
-            handover:state.handover,interruptPolicy:state.handover.stopDigitalConversation||handoverChanged?'immediate':['conversation_preference_changed','agent_proposal_available','agent_proposal_batch_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
+            ...(state.last?.voiceSessionId?{voiceSessionId:state.last.voiceSessionId}:{}),handover:state.handover,interruptPolicy:state.handover.stopDigitalConversation||handoverChanged?'immediate':['conversation_preference_changed','agent_proposal_available','agent_proposal_batch_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
         }catch{subscriber.complete();}
       };
       const timer=setInterval(poll,250);poll();return ()=>clearInterval(timer);
@@ -159,12 +166,13 @@ export class ProtectedLifeController {
   @Get('cases/:caseId/audit') audit(@Req() req:Request,@Param('caseId') id:string){this.r.engine.caseFor(req.actor,uuid(id));return this.r.store.view(db=>db.audit.filter(a=>a.caseId===id));}
   @Post('cases/:caseId/feedback') feedback(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.insights.feedback(req.actor,uuid(id),body);}
   @Get('insights') insights(@Req() req:Request){return this.r.insights.aggregate(req.actor);}
-  @Delete('cases/:caseId') remove(@Req() req:Request,@Param('caseId') id:string){
+  @Delete('cases/:caseId') async remove(@Req() req:Request,@Param('caseId') id:string){
     if(req.actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
-    return this.r.engine.edit(req.actor,uuid(id),undefined,(c,db)=>{
+    const result=await this.r.engine.edit(req.actor,uuid(id),undefined,(c,db)=>{
       delete db.cases[c.id];db.feedback=db.feedback.filter(f=>f.caseId!==c.id);
       for(const [key,s] of Object.entries(db.sessions))if(s.caseId===c.id)delete db.sessions[key];
       this.r.engine.audit(db,req.actor,c,'case_deleted');return {deleted:true};},{allowDuringHandover:true});
+    await this.r.voice.sweep();return result;
   }
 }
 

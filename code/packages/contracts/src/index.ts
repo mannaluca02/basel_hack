@@ -8,3 +8,5 @@ export * from './summary.js';
 export * from './proposal-workflow.js';
 export * from './customer-confirmation.js';
 export * from './human-handover.js';
+export * from './voice-integration.js';
+export * from './model-extraction.js';

@@ -82,7 +82,7 @@ export class LifeInsuranceEngine {
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),
         locale:body.locale,timeBudgetMinutes:body.timeBudgetMinutes,caseRevision:1,contextRevision:1,
         draft:{financial:null,insurance:null,goals:[],reviewFlags:[]},draftDirty:true,confirmedVersions:[],latestAnalysisRequestId:null,activeRunId:null,
-        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],handover:structuredClone(DEFAULT_HUMAN_HANDOVER),confirmationRequests:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
+        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],handover:structuredClone(DEFAULT_HUMAN_HANDOVER),voiceSessions:[],confirmationRequests:[],modelExtractionConsent:null,proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
   }

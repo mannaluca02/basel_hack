@@ -18,7 +18,11 @@ export async function createDemoApp() {
 if(process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port=Number(process.env.PORT??3000);
   if(!Number.isInteger(port)||port<1||port>65535) throw new Error('Invalid PORT');
-  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',token:process.env.LOGISMATA_BEARER_TOKEN??''});
+  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',token:process.env.LOGISMATA_BEARER_TOKEN??'',modelExtraction:{enabled:process.env.PAX_SYNTHETIC_EXTRACTION_ENABLED==='1'},voice:{enabled:process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1',
+    ...(process.env.OPENAI_API_KEY?{openAiApiKey:process.env.OPENAI_API_KEY}:{}),
+    ...(process.env.ELEVENLABS_API_KEY?{elevenLabsApiKey:process.env.ELEVENLABS_API_KEY}:{}),
+    ...(process.env.ELEVENLABS_AGENT_ID?{elevenLabsAgentId:process.env.ELEVENLABS_AGENT_ID}:{}),
+    ...(process.env.LIVE_MODEL?{liveModel:process.env.LIVE_MODEL}:{}),...(process.env.LIVE_VOICE?{liveVoice:process.env.LIVE_VOICE}:{})}});
   try{await app.listen(port,'127.0.0.1');}catch(error){await runtime.close();throw error;}
   console.info(`Pax life-insurance backend (live calculator): http://127.0.0.1:${port}/api/status`);
   console.info(`Local demo access codes: ${runtime.store.directory}/access-codes.json`);

@@ -33,7 +33,7 @@ export const AdvisorContextSchema=z.object({handover:HumanHandoverSchema.default
   policy:z.object({noRawHealthData:z.literal(true),noProviderTokens:z.literal(true),noExternalAiTransferAuthorized:z.literal(true),productFirstSelling:z.literal(false)}).strict(),
 }).strict();
 export const AdvisorContextUpdatedSchema=z.object({schemaVersion:z.literal('1.0'),messageId:Id,caseId:Id,correlationId:Id,eventId:Id,
-  contextRevision:revision,reason:z.string().max(100),contextRef:z.string().regex(/^\/api\/cases\/[A-Za-z0-9_-]+\/advisor\/context$/),
+  contextRevision:revision,reason:z.string().max(100),voiceSessionId:Id.optional(),contextRef:z.string().regex(/^\/api\/cases\/[A-Za-z0-9_-]+\/advisor\/context$/),
   handover:HumanHandoverSchema.default(()=>structuredClone(DEFAULT_HUMAN_HANDOVER)),
   interruptPolicy:z.enum(['refresh_before_next_turn','if_current_answer_invalid','immediate'])}).strict()
   .refine(e=>e.contextRef===`/api/cases/${e.caseId}/advisor/context`,'Event context belongs to a different case');

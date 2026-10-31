@@ -18,7 +18,7 @@
     "contracts:export": "npm run build && node scripts/export-contracts.mjs",
     "contracts:check": "node scripts/export-contracts.mjs --check",
     "contracts:examples": "npm run build && node scripts/export-demo-contracts.mjs",
-    "start": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env apps/api/dist/main.js",
+    "start": "npm run build && node --env-file-if-exists=../.env --env-file-if-exists=../documentation/baselhack/private/logismata.env apps/api/dist/main.js",
     "start:demo": "npm run build && node scripts/start-demo.mjs",
     "demo": "npm run build && node scripts/demo.mjs",
     "test:live": "npm run build && node --env-file-if-exists=../documentation/baselhack/private/logismata.env scripts/live-journey.mjs",
@@ -28,7 +28,9 @@
     "demo:voice-confirmation": "npm run build && node scripts/demo-voice-confirmation.mjs",
     "contracts:voice-examples": "npm run build && node scripts/demo-voice-confirmation.mjs --export",
     "demo:handover": "npm run build && node scripts/demo-human-handover.mjs",
-    "contracts:handover-examples": "npm run build && node scripts/demo-human-handover.mjs --export"
+    "contracts:handover-examples": "npm run build && node scripts/demo-human-handover.mjs --export",
+    "demo:voice-integration": "npm run build && node scripts/demo-voice-integration.mjs",
+    "contracts:voice-integration-examples": "npm run build && node scripts/demo-voice-integration.mjs --export"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
