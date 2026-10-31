@@ -1,0 +1,167 @@
+/*
+ * Pax design tokens. The only file in the app that may contain colour literals.
+ *
+ * Values measured from ui.pax.ch/styles/main.357c4b95cdb7dbc93845.css. Pax switches
+ * themes with [data-theme=dark]; here the dark values sit inside
+ * prefers-color-scheme, so the theme always follows the operating system.
+ *
+ * Two layers:
+ * 1. Primitives (--color-*, --radius-*, --stroke-*): raw Pax values, same in both themes.
+ *    Only this file references the --color-* ones.
+ * 2. Semantic tokens (--bg-*, --text-*, --icon-*, --border-*, --chart-*): what components use.
+ *
+ * Deviations from Pax, all for WCAG AA text contrast:
+ * - --text-brand is Pax Purple in light (Pax Green on white is 1.93:1). Green is for fills,
+ *   rings and icons only.
+ * - Pax has no AA-safe "subtle" text colour (#adadad on white is 2.30:1), so there is no
+ *   --text-subtle. Use --text-muted.
+ * - Dark --bg-warning is Warning Dark instead of Pax's #ffffff, which put white text on white.
+ *
+ * Check: npm run check:tokens
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Brand */
+  --color-brand-pax-green: #8ccd0f;
+  --color-brand-pax-purple: #3c0078;
+  --color-brand-deep-green: #003018;
+  --color-brand-deep-purple: #2a0754;
+  --color-brand-contrast-green: #5ca700;
+
+  /* Neutrals */
+  --color-neutral-black: #121212;
+  --color-neutral-white: #ffffff;
+  --color-neutral-gray-1: #f5f5f5;
+  --color-neutral-gray-2: #ededed;
+  --color-neutral-gray-3: #d4d4d4;
+  --color-neutral-gray-4: #adadad;
+  --color-neutral-gray-5: #8e8e8e;
+  --color-neutral-gray-6: #6a6a6a;
+  --color-neutral-gray-7: #282828;
+
+  /* System */
+  --color-system-success: #00be00;
+  --color-system-success-light: #f5fbe9;
+  --color-system-success-dark: #003018;
+  --color-system-warning: #ff9600;
+  --color-system-warning-light: #fff4e5;
+  --color-system-warning-dark: #814c00;
+  --color-system-error: #ff3232;
+  --color-system-error-light: #fff5f5;
+  --color-system-error-dark: #5c1212;
+  --color-system-info: #3c0078;
+  --color-system-info-light: #f8f6fb;
+  --color-system-info-dark: #2a0754;
+
+  /* Chart */
+  --color-chart-turquoise: #78c7c7;
+  --color-chart-amber: #e6be4b;
+  --color-chart-blue: #345076;
+  --color-chart-red: #b54963;
+  --color-chart-silver: #bcbbb0;
+  --color-chart-beige: #c3a57d;
+
+  /* Radius (--radius-xl grows at the Pax desktop breakpoint below) */
+  --radius-none: 0rem;
+  --radius-sm: 0.25rem;
+  --radius-m: 0.625rem;
+  --radius-xl: 1rem;
+  --radius-full: 62.5rem;
+
+  /* Stroke */
+  --stroke-xs: 0.075rem;
+  --stroke-s: 0.1rem;
+  --stroke-m: 0.125rem;
+  --stroke-border: 0.075rem;
+  --stroke-focusring: 0.125rem;
+
+  /* Font. Pax uses "Civil Premium", which is licensed; add it in front once the team has access. */
+  --font-family: system-ui, -apple-system, sans-serif;
+
+  /* Semantic: light */
+  --bg-default: var(--color-neutral-white);
+  --bg-muted: var(--color-neutral-gray-1);
+  --bg-brand: var(--color-brand-pax-green);
+  --bg-brand-contrast: var(--color-brand-contrast-green);
+  --bg-brand-purple: var(--color-brand-pax-purple);
+  --bg-success: var(--color-system-success-light);
+  --bg-warning: var(--color-system-warning-light);
+  --bg-error: var(--color-system-error-light);
+  --bg-info: var(--color-system-info-light);
+
+  --text-default: var(--color-neutral-black);
+  --text-muted: var(--color-neutral-gray-6);
+  --text-brand: var(--color-brand-pax-purple);
+  --text-on-brand: var(--color-neutral-black);
+  --text-inverse: var(--color-neutral-white);
+  --text-success: var(--color-system-success-dark);
+  --text-warning: var(--color-system-warning-dark);
+  --text-error: var(--color-system-error-dark);
+  --text-info: var(--color-system-info-dark);
+
+  --icon-default: var(--color-neutral-black);
+  --icon-muted: var(--color-neutral-gray-6);
+  --icon-brand: var(--color-brand-pax-green);
+  --icon-brand-contrast: var(--color-brand-contrast-green);
+  --icon-success: var(--color-system-success);
+  --icon-warning: var(--color-system-warning);
+  --icon-error: var(--color-system-error);
+  --icon-info: var(--color-system-info);
+
+  --border-default: var(--color-neutral-black);
+  --border-soft: var(--color-neutral-gray-3);
+  --border-subtle: var(--color-neutral-gray-4);
+  --border-focusring: var(--color-brand-pax-green);
+  --border-success: var(--color-system-success);
+  --border-warning: var(--color-system-warning);
+  --border-error: var(--color-system-error);
+  --border-info: var(--color-system-info);
+
+  --chart-1: var(--color-brand-pax-green);
+  --chart-2: var(--color-brand-pax-purple);
+  --chart-3: var(--color-chart-turquoise);
+  --chart-4: var(--color-chart-amber);
+  --chart-5: var(--color-chart-blue);
+  --chart-6: var(--color-chart-red);
+  --chart-7: var(--color-chart-silver);
+  --chart-8: var(--color-chart-beige);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --radius-xl: 1.25rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Semantic: dark (Pax [data-theme=dark]) */
+    --bg-default: var(--color-neutral-black);
+    --bg-muted: var(--color-neutral-gray-7);
+    --bg-success: var(--color-system-success-dark);
+    --bg-warning: var(--color-system-warning-dark);
+    --bg-error: var(--color-system-error-dark);
+    --bg-info: var(--color-system-info-dark);
+
+    --text-default: var(--color-neutral-white);
+    --text-muted: var(--color-neutral-gray-2);
+    --text-brand: var(--color-brand-pax-green);
+    --text-success: var(--color-system-success-light);
+    --text-warning: var(--color-neutral-white);
+    --text-error: var(--color-system-error-light);
+    --text-info: var(--color-system-info-light);
+
+    --icon-default: var(--color-neutral-white);
+    --icon-muted: var(--color-neutral-gray-2);
+    --icon-brand-contrast: var(--color-brand-pax-green);
+    --icon-warning: var(--color-neutral-white);
+    --icon-info: var(--color-system-info-light);
+
+    --border-default: var(--color-neutral-white);
+    --border-soft: var(--color-neutral-gray-4);
+    --border-subtle: var(--color-neutral-gray-3);
+    --border-warning: var(--color-neutral-white);
+  }
+}

@@ -10,8 +10,8 @@ body {
 }
 
 body {
-  color: #121212;
-  background: #fff;
-  font-family: system-ui, sans-serif;
+  color: var(--text-default);
+  background: var(--bg-default);
+  font-family: var(--font-family);
   overflow-wrap: anywhere;
 }
