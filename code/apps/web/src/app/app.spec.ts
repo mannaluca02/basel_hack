@@ -248,23 +248,22 @@ describe('App', () => {
   });
 
   it('switches shell, open tab and document title to another language without reload', async () => {
-    const harness = await RouterTestingHarness.create();
-    const fixture = TestBed.createComponent(App);
-    await harness.navigateByUrl('/risks');
-    await fixture.whenStable();
-    const root = fixture.nativeElement as HTMLElement;
+    // One router outlet only: a second one from RouterTestingHarness misses the tab on its first lazy load (FE-26).
+    const { fixture, root, navigate } = await renderShell();
+    await navigate('/risks');
     const navLabels = () => Array.from(root.querySelectorAll('nav .label'), (a) => a.textContent);
+    const heading = () => root.querySelector('main app-risks-tab h1')?.textContent;
 
     expect(navLabels()).toEqual(['Grafiken', 'Risiken', 'Chat', 'Info']);
+    expect(heading()).toBe('Risiken');
     expect(document.title).toBe('Risiken | Pax Digital Advisor');
 
     await TestBed.inject(AppLanguage).use('fr');
     await fixture.whenStable();
-    await harness.fixture.whenStable();
 
     expect(navLabels()).toEqual(['Graphiques', 'Risques', 'Chat', 'Infos']);
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Espace de travail');
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Risques');
+    expect(heading()).toBe('Risques');
     expect(document.title).toBe('Risques | Pax Digital Advisor');
   });
 });
