@@ -89,7 +89,9 @@
     "neededLine": "Necessario: {{amount}}",
     "payout": "Versamento al pensionamento ({{year}})",
     "showInInfo": "Mostra in Info",
-    "taxSaving": "Risparmio fiscale secondo il calcolatore: {{amount}} ({{period}})"
+    "taxSaving": "Risparmio fiscale secondo il calcolatore: {{amount}} ({{period}})",
+    "selectedEvent": "Selezionato: {{label}} ({{year}})",
+    "selectEventHint": "Scegliere un evento per evidenziarne l’anno negli altri grafici"
   },
   "risks": {
     "title": "Rischi",

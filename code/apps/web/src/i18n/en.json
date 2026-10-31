@@ -89,7 +89,9 @@
     "neededLine": "Needed: {{amount}}",
     "payout": "Paid out at retirement ({{year}})",
     "showInInfo": "Show in Info",
-    "taxSaving": "Tax saving according to the calculator: {{amount}} ({{period}})"
+    "taxSaving": "Tax saving according to the calculator: {{amount}} ({{period}})",
+    "selectedEvent": "Selected: {{label}} ({{year}})",
+    "selectEventHint": "Pick an event to mark its year in the other charts"
   },
   "risks": {
     "title": "Risks",

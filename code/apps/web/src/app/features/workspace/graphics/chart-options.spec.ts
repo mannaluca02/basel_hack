@@ -204,6 +204,28 @@ describe('buildChartView', () => {
     });
   });
 
+  describe('selected life event', () => {
+    const event = { year: 2030, label: 'Eigenheim' };
+
+    it('marks its year as a band in the charts that have it on their axis', () => {
+      const view = buildChartView(incomeChart(), ctx, { scenario: 0, event });
+      expect(optionOf(view).series[0]!.markArea?.data).toEqual([[{ xAxis: '2030' }, { xAxis: '2030' }]]);
+      expect(view.legend.at(-1)).toEqual({
+        label: 'graphics.selectedEvent{"label":"Eigenheim","year":"2030"}',
+        token: '--border-focusring',
+        mark: 'bar',
+      });
+    });
+
+    it('guesses no position for a year the chart did not sample', () => {
+      const view = buildChartView(incomeChart(), ctx, { scenario: 0, event: { ...event, year: 2031 } });
+      expect(optionOf(view).series[0]!.markArea).toBeUndefined();
+      expect(view.legend.map((item) => item.label)).not.toContain(
+        'graphics.selectedEvent{"label":"Eigenheim","year":"2031"}',
+      );
+    });
+  });
+
   describe('pillar 3a growth', () => {
     it('draws with contributions solid and without dashed', () => {
       const view = buildChartView(pillar3aChart(), ctx);

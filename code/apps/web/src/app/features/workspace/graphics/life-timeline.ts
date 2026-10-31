@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, afterNextRender, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, afterNextRender, inject, input, signal } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { LifeEventSelection } from '../../../core/layout/life-event-selection';
 import { TimelineEntry } from './chart-options';
 
 /**
@@ -6,11 +8,15 @@ import { TimelineEntry } from './chart-options';
  * so any number of events stays readable on a phone. Like every chart card, the card also offers
  * the events as a data table. The marker shape repeats the certainty: filled for past and
  * confirmed, hollow for planned, with a halo for today; a dashed line leads to planned events.
+ * Picking an event marks its year in the other charts (`LifeEventSelection`); today is not an
+ * event to pick.
  */
 @Component({
   selector: 'app-life-timeline',
+  imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <p class="hint">{{ 'graphics.selectEventHint' | transloco }}</p>
     <ol class="timeline">
       @for (entry of entries(); track entry.id) {
         <li
@@ -24,10 +30,21 @@ import { TimelineEntry } from './chart-options';
                year and event apart when read aloud. -->
           <span class="year">{{ entry.year }}<span class="visually-hidden">: </span></span>
           <span class="marker" aria-hidden="true"></span>
-          <span class="label"
-            >{{ entry.label
-            }}<span class="visually-hidden">, {{ entry.certaintyLabel }}</span></span
-          >
+          @if (entry.today) {
+            <span class="label"
+              >{{ entry.label
+              }}<span class="visually-hidden">, {{ entry.certaintyLabel }}</span></span
+            >
+          } @else {
+            <button
+              type="button"
+              class="label pick"
+              [attr.aria-pressed]="selection.selected()?.eventId === entry.id"
+              (click)="pick(entry)"
+            >
+              {{ entry.label }}<span class="visually-hidden">, {{ entry.certaintyLabel }}</span>
+            </button>
+          }
         </li>
       }
     </ol>
@@ -105,6 +122,34 @@ import { TimelineEntry } from './chart-options';
       font-weight: 700;
     }
 
+    .hint {
+      margin: 0 0 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+    }
+
+    .pick {
+      justify-self: start;
+      padding: 0.125rem 0.375rem;
+      margin-left: -0.375rem;
+      border: var(--stroke-s) solid transparent;
+      border-radius: var(--radius-sm);
+      color: inherit;
+      background: none;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .pick:hover {
+      border-color: var(--border-soft);
+    }
+
+    .pick[aria-pressed='true'] {
+      border-color: var(--border-focusring);
+      font-weight: 700;
+    }
+
     .entry-enter {
       animation: entry-enter 300ms ease-out both;
     }
@@ -131,6 +176,11 @@ import { TimelineEntry } from './chart-options';
 })
 export class LifeTimeline {
   readonly entries = input.required<readonly TimelineEntry[]>();
+  protected readonly selection = inject(LifeEventSelection);
+
+  protected pick(entry: TimelineEntry): void {
+    this.selection.toggle({ eventId: entry.id, kind: entry.kind, year: Number(entry.year), label: entry.label });
+  }
 
   /** Empty for the first render: the card itself enters; later events enter on their own. */
   protected readonly enterClass = signal('');

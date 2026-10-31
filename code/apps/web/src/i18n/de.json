@@ -89,7 +89,9 @@
     "neededLine": "Benötigt: {{amount}}",
     "payout": "Auszahlung bei Pensionierung ({{year}})",
     "showInInfo": "In Info zeigen",
-    "taxSaving": "Steuerersparnis laut Rechner: {{amount}} ({{period}})"
+    "taxSaving": "Steuerersparnis laut Rechner: {{amount}} ({{period}})",
+    "selectedEvent": "Gewählt: {{label}} ({{year}})",
+    "selectEventHint": "Ereignis wählen, um sein Jahr in den anderen Grafiken zu markieren"
   },
   "risks": {
     "title": "Risiken",
