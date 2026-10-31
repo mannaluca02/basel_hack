@@ -15,7 +15,7 @@ export function isSpeech(text) {
 
 // "Ciao" is left out on purpose: in Italian it is also a greeting.
 const GOODBYES = [
-  "tschüss", "tschüs", "mach's gut", "machs gut", "bis bald", "auf wiedersehen", "auf wiederhören",
+  "tschüss", "tschüs", "tschau", "adieu", "uf wiederluege", "uf wiederhöre", "mach's gut", "machs gut", "bis bald", "auf wiedersehen", "auf wiederhören",
   "au revoir", "à bientôt", "bonne journée", "arrivederci", "a presto", "buona giornata", "goodbye", "bye bye", "take care",
 ];
 const GOODBYE_PATTERN = new RegExp(`(^|[^\\p{L}])(${GOODBYES.join("|")})($|[^\\p{L}])`, "iu");
@@ -38,7 +38,7 @@ export function progressNote(progress) {
   return [
     progress.known ? `Already known (never ask again): ${progress.known}.` : "",
     priority.length ? `The app especially needs these next: ${priority.join(", ")}. Steer the conversation there at the next natural moment.` : "",
-    `Still open: ${open.join(", ")}. Find these out naturally in the conversation, in whatever order fits. Do not wrap up or say goodbye yet.`,
+    `Still open: ${open.join(", ")}. Find these out naturally in the conversation, in whatever order fits. Do not start wrapping up on your own yet. But if the person wants to end, respect it: summarise briefly, propose what you can, and say goodbye without asking anything else.`,
   ]
     .filter(Boolean)
     .join(" ");

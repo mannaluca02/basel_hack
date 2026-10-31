@@ -93,7 +93,10 @@ export function createPaxiVoice({
   let poller = null;
   let agentTurnText = "";
   let goodbyeTimer;
-  let lastGoodbyeNudge = 0;
+  let closeAfterGoodbye = null;
+  let userTurnText = "";
+  let userGoodbyeTimer;
+  let personSaidGoodbye = false;
 
   const emit = (callback, value) => {
     try {
@@ -413,8 +416,10 @@ export function createPaxiVoice({
     });
   }
 
-  // Paxi sometimes starts to say goodbye while details are still open. Then it gets a
-  // spoken nudge to carry on. Once everything is complete, its goodbye ends the call.
+  // A goodbye is final. When Paxi says goodbye, the call ends after the farewell, even if
+  // details are still open (they go to a Pax colleague). When the person says goodbye,
+  // Paxi only says goodbye too. Reopening the conversation after a farewell feels wrong.
+  // Only if the person keeps talking about something else does the conversation go on.
   function watchForGoodbye(text) {
     agentTurnText += text;
     clearTimeout(goodbyeTimer);
@@ -422,21 +427,38 @@ export function createPaxiVoice({
       const said = agentTurnText;
       agentTurnText = "";
       if (!isGoodbye(said) || !running || closingForInactivity) return;
-      if (poller?.latest?.complete) {
-        closingForInactivity = true;
-        setTimeout(() => finish("closed"), GOODBYE_MS);
+      closingForInactivity = true;
+      closeAfterGoodbye = setTimeout(() => finish("closed"), GOODBYE_MS);
+    }, 1200);
+  }
+
+  function watchUserForGoodbye(text) {
+    userTurnText += text;
+    clearTimeout(userGoodbyeTimer);
+    userGoodbyeTimer = setTimeout(() => {
+      const said = userTurnText;
+      userTurnText = "";
+      if (!running) return;
+      if (!isGoodbye(said)) {
+        // The person kept talking after a farewell: the conversation goes on.
+        if (closeAfterGoodbye) {
+          clearTimeout(closeAfterGoodbye);
+          closeAfterGoodbye = null;
+          closingForInactivity = false;
+        }
         return;
       }
-      const open = [...(poller?.latest?.open_core ?? []), ...(poller?.latest?.open_extended ?? [])];
-      if (!open.length || performance.now() - lastGoodbyeNudge < 20_000) return;
-      lastGoodbyeNudge = performance.now();
+      if (personSaidGoodbye) return;
+      personSaidGoodbye = true;
       send(current, {
         type: "session.commentary.append",
         delegation_id: null,
-        content: `You started to say goodbye, but the conversation is not finished yet. Still open: ${open.join(", ")}. Say in a light way that there is just a little more you would love to know, and continue naturally with one of these.`,
+        content:
+          "The person is saying goodbye. Do not ask anything else, not even a small question. Thank them warmly in one or two sentences, say that a colleague of yours will look at your proposals and the open points and get in touch with an assessment, and say goodbye.",
       });
-    }, 1200);
+    }, 800);
   }
+
 
   // --- Avatar emotions -----------------------------------------------------------------------
 
@@ -495,6 +517,7 @@ export function createPaxiVoice({
             lastUserAt = performance.now();
             inactiveWarnedAt = null;
             collectFirstWords(session, f.text);
+            watchUserForGoodbye(f.text);
           }
           if (speaker === "agent") watchForGoodbye(f.text);
           pendingFragments.push({ sessionId: session.id, fragment: f });
@@ -608,7 +631,12 @@ export function createPaxiVoice({
     poller?.stop();
     poller = null;
     clearTimeout(goodbyeTimer);
+    clearTimeout(userGoodbyeTimer);
+    clearTimeout(closeAfterGoodbye);
+    closeAfterGoodbye = null;
     agentTurnText = "";
+    userTurnText = "";
+    personSaidGoodbye = false;
     clearInterval(levelTimer);
     clearTimeout(firstWordsTimer);
     endPlayback("cancelled");
