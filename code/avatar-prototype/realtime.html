@@ -1,0 +1,151 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Question: how do we sync the Pax avatar to OpenAI Realtime voice output?
+  Run: node code/avatar-prototype/server.mjs  →  http://localhost:8787/realtime.html
+  Sync model:
+    body motion  ← loudness of the remote WebRTC audio track (same stream the speaker plays)
+    listening    ← input_audio_buffer.speech_started
+    thinking     ← input_audio_buffer.speech_stopped (until the reply starts)
+    emotion      ← set_emotion tool call the model makes at the start of each reply
+    playback     ← output_audio_buffer.started / stopped / cleared  (→ I06 VoicePlaybackEvent)
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PROTOTYPE · Pax Avatar × OpenAI Realtime</title>
+<link rel="stylesheet" href="avatar-prototype.css" />
+</head>
+<body>
+<main id="stage">
+  <div id="caption">PROTOTYPE · Pax Avatar × OpenAI Realtime</div>
+  <div id="avatar"></div>
+  <div id="say"></div>
+</main>
+
+<aside id="panel">
+  <h3>Verbindung</h3>
+  <div class="grid">
+    <button class="wide" id="btnConnect">🎙 Gespräch starten</button>
+  </div>
+  <div style="margin-top:8px" class="meter"><div id="meter"></div></div>
+
+  <h3>Zustand</h3>
+  <pre id="state"></pre>
+
+  <h3>Ereignisse</h3>
+  <pre id="log"></pre>
+</aside>
+
+<audio id="remote" autoplay></audio>
+<script src="pax-avatar.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const status = { connection: "idle", playback: "–", emotion: "neutral", responseId: "–" };
+
+const avatar = PaxAvatar.mount($("avatar"), { onFrame: ({ emotion, level }) => {
+  $("meter").style.width = (level * 100).toFixed(0) + "%";
+  status.emotion = emotion;
+  $("state").textContent = Object.entries(status).map(([k, v]) => `${k.padEnd(11)}${v}`).join("\n");
+} });
+
+function log(line) {
+  const el = $("log");
+  el.textContent = `${new Date().toLocaleTimeString()}  ${line}\n` + el.textContent.slice(0, 6000);
+}
+
+// I06 VoicePlaybackEvent (Dario → Lukas). Here just logged; in the app this goes to the AgentRenderer.
+function playback(event, responseId) {
+  status.playback = event;
+  log(`I06 VoicePlaybackEvent ${event} (${responseId || "?"})`);
+}
+
+let pc, dc, followUps = 0;
+let currentResponse = null;
+
+$("btnConnect").onclick = async () => {
+  if (pc) { pc.close(); pc = null; status.connection = "closed"; $("btnConnect").textContent = "🎙 Gespräch starten"; avatar.setEmotion("neutral"); return; }
+  status.connection = "connecting";
+  try {
+    const session = await fetch("/session", { method: "POST" });
+    if (!session.ok) throw new Error(`/session ${session.status}: ${await session.text()}`);
+    const { value: ephemeralKey } = await session.json();
+
+    pc = new RTCPeerConnection();
+    pc.ontrack = (e) => {
+      $("remote").srcObject = e.streams[0];      // the speaker plays it …
+      avatar.attachStream(e.streams[0]);          // … and the avatar listens to the very same stream
+    };
+    const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+    pc.addTrack(mic.getTracks()[0]);
+
+    dc = pc.createDataChannel("oai-events");
+    dc.onmessage = (e) => onServerEvent(JSON.parse(e.data));
+    dc.onopen = () => { status.connection = "connected"; log("data channel open"); };
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    const answer = await fetch("https://api.openai.com/v1/realtime/calls", {
+      method: "POST",
+      body: offer.sdp,
+      headers: { Authorization: `Bearer ${ephemeralKey}`, "Content-Type": "application/sdp" },
+    });
+    if (!answer.ok) throw new Error(`/v1/realtime/calls ${answer.status}: ${await answer.text()}`);
+    await pc.setRemoteDescription({ type: "answer", sdp: await answer.text() });
+    $("btnConnect").textContent = "⏹ Gespräch beenden";
+  } catch (err) {
+    status.connection = "error"; log(`ERROR ${err.message}`); pc?.close(); pc = null;
+  }
+};
+
+function send(event) { dc?.readyState === "open" && dc.send(JSON.stringify(event)); }
+
+function onServerEvent(ev) {
+  switch (ev.type) {
+    case "input_audio_buffer.speech_started":
+      followUps = 0;
+      avatar.setEmotion("listening"); log("user speaking → listening");
+      break;
+    case "input_audio_buffer.speech_stopped":
+      avatar.setEmotion("thinking"); log("user done → thinking");
+      break;
+    case "response.created":
+      currentResponse = ev.response.id; status.responseId = currentResponse; $("say").textContent = "";
+      break;
+    case "response.function_call_arguments.done":
+      if (ev.name === "set_emotion") {
+        let emotion = "neutral";
+        try { emotion = JSON.parse(ev.arguments).emotion; } catch {}
+        avatar.setEmotion(emotion); log(`set_emotion → ${emotion}`);
+        send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: ev.call_id, output: JSON.stringify({ ok: true }) } });
+      }
+      break;
+    case "response.done": {
+      // If the model only called set_emotion and has not spoken yet, ask it to continue with the actual reply.
+      const out = ev.response.output || [];
+      const onlyTools = out.length > 0 && out.every((i) => i.type === "function_call");
+      if (onlyTools && followUps < 2) { followUps++; send({ type: "response.create" }); log("tool-only response → response.create"); }
+      if (ev.response.status !== "completed") log(`response ${ev.response.status}`);
+      break;
+    }
+    case "output_audio_buffer.started":
+      if (["listening", "thinking"].includes(avatar.emotion)) avatar.setEmotion("neutral");
+      playback("started", ev.response_id);
+      break;
+    case "output_audio_buffer.stopped":
+      playback("ended", ev.response_id);
+      break;
+    case "output_audio_buffer.cleared":
+      playback("cancelled", ev.response_id);
+      break;
+    case "response.output_audio_transcript.delta":
+      $("say").textContent += ev.delta;
+      break;
+    case "error":
+      log(`ERROR ${ev.error?.message || JSON.stringify(ev.error)}`);
+      break;
+  }
+}
+</script>
+</body>
+</html>

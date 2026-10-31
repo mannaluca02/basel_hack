@@ -1,0 +1,23 @@
+/* PROTOTYPE — shared page chrome for index.html and realtime.html */
+:root { --purple: #360573; --green: #9acb41; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { display: grid; grid-template-columns: 1fr 340px; background: #f5f3f8; color: #1d1530; }
+
+#stage { display: grid; place-items: center; position: relative; overflow: hidden; }
+#avatar { width: min(70vmin, 520px); }
+#caption { position: absolute; top: 24px; left: 0; right: 0; text-align: center; font-size: 13px; opacity: .6; letter-spacing: .02em; }
+#say { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); max-width: 70%; text-align: center; font-size: 16px; min-height: 1.4em; opacity: .85; }
+
+#panel { padding: 20px; overflow-y: auto; font-size: 13px; border-left: 1px solid rgba(127,127,127,.25); }
+#panel h3 { margin: 18px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .6; }
+#panel h3:first-child { margin-top: 0; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+button { font: inherit; padding: 7px 8px; border-radius: 8px; border: 1px solid rgba(127,127,127,.35); background: rgba(127,127,127,.08); color: inherit; cursor: pointer; text-align: left; }
+button:hover { background: rgba(127,127,127,.18); }
+button.on { background: var(--green); color: #1b1030; border-color: var(--green); }
+.wide { grid-column: span 2; }
+pre { font-size: 11px; line-height: 1.45; background: rgba(127,127,127,.1); padding: 10px; border-radius: 8px; margin: 0; white-space: pre-wrap; }
+.meter { height: 6px; border-radius: 3px; background: rgba(127,127,127,.2); overflow: hidden; }
+.meter > div { height: 100%; width: 0; background: var(--green); }
+#log { max-height: 46vh; overflow-y: auto; }
