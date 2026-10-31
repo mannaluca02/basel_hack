@@ -117,7 +117,15 @@
     "estimatedNote": "≈ estimated"
   },
   "chat": {
-    "title": "Chat"
+    "title": "Chat",
+    "empty": "The conversation appears here as soon as the call starts.",
+    "latest": "Jump to latest",
+    "interim": "still being transcribed",
+    "speaker": {
+      "customer": "You",
+      "agent": "Assistant"
+    },
+    "announce": "{{speaker}}: {{text}}"
   },
   "info": {
     "title": "Info"

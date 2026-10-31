@@ -117,7 +117,15 @@
     "estimatedNote": "≈ estimation"
   },
   "chat": {
-    "title": "Chat"
+    "title": "Chat",
+    "empty": "La conversation s’affiche ici dès que l’appel commence.",
+    "latest": "Aller au plus récent",
+    "interim": "transcription en cours",
+    "speaker": {
+      "customer": "Vous",
+      "agent": "Assistant"
+    },
+    "announce": "{{speaker}}: {{text}}"
   },
   "info": {
     "title": "Infos"
