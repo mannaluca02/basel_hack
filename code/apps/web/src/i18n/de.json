@@ -10,7 +10,8 @@
     "graphics": "Grafiken",
     "risks": "Risiken",
     "chat": "Chat",
-    "info": "Info"
+    "info": "Info",
+    "openRisks": "{{count}} offen"
   },
   "graphics": {
     "title": "Grafiken"
