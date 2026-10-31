@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { DraftSchema,type InsuranceDraft,type LifeScenario } from '@pax/contracts';
 import type { LifeInsuranceEngine } from './engine.js';
+import type { DraftEstimateService } from './estimates.js';
 import type { SessionService } from './auth.js';
 import type { BootstrapCredentials } from './store.js';
 import { WorkflowError,type Actor } from './types.js';
@@ -81,7 +82,8 @@ type DemoSession={sessionToken:string;csrfToken:string;expiresAt:string;caseId:s
 export class DemoJourney {
   private current:Promise<DemoSession>|null=null;
   /** `demoStart` is null unless the server was started with the explicit demo flag. */
-  constructor(private readonly engine:LifeInsuranceEngine,private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null){}
+  constructor(private readonly engine:LifeInsuranceEngine,private readonly estimates:DraftEstimateService,
+    private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null){}
 
   get startEnabled(){return this.demoStart!==null;}
 
@@ -96,6 +98,29 @@ export class DemoJourney {
     if(reusable&&this.valid(reusable))return reusable;
     this.current=this.prepare(body.locale);
     return this.current;
+  }
+
+  /**
+   * 3a growth until the first retirement, as an explicit calculator estimate: with the profile's own
+   * yearly 3a contribution, or the legal maximum from the baseline run if there is none yet. A failed
+   * estimate leaves the analyses intact.
+   */
+  private async pillar3aEstimate(actor:Actor,caseId:string,draft:InsuranceDraft,baselineRunId:string|undefined) {
+    const c=this.engine.caseFor(actor,caseId),baseline=c.runs.find(r=>r.id===baselineRunId);
+    const financial=draft.financial,insurance=draft.insurance,first=insurance?.persons[0];
+    const person=financial?.persons.find(p=>p.id===first?.personId);
+    if(!financial||!insurance||!first||!person||first.desiredWorkStopAge===null)return {status:'skipped' as const,code:'NEEDS_INPUT'};
+    const limits=baseline?.providerResults.find(r=>r.operation==='saving3aLimits')?.metrics;
+    const maximum=limits?.find(m=>m.id===(first.withPillar2===false?'max3aWithoutP2':'max3aWithP2'))?.value??null;
+    const annualCents=insurance.existingAnnualPillar3aContributionCents||maximum;
+    const years=person.birthYear+first.desiredWorkStopAge-new Date().getUTCFullYear();
+    if(!annualCents||years<1)return {status:'skipped' as const,code:'NEEDS_INPUT'};
+    const initialCents=financial.assets.filter(a=>a.pillar==='3').reduce((sum,a)=>sum+(a.amount.value??0),0);
+    try{
+      await this.estimates.calculate(actor,caseId,{expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v2',
+        allowSyntheticCalculatorTransfer:true,operations:['saving3a'],saving3a:{years,initialCents,annualCents}});
+      return {status:'calculated' as const,years,initialCents,annualCents};
+    }catch(error){if(!(error instanceof WorkflowError))throw error;return {status:'failed' as const,code:error.code};}
   }
 
   private valid(session:DemoSession){
@@ -133,9 +158,10 @@ export class DemoJourney {
       const {run}=await this.engine.analyze(actor,caseId,{expectedCaseRevision:c.caseRevision,expectedProfileVersion:body.expectedProfileVersion,scenarioVersionId,scenario}) as {run:{id:string;status:string}};
       runs.push({scenarioVersionId,runId:run.id,status:run.status});
     }
+    const pillar3a=await this.pillar3aEstimate(actor,caseId,confirmed.draft,runs.at(-1)?.runId);
     let recommendation:unknown=null,recommendationError:string|null=null;
     try{recommendation=await this.engine.recommendation(actor,caseId);}
     catch(error){if(!(error instanceof WorkflowError))throw error;recommendationError=error.code;}
-    return {runs,recommendation,recommendationError};
+    return {runs,pillar3a,recommendation,recommendationError};
   }
 }

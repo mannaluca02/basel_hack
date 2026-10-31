@@ -50,7 +50,8 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
         db.audit=db.audit.filter(a=>Date.parse(a.at)>Date.now()-86400_000);
       }).catch(()=>{});
     },60_000);cleanup.unref();
-    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),demo:new DemoJourney(engine,options.demoStart?{sessions,credentials}:null),
+    const estimates=new DraftEstimateService(engine);
+    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,demo:new DemoJourney(engine,estimates,options.demoStart?{sessions,credentials}:null),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }

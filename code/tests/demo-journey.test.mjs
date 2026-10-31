@@ -53,8 +53,11 @@ test('a loaded persona stays a draft until the customer confirms, then the stand
   const result=await request('POST',`/api/cases/${c.id}/standard-analyses`,customer.sessionToken,{expectedProfileVersion:1});
   assert.equal(result.status,201,JSON.stringify(result.body));
   assert.deepEqual(result.body.runs.map(r=>r.scenarioVersionId),['standard_family_v1','standard_home_v1','standard_retirement_v1','standard_baseline_v1']);
+  // Mueller pays no 3a yet: the estimate uses the legal maximum from the baseline run until 2049.
+  assert.deepEqual(result.body.pillar3a,{status:'calculated',years:2049-new Date().getUTCFullYear(),initialCents:0,annualCents:725800});
   const after=(await request('GET',`/api/cases/${c.id}`,customer.sessionToken)).body;
   assert.equal(after.activeRunId,result.body.runs.at(-1).runId);
+  assert.ok(after.estimates.at(-1).results.some(r=>r.operation==='saving3a'&&r.metrics.some(m=>m.id==='GrossCapital')));
   assert.ok(after.runs.find(r=>r.scenario.kind==='retirement').timeline.periods.length>12);
 });
 
@@ -118,4 +121,32 @@ test('the demo start hands out one calculated Mueller case without an access cod
     const fresh=await start({fresh:true});
     assert.notEqual(fresh.body.caseId,first.body.caseId);
   }finally{await demoApp.close();await rm(dir,{recursive:true,force:true});}
+});
+
+test('a separate voice agent records the call history without touching the case revision',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'pax-agent-turns-'));
+  const {app:voiceApp}=await createLifeInsuranceApp({dataDirectory:dir,provider:new SyntheticTestProvider(),providerMode:'test',credentials,voice:{enabled:true}});
+  try{
+    await voiceApp.listen(0,'127.0.0.1');const url=await voiceApp.getUrl();
+    const call=async(method,path,token,body)=>{const r=await fetch(url+path,{method,headers:{...(token?{Authorization:`Bearer ${token}`}:{}),...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:r.status,body:await r.json()};};
+    const owner=(await call('POST','/api/sessions',null,{accessCode:credentials.customerAccessCode})).body;
+    const reviewer=(await call('POST','/api/sessions',null,{accessCode:credentials.reviewerAccessCode})).body;
+    const c=(await call('POST','/api/cases',owner.sessionToken,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
+    const grant=(await call('POST',`/api/cases/${c.id}/agent-access`,owner.sessionToken,{})).body;
+    const at='2026-10-31T12:00:00.000Z';
+    const turns=[{messageId:'conv_1_t0',speaker:'agent',text:'Hoi, ich bin Paxi.',at},{messageId:'conv_1_t1',speaker:'customer',text:'Ich verdiene',at}];
+    const first=await call('POST',`/api/cases/${c.id}/voice/agent-turns`,grant.sessionToken,{conversationId:'conv_1',turns});
+    assert.equal(first.status,201,JSON.stringify(first.body));assert.equal(first.body.recorded,2);
+    assert.equal((await call('POST',`/api/cases/${c.id}/voice/agent-turns`,owner.sessionToken,{conversationId:'conv_1',turns})).status,403);
+    const again=await call('POST',`/api/cases/${c.id}/voice/agent-turns`,grant.sessionToken,{conversationId:'conv_1',turns});
+    assert.equal(again.body.recorded,0);
+    const grown=await call('POST',`/api/cases/${c.id}/voice/agent-turns`,grant.sessionToken,{conversationId:'conv_1',turns:[{...turns[1],text:'Ich verdiene 105000 brutto.'}]});
+    assert.deepEqual([grown.body.recorded,grown.body.total],[1,2]);
+    const after=(await call('GET',`/api/cases/${c.id}`,owner.sessionToken)).body;
+    assert.equal(after.caseRevision,c.caseRevision);assert.equal(after.agentTurns,undefined);
+    assert.ok(after.contextRevision>c.contextRevision);
+    const history=(await call('GET',`/api/cases/${c.id}/voice/agent-turns`,owner.sessionToken)).body;
+    assert.deepEqual(history.turns.map(t=>[t.speaker,t.text]),[['agent','Hoi, ich bin Paxi.'],['customer','Ich verdiene 105000 brutto.']]);
+    assert.equal((await call('GET',`/api/cases/${c.id}/voice/agent-turns`,reviewer.sessionToken)).status,403);
+  }finally{await voiceApp.close();await rm(dir,{recursive:true,force:true});}
 });

@@ -19,6 +19,11 @@ export const ExternalVoiceObservationsSchema = z.object({
     observations: z.array(VoiceObservationSchema).min(1).max(50),
     supersedesBatchIds: z.array(z.string().regex(/^[A-Za-z0-9_-]{1,120}$/)).max(20).default([]),
 }).strict();
+export const AgentVoiceTurnsSchema = z.object({
+    conversationId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/),
+    turns: z.array(z.object({ messageId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/), speaker: z.enum(['customer', 'agent']), text: z.string().min(1).max(4000), at: z.iso.datetime() }).strict()).min(1).max(50),
+}).strict();
+const MAX_AGENT_TURNS = 500;
 const active = (s: StoredVoiceSession) => s.status === 'active' || s.status === 'starting';
 const now = () => new Date().toISOString();
 const prompt = (locale: string) => `You are Paxi, a friendly voice intake assistant. Speak ${locale}. This is a synthetic-data demonstration only. Ask one short question at a time. Never ask for real names, full birth dates, identifying details or health data. Never invent missing amounts, average a range, infer a risk appetite or calculate pension/tax limits. Ask for clarification. Collect annual gross income explicitly separately from monthly net income. All calculations, proposed changes and confirmations belong to the case backend. Never claim that data is confirmed or a colleague will call. Never confirm a profile, accept a contract or place a call. Stop immediately when the application requests handover. Financial recommendations require backend-approved facts; do not improvise them.`;
@@ -179,6 +184,54 @@ export class VoiceIntegrationService {
             this.engine.audit(db, actor, c, 'voice_turn_finalized');
             return { voiceSession: this.dto(s), replayed: false };
         });
+    }
+    /**
+     * Final turns of a separately running voice agent, for the call history in the customer app.
+     * A turn is a record of what was said, not a fact: nothing here changes the draft or the
+     * case revision, so an open customer question stays valid.
+     */
+    async recordAgentTurns(actor: Actor, id: string, input: unknown) {
+        this.engine.sessions.assertActive(actor);
+        if (actor.role !== 'advisor')
+            throw new WorkflowError('FORBIDDEN', 403);
+        if (!this.enabled)
+            throw new WorkflowError('VOICE_PROVIDER_DISABLED', 503);
+        this.engine.caseFor(actor, id, true);
+        const b = AgentVoiceTurnsSchema.parse(input);
+        return this.engine.store.transaction(db => {
+            this.engine.sessions.assertActive(actor, db);
+            const c = db.cases[id];
+            if (!c || c.ownerId !== actor.id || actor.caseId !== id || c.expiresAt <= now())
+                throw new WorkflowError('NOT_FOUND', 404);
+            c.agentTurns ??= [];
+            let changed = 0;
+            for (const turn of b.turns) {
+                const known = c.agentTurns.find(t => t.messageId === turn.messageId);
+                // The agent groups speech into turns, so the text of its newest turn may still grow.
+                if (known) {
+                    if (known.text !== turn.text || known.speaker !== turn.speaker) { Object.assign(known, turn); changed++; }
+                    continue;
+                }
+                if (c.agentTurns.length >= MAX_AGENT_TURNS)
+                    throw new WorkflowError('VOICE_TURN_CAPACITY', 429);
+                c.agentTurns.push({ ...turn, conversationId: b.conversationId, receivedAt: now() });
+                changed++;
+            }
+            if (changed) {
+                c.contextRevision++; c.updatedAt = now();
+                c.events.push({ id: randomUUID(), contextRevision: c.contextRevision, reason: 'agent_turns_recorded', at: c.updatedAt });
+                c.events = c.events.slice(-100);
+            }
+            return { caseId: id, contextRevision: c.contextRevision, recorded: changed, total: c.agentTurns.length };
+        });
+    }
+    /** The owner's call history from a separate voice agent; never part of the case DTO. */
+    agentTurns(actor: Actor, id: string) {
+        // Reviewers decide on the analysis, they do not read what the customer said.
+        if (actor.role === 'reviewer')
+            throw new WorkflowError('FORBIDDEN', 403);
+        const c = this.engine.caseFor(actor, id, true);
+        return { caseId: id, turns: (c.agentTurns ?? []).map(({ receivedAt: _received, ...turn }) => turn) };
     }
     /** Same mapping and gates as a backend voice session, for a voice agent with its own provider session. */
     async proposeExternal(actor: Actor, id: string, input: unknown) {
