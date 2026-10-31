@@ -143,9 +143,10 @@ Sources: the backend's intake list and question texts on `main`, the shared cont
 
 ## Example conversations
 
-`examples/` holds two real test conversations from the demo, one per provider, pseudonymised (name and personal details replaced with demo values; everything else unchanged):
+`examples/` holds real test conversations from the demo. `conversation-gpt-live.json` and `conversation-elevenlabs.json` are pseudonymised (name and personal details replaced with demo values; everything else unchanged):
 
 - [`conversation-gpt-live.json`](examples/conversation-gpt-live.json): OpenAI GPT-Live, German, 26 turns. Shows the conversational style and nine details filled in from the conversation, including inferred ones (relationship year, child's birth year) and the extracted life context.
+- [`conversation-stress-test.json`](examples/conversation-stress-test.json): GPT-Live, German, 142 turns, unchanged. A tester plays an invented, deliberately provocative persona ("Peter"). Shows extraction of 23 details, Paxi's summary with corrections and its own plan proposals, and, from 9:18 on, the behaviour before the fix "a goodbye is final" (Paxi kept asking after saying goodbye).
 - [`conversation-elevenlabs.json`](examples/conversation-elevenlabs.json): recorded with the former ElevenLabs integration (removed again), 46 turns. Same log format. Starts in French, switches to German on request, and shows how Paxi handles off-topic and provocative input.
 
 ## Log format
