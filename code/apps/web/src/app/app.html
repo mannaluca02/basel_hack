@@ -48,7 +48,24 @@
           }
         </a>
       }
+      @if (debugVoice) {
+        <a class="tab" routerLink="/voice-lab" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
+          <span class="glyph">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9" />
+            </svg>
+          </span>
+          <span class="label">{{ 'lab.title' | transloco }}</span>
+        </a>
+      }
     </nav>
+
+    <!-- The live voice loads after the workspace, in its own chunk. -->
+    @if (liveVoice) {
+      @defer (on idle) {
+        <app-live-voice-control class="live-voice" />
+      }
+    }
 
     <!-- Lukas's avatar renderer goes inside, as projected content. -->
     <app-agent-dock class="dock" [progress]="progress()" [activity]="activity()" />

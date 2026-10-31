@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { provideEchartsCore } from 'ngx-echarts';
 import { KEEP_ALIVE } from './core/layout/keep-alive-route-reuse-strategy';
+import { debugRoutes } from './debug-routes';
 
 /** Workspace tabs keep their state across tab switches (FE-07). */
 const keepAlive = { [KEEP_ALIVE]: true };
@@ -36,5 +37,6 @@ export const routes: Routes = [
     data: keepAlive,
     loadComponent: () => import('./features/workspace/info/info-tab').then((m) => m.InfoTab),
   },
+  ...debugRoutes,
   { path: '**', redirectTo: 'graphics' },
 ];

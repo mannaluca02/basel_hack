@@ -8,6 +8,7 @@ export const PROCESSING_NOTICE={version:'erni-synthetic-extraction-v1',provider:
 export type IntakeTarget={path:string;personId:string;value:number;currency:'CHF';unit:'cent';period:'year';incomeBasis:'gross'};
 export type SyntheticProjection={conversation:{role:'user'|'assistant';text:string}[];speakerPersonId:string;fields:IntakeTarget[];writablePaths:string[];questions:string[]};
 export type ResponsesRequest={model:string;store:false;instructions:string;input:{role:'user';content:string}[];
+  reasoning?:{effort:'low'};
   tools:Record<string,unknown>[];tool_choice:'auto';parallel_tool_calls:false;max_output_tokens:number};
 export type ResponsesTransport=(request:ResponsesRequest,signal:AbortSignal)=>Promise<unknown>;
 
@@ -15,6 +16,30 @@ const ArgumentsSchema=z.object({changes:z.array(z.object({path:z.string(),person
   ambiguities:z.array(z.object({path:z.string(),personId:z.string(),question:z.string().min(1).max(1000)}).strict()).max(1)}).strict();
 const ResponseSchema=z.object({status:z.literal('completed'),error:z.unknown().optional(),output:z.array(z.object({type:z.string(),name:z.string().optional(),arguments:z.string().optional(),
   status:z.string().optional(),content:z.array(z.object({type:z.string()}).passthrough()).optional()}).passthrough()).max(20)});
+
+/** Shared by every Responses caller: one abort, timeout and transport-error mapping. */
+export async function callResponses(transport:ResponsesTransport,request:ResponsesRequest,signal?:AbortSignal):Promise<unknown>{
+  const controller=new AbortController();let timer:ReturnType<typeof setTimeout>|undefined;
+  const cancel=()=>controller.abort();signal?.addEventListener('abort',cancel,{once:true});
+  try{
+    const interrupted=new Promise<never>((_,reject)=>{
+      controller.signal.addEventListener('abort',()=>reject(new Error('Model request aborted')),{once:true});
+      timer=setTimeout(cancel,15000);
+    });
+    return await Promise.race([interrupted,transport(request,controller.signal)]);
+  }catch{
+    if(signal?.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
+    if(controller.signal.aborted)throw new WorkflowError('MODEL_TIMEOUT',504);
+    throw new WorkflowError('MODEL_TRANSPORT_FAILED',502);
+  }finally{if(timer)clearTimeout(timer);signal?.removeEventListener('abort',cancel);}
+}
+/** The single function call of a completed response (undefined if none); anything unexpected throws. */
+export function submittedCall(raw:unknown){
+  const response=ResponseSchema.parse(raw),calls=response.output.filter(item=>item.type==='function_call');
+  if(response.error!=null||calls.length>1||response.output.some(item=>!['reasoning','message','function_call'].includes(item.type)||
+    (item.status!==undefined&&item.status!=='completed')||item.content?.some(content=>content.type==='refusal')))throw new Error();
+  return calls[0];
+}
 
 export class ResponsesIntakeAdapter {
   constructor(private readonly transport:ResponsesTransport,private readonly model='gpt-5.6-terra'){}
@@ -33,26 +58,11 @@ export class ResponsesIntakeAdapter {
       input:[{role:'user',content:JSON.stringify(projection)}],
       tools:[{type:'function',name:'submit_intake_proposals',description:'Submit unconfirmed annual gross income changes or one clarification.',parameters,strict:true}],
       tool_choice:'auto',parallel_tool_calls:false,max_output_tokens:2000};
-    const controller=new AbortController();let timer:ReturnType<typeof setTimeout>|undefined;
-    const cancel=()=>controller.abort();signal?.addEventListener('abort',cancel,{once:true});
-    let raw:unknown;
+    const raw=await callResponses(this.transport,request,signal);
     try{
-      const interrupted=new Promise<never>((_,reject)=>{
-        controller.signal.addEventListener('abort',()=>reject(new Error('Model request aborted')),{once:true});
-        timer=setTimeout(cancel,15000);
-      });
-      raw=await Promise.race([interrupted,this.transport(request,controller.signal)]);
-    }catch{
-      if(signal?.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
-      if(controller.signal.aborted)throw new WorkflowError('MODEL_TIMEOUT',504);
-      throw new WorkflowError('MODEL_TRANSPORT_FAILED',502);
-    }finally{if(timer)clearTimeout(timer);signal?.removeEventListener('abort',cancel);}
-    try{
-      const response=ResponseSchema.parse(raw),calls=response.output.filter(item=>item.type==='function_call');
-      if(response.error!=null||calls.length>1||response.output.some(item=>!['reasoning','message','function_call'].includes(item.type)||
-        (item.status!==undefined&&item.status!=='completed')||item.content?.some(content=>content.type==='refusal')))throw new Error();
-      if(!calls.length)return {changes:[],ambiguities:[]};
-      const call=calls[0]!;if(call.name!=='submit_intake_proposals'||!call.arguments)throw new Error();
+      const call=submittedCall(raw);
+      if(!call)return {changes:[],ambiguities:[]};
+      if(call.name!=='submit_intake_proposals'||!call.arguments)throw new Error();
       const result=ArgumentsSchema.parse(JSON.parse(call.arguments));
       for(const item of [...result.changes,...result.ambiguities])if(!projection.fields.some(field=>field.path===item.path&&field.personId===item.personId))throw new Error();
       return result;

@@ -18,9 +18,31 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Li
 
 `emotionHoldMs` is configurable per instance (default `5000`; `0` disables the hold). It must be a finite non-negative number. The first emotion applies immediately; later requests keep only the latest candidate until the current hold expires. Repeated answers for the same emotion do not restart the hold. The live demo sets this option in [`realtime.html`](realtime.html).
 
-`attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
+`attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level, localAudioActive }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
 
-## The three events
+### Voice Lab: optional local audio visual (not playback evidence)
+
+```js
+avatar.attachAudio(remoteStream);
+avatar.handle({ type: "local-audio-visual", enabled: true });
+// On Stop / stream detach:
+avatar.attachAudio(null);
+avatar.handle({ type: "local-audio-visual", enabled: false });
+avatar.handle({ type: "activity", state: "idle" });
+```
+
+This opt-in mode samples the renderer's existing output audio analyser each animation frame.
+Energy selects the audio-responsive `explaining` pose (including amplitude-driven eye emphasis
+and speech-onset beats); 250 ms of local quiet selects `listening`. Late transcript activity cannot
+leave the pose stuck thinking. `localAudioActive` describes this **local heuristic only**.
+Detach/reset clears the heuristic and audio envelope synchronously. Existing real playback IDs,
+if supplied, keep visual precedence. The original prototype behaviour is preserved unless this
+mode is explicitly enabled.
+
+This mode neither emits nor fabricates `playback started/ended`, transcript finality, or customer
+confirmation evidence. It is not an emotion classifier or proof that the user heard the audio.
+
+## Core events
 
 | Event | Send when | Current GPT-Live adapter source |
 |---|---|---|
@@ -64,7 +86,7 @@ avatar.handle({ type: "emotion", emotion: "empathetic", playbackId });
 - **Early emotions wait for the reply.** An `emotion` that arrives while the user speaks or the advisor thinks (e.g. from the input transcript trigger) is queued and shown when playback starts. Otherwise it is shown right away.
 - **Minimum emotion hold.** All reply emotions, including `neutral`, use the same `emotionHoldMs` interval, including during listening/thinking and playback. The latest candidate wins at expiry; candidates tied to finished playback are discarded. Activity faces and cancellation remain immediate; explicit `reset()` and design-only `show()` bypass the hold.
 - **Relax after the reply.** Return to neutral after both the minimum emotion hold and ~1.5 s after playback end have elapsed. A new user turn clears old candidates and returns to neutral if the hold has elapsed; listening/thinking can still show immediately.
-- **Calm expression motion.** Each expression has a subtle tilt, breath, nod or sway; warm expressions lift once on entry and recovery briefly resets. Audio only adds tiny eye emphasis when explaining; it never drives body motion. Reduced-motion preferences suppress decorative motion and blinking while preserving all eye shapes and decorations.
+- **Calm expression motion.** Each expression has a subtle tilt, breath, nod or sway; warm expressions lift once on entry and recovery briefly resets. The explaining pose responds to audio with eye emphasis and small speech-onset beats. Reduced-motion preferences suppress decorative motion and blinking while preserving all eye shapes and decorations.
 
 
 ## GPT-Live prototype mapping
