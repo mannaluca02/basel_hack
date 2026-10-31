@@ -32,6 +32,8 @@ const MAIN_PERSON_FIELDS = new Set(["annual_gross_income_chf", "birth_date", "se
 
 // A turn keeps its first start time while more speech is added, unlike its position.
 function turnId(conversationId, turn, index) {
+  // A confirmation question keeps the reply ID the backend bound it to (VOICE-08).
+  if (turn.replyId) return turn.replyId;
   return Number.isFinite(turn.start_ms)
     ? `${conversationId}_${turn.speaker === "user" ? "c" : "a"}${Math.round(turn.start_ms)}`.slice(0, 120)
     : `${conversationId}_t${index}`.slice(0, 120);

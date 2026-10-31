@@ -18,7 +18,10 @@ import { createCaseBridge } from "./case-bridge.mjs";
 import { extractContext } from "./conversation-context.mjs";
 import { detectLanguage } from "./language-detect.mjs";
 import { customVoices } from "./paxi-voice.mjs";
+import { withoutForeignScript } from "./public/paxi-common.js";
 import { loadSkills, skillsPrompt } from "./skills.mjs";
+import { createCommandQueue, steerCommand } from "./steering.mjs";
+import { timingSafeEqual } from "node:crypto";
 
 const here = dirname(fileURLToPath(import.meta.url));
 try {
@@ -424,11 +427,15 @@ app.post("/api/conversations/:sessionId/transcript", sameOrigin, async (request,
       Number.isFinite(fragment.start_ms) &&
       Number.isFinite(fragment.end_ms)
     ) {
+      // Words in another script are misread noise (the browser drops them too).
+      const text = fragment.speaker === "user" ? withoutForeignScript(fragment.text) : fragment.text;
+      if (!text.trim()) continue;
       addTranscriptFragment(log, {
         speaker: fragment.speaker,
-        text: fragment.text,
+        text,
         start_ms: fragment.start_ms + entry.offsetMs,
         end_ms: fragment.end_ms + entry.offsetMs,
+        reply_id: typeof fragment.reply_id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(fragment.reply_id) ? fragment.reply_id : undefined,
       });
     }
   }
@@ -524,6 +531,7 @@ app.get("/api/conversations/:sessionId/progress", async (request, response) => {
     changes,
     known: knownSummary(log),
     ...progress(log),
+    commands: commands.since(log.conversationId, Number(request.query.commands) || 0),
     ...(log.caseLink
       ? {
           case_linked: caseState !== null,
@@ -571,7 +579,8 @@ app.post("/api/conversations/:sessionId/language", sameOrigin, async (request, r
   const session = findSession(request, response);
   if (!session) return;
   const { log, entry } = session;
-  const text = typeof request.body?.text === "string" ? request.body.text.slice(0, 500) : null;
+  // Only Paxi's four languages count; words in another script are noise.
+  const text = typeof request.body?.text === "string" ? withoutForeignScript(request.body.text.slice(0, 500)) || null : null;
   let language = request.body?.language;
   if (!language && text) {
     client ??= new OpenAI({ maxRetries: 0 });
@@ -640,6 +649,177 @@ app.post("/api/conversations/:sessionId/priorities", sameOrigin, async (request,
   response.json({ priorities, labels: labelsOf(priorities), ...progress(session.log) });
 });
 
+// --- Steering a running call: topics, visuals, priorities, end ---------------------------
+
+const commands = createCommandQueue();
+// Shared secret for Valentin's backend (POST /api/steer); without it, backend steering is off.
+const steerToken = process.env.PAXI_STEER_TOKEN ?? "";
+
+// What a visual shows (and what changed since the last version), in a few plain sentences:
+// the caller's own description, or one the backend model writes from the data (for example
+// a ChartResult from the web app).
+async function describeVisual({ title, description, data, previous }) {
+  if (description) return { description, change: null };
+  if (data === undefined) return { description: "", change: null };
+  try {
+    client ??= new OpenAI({ maxRetries: 0 });
+    const result = await client.responses.create({
+      model: backendModel,
+      reasoning: { effort: "low" },
+      instructions:
+        "This is the data of a visual (usually a chart) that a person sees on their screen during a conversation with a voice assistant. " +
+        "In `description`, say in at most four short English sentences what it shows and what stands out, with rounded numbers. " +
+        "If a previous version is given, say in `change` in at most two short sentences what changed and in which direction; otherwise set `change` to an empty string. " +
+        "Money values with unit rappen are cents: divide by 100 for CHF. null means unknown; say so if it matters. No advice.",
+      input: `Title: ${title}\n${previous?.data ? `Previous version: ${previous.data}\n` : ""}Current version: ${data}`,
+      text: {
+        format: {
+          type: "json_schema",
+          name: "visual",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: { description: { type: "string" }, change: { type: "string" } },
+            required: ["description", "change"],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+    const { description: said, change } = JSON.parse(result.output_text);
+    return { description: said.trim().slice(0, 900), change: change.trim().slice(0, 400) || null };
+  } catch (error) {
+    console.error("Visual description failed", error.message);
+    return { description: data.slice(0, 900), change: null };
+  }
+}
+
+const steerContext = { describe: describeVisual, validFields: validPriorities, labelsOf, setPriorities };
+
+// From Paxi's page (paxi.steer, paxi.showVisual, or the customer app via postMessage): the
+// browser applies the returned command itself.
+app.post("/api/conversations/:sessionId/steer", sameOrigin, async (request, response) => {
+  const session = findSession(request, response);
+  if (!session) return;
+  const result = await steerCommand(session.log, request.body, steerContext);
+  if (result.error) {
+    response.status(400).json({ error: result.error });
+    return;
+  }
+  await persist(session.log);
+  response.json({ command: result.command, description: result.description, change: result.change });
+});
+
+// Kept for the first integration: same as steer with { type: "visual" }.
+app.post("/api/conversations/:sessionId/visuals", sameOrigin, async (request, response) => {
+  const session = findSession(request, response);
+  if (!session) return;
+  const result = await steerCommand(session.log, { ...request.body, type: "visual" }, steerContext);
+  if (result.error) {
+    response.status(400).json({ error: result.error });
+    return;
+  }
+  await persist(session.log);
+  response.json({ command: result.command, description: result.description, change: result.change });
+});
+
+function bearerMatches(request) {
+  const given = Buffer.from(/^Bearer (.+)$/.exec(request.headers.authorization ?? "")?.[1] ?? "");
+  const expected = Buffer.from(steerToken);
+  return steerToken !== "" && given.length === expected.length && timingSafeEqual(given, expected);
+}
+
+// The running conversation for a case or conversation ID, the newest if there are several.
+function activeConversation({ caseId, conversationId }) {
+  const matching = [...conversations.values()].filter(
+    (log) => log.status === "active" && (conversationId ? log.conversationId === conversationId : caseId && log.caseLink?.caseId === caseId),
+  );
+  return matching.sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)))[0] ?? null;
+}
+
+// From the backend, server to server: { caseId | conversationId, type, ... } with the shared
+// secret as bearer token. The command waits for the browser's next progress poll (≤ 1.5 s).
+app.post("/api/steer", async (request, response) => {
+  if (!steerToken) {
+    response.status(503).json({ error: "Backend steering is off; set PAXI_STEER_TOKEN" });
+    return;
+  }
+  if (!bearerMatches(request)) {
+    response.status(401).json({ error: "Invalid steering token" });
+    return;
+  }
+  const log = activeConversation(request.body ?? {});
+  if (!log) {
+    response.status(404).json({ error: "No running Paxi conversation for this case" });
+    return;
+  }
+  const result = await steerCommand(log, request.body, steerContext);
+  if (result.error) {
+    response.status(400).json({ error: result.error });
+    return;
+  }
+  await persist(log);
+  const queued = result.command ? commands.push(log.conversationId, result.command) : null;
+  response.status(202).json({ conversationId: log.conversationId, queued: queued ? { type: queued.type, seq: queued.seq } : null, description: result.description, change: result.change });
+});
+
+// --- After a restart: the browser reattaches its running call (VOICE-10) ------------------
+
+const SESSION_ID = /^[A-Za-z0-9_-]{1,120}$/;
+
+// The voice server keeps sessions and case links in memory only. After a restart the browser
+// still has its WebRTC call; it sends what it knows, and the conversation continues. An
+// unlinked conversation comes back from its log file; a linked one is never written to disk,
+// so it is rebuilt from the browser's transcript. With a fresh link from the customer app
+// ({ link }), the case gets the call history and the proposals again.
+app.post("/api/conversations/:sessionId/reattach", sameOrigin, async (request, response) => {
+  const body = request.body ?? {};
+  const sessionId = request.params.sessionId;
+  const conversationId = body.conversationId;
+  const known = Array.isArray(body.sessions) ? body.sessions.filter((s) => SESSION_ID.test(s?.sessionId ?? "") && Number.isFinite(s.offsetMs)) : [];
+  if (!SESSION_ID.test(sessionId) || typeof conversationId !== "string" || !SESSION_ID.test(conversationId) || !known.some((s) => s.sessionId === sessionId)) {
+    response.status(400).json({ error: "sessionId, conversationId and sessions are required" });
+    return;
+  }
+  let log = sessions.get(sessionId)?.log ?? (await loadConversation(conversationId));
+  const rebuilt = !log;
+  if (rebuilt) {
+    log = createLog({ conversationId, questionnaire, model: liveModel });
+    log.language = languages[body.language] ? body.language : null;
+  }
+  if (log.conversationId !== conversationId) {
+    response.status(404).json({ error: "Unknown conversation" });
+    return;
+  }
+  log.status = "active";
+  log.endedAt = null;
+  for (const s of known) {
+    const entry = log.sessions.find((e) => e.sessionId === s.sessionId) ?? addSession(log, { sessionId: s.sessionId, voice: String(s.voice ?? ""), language: log.language, offsetMs: s.offsetMs });
+    sessions.set(s.sessionId, { log, entry });
+  }
+  if (rebuilt && Array.isArray(body.fragments)) {
+    for (const { sessionId: from, fragment } of body.fragments.slice(-2000)) {
+      const entry = log.sessions.find((e) => e.sessionId === from);
+      if (!entry || !fragment || !["user", "agent"].includes(fragment.speaker) || typeof fragment.text !== "string") continue;
+      if (!Number.isFinite(fragment.start_ms) || !Number.isFinite(fragment.end_ms)) continue;
+      const text = fragment.speaker === "user" ? withoutForeignScript(fragment.text) : fragment.text;
+      if (!text.trim()) continue;
+      addTranscriptFragment(log, { speaker: fragment.speaker, text: text.slice(0, 4000), start_ms: fragment.start_ms + entry.offsetMs, end_ms: fragment.end_ms + entry.offsetMs, reply_id: fragment.reply_id });
+    }
+  }
+  const caseLink = typeof body.link === "string" ? bridge.linkFor(body.link) : null;
+  if (caseLink) {
+    log.caseLink = caseLink;
+    log.events.push({ type: "case_linked", at: new Date().toISOString(), caseId: caseLink.caseId, after: "restart" });
+  }
+  log.events.push({ type: "reattached", at: new Date().toISOString(), sessionId, rebuilt });
+  conversations.set(conversationId, log);
+  if (log.transcript.some((turn) => turn.speaker === "user")) scheduleExtraction(log);
+  if (log.caseLink) bridge.turnsChanged(log.caseLink.linkId, log);
+  await persist(log);
+  response.json({ ok: true, rebuilt, case_linked: Boolean(log.caseLink && caseLink) });
+});
+
 // status "handoff" ends only this session; the conversation continues in the next one.
 app.post("/api/conversations/:sessionId/close", sameOrigin, async (request, response) => {
   const session = findSession(request, response);
@@ -653,6 +833,7 @@ app.post("/api/conversations/:sessionId/close", sameOrigin, async (request, resp
     log.status = ["disconnected", "inactive"].includes(status) ? status : "closed";
     log.endedAt = at;
     log.events.push({ type: `conversation_${log.status}`, at });
+    commands.clear(log.conversationId);
     // Runs after the response; the log file gets a "context" section when it finishes.
     extractContext(client, backendModel, log).then(() => persist(log));
   }

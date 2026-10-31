@@ -33,6 +33,7 @@ The server reads the repository-root `.env`, not a file inside `code/voice-agent
 | `PORT` | `3100` | HTTP port when run on its own (`npm start` here). |
 | `PAX_VOICE_AGENT` | off | `1` makes the case backend start Paxi (`dev:paxi` sets it). |
 | `PAX_API_URL` | `http://127.0.0.1:3000` | Valentin's case backend that receives Paxi's proposals once a case is linked. |
+| `PAXI_STEER_TOKEN` | not set | Shared secret for the backend's `POST /api/steer` (bearer token). Without it, backend steering is off. |
 | `PAX_APP_ORIGINS` | `http://localhost:4200,http://127.0.0.1:4200` | Customer app origins allowed to hand a case to Paxi via `/api/case-link`. |
 | `LIVE_MODEL` | `gpt-live-1` | Live speech model. |
 | `LIVE_BACKEND_MODEL` | `gpt-6-luna` | Language delegation/detection, answer extraction and final context extraction. |
@@ -48,7 +49,18 @@ In the customer app (`npm run start:api` in `code/apps/web`), "Mit Paxi sprechen
 
 After every answer extraction, the bridge sends the captured details the backend maps directly (income, birth date, Pensum, pension fund, 3a, housing cost, civil status, retirement age, risk appetite) to `POST /api/cases/:id/voice/agent-observations`. Each one quotes the customer turn it comes from; a value not said in these digits goes as `approximate`, and the backend asks it back. The result is one **unconfirmed** package on the app's review stand: the person accepts it and confirms the profile there. A newer answer replaces a still open package; accepted answers are not proposed again. The bridge also sends every turn (both speakers, once it pauses) to `POST /api/cases/:id/voice/agent-turns`, so the app's Chat tab shows the call history. Both backend routes only work with `PAX_SYNTHETIC_VOICE_ENABLED=1`.
 
-The app's call controls steer this window with `postMessage` (`{ type: "pax.call", action }`, actions `end`, `mute`, `unmute`, `stop_speaking`). Only the window that opened Paxi is listened to. `stop_speaking` mutes Paxi until the person speaks again; it does not cancel the model response on the server.
+The app's call controls steer this window with `postMessage` (`{ type: "pax.call", action, … }`). Only the window that opened Paxi is listened to.
+
+| `action` | Extra fields | Effect |
+|---|---|---|
+| `end`, `mute`, `unmute`, `language` | `language` for `language` | Call controls (FE-10). Mute also sends `session.input_audio.mute`, so Paxi takes no turns while muted. |
+| `stop_speaking` | | Paxi stops within about half a second and answers what the person says next (VOICE-09, see "Steering a running call"). |
+| `steer` | `command` | Any steering command: topic, visual, priorities, end. |
+| `visual` | `visual` | Shortcut for `steer` with `{ type: "visual", … }`. |
+| `confirm`, `cancel_confirmation` | `confirmation: { confirmationId, questionText, questionReplyId }` | Spoken confirmation question (VOICE-08). |
+| `relink` | `link` | Fresh link ID after the voice server restarted (VOICE-10). |
+
+Paxi's window sends back `{ type: "pax.status", … }`, `{ type: "pax.confirmation", confirmationId, questionReplyId, event, … }` and `{ type: "pax.relink", conversationId }`.
 
 Without a link, Paxi runs as before and keeps everything in its own log.
 
@@ -89,6 +101,14 @@ paxi.stop();
 // Another part of the app (e.g. Earnie's advisor backend) can steer which questions come first:
 paxi.start({ priorities: ["annual_gross_income_chf", "has_pension_fund"] });
 paxi.prioritize(["housing"]); // during the call; [] clears the priorities
+
+// Steering (see "Steering a running call"): Paxi finishes the current exchange first.
+paxi.steer({ type: "topic", topic: "Wohnungskauf", reason: "für die Budgetgrafik", fields: ["home_purchase_year"] });
+paxi.showVisual({ id: "chart_income_timeline", title: "Einkommen bis zur Pension", data: chartResult, revision: 1 });
+paxi.updateVisual({ id: "chart_income_timeline", data: recalculated, revision: 2 }); // Paxi points out what changed
+paxi.hideVisual("chart_income_timeline");
+paxi.steer({ type: "end", reason: "ein Kollege übernimmt" });
+paxi.confirm({ confirmationId, questionText, questionReplyId }); // results via onConfirmation
 ```
 
 The server part (`server.mjs`) keeps the API key, creates the GPT-Live sessions, fills in the answers and writes the log. In the full solution these routes move into the NestJS backend as the VoiceAdapter.
@@ -114,9 +134,13 @@ All request bodies below are JSON. The browser module already handles these call
 | `GET /api/questionnaire` | Returns the questionnaire, including suitability fields. |
 | `POST /api/session` | `{ sdp, priorities?, continueFrom?, resume? }`; returns HTTP 201 with the Live result plus `conversationId`, `language`, `voice`, `offsetMs`, `greeting`, `intro`, and `fallbackGreeting`. `continueFrom` is an active session ID for a voice handoff; `resume` is a non-active conversation ID. Use one continuation mode at a time. |
 | `POST /api/conversations/:sessionId/transcript` | `{ fragments: [{ speaker, text, start_ms, end_ms }] }`; speaker is `user` or `agent`, times are session-relative milliseconds. Accepted fragments are offset and merged in the log. Returns 204. |
-| `GET /api/conversations/:sessionId/progress?since=0` | Returns answer `version`, `changes`, `known`, `open_priority`, `open_core`, `open_extended`, `core_complete`, and `complete`. Use the returned version as the next `since`. Open-field lists contain labels. |
+| `GET /api/conversations/:sessionId/progress?since=0&commands=0` | Returns queued steering `commands` (each with `seq`; pass the last one as `commands`), answer `version`, `changes`, `known`, `open_priority`, `open_core`, `open_extended`, `core_complete`, and `complete`. Use the returned version as the next `since`. Open-field lists contain labels. |
 | `POST /api/conversations/:sessionId/language` | `{ language: "de" }` (`de`, `fr`, `it`, `en`) or `{ text: "Bonjour…" }`; returns `{ ok, language, voice, switch_voice }`, or `{ ok: false, reason }`. |
 | `POST /api/conversations/:sessionId/priorities` | `{ fields: ["annual_gross_income_chf"], source?: "advisor" }`; returns accepted `priorities`, `labels` and progress. Unknown/suitability IDs are filtered out; `[]` clears priorities. |
+| `POST /api/conversations/:sessionId/steer` | A steering command (see "Steering a running call"); returns `{ command, description?, change? }`. Use `paxi.steer()`: it also applies the command. |
+| `POST /api/conversations/:sessionId/visuals` | Same as `steer` with `type: "visual"` (kept for the first integration). |
+| `POST /api/steer` | Backend, server to server: `Authorization: Bearer <PAXI_STEER_TOKEN>`, `{ caseId \| conversationId, type, … }`. Finds the running conversation (for a case: its newest) and queues the command; the browser picks it up with its next progress poll (≤ 1.5 s). Returns 202 `{ conversationId, queued }`; 404 without a running conversation, 401/503 for the token. |
+| `POST /api/conversations/:sessionId/reattach` | `{ conversationId, sessions: [{ sessionId, offsetMs, voice }], language?, link?, fragments? }`; after a server restart (VOICE-10). Returns `{ ok, rebuilt, case_linked }`. The browser module does this itself. |
 | `POST /api/conversations/:sessionId/close` | `{ status?: "closed", usage? }`; returns 204. `inactive` and `disconnected` set those conversation statuses; `handoff` closes only the current session. Other status values close the conversation as `closed`. |
 | `GET /api/conversations/:sessionId` | Returns the complete conversation log shared by that session. |
 
@@ -221,6 +245,42 @@ Other parts of the app can steer Paxi's questions, for example when a calculatio
 
 Paxi gets a quiet note to steer there at the next natural moment, without cutting off what the person is telling. Prioritised details then come first in every progress note, and the log records each change as `priorities_set`. In the demo, tap a field (★) or open `/?priorities=annual_gross_income_chf,has_pension_fund`.
 
+## Steering a running call
+
+The customer app (`paxi.steer()` or `postMessage`) and the backend (`POST /api/steer`) can steer a running call with the same commands. Every command becomes a note for Paxi (`steering.mjs`); notes wait until the language is chosen and a voice switch is done.
+
+| Command | Fields | What Paxi does |
+|---|---|---|
+| `topic` | `topic`, `reason?`, `fields?`, `urgency?: "next" \| "soon"` | `next`: finishes the current exchange, reacts to the person's answer, then leads over to the topic with an open question. `soon`: brings it up at a natural moment. `fields` are also prioritised. |
+| `visual` | `id`, `title`, `event?: "shown" \| "updated" \| "hidden"`, `description?` or `data?`, `revision?`, `announce?` | `shown`: describes the visual after the current exchange and asks what the person thinks. `updated`: points out what changed (the backend model compares the previous and the current `data`). `hidden`: stops referring to it. `announce: false` only gives quiet context. |
+| `priorities` | `fields` | Like `paxi.prioritize()`. |
+| `end` | `reason?`, `goodbye?: true` | Finishes its sentence, thanks the person, mentions the colleague, says goodbye; the call closes after the goodbye (at the latest after 15 s). `goodbye: false` closes right away. The log records `end_requested`. |
+| `stop_speaking` | | Stops the current answer (below). |
+
+Topics and visuals never cut the person off. Paxi gets the note right away; when the person answers the current question, a short reminder makes Paxi's reply turn to the next agenda item instead of asking something new; if the person stays silent, the next idle nudge goes there. Several items come one by one.
+
+**Changing visuals.** A chart can change while it is on the screen (a recalculation after a new answer). Send it again with the same `id` and `event: "updated"` (ideally with a higher `revision`). Updates of the same visual within 1.2 s count as one; an older `revision` or unchanged content is ignored, so repeated renders stay quiet. A pending, not yet discussed version is replaced by the newer one. The log records `visual_shown`, `visual_updated` (with `change`) and `visual_hidden`.
+
+**Stop speaking (VOICE-09).** GPT-Live has no event to cancel an answer in progress. The Live delegation guide names `session.instructions.append` for a "direction to stop speaking", so `stopSpeaking()` mutes Paxi locally (the rest of the answer is neither heard nor logged) and appends that instruction; when the person speaks again, Paxi gets a note to answer normally.
+
+**Spoken confirmation (VOICE-08).** The customer app creates the confirmation (`POST /api/cases/:id/customer-confirmations`, `channel: "voice"`) and passes `{ confirmationId, questionText, questionReplyId }` to Paxi. Paxi waits until it has been quiet briefly, then says exactly that text (resent once if it does not start). The agent turn is logged and sent to the case with `questionReplyId` as its message ID. `onConfirmation` / `pax.confirmation` reports:
+- `presented` with `playback: { playbackId, event: "ended" }` only after the audio of the whole question really ended (at least 85 % of its words said, no further audio segment within 0.6 s);
+- `answer` with the person's final words (`text`, `locale`, `transcriptStatus: "final"`) after a 1.2 s pause; the backend interprets the yes or no;
+- `cancelled` with `reason` (`cancelled_by_customer` when the person interrupted the question or pressed stop, `new_question` when Paxi moved on, a voice switch happened or the question was not played within 30 s).
+The app then calls `presented`, `answer` or `cancel` on the backend with the customer session. Accepting a package and confirming the profile are two separate questions. Questions longer than 1,500 characters are cancelled (`detail: "too_long"`); they belong on the screen.
+
+**After a restart (VOICE-10).** Sessions and case links live in memory. If the voice server restarts during a call, the browser keeps the WebRTC call; its next progress poll gets 404 and `onServerLost` fires. An unlinked call reattaches right away (the log comes back from disk). A linked call asks the customer app for a fresh link (`pax.relink`); the app registers one (`POST /api/case-link`) and answers `{ type: "pax.call", action: "relink", link }`. The browser then posts its sessions and every transcript fragment it sent, the server rebuilds the conversation (linked logs are never on disk), re-extracts the answers and sends the call history to the case again. Without a new link, Paxi's page says that the call is no longer linked.
+
+Tested live with the fake microphone:
+- A backend topic made Paxi react to the answer and then ask about buying a flat.
+- A chart shown and changed 2 s later produced one update note; Paxi turned to it after the next answer.
+- `stop_speaking` silenced Paxi within half a second, and it answered the next words.
+- A backend `end` produced a clean goodbye and closed the call.
+- A confirmation question was said word for word, reported as `presented` after the audio ended, and "Ja, das stimmt so" came back as `answer`.
+- A server restart mid-call reattached and kept extracting answers.
+
+The linked-case paths (relink, turns with `questionReplyId`) are covered by unit tests only, without the case backend running.
+
 ## Intro
 
 Every call starts with the recorded intro `public/intro.mp3` (four short clips: "Hi, ich bin Paxi! In welcher Sprache kann ich dir helfen?", then the same question in French, Italian and English; the text is in `welcome.txt`). It is normalised to the same loudness as Paxi's voice (-25 LUFS). The browser plays it itself while the microphone already runs, so the person can interrupt it just by speaking. As soon as the microphone hears a voice clearly louder than the intro's own echo (measured during its first second), the intro drops to 20 % volume; as soon as the person's first words show up in the transcript, it stops and Paxi answers in their language. If the transcript does not confirm real words within 2.5 seconds, the volume comes back. Without headphones, the intro can echo back through the microphone; transcript text that mostly repeats the intro's words is ignored.
@@ -243,6 +303,7 @@ ffmpeg -i w1.mp3 -i w2.mp3 -i w3.mp3 -i w4.mp3 -filter_complex "[0:a]apad=pad_du
 - **Goodbyes are final.** Paxi does not start wrapping up on its own while core or extended details are open, but a wish to end always wins. When the person says goodbye ("Tschüss", "Tschau", "Uf Wiederluege", …), Paxi gets a note to thank them, mention the colleague and say goodbye without another question. When Paxi says goodbye, the app ends the call about 7 seconds later; open details go to a colleague via the log. Only if the person keeps talking about something else does the conversation continue.
 - **Fast mode.** If the person is in a hurry, Paxi drops the small talk and asks the open core details one short question at a time.
 - **Inactivity.** Breathing, background noise and fillers ("[sniff]", "mhm", "ähm") do not count as speech, and neither does microphone noise, so Paxi's own initiative after 8 seconds is not delayed by them either. If the person says nothing for 30 seconds, Paxi says it will close the call in about 30 seconds and that they can simply continue later. After another 30 seconds of silence it says goodbye and closes the call (log status `inactive`). `paxi.start({ resume: conversationId })` continues the same conversation and log: Paxi welcomes the person back and continues with what is still open. The demo does this on the next tap.
+- **Lively voice.** GPT-Live has no temperature, speed or expressiveness parameter (the session only takes voice, instructions, history, delegation and triggers). Liveliness comes from the prompt: `persona.md`, "How you sound" (melody, tempo, real reactions). Other levers: the voice itself (`LIVE_VOICE`), the backchannel policy in `server.mjs`, and the voice design prompt of custom voices (`paxi-voice.mjs`, then `create-voice.mjs`).
 - **"A colleague of mine".** Paxi never says "Pax specialist" or "Fachperson"; it always says that a colleague of theirs will get in touch.
 
 ## Language and voice switch
@@ -252,6 +313,8 @@ Paxi greets in German, French, Italian and English, asks which language the pers
 1. The browser collects the person's first words (during or after the welcome). After a 0.7 s pause, the server detects their language (`language-detect.mjs`: a word list for the usual openings, the backend model for anything unclear). Later language changes in the call come from the backend's `set_language` tool.
 2. If that language has a different native voice, the browser mutes the current session and starts a new one with that voice. The new session gets the conversation so far as text history plus the answers already saved, and continues without greeting again.
 3. Once the new session runs, the old one is closed. Both sessions write to the same log.
+
+Only German, French, Italian and English count. GPT-Live has no setting for the transcription language and sometimes turns noise or echo into words in another script (a log showed Arabic right after the welcome). Words that are not in Latin script are removed in the browser and on the server (`withoutForeignScript` in `paxi-common.js`), never choose a language, and give Paxi a quiet note to stay in the conversation language. `persona.md` ("Languages you speak") forbids any other language; language detection only returns the four languages.
 
 The switch takes about two seconds. Native voices: German `juni` (or `LIVE_VOICE`), French `brise`, English `gleam`, Italian the custom `paxi-it` voice (GPT-Live has no built-in Italian voice). The welcome and the first session use the German voice. Switching to another language later in the call triggers the same switch again.
 
