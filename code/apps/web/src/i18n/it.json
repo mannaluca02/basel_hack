@@ -157,7 +157,8 @@
     }
   },
   "app": {
-    "name": "Pax Digital Advisor"
+    "name": "Pax Digital Advisor",
+    "product": "Digital Advisor"
   },
   "language": {
     "label": "Lingua",

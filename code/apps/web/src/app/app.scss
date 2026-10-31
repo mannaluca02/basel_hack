@@ -47,9 +47,23 @@
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.logo {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 1.25rem;
+}
+
+.product {
   min-width: 0;
   overflow: hidden;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -62,9 +76,8 @@
   color: var(--text-inverse);
   background: var(--bg-brand-purple);
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  // Pax Brand: no uppercase.
+  font-weight: var(--font-weight-bold);
 }
 
 .bar app-language-switcher {

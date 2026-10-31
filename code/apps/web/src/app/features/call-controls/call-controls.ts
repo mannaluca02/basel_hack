@@ -91,6 +91,7 @@ import { VoiceCall } from '../../core/voice/voice-call';
       color: var(--text-default);
       background: var(--bg-default);
       font: inherit;
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
     }
 

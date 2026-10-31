@@ -147,7 +147,7 @@ describe('BundledTranslationLoader', () => {
   it.each(LANGUAGES)('loads %s from the bundle', async (lang) => {
     const translation = await new BundledTranslationLoader().getTranslation(lang);
 
-    expect(translation['app']).toEqual({ name: 'Pax Digital Advisor' });
+    expect(translation['app']).toEqual({ name: 'Pax Digital Advisor', product: 'Digital Advisor' });
   });
 
   it('rejects unsupported languages', async () => {

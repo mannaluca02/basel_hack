@@ -475,6 +475,7 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
       color: var(--text-default);
       background: var(--bg-default);
       font: inherit;
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
 
       &:disabled {

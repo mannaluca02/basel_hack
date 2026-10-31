@@ -119,7 +119,7 @@ import { TITLE_KEYS } from './chart-options';
       color: var(--text-on-brand);
       background: var(--bg-brand);
       font: inherit;
-      font-weight: 600;
+      font-weight: var(--font-weight-bold);
       cursor: pointer;
     }
 

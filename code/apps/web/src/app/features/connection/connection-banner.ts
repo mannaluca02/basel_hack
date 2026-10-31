@@ -52,6 +52,7 @@ import { VoiceCall } from '../../core/voice/voice-call';
       color: inherit;
       background: none;
       font: inherit;
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
     }
   `,
