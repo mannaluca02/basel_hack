@@ -17,6 +17,7 @@ import { FeedbackStage, JourneyApi, Recommendation } from '../../core/advisor/ap
 import { CaseStore } from '../../core/advisor/store/case-store';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { LocaleFormat } from '../../core/i18n/locale-format';
+import { DossierDialog } from './dossier-dialog';
 import { NpsCard } from './nps-card';
 import { SuitabilityForm } from './suitability-form';
 
@@ -98,7 +99,7 @@ const DOCUMENT_KIND: Readonly<Record<string, string>> = {
  */
 @Component({
   selector: 'app-journey-view',
-  imports: [TranslocoPipe, RouterLink, NgTemplateOutlet, NpsCard, SuitabilityForm],
+  imports: [TranslocoPipe, RouterLink, NgTemplateOutlet, NpsCard, SuitabilityForm, DossierDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './journey-view.html',
   styleUrl: './journey-view.scss',
@@ -120,6 +121,8 @@ export class JourneyView {
   protected readonly error = signal<string | null>(null);
   protected readonly selected = signal<ReadonlySet<string>>(new Set());
   protected readonly documentsRead = signal(false);
+  protected readonly dossierOpen = signal(false);
+  private dossierOpener: HTMLElement | null = null;
 
   protected readonly caseId = computed(() => this.customer.session()?.caseId ?? null);
 
@@ -255,8 +258,15 @@ export class JourneyView {
     return this.api.documentUrl(this.caseId() ?? '', documentId);
   }
 
-  protected dossierUrl(): string {
-    return this.api.dossierUrl(this.caseId() ?? '');
+  protected openDossier(opener: HTMLElement): void {
+    this.dossierOpener = opener;
+    this.dossierOpen.set(true);
+  }
+
+  protected closeDossier(): void {
+    this.dossierOpen.set(false);
+    this.dossierOpener?.focus();
+    this.dossierOpener = null;
   }
 
   protected time(value: string): string {

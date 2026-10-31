@@ -647,7 +647,11 @@
       "SUITABILITY_ADVISED_AGAINST": "La verifica dell’adeguatezza sconsiglia questo prodotto.",
       "QUOTE_EXPIRED": "L’offerta è scaduta. Richiedine una nuova.",
       "HUMAN_REVIEW_REQUIRED": "Prima uno specialista Pax deve verificare la consulenza."
-    }
+    },
+    "dossierTitle": "Dossier di consulenza",
+    "dossierClose": "Chiudi il dossier di consulenza",
+    "print": "Stampa",
+    "dossierFailed": "Non è stato possibile caricare il dossier di consulenza."
   },
   "insights": {
     "title": "Approfondimenti per la gestione prodotti",

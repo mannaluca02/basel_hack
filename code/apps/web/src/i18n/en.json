@@ -647,7 +647,11 @@
       "SUITABILITY_ADVISED_AGAINST": "The suitability check advises against this product.",
       "QUOTE_EXPIRED": "The quote has expired. Please request a new one.",
       "HUMAN_REVIEW_REQUIRED": "A Pax specialist has to review the advice first."
-    }
+    },
+    "dossierTitle": "Advice dossier",
+    "dossierClose": "Close the advice dossier",
+    "print": "Print",
+    "dossierFailed": "The advice dossier could not be loaded."
   },
   "insights": {
     "title": "Product management insights",

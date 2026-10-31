@@ -647,7 +647,11 @@
       "SUITABILITY_ADVISED_AGAINST": "L’examen d’adéquation déconseille ce produit.",
       "QUOTE_EXPIRED": "L’offre a expiré. Demande-en une nouvelle.",
       "HUMAN_REVIEW_REQUIRED": "Un ou une spécialiste Pax doit d’abord examiner le conseil."
-    }
+    },
+    "dossierTitle": "Dossier de conseil",
+    "dossierClose": "Fermer le dossier de conseil",
+    "print": "Imprimer",
+    "dossierFailed": "Le dossier de conseil n’a pas pu être chargé."
   },
   "insights": {
     "title": "Aperçus pour la gestion des produits",

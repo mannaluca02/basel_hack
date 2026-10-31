@@ -647,7 +647,11 @@
       "SUITABILITY_ADVISED_AGAINST": "Die Eignungsprüfung rät von diesem Produkt ab.",
       "QUOTE_EXPIRED": "Die Offerte ist abgelaufen. Fordere bitte eine neue an.",
       "HUMAN_REVIEW_REQUIRED": "Zuerst muss eine Pax-Fachperson die Beratung prüfen."
-    }
+    },
+    "dossierTitle": "Beratungsdossier",
+    "dossierClose": "Beratungsdossier schliessen",
+    "print": "Drucken",
+    "dossierFailed": "Das Beratungsdossier konnte nicht geladen werden."
   },
   "insights": {
     "title": "Produktmanagement-Einblicke",

@@ -194,9 +194,15 @@
       }
       @if (caseId()) {
         <p>
-          <a class="link" [href]="dossierUrl()" target="_blank" rel="noopener">{{
-            'journey.dossier' | transloco
-          }}</a>
+          <button
+            #dossierButton
+            type="button"
+            class="action"
+            data-action="dossier"
+            (click)="openDossier(dossierButton)"
+          >
+            {{ 'journey.dossier' | transloco }}
+          </button>
         </p>
         <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
       }
@@ -244,3 +250,7 @@
     </ul>
   }
 </ng-template>
+
+@if (dossierOpen() && caseId(); as id) {
+  <app-dossier-dialog [caseId]="id" (closed)="closeDossier()" />
+}

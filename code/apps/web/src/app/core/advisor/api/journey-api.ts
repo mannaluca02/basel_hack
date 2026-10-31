@@ -123,9 +123,13 @@ export class JourneyApi {
     return firstValueFrom(this.http.get<Insights>(`${this.base}/demo/insights`));
   }
 
-  /** Opens in a new tab with the session cookie; escaped print HTML from the backend. */
-  dossierUrl(caseId: string): string {
-    return `${this.caseUrl(caseId)}/dossier?audience=customer&format=html`;
+  /** The customer's advice dossier as escaped print HTML from the backend. */
+  dossierHtml(caseId: string): Promise<string> {
+    return firstValueFrom(
+      this.http.get(`${this.caseUrl(caseId)}/dossier?audience=customer&format=html`, {
+        responseType: 'text',
+      }),
+    );
   }
 
   documentUrl(caseId: string, documentId: string): string {
