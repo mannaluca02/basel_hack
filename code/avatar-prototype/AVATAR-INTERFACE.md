@@ -30,7 +30,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts) and [`pax-avatar-controller.d.ts`](p
 | `{ type: "playback", event: "cancelled", playbackId }` | Audio was cut off (barge-in, stop, new turn) | `output_audio_buffer.cleared` |
 | `{ type: "playback", event: "error", playbackId }` | Playback failed | — |
 
-`emotion` values: `neutral`, `happy`, `empathetic`, `concerned`, `surprised`, `celebrating`, `reassuring`, `curious`, `unsure`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
+`emotion` values: `neutral`, `acknowledging`, `curious`, `explaining`, `reassuring`, `empathetic`, `pleased`, `recovering`, `presenting_offer`. `turnId` and `replyId` from I06 may be added to `playback` events; the avatar does not need them but passes them through.
 
 ## What the avatar guarantees
 
@@ -39,7 +39,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts) and [`pax-avatar-controller.d.ts`](p
 - **Early emotions wait for the reply.** An `emotion` that arrives while the user speaks or the advisor thinks (e.g. from the input transcript trigger) is queued and shown when playback starts. Otherwise it is shown right away.
 - **No flicker from classifiers.** While the advisor has the turn, `neutral` never replaces a stronger emotion, and other changes apply at most every 2 s (the latest one wins). Send every answer; the avatar filters.
 - **Relax after the reply.** The emotion is held ~1.5 s after playback ends, then the face relaxes to neutral. A new user turn starts from neutral.
-- **Fixed body height and size.** Audio does not move or stretch the body. Eye expressions, blinking, and gentle horizontal sway remain.
+- **Calm expression motion.** Each expression has a subtle tilt, breath, nod or sway; warm expressions lift once on entry and recovery briefly resets. Audio only adds tiny eye emphasis when explaining; it never drives body motion. Reduced-motion preferences suppress decorative motion and blinking while preserving all eye shapes and decorations.
 
 
 ## GPT-Live prototype mapping
@@ -63,7 +63,7 @@ Live has no speech-start/stop or playback boundary events. Listening/thinking an
 ## Integrating into the Angular app
 
 1. **Copy the avatar files** into the app, e.g. `src/app/avatar/`: `pax-avatar.js`, `pax-avatar-controller.js` and both `.d.ts` files. They are plain ES modules with type declarations, no build step or dependency.
-2. **Mount it in a component, outside the Angular zone** (the avatar animates every frame; inside the zone that would trigger change detection 60 times per second). Only one avatar per page: the SVG uses fixed element IDs.
+2. **Mount it in a component, outside the Angular zone** (the avatar animates every frame; inside the zone that would trigger change detection 60 times per second). Multiple avatars can coexist: each mount gives its SVG definitions unique IDs.
 
    ```ts
    import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inject } from "@angular/core";

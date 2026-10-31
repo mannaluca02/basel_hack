@@ -2,18 +2,18 @@
 // Framework-free ES module. Voice code should not call this directly; use pax-avatar-controller.js.
 //
 //   const rig = mountPaxAvatar(document.getElementById("host"));
-//   rig.setEmotion("happy");
+//   rig.setEmotion("pleased");
 //   rig.attachStream(remoteAudioStream);   // audio level remains available to the UI
 //   rig.setLevelSource(() => 0.4);         // or any custom 0..1 level
 const SVG = `
 <svg viewBox="0 0 200 200" aria-label="Pax Beratercharakter" style="width:100%;height:auto;overflow:visible">
   <defs>
     <radialGradient id="paxBody" cx="35%" cy="28%" r="85%">
-      <stop offset="0" stop-color="#d4f08f" />
-      <stop offset=".45" stop-color="#9acb41" />
-      <stop offset="1" stop-color="#6f9c25" />
+      <stop offset="0" stop-color="#9bd509" />
+      <stop offset=".45" stop-color="#8bcb00" />
+      <stop offset="1" stop-color="#62a600" />
     </radialGradient>
-    <filter id="paxSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
+    <filter id="paxSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.8" /></filter>
     <mask id="paxMaskL" maskUnits="userSpaceOnUse" x="-50" y="-50" width="300" height="300">
       <rect x="-50" y="-50" width="300" height="300" fill="#fff" />
       <rect data-part="lidL" fill="#000" /><circle data-part="lowL" fill="#000" />
@@ -30,40 +30,42 @@ const SVG = `
     <ellipse data-part="blushL" cx="66" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
     <ellipse data-part="blushR" cx="134" cy="118" rx="10" ry="5" fill="#ff8fb1" filter="url(#paxSoft)" />
     <g fill="#360573">
-      <rect data-part="eyeL" mask="url(#paxMaskL)" />
-      <rect data-part="eyeR" mask="url(#paxMaskR)" />
+      <ellipse data-part="eyeL" mask="url(#paxMaskL)" />
+      <ellipse data-part="eyeR" mask="url(#paxMaskR)" />
     </g>
   </g>
   <g data-part="dots" fill="#360573"><circle r="3.2" /><circle r="4.2" /><circle r="5.4" /></g>
-  <g data-part="sparkles" fill="#9acb41"></g>
+  <g data-part="sparkles" fill="#8bcb00"></g>
 </svg>`;
 
-// ---------- Rig dimensions (viewBox units) ----------
-const EYE = { w: 8.5, h: 13, rx: 8.5 };
-
-// ---------- Emotions: target values for the rig ----------
-// gx/gy gaze (-1..1), open (eye height), size (eye scale), lidA (deg, + = droopy/sad outer corners),
-// lidD (upper lid drop 0..1), smile (lower lid push → ^^ eyes), squint (extra lid on right eye),
-// blush, dots, sparkles
-const BASE = { gx:0, gy:0, open:1, size:1, lidA:0, lidD:0, smile:0, squint:0, blush:0, dots:0, sparkles:0 };
-export const EMOTIONS = {
-  neutral:     { label: "Neutral" },
-  listening:   { label: "Zuhören",      gy:-.08, open:1.04, size:1.04 },
-  thinking:    { label: "Nachdenken",   gx:.75, gy:-.8, open:.92, lidD:.12, squint:.35, dots:1 },
-  happy:       { label: "Freude",       smile:.85, blush:.6 },
-  empathetic:  { label: "Mitgefühl",    gy:.05, lidA:8, lidD:.08, open:1.03 },
-  reassuring:  { label: "Beruhigend",   smile:.48, open:.94, blush:.12 },
-  curious:     { label: "Neugierig",    gx:.2, gy:-.2, open:1.12, size:1.06, squint:.08 },
-  unsure:      { label: "Unsicher",     gx:-.35, gy:-.15, lidD:.1, squint:.28 },
-  concerned:   { label: "Besorgt",      gy:.08, lidA:17, lidD:.14, open:1.08 },
-  surprised:   { label: "Überrascht",   open:1.3, size:1.22 },
-  celebrating: { label: "Abschluss 🎉", smile:1, size:1.08, blush:.8, sparkles:1 },
+// Every pose and motion target is numeric, including independent eye geometry.
+const BASE = {
+  gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0,
+  wL:1, wR:1, hL:1, hR:1, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
+  tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, nod:0, glance:.08, pulse:0,
+  hop:0, shake:0, speech:0, blinkDuration:.18, blinkGap:4,
 };
+export const EMOTIONS = {
+  neutral: { label:"Neutral", subtitle:"Calm and available" },
+  listening: { label:"Listening", subtitle:"Focused attention", gx:-.18, tilt:-4, sway:.5, speed:.4, glance:.025, blinkDuration:.3, blinkGap:5.5 },
+  acknowledging: { label:"Acknowledging", subtitle:"I hear you", wL:1.05, wR:1.05, hL:.63, hR:.63, nod:2.2, speed:.55 },
+  curious: { label:"Curious", subtitle:"Tell me more", hL:1.24, hR:.9, wL:.96, wR:.93, yL:-4, yR:3, tilt:4, gx:.12, pulse:.025, glance:.12 },
+  thinking: { label:"Thinking", subtitle:"Considering your question", gx:.25, gy:-.25, hL:1.2, hR:1.05, lidL:.23, lidR:.48, dots:1, glance:.035, speed:.4 },
+  explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.9, wR:.9, hL:1.22, hR:1.22, glance:.17, speed:1.2, speech:.025 },
+  reassuring: { label:"Reassuring", subtitle:"We can take this step by step", wL:1.08, wR:1.08, hL:.78, hR:.78, breathe:.026, breathPeriod:5.5, speed:.4, glance:.025, blinkDuration:.38, blinkGap:5 },
+  empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.34, lidR:.34, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
+  pleased: { label:"Pleased", subtitle:"A warm welcome", smile:1, blush:1, hop:3, sway:1, speed:.65 },
+  recovering: { label:"Recovering", subtitle:"Let me try again", wR:.85, hR:.85, yR:7, shake:1, glance:.04, speed:.5 },
+  presenting_offer: { label:"Presenting an offer", subtitle:"Your offer is ready", smile:1, blush:1, sparkles:1, hop:4, sway:.8, speed:.6 },
+};
+let mountId = 0;
 
 const set = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
 
 export function mountPaxAvatar(host, { onFrame } = {}) {
-  host.innerHTML = SVG;
+  const id = `pax-${++mountId}-`;
+  host.innerHTML = SVG.replace(/id="(pax\w+)"/g, (_, name) => `id="${id}${name}"`)
+    .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
   const part = (name) => host.querySelector(`[data-part="${name}"]`);
   const P = {};
   for (const n of ["shadow", "char", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
@@ -72,14 +74,37 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
   const cur = { ...BASE };
   let level = 0, levelSource = () => 0;
   let analyser = null, audioCtx = null, buf = null;
-  let blinkT = 0, nextBlink = 2, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
+  let blinkDuration = 0;
+  let blinkT = 0, nextBlink = 3 + Math.random() * 3, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
   const gaze = { x: 0, y: 0 };
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const sparkles = [];
+  let dotsEnteredAt = 0;
+  const entries = [];
+  const dotOpacity = [0, 0, 0];
+  const pose = { sx:1, sy:1, rot:0, ty:0, tx:0, lift:0 };
+  function replay() {
+    const target = { ...BASE, ...EMOTIONS[emotion] };
+    // Let an in-flight gesture finish; changing expressions cannot reset its envelope.
+    for (const kind of ["hop", "shake"]) {
+      if (target[kind] && !entries.some(e => e.kind === kind)) {
+        entries.push({ kind, amount:target[kind], startedAt:t, duration:kind === "shake" ? .6 : .8 });
+      }
+    }
+  }
+  // Fixed positions keep decoration calm and avoid particle churn.
+  for (const [x,y,scale] of [[32,47,.7],[48,20,.8],[145,22,.65],[174,42,1],[176,105,.7],[124,183,.6]]) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    el.setAttribute("d", "M0,-7 L2,-2 7,0 2,2 0,7 -2,2 -7,0 -2,-2Z");
+    P.sparkles.appendChild(el);
+    sparkles.push({ el, x, y, scale });
+  }
 
   function setEmotion(key) {
-    if (!EMOTIONS[key] || key === emotion) return false;
+    if (!Object.hasOwn(EMOTIONS, key) || key === emotion) return false;
     emotion = key;
+    if (key === "thinking") dotsEnteredAt = t;
+    replay();
     return true;
   }
   function setLevelSource(fn) { levelSource = fn || (() => 0); }
@@ -105,15 +130,7 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     });
   }
 
-  function spawnSparkle() {
-    const a = Math.random() * Math.PI * 2, r = 70 + Math.random() * 25;
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    el.setAttribute("d", "M0,-6 L1.6,-1.6 6,0 1.6,1.6 0,6 -1.6,1.6 -6,0 -1.6,-1.6Z");
-    P.sparkles.appendChild(el);
-    sparkles.push({ el, x: 100 + Math.cos(a) * r, y: 100 + Math.sin(a) * r, life: 1, s: .6 + Math.random() * .8 });
-  }
-
-  let last = performance.now(), t = 0, raf = 0;
+  let last = performance.now(), t = 0, phase = 0, breathPhase = 0, raf = 0;
   function frame(now) {
     const dt = Math.min(.05, (now - last) / 1000); last = now; t += dt;
     const target = { ...BASE, ...EMOTIONS[emotion] };
@@ -124,58 +141,84 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     const raw = levelSource(dt);
     level += (raw - level) * (1 - Math.exp(-dt * (raw > level ? 30 : 10)));
 
-    // blink
-    blinkT += dt; let blink = 1;
-    if (blinkT > nextBlink) { const p = (blinkT - nextBlink) / .14; blink = p < 1 ? Math.abs(1 - 2 * p) : 1;
-      if (p >= 1) { blinkT = 0; nextBlink = 2 + Math.random() * 3.5; } }
-    // micro saccades when idle-ish
-    nextSaccade -= dt;
-    if (nextSaccade < 0) { saccade = { x: (Math.random() - .5) * .5, y: (Math.random() - .5) * .3 }; nextSaccade = 1 + Math.random() * 2.5; }
-    const idleGaze = emotion === "thinking" || emotion === "surprised" ? 0 : 1;
-    gaze.x += (saccade.x * idleGaze - gaze.x) * (1 - Math.exp(-dt * 8));
-    gaze.y += (saccade.y * idleGaze - gaze.y) * (1 - Math.exp(-dt * 8));
-
     const motion = reducedMotion.matches ? 0 : 1;
+    phase += dt * cur.speed;
+    breathPhase += dt * 2 * Math.PI / cur.breathPeriod;
+    let hop = 0, shake = 0;
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const e = entries[i], age = t - e.startedAt;
+      if (age >= e.duration) { entries.splice(i, 1); continue; }
+      const progress = age / e.duration;
+      if (e.kind === "hop") hop += e.amount * Math.sin(progress * Math.PI) ** 2;
+      else shake += e.amount * Math.sin(progress * 5 * Math.PI) * Math.sin(progress * Math.PI) ** 2 * (1 - progress);
+    }
+    const nod = Math.max(0, Math.sin(phase * 2)) ** 8 * cur.nod;
+    const lift = -hop;
+    const breath = Math.sin(breathPhase) * cur.breathe;
+    const body = {
+      sx:1 + motion * (-breath * .28 + hop * .003),
+      sy:1 + motion * (breath - hop * .003),
+      rot:motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2),
+      ty:motion * (nod + lift),
+    };
+    let tx = motion * (Math.sin(phase) * cur.sway + shake * 2);
+    // Ease pose targets while the independent entry gestures finish continuously.
+    const bodyTarget = { ...body, tx, lift:motion * lift };
+    for (const key in pose) pose[key] = motion ? pose[key] + (bodyTarget[key] - pose[key]) * (1 - Math.exp(-dt * 16)) : bodyTarget[key];
+    for (const key in body) body[key] = pose[key];
+    tx = pose.tx;
+    set(P.char, { transform:`translate(${tx} ${body.ty}) translate(100 160) rotate(${body.rot} 0 -60) scale(${body.sx} ${body.sy}) translate(-100 -160)` });
+    set(P.shadow, { rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2, opacity:1 + pose.lift * .04 });
+    P.blushL.setAttribute("opacity", cur.blush * .8); P.blushR.setAttribute("opacity", cur.blush * .8);
 
-    // Keep the body at a fixed height and size in every emotion and audio state.
-    const tx = motion * Math.sin(t * .45) * 1.2;
-    P.char.setAttribute("transform", `translate(${tx} 0)`);
-    P.blushL.setAttribute("opacity", cur.blush * .55); P.blushR.setAttribute("opacity", cur.blush * .55);
-
-    // eyes
-    const gx = (cur.gx + gaze.x * motion) * 9, gy = (cur.gy + gaze.y * motion) * 7;
+    blinkT += dt; let blink = 1;
+    if (!motion) { blinkT = 0; blinkDuration = 0; }
+    else if (blinkT > nextBlink) {
+      if (!blinkDuration) blinkDuration = cur.blinkDuration;
+      const p = (blinkT - nextBlink) / blinkDuration;
+      blink = p < 1 ? Math.abs(1 - 2 * p) : 1;
+      if (p >= 1) { blinkDuration = 0; blinkT = 0; nextBlink = cur.blinkGap + Math.random() * 2; }
+    }
+    nextSaccade -= dt;
+    if (nextSaccade < 0) {
+      saccade = { x:Math.random() - .5, y:(Math.random() - .5) * .5 };
+      nextSaccade = 2 + Math.random() * 3;
+    }
+    gaze.x += (saccade.x - gaze.x) * k;
+    gaze.y += (saccade.y - gaze.y) * k;
+    const gx = (cur.gx + motion * cur.glance * (gaze.x + Math.sin(phase * 2))) * 9;
+    const gy = (cur.gy + motion * cur.glance * gaze.y) * 7;
     for (const side of ["L", "R"]) {
       const sign = side === "L" ? -1 : 1;
-      const cx = 100 + sign * 22 + gx, cy = 98 + gy;
-      const w = EYE.w * cur.size, h = EYE.h * cur.size * cur.open * blink;
-      set(P["eye" + side], { x: cx - w, y: cy - h, width: w * 2, height: Math.max(.6, h * 2), rx: Math.min(EYE.rx * cur.size, w, h) });
-      const drop = cur.lidD + (side === "R" ? cur.squint : 0);
-      const lidY = cy - h + drop * 2 * h;
-      set(P["lid" + side], { x: cx - 30, y: lidY - 40, width: 60, height: 40,
-        transform: `rotate(${sign * cur.lidA} ${cx} ${lidY})` });
+      const cx = 100 + sign * 23 + gx, cy = 101 + gy + cur["y" + side];
+      const pulse = 1 + motion * (cur.pulse * Math.sin(phase * 2) + cur.speech * level);
+      const w = 11 * cur.size * cur["w" + side];
+      const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (blink + (1 - blink) * cur.smile);
+      set(P["eye" + side], { cx, cy, rx:w, ry:Math.max(.3,h) });
+      const lidY = cy - h + cur["lid" + side] * 2 * h;
+      set(P["lid" + side], { x:cx - 30, y:lidY - 40, width:60, height:40,
+        transform:`rotate(${cur["angle" + side]} ${cx} ${lidY})` });
       const r = w * 1.25;
-      set(P["low" + side], { cx, cy: cy + h + r - cur.smile * h * 1.45, r });
+      set(P["low" + side], { cx, cy:cy + h + r - cur.smile * h * 1.3, r });
     }
-
-    // thinking dots
-    const dots = P.dots.children;
-    for (let i = 0; i < 3; i++) set(dots[i], { cx: 160 + i * 11, cy: 42 - i * 10, opacity: cur.dots * (.5 + .5 * Math.sin(t * 5 - i)) });
-
-    // sparkles
-    if (cur.sparkles > .5 && Math.random() < dt * 9) spawnSparkle();
-    for (let i = sparkles.length - 1; i >= 0; i--) {
-      const s = sparkles[i]; s.life -= dt * 1.2; s.y -= dt * 18;
-      set(s.el, { transform: `translate(${s.x} ${s.y}) scale(${s.s * Math.sin(Math.max(0, s.life) * Math.PI)})` });
-      if (s.life <= 0) { s.el.remove(); sparkles.splice(i, 1); }
+    for (let i = 0; i < 3; i++) {
+      const reveal = motion ? Math.min(1, Math.max(0, (t - dotsEnteredAt - i * .22) * 4)) : 1;
+      const wanted = cur.dots * (target.dots ? reveal : 1);
+      dotOpacity[i] += (wanted - dotOpacity[i]) * k;
+      set(P.dots.children[i], { cx:158 + i * 11, cy:35 - i * 10,
+        opacity:dotOpacity[i] * (motion ? .7 + .3 * Math.sin(t * 3 - i) : 1) });
     }
-
-    onFrame?.({ emotion, level, cur, body: { sx: 1, sy: 1, rot: 0, ty: 0 } });
+    sparkles.forEach((s,i) => {
+      const twinkle = motion ? .75 + .25 * Math.sin(t * 2.5 - i * 1.3) : 1;
+      set(s.el, { opacity:cur.sparkles * twinkle, transform:`translate(${s.x} ${s.y}) scale(${s.scale * twinkle})` });
+    });
+    onFrame?.({ emotion, level, cur, body });
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
   return {
-    setEmotion, attachStream, setLevelSource,
+    setEmotion, replay, attachStream, setLevelSource,
     get emotion() { return emotion; },
     destroy() { cancelAnimationFrame(raf); host.innerHTML = ""; },
   };

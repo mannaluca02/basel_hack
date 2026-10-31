@@ -22,15 +22,15 @@ const HOST = process.env.HOST || "127.0.0.1";   // expose via `tailscale serve`,
 const MODEL = "gpt-live-1";
 const VOICE = process.env.OPENAI_REALTIME_VOICE || "marin";
 const EMOTION_CHOICES = [
-  { value: "neutral", description: "Sachliche Erklärung ohne besonderen emotionalen Anlass. Im Zweifel neutral." },
-  { value: "happy", description: "Freundliche Begrüssung oder eine gute Nachricht, keine ernsten oder belastenden Themen." },
-  { value: "empathetic", description: "Der Kunde schildert einen persönlichen Verlust, Krankheit oder Belastung: ruhig mitfühlen, nicht lächeln oder feiern." },
-  { value: "concerned", description: "Ein konkretes erkanntes Risiko oder eine Vorsorgelücke, nicht allein die Erwähnung von Tod oder Krankheit." },
-  { value: "surprised", description: "Eine wirklich unerwartete Wendung; nicht jede neue Information." },
-  { value: "reassuring", description: "Der Berater gibt nach einer Sorge ruhige Zuversicht und erklärt einen hilfreichen nächsten Schritt. Kein Erfolg wird gefeiert." },
-  { value: "curious", description: "Eine offene Rückfrage zeigt Interesse an Wünschen oder Lebenssituation des Kunden." },
-  { value: "unsure", description: "Der Berater sagt ausdrücklich, dass Angaben fehlen oder etwas unklar ist und geklärt werden muss." },
-  { value: "celebrating", description: "Ein ausdrücklich erreichtes Ziel oder Erfolg des Kunden, keine blosse Zustimmung." },
+  { value: "neutral", description: "Sachlicher, ruhiger Grundzustand ohne besonderen Anlass. Im Zweifel neutral." },
+  { value: "acknowledging", description: "Kurze Bestätigung oder Zusammenfassung: Ich habe Sie verstanden. Keine neue Erklärung oder Erfolgsmeldung." },
+  { value: "curious", description: "Offene Rückfrage zu Wünschen, Lebenssituation oder fehlenden Angaben des Kunden." },
+  { value: "explaining", description: "Der Berater erklärt Zusammenhänge, Berechnungen, Vorsorgelücken oder nächste Optionen sachlich und engagiert." },
+  { value: "reassuring", description: "Der Kunde ist besorgt oder überfordert; ruhig Zuversicht geben und Schritt für Schritt weiterhelfen." },
+  { value: "empathetic", description: "Persönlicher Verlust, Krankheit oder Belastung: stilles Mitgefühl zeigen." },
+  { value: "pleased", description: "Warme Begrüssung, Willkommen oder freundliche Freude über eine gute Nachricht." },
+  { value: "recovering", description: "Der Berater hat etwas missverstanden, korrigiert sich oder muss einen Versuch beziehungsweise eine Erklärung wiederholen." },
+  { value: "presenting_offer", description: "Nur wenn gerade eine konkrete Offerte oder ein fertiges Ergebnis tatsächlich präsentiert wird. Nicht bei einer Ankündigung oder blossen Zustimmung." },
 ];
 
 const INSTRUCTIONS = `Du bist Pax, ein KI-Vorsorgeberater der Pax Versicherung (klar als KI erkennbar).

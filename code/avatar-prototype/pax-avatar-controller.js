@@ -21,7 +21,7 @@
 //   Transcript-driven classifiers flip on every few words; the face should not.
 // - After a reply ends, its emotion is held briefly, then the face relaxes to neutral.
 
-/** @typedef {"neutral"|"happy"|"empathetic"|"concerned"|"surprised"|"celebrating"|"reassuring"|"curious"|"unsure"} ReplyEmotion */
+/** @typedef {"neutral"|"acknowledging"|"curious"|"explaining"|"reassuring"|"empathetic"|"pleased"|"recovering"|"presenting_offer"} ReplyEmotion */
 /**
  * @typedef {{ type: "activity", state: "idle"|"listening"|"thinking" }
  *   | { type: "emotion", emotion: ReplyEmotion, playbackId?: string }
@@ -29,7 +29,7 @@
  * } AvatarEvent
  */
 
-export const REPLY_EMOTIONS = ["neutral", "happy", "empathetic", "concerned", "surprised", "celebrating", "reassuring", "curious", "unsure"];
+export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "reassuring", "empathetic", "pleased", "recovering", "presenting_offer"];
 const HOLD_AFTER_REPLY_MS = 1500;
 const EMOTION_HOLD_MS = 2000;
 const MAX_FINISHED_IDS = 50;

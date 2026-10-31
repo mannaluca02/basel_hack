@@ -20,6 +20,7 @@
 </main>
 
 <aside id="panel">
+  <p><a href="expressions.html">Expression study · alle 11 Ausdrücke</a></p>
   <h3>Gesicht direkt setzen</h3>
   <div class="grid" id="emotions"></div>
 
@@ -53,7 +54,7 @@ const rig = mountPaxAvatar($("avatar"), { onFrame: ({ emotion, level, cur, body 
   $("state").textContent =
     `face      ${emotion}\nactivity  ${s.activity}  playing ${s.playing ?? "–"}\naudio     ${source}  level ${level.toFixed(2)}\n` +
     `eyes      gaze ${cur.gx.toFixed(2)},${cur.gy.toFixed(2)} open ${cur.open.toFixed(2)}\n` +
-    `          lid ${cur.lidA.toFixed(1)}° drop ${cur.lidD.toFixed(2)} smile ${cur.smile.toFixed(2)}\n` +
+    `          lid ${cur.angleL.toFixed(1)}° drop ${cur.lidL.toFixed(2)} smile ${cur.smile.toFixed(2)}\n` +
     `body      sx ${body.sx.toFixed(3)} sy ${body.sy.toFixed(3)} rot ${body.rot.toFixed(1)}° ty ${body.ty.toFixed(1)}`;
   document.querySelectorAll("[data-emo]").forEach((b) => b.classList.toggle("on", b.dataset.emo === emotion));
 } });
@@ -99,13 +100,13 @@ $("btnMic").onclick = async () => {
 // ---------- Scripted conversation: exactly what a voice adapter would send ----------
 const say = (text) => ({ say: text });
 const SCRIPT = [
-  [0,     { type: "emotion", emotion: "happy", playbackId: "p1" }],
+  [0,     { type: "emotion", emotion: "pleased", playbackId: "p1" }],
   [100,   { type: "playback", event: "started", playbackId: "p1" }, say("Grüezi! Ich bin Pax, Ihr digitaler Vorsorge-Berater.")],
   [1500,  { type: "activity", state: "listening" }, say("(Geräusch im Raum – Voice ignoriert es, kein Abbruch)")],
   [3000,  { type: "playback", event: "ended", playbackId: "p1" }, say("")],
   [3600,  { type: "activity", state: "listening" }, say("(Kunde erzählt von Familie und Job …)")],
   [6400,  { type: "activity", state: "thinking" }, say("(Vorsorgebild wird berechnet …)")],
-  [8600,  { type: "emotion", emotion: "concerned", playbackId: "p2" }],
+  [8600,  { type: "emotion", emotion: "explaining", playbackId: "p2" }],
   [8700,  { type: "playback", event: "started", playbackId: "p2" }, say("Bei Erwerbsunfähigkeit sehe ich eine Vorsorgelücke …")],
   [10600, { type: "activity", state: "listening" }, say("(Kunde unterbricht wirklich)")],
   [10700, { type: "playback", event: "cancelled", playbackId: "p2" }],
@@ -116,8 +117,8 @@ const SCRIPT = [
   [17600, { type: "playback", event: "ended", playbackId: "p3" }],
   [19600, { type: "activity", state: "listening" }, say("(Kunde: «Dann machen wir das so.»)")],
   [21400, { type: "activity", state: "thinking" }, say("")],
-  [22400, { type: "emotion", emotion: "celebrating", playbackId: "p4" }],
-  [22500, { type: "playback", event: "started", playbackId: "p4" }, say("Antrag abgeschlossen!")],
+  [22400, { type: "emotion", emotion: "presenting_offer", playbackId: "p4" }],
+  [22500, { type: "playback", event: "started", playbackId: "p4" }, say("Ihre Offerte ist bereit. Schauen wir sie gemeinsam an.")],
   [25000, { type: "playback", event: "ended", playbackId: "p4" }],
   [27500, { type: "activity", state: "idle" }, say("")],
 ];

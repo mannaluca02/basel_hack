@@ -6,7 +6,7 @@ export type { AvatarEvent, AvatarState, ReplyEmotion };
 export interface AvatarController {
   /** Returns false if the event was ignored (unknown, or for an ended/cancelled playbackId). */
   handle(event: AvatarEvent): boolean;
-  /** The stream or element that plays the advisor's voice; supplies audio levels without body movement. */
+  /** The stream or element that plays the advisor's voice; supplies audio levels for subtle eye emphasis only. */
   attachAudio(source: MediaStream | HTMLMediaElement): void;
   /** Fallback when only raw audio chunks exist: return the current level 0..1 each frame. */
   setLevelSource(fn: ((dt: number) => number) | null): void;

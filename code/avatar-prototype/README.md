@@ -1,6 +1,6 @@
 # Avatar prototype (throwaway)
 
-Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via eyes and blush; the body stays at a fixed height and size.
+Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Eleven expressions via eyes, blush, and calm characteristic motion.
 
 **Voice integration: read [AVATAR-INTERFACE.md](AVATAR-INTERFACE.md).**
 
@@ -12,15 +12,18 @@ Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Emotions via ey
 | `openai-realtime-adapter.js` | Dario | Reference adapter: GPT-Live (WebRTC) → AvatarEvents |
 | `server.mjs` | Dario | Dev server: static files + `POST /session` exchanges SDP with the Live API |
 | `index.html` | — | Design demo: face buttons, fake speech, mic, scripted conversation as AvatarEvents |
+| `expressions.html` | — | Live eleven-expression review sheet, focused view and replay |
 | `realtime.html` | — | Live test against GPT-Live |
 
 ## Expressions and listening
 
-`empathetic` uses open, softly angled eyes. `concerned` is more serious. `reassuring` is a small calm smile, `curious` uses a questioning gaze and wider eyes, and `unsure` uses an asymmetric squint. The Live trigger choices distinguish personal distress, concrete risk, reassurance, and clarification.
+The eleven faces follow the expression sheet: `neutral` has round dots; `listening` holds an attentive tilt; `acknowledging` uses flattened ovals and a slow nod; `curious` has asymmetric eyes and a head tilt; `thinking` looks up with independent flat lids and sequential thought dots; `explaining` uses tall alert ovals; `reassuring` uses soft wide ovals; `empathetic` lowers its gaze beneath slanted lids; `pleased` closes its eyes into arcs with blush; `recovering` resets with asymmetric dots; `presenting_offer` adds green twinkling stars to the welcoming arcs.
 
-The body never bobs, nods, rotates, or stretches vertically, including during speech, emotion transitions, and celebration. A gentle horizontal sway accompanies eye movement and blinking, including while listening. Reduced-motion preferences suppress the decorative drift. Input emotion decisions still prepare the upcoming reply.
+`listening` and `thinking` are activity faces. The other nine are reply emotions. Live trigger descriptions distinguish acknowledgment, explanation, reassurance, concern, clarification, correction, welcome, and an actually presented offer or result. Input decisions prepare the upcoming reply.
 
-The microphone demo explicitly enters listening mode. Audio levels remain available to the UI but do not move or resize the body.
+The body moves subtly for each expression: slow breathing and sway, a small listening/curiosity tilt, a gentle acknowledgment nod, and a single small lift on entering the welcoming or offer expressions. Recovery gives a brief tiny shake, then settles. Translation stays within four viewBox units, rotation within six degrees, and scale within three percent. Shadow size follows the lift. Reduced-motion preferences suppress decorative motion and blinking, keeping the expression visible. Audio never drives body motion; explaining can react very slightly through eye height.
+
+Open [expressions.html](expressions.html) for all eleven live expressions, or add `?only=curious` for a focused view. Each tile links to the interactive demo and offers a replay button for entry motion. Multiple mounts have unique SVG IDs. The microphone demo explicitly enters listening mode.
 
 ## Run
 
