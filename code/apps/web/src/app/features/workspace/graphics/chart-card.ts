@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ResultStatus } from '../../../core/advisor/contracts';
-import { ChartResult } from '../../../core/advisor/ui-models';
+import { ChartResult, EventImpactScenario } from '../../../core/advisor/ui-models';
 import { AppLanguage } from '../../../core/i18n/language';
 import { LocaleFormat } from '../../../core/i18n/locale-format';
 import { ColorScheme } from '../../../core/theme/color-scheme';
@@ -40,6 +40,11 @@ const STATUS_LOOK: Readonly<Record<ResultStatus, { readonly tone: Tone; readonly
   };
 
 let nextId = 0;
+
+/** Identifies a life-event scenario across updates: the event and the person it happens to. */
+function impactKey(scenario: EventImpactScenario): string {
+  return `${scenario.event}:${scenario.personId}`;
+}
 
 /**
  * One chart in the Graphics feed: title, status as text, the drawn chart, a text legend and a data
@@ -82,7 +87,7 @@ let nextId = 0;
                 type="button"
                 class="scenario"
                 [attr.aria-pressed]="$index === view().scenario"
-                (click)="scenario.set($index)"
+                (click)="selectScenario($index)"
               >
                 {{ label }}
               </button>
@@ -193,12 +198,32 @@ export class ChartCard {
     };
   });
 
-  /** Scenario shown by an event-impact chart; kept across updates of the same chart. */
-  protected readonly scenario = signal(0);
+  /**
+   * Scenario shown by an event-impact chart, by event and person rather than position: kept
+   * across updates of the same chart, even when the backend sends the scenarios in a new order.
+   */
+  private readonly scenarioKey = signal<string | null>(null);
+
+  private readonly scenario = computed(() => {
+    const chart = this.chart();
+    const key = this.scenarioKey();
+    if (chart.type !== 'event_impact' || key === null) return 0;
+    // A scenario the update no longer has falls back to the first one.
+    return Math.max(
+      0,
+      chart.scenarios.findIndex((s) => impactKey(s) === key),
+    );
+  });
 
   protected readonly view = computed(() =>
     buildChartView(this.chart(), this.context(), { scenario: this.scenario() }),
   );
+
+  protected selectScenario(index: number): void {
+    const chart = this.chart();
+    if (chart.type !== 'event_impact' || !chart.scenarios[index]) return;
+    this.scenarioKey.set(impactKey(chart.scenarios[index]));
+  }
 
   constructor() {
     let lastRevision: number | undefined;

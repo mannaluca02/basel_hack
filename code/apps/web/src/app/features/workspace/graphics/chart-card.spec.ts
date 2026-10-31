@@ -130,6 +130,25 @@ describe('ChartCard', () => {
     expect(pressed()).toEqual(['false', 'true']);
   });
 
+  it('keeps the chosen scenario when an update brings the scenarios in a new order', async () => {
+    const [disability] = impactChart().scenarios;
+    const death = { ...disability, event: 'death' as const };
+    await set(impactChart({ scenarios: [disability, death] }));
+    const buttons = () => [...root.querySelectorAll<HTMLButtonElement>('.scenario')];
+    const shown = () => buttons().find((b) => b.getAttribute('aria-pressed') === 'true');
+
+    buttons()[1].click();
+    await fixture.whenStable();
+    expect(shown()?.textContent?.trim()).toBe('Todesfall');
+
+    await set(impactChart({ revision: 2, scenarios: [death, disability] }));
+    expect(shown()?.textContent?.trim()).toBe('Todesfall');
+
+    // A scenario the update dropped falls back to the first one.
+    await set(impactChart({ revision: 3, scenarios: [disability] }));
+    expect(text('.scenario-name')).toBe('Invalidität');
+  });
+
   it('names a single scenario instead of offering a switch with one option', async () => {
     await set(impactChart());
     expect(root.querySelector('.scenarios')).toBeNull();
