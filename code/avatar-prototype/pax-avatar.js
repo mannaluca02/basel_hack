@@ -26,8 +26,13 @@ const SVG = `
     <ellipse data-part="blushR" cx="134" cy="118" rx="17" ry="12" fill="url(#paxBlush)" />
     </g>
     <g fill="#360573">
-      <ellipse data-part="eyeL" mask="url(#paxMaskL)" />
-      <ellipse data-part="eyeR" mask="url(#paxMaskR)" />
+      <rect data-part="eyeL" mask="url(#paxMaskL)" />
+      <rect data-part="eyeR" mask="url(#paxMaskR)" />
+    </g>
+    <g data-part="monocle" fill="none" stroke="#360573">
+      <circle r="21" stroke-width="2.6" />
+      <path d="M-14,-7 A15.5,15.5 0 0 1 -5,-14.8" stroke="#fff" stroke-opacity=".75" stroke-width="2.2" stroke-linecap="round" />
+      <path d="M14.8,14.8 C25,23 35,27 31,43" stroke-width="1.6" stroke-dasharray="2 2.4" stroke-linecap="round" />
     </g>
   </g>
   <g data-part="dots" fill="#360573"><circle r="3.2" /><circle r="4.2" /><circle r="5.4" /></g>
@@ -35,9 +40,10 @@ const SVG = `
 </svg>`;
 
 // Every pose and motion target is numeric, including independent eye geometry.
+// Eyes are pills: taller than wide by default; flat expressions become horizontal pills.
 const BASE = {
-  gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0,
-  wL:1, wR:1, hL:1, hR:1, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
+  gx:0, gy:0, open:1, size:1, smile:0, blush:0, dots:0, sparkles:0, monocle:0,
+  wL:.85, wR:.85, hL:1.2, hR:1.2, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
   tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, glance:.08, pulse:0,
   nod:0, nodFace:0, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:0, nodInterval:3, nodJitter:.25, nodDelay:.2,
   yaw:0, yawDir:0, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4,
@@ -52,16 +58,16 @@ export const EMOTIONS = {
     nod:5.5, nodFace:3, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:.6,
     nodInterval:4.5, nodJitter:.4, nodDelay:.2,
   },
-  curious: { label:"Curious", subtitle:"Tell me more", hL:.9, hR:1.24, wL:.93, wR:.96, yL:3, yR:-4, tilt:-4, gx:-.12, pulse:.025, glance:.12,
+  curious: { label:"Curious", subtitle:"Tell me more", hL:1.1, hR:1.3, wL:.85, wR:1, yL:2, yR:-2, monocle:1, tilt:-4, gx:-.12, pulse:.025, glance:.12,
     yaw:1, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4 },
-  thinking: { label:"Thinking", subtitle:"Considering your question", gx:.25, gy:-.25, hL:1.2, hR:1.05, lidL:.23, lidR:.48, dots:1, glance:.035, speed:.4 },
-  explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.9, wR:.9, hL:1.22, hR:1.22, glance:0, speed:1.2, speech:.025,
+  thinking: { label:"Thinking", subtitle:"Considering your question", gx:.25, gy:-.25, hL:1.44, hR:1.26, lidL:.23, lidR:.48, dots:1, glance:.035, speed:.4 },
+  explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.85, wR:.85, hL:1.46, hR:1.46, glance:0, speed:1.2, speech:.025,
     beat:1, beatRefractory:.7, beatRaise:.15, gazeStep:1, blinkDuration:.7,
     yaw:1, yawDir:-1, yawIn:.5, yawHold:1.2, yawOut:.6, yawInterval:6.5, yawJitter:.5, yawDelay:2 },
   reassuring: { label:"Reassuring", subtitle:"We can take this step by step", wL:1.08, wR:1.08, hL:.78, hR:.78, breathe:.026, breathPeriod:5.5, speed:.4, glance:.025, blinkDuration:.38, blinkGap:5 },
   empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.2, lidR:.2, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
   pleased: { label:"Pleased", subtitle:"A warm welcome", smile:1, blush:1, hop:3, sway:1, speed:.65 },
-  recovering: { label:"Recovering", subtitle:"Let me try again", wR:.85, hR:.85, yR:7, shake:1, glance:.04, speed:.5 },
+  recovering: { label:"Recovering", subtitle:"Let me try again", wR:.72, hR:1.02, yR:7, shake:1, glance:.04, speed:.5 },
   presenting_offer: { label:"Presenting an offer", subtitle:"Your offer is ready", smile:1, blush:1, sparkles:1, hop:4, sway:.8, speed:.6 },
 };
 let mountId = 0;
@@ -89,7 +95,7 @@ export function createPaxAvatar(host) {
     .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
   const part = (name) => host.querySelector(`[data-part="${name}"]`);
   const P = {};
-  for (const n of ["shadow", "char", "highlight", "blush", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles"]) P[n] = part(n);
+  for (const n of ["shadow", "char", "highlight", "blush", "blushL", "blushR", "eyeL", "eyeR", "lidL", "lidR", "lowL", "lowR", "dots", "sparkles", "monocle"]) P[n] = part(n);
 
   for (const el of host.querySelectorAll("*")) attributes.set(el, Object.create(null));
   let emotion = "neutral", destroyed = false, visible = true;
@@ -311,9 +317,11 @@ export function createPaxAvatar(host) {
       const far = Math.max(0, -sign * yawPose), near = Math.max(0, sign * yawPose);
       const cx = 100 + sign * 23 + gx + yawPose * 4.5 - sign * far * 1.5, cy = 101 + gy + cur["y" + side] + faceDip;
       const pulse = 1 + motion * (beatPose * cur.beatRaise + cur.pulse * Math.sin(phase * 2) + cur.speech * level);
-      const w = 11 * cur.size * cur["w" + side] * (1 - far * .15 + near * .05);
+      const w = 11 * cur.size * cur["w" + side] * (1 + near * .05);
       const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (1 - nodPose * .06 / 5.5) * (blink + (1 - blink) * cur.smile);
-      set(P["eye" + side], "cx", cx); set(P["eye" + side], "cy", cy); set(P["eye" + side], "rx", w); set(P["eye" + side], "ry", Math.max(.3,h));
+      const eyeH = Math.max(.3, h), round = Math.min(w, eyeH);
+      set(P["eye" + side], "x", cx - w); set(P["eye" + side], "y", cy - eyeH); set(P["eye" + side], "width", 2 * w); set(P["eye" + side], "height", 2 * eyeH);
+      set(P["eye" + side], "rx", round); set(P["eye" + side], "ry", round);
       const lidY = cy - h + cur["lid" + side] * 2 * h;
       set(P["lid" + side], "x", cx - 30); set(P["lid" + side], "y", lidY - 40); set(P["lid" + side], "width", 60); set(P["lid" + side], "height", 40); set(P["lid" + side], "transform", `rotate(${fmt(cur["angle" + side])} ${fmt(cx)} ${fmt(lidY)})`);
       const r = w * 1.25;
@@ -326,6 +334,13 @@ export function createPaxAvatar(host) {
       const wanted = cur.dots * (target.dots ? reveal : 1);
       dotOpacity[i] += (wanted - dotOpacity[i]) * k;
       set(P.dots.children[i], "cx", 158 + i * 11); set(P.dots.children[i], "cy", 35 - i * 10); set(P.dots.children[i], "opacity", dotOpacity[i] * (motion ? .7 + .3 * Math.sin(t * 3 - i) : 1));
+    }
+    // The monocle sits on the face, not the pupil, so the curious eye can still glance inside it.
+    const monocleVisible = cur.monocle > .001 || target.monocle;
+    set(P.monocle, "display", monocleVisible ? "inline" : "none");
+    if (monocleVisible) {
+      set(P.monocle, "opacity", cur.monocle);
+      set(P.monocle, "transform", `translate(${fmt(123 + yawPose * 4.5)} ${fmt(101 + cur.yR + faceDip)}) scale(${fmt(.6 + .4 * cur.monocle)})`);
     }
     const starsVisible = cur.sparkles > .001 || target.sparkles;
     set(P.sparkles, "display", starsVisible ? "inline" : "none");

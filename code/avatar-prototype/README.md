@@ -25,7 +25,7 @@ avatar.handle(event);
 
 ## Expressions and listening
 
-The eleven faces follow the expression sheet: `neutral` has round dots; `listening` holds an attentive tilt; `acknowledging` uses flattened ovals and a slow nod; `curious` has asymmetric eyes and a head tilt; `thinking` looks up with independent flat lids and sequential thought dots; `explaining` uses tall alert ovals; `reassuring` uses soft wide ovals; `empathetic` lowers its gaze beneath slanted lids; `pleased` closes its eyes into arcs with blush; `recovering` resets with asymmetric dots; `presenting_offer` adds green twinkling stars to the welcoming arcs.
+The eleven faces follow the expression sheet: `neutral` has upright pill eyes; `listening` holds an attentive tilt; `acknowledging` uses flattened pills and a slow nod; `curious` peers through a monocle on the right eye with a head tilt; `thinking` looks up with independent flat lids and sequential thought dots; `explaining` uses tall alert pills; `reassuring` uses soft wide pills; `empathetic` lowers its gaze beneath slanted lids; `pleased` closes its eyes into arcs with blush; `recovering` resets with asymmetric pills; `presenting_offer` adds green twinkling stars to the welcoming arcs.
 
 `listening` and `thinking` are activity faces. The other nine are reply emotions. Live trigger descriptions distinguish acknowledgment, explanation, reassurance, concern, clarification, correction, welcome, and an actually presented offer or result. Input decisions prepare the upcoming reply.
 
