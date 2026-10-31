@@ -17,7 +17,7 @@ npm install
 npm start
 ```
 
-Put `OPENAI_API_KEY` in the repo root `.env` (see `.env.example`) and open http://localhost:3000. Tap Paxi to start; microphone access needs `localhost` or HTTPS. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
+Put `OPENAI_API_KEY` in the repo root `.env` (see `.env.example`) and open http://localhost:3100. Tap Paxi to start; microphone access needs `localhost` or HTTPS. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
 
 `npm test` runs the log and validation tests.
 
@@ -28,7 +28,9 @@ The server reads the repository-root `.env`, not a file inside `code/voice-agent
 | Variable | Default | Purpose |
 |---|---|---|
 | `OPENAI_API_KEY` | Required to start a call | Server-side credentials; never put this key in browser code. |
-| `PORT` | `3000` | HTTP port; the server binds to `127.0.0.1`. |
+| `PORT` | `3100` | HTTP port; the server binds to `127.0.0.1`. 3100 so it runs next to the case backend on 3000. |
+| `PAX_API_URL` | `http://127.0.0.1:3000` | Valentin's case backend that receives Paxi's proposals once a case is linked. |
+| `PAX_APP_ORIGINS` | `http://localhost:4200,http://127.0.0.1:4200` | Customer app origins allowed to hand a case to Paxi via `/api/case-link`. |
 | `LIVE_MODEL` | `gpt-live-1` | Live speech model. |
 | `LIVE_BACKEND_MODEL` | `gpt-6-luna` | Language delegation/detection, answer extraction and final context extraction. |
 | `LIVE_VOICE` | `juni` | Initial/German voice key: `juni`, `nuri`, `flitz`, `brise`, `gleam`, or a configured custom key. |
@@ -36,6 +38,14 @@ The server reads the repository-root `.env`, not a file inside `code/voice-agent
 | `LIVE_VOICE_ID_IT` | Unset | Registers `paxi-it` for Italian. Without it, Italian falls back to `paxi` if configured, otherwise `juni`. |
 
 Use `http://localhost:<PORT>` exactly. Mutating API requests must carry that exact `Origin`; `127.0.0.1`, another port or another app origin is rejected. `baseUrl` in the client does not enable cross-origin access. Integration behind another origin requires corresponding server origin/CORS changes.
+
+## Connected to the shared case
+
+In the customer app (`npm run start:api` in `code/apps/web`), "Mit Paxi sprechen" shows the backend's voice notice, then creates a 15-minute case-scoped agent grant and posts it to `POST /api/case-link` here. The grant stays in this process (`case-bridge.mjs`), never in the log or the browser page. The app opens `http://localhost:3100/?link=<linkId>`; the first session of that conversation is linked to the case.
+
+After every answer extraction, the bridge sends the captured details the backend maps directly (income, birth date, Pensum, pension fund, 3a, housing cost, civil status, retirement age, risk appetite) to `POST /api/cases/:id/voice/agent-observations`. Each one quotes the customer turn it comes from; a value not said in these digits goes as `approximate`, and the backend asks it back. The result is one **unconfirmed** package on the app's review stand: the person accepts it and confirms the profile there. A newer answer replaces a still open package; accepted answers are not proposed again. The backend route only works with `PAX_SYNTHETIC_VOICE_ENABLED=1`.
+
+Without a link, Paxi runs as before and keeps everything in its own log.
 
 ## Architecture and data flow
 

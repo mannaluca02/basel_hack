@@ -47,6 +47,7 @@ const DUCK_RELEASE_MS = 2500;
 /**
  * @param {object} options
  * @param {string} [options.baseUrl] Origin of the voice-agent server ("" for same origin).
+ * @param {string} [options.caseLink] Link ID from /api/case-link: Paxi then proposes what it hears to that case.
  * @param {(stream: MediaStream) => void} [options.onAudioStream] The stream the person hears; called again after a voice switch.
  * @param {(event: object) => void} [options.onAvatarEvent] AvatarEvents: activity, playback.
  * @param {(fragment: {speaker: "user"|"agent", text: string, startMs: number, endMs: number}) => void} [options.onTranscript]
@@ -56,6 +57,7 @@ const DUCK_RELEASE_MS = 2500;
  */
 export function createPaxiVoice({
   baseUrl = "",
+  caseLink,
   onAudioStream = () => {},
   onAvatarEvent = () => {},
   onTranscript = () => {},
@@ -594,6 +596,7 @@ export function createPaxiVoice({
         continueFrom,
         resume: previous ? undefined : resumeId,
         priorities: previous ? undefined : startPriorities,
+        link: previous ? undefined : caseLink,
       });
       Object.assign(session, {
         id: result.session.id,
