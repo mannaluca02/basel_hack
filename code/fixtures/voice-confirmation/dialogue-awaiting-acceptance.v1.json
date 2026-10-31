@@ -1,0 +1,114 @@
+{
+  "caseId": "81508195-f8a0-488d-bfea-ff25ace56889",
+  "caseRevision": 5,
+  "contextRevision": 5,
+  "profileVersion": 1,
+  "runId": null,
+  "scenarioVersionId": null,
+  "calculationInputHash": null,
+  "locale": "de",
+  "tempo": "compact",
+  "graphContext": null,
+  "contextId": null,
+  "selectedGraphFacts": null,
+  "maySpeakSelectedAmounts": false,
+  "calculationStatus": "needs_input",
+  "ambiguities": [
+    {
+      "path": "insurance.persons.0.grossAnnualIncomeCents",
+      "personId": "person_demo_1",
+      "question": "Wie hoch ist Ihr Bruttojahreseinkommen?",
+      "source": {
+        "messageId": "annual_gross_question",
+        "turnId": "turn_annual_gross_question",
+        "sourceRef": "synthetic:annual_gross"
+      },
+      "id": "0e8b26c1-71a2-411e-908d-a0a9904ffc0c",
+      "locale": "de",
+      "createdAt": "2026-10-31T12:53:16.656Z",
+      "status": "open",
+      "resolvedAt": null,
+      "resolvedByBatchId": null,
+      "resolutionSourceRef": null,
+      "dialogueStatus": "awaiting_customer_acceptance",
+      "answerBatchId": "033d2fbd-7a5d-42f0-a111-3d9bca269573"
+    }
+  ],
+  "pendingAcceptanceBatchIds": [
+    "033d2fbd-7a5d-42f0-a111-3d9bca269573"
+  ],
+  "approvedFacts": [],
+  "nextQuestion": null,
+  "missingFields": [
+    "insurance.persons.0.grossAnnualIncomeCents"
+  ],
+  "scenarioComparisons": [],
+  "reviewStatus": "not_started",
+  "maySpeakAmounts": false,
+  "progress": {
+    "domain": "data_capture",
+    "percent": 100,
+    "reviewOpen": true,
+    "groups": [
+      {
+        "id": "income",
+        "complete": true,
+        "missing": [],
+        "label": "Einkommen"
+      },
+      {
+        "id": "budget",
+        "complete": true,
+        "missing": [],
+        "label": "Haushaltsbudget"
+      },
+      {
+        "id": "capital",
+        "complete": true,
+        "missing": [],
+        "label": "Vermögen und Zuordnung"
+      },
+      {
+        "id": "pillar_1",
+        "complete": true,
+        "missing": [],
+        "label": "Erste Säule: AHV/IV"
+      },
+      {
+        "id": "pillar_2",
+        "complete": true,
+        "missing": [],
+        "label": "Zweite Säule: Pensionskasse"
+      },
+      {
+        "id": "pillar_3",
+        "complete": true,
+        "missing": [],
+        "label": "Dritte Säule: private Vorsorge"
+      },
+      {
+        "id": "life_goals",
+        "complete": true,
+        "missing": [],
+        "label": "Lebensziele"
+      },
+      {
+        "id": "insurance_parameters",
+        "complete": true,
+        "missing": [],
+        "label": "Versicherungsbedarf"
+      }
+    ],
+    "scope": "whole_life_intake"
+  },
+  "allowedActions": [
+    "read_context",
+    "propose_patch"
+  ],
+  "policy": {
+    "noRawHealthData": true,
+    "noProviderTokens": true,
+    "noExternalAiTransferAuthorized": true,
+    "productFirstSelling": false
+  }
+}

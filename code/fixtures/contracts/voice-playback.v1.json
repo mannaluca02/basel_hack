@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "messageId": "playback_message_01",
+  "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+  "correlationId": "correlation_demo_01",
+  "turnId": "turn_demo_01",
+  "replyId": "reply_demo_01",
+  "playbackId": "playback_demo_01",
+  "event": "started",
+  "occurredAt": "2026-10-31T02:31:27.297Z"
+}

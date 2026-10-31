@@ -1,0 +1,27 @@
+{
+  "messageId": "synthetic_salary_correction",
+  "source": {
+    "messageId": "synthetic_salary_correction",
+    "turnId": "turn_salary_01",
+    "sourceRef": "synthetic:invented-dialogue"
+  },
+  "expectedCaseRevision": 3,
+  "expectedProfileVersion": 1,
+  "basisDraftHash": "c6b30d9aaedc5538537b4fce0d62866dc31e0bb0276e88d76768e3f17af232cf",
+  "changes": [
+    {
+      "path": "financial.persons.0.income.value",
+      "value": 8300000,
+      "personId": "person_demo_1"
+    },
+    {
+      "path": "insurance.persons.0.grossAnnualIncomeCents",
+      "value": 11900000,
+      "personId": "person_demo_1"
+    }
+  ],
+  "ambiguities": [],
+  "supersedesBatchIds": [],
+  "supersedesProposalIds": [],
+  "resolvesAmbiguityIds": []
+}

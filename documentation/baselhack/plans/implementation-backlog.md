@@ -1,6 +1,6 @@
 # Pax LifeMap – Ticket-Backlog nach dem Workshop
 
-Stand: 31.10.2026 · Version 2.0-workshop. Die Namen und Zuständigkeiten sowie Fortschritt am Agenten wurden vom Nutzer bestätigt. Alle Implementierungstickets sind geplant; der Workshop ist kein Implementierungsnachweis.
+Stand: 31.10.2026 · Version 2.0-workshop. Die Namen und Zuständigkeiten sowie Fortschritt am Agenten wurden vom Nutzer bestätigt. LOG-01 bis LOG-07 sind im Backend implementiert und automatisch geprüft; gemeinsame Team-/Pax-Fachabnahme bleibt offen. Die übrigen Team-Tickets werden hierdurch nicht als umgesetzt markiert.
 
 Der [Detailplan](implementation-plan.md), die [Workshop-Entscheide](workshop-decisions.md) und die [JSON-Fassung](../catalog/implementation-backlog.json) verwenden denselben Zuschnitt.
 
@@ -506,7 +506,7 @@ P0 · geplant · 1 Personenstunden · M5
 
 ### LOG-01 – Fachvertrag, GraphContext und Fortschrittsdaten
 
-P0 · geplant · 2 Personenstunden · M0
+P0 · implementiert, gemeinsame Abnahme offen · 2 Personenstunden · M0
 
 **Ergebnis:** Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.
 
@@ -522,9 +522,12 @@ P0 · geplant · 2 Personenstunden · M0
 - [ ] GraphContext enthält Run, Profil-/Szenarioversion, Person, Kennzahl und Periode.
 - [ ] Fortschritt basiert auf erledigten Pflichtgruppen, nicht auf Risikolücken.
 
+**Implementierungsstand (31.10.2026):** Autorisierter gemeinsamer Fall, unveränderliche bestätigte Profile, Schemas für vollständige Analyse, GraphContext, Kontextrevision und Fortschrittsgruppen implementiert und automatisch geprüft. UI-/Voice-/Avatar-Anschluss gemeinsam abnehmen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-02 – Logismata-Baseline und Antwortnormalisierung
 
-P0 · geplant · 3 Personenstunden · M1
+P0 · implementiert, gemeinsame Abnahme offen · 3 Personenstunden · M1
 
 **Ergebnis:** Serverseitiger Adapter für geeignete Baseline-/Grenz-/Metadatenpfade.
 
@@ -540,9 +543,12 @@ P0 · geplant · 3 Personenstunden · M1
 - [ ] Risiko-Code 0 bis zur Klärung reviewpflichtig; HTTP 200 ist nicht alleinige Freigabe.
 - [ ] Begrenzte Fehlerpfade und Replay nur bei passendem vollständigem Input-Hash.
 
+**Implementierungsstand (31.10.2026):** 24 echte Logismata-Operationen mit validierten Requests, Normalisierung und begrenztem Client implementiert; vollständiger synthetischer Live-Test bestanden. Risiko-Code 0 bleibt fachlich offen und requires_review. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-03 – Budget und Kapitalzuordnung ohne Doppelzählung
 
-P0 · geplant · 2 Personenstunden · M2
+P0 · implementiert, gemeinsame Abnahme offen · 2 Personenstunden · M2
 
 **Ergebnis:** Drei-Säulen-/Budgetausgabe mit Herkunft und verfügbarer Liquidität.
 
@@ -558,9 +564,12 @@ P0 · geplant · 2 Personenstunden · M2
 - [ ] Bedarf unbekannt erzeugt keine falsche Null-Lücke.
 - [ ] Kapital wird nicht gleichzeitig vollständig mehreren Zielen zugeordnet.
 
+**Implementierungsstand (31.10.2026):** Budget, Netto-/Steuerbasis, Beiträge, Schulden, Kapital-Ledger und drei Säulen im gemeinsamen bestätigten Fall integriert; unbekannte Werte und Doppelzählungsfälle automatisch geprüft. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-04 – Familien- und Pensionierungsphasen
 
-P0 · geplant · 3 Personenstunden · M3
+P0 · implementiert, gemeinsame Abnahme offen · 3 Personenstunden · M3
 
 **Ergebnis:** Gespeicherte Szenarioänderungen mit berechenbaren Differenzen und Fachgrenzen.
 
@@ -576,9 +585,12 @@ P0 · geplant · 3 Personenstunden · M3
 - [ ] Erwerbsende, Rentenbeginn und Überbrückung getrennt.
 - [ ] Phasen und Kapitalerschöpfung sichtbar; nicht unterstützte Regeln bleiben offen.
 
+**Implementierungsstand (31.10.2026):** Familienvariante und mehrphasige Pensionierung mit getrennten Erwerbs-/Rentenzeitpunkten, endlichem Kapital, gebundenen Sparbeträgen und gespeicherten Vergleichen implementiert; automatisierte und echte synthetische Variantenläufe bestanden. PK-Sonderfolgen bleiben fachlich prüfpflichtig. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-05 – Eigenheimvergleich und Reserven
 
-P0 · geplant · 2 Personenstunden · M3
+P0 · implementiert, gemeinsame Abnahme offen · 2 Personenstunden · M3
 
 **Ergebnis:** Beispiel-Eigenmittellücke und Auswirkungen auf andere Ziele.
 
@@ -594,9 +606,12 @@ P0 · geplant · 2 Personenstunden · M3
 - [ ] Gebundene Vorsorgemittel werden nicht still als freie Mittel gerechnet.
 - [ ] Unfinanziertes Ziel und Reserveverzehr bleiben erkennbar.
 
+**Implementierungsstand (31.10.2026):** Eigenmittellücke, explizite Kosten/Reserve, Kapitalzuordnungen und gespeicherter Vergleich im gemeinsamen Fall implementiert; gebundene Mittel bleiben ausgeschlossen. Automatisch und live geprüft, keine Kreditzusage. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-06 – Demo-Vertragsstatus und Regeln für Übergänge
 
-P0 · geplant · 1.5 Personenstunden · M4
+P0 · implementiert, gemeinsame Abnahme offen · 1.5 Personenstunden · M4
 
 **Ergebnis:** Fachliche State Machine vom Vorschlag bis zur Demo-Police auf gespeicherten Objekten.
 
@@ -612,9 +627,12 @@ P0 · geplant · 1.5 Personenstunden · M4
 - [ ] Antrag, Annahme und Police getrennt; Einreichung idempotent.
 - [ ] Keine echte Signatur, Annahme oder Versicherungsdeckung behauptet.
 
+**Implementierungsstand (31.10.2026):** Vollständige gespeicherte Demo-State-Machine mit aktueller Empfehlung, getrenntem Review, Dokumenthash/Bestätigung, idempotenter Einreichung, Annahme, Demo-Police und Portal nach Neustart implementiert und geprüft. Keine echte Abschluss-API verfügbar. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+
+
 ### LOG-07 – Fachtests, Quellenreview und Domain-Klärung
 
-P0 · geplant · 2.5 Personenstunden · M5
+P0 · implementiert, gemeinsame Abnahme offen · 2.5 Personenstunden · M5
 
 **Ergebnis:** Nachvollziehbare Domain-Invarianten und offene Pax-Fragen mit tatsächlichem Status.
 
@@ -629,6 +647,8 @@ P0 · geplant · 2.5 Personenstunden · M5
 - [ ] Provider-/Muster-/vlot-Werte werden nicht ohne identische Annahmen gleichgesetzt.
 - [ ] Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.
 - [ ] Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich.
+
+**Implementierungsstand (31.10.2026):** 121 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
 
 
 ## Earnie – KI-Backend
@@ -806,3 +826,9 @@ Die alten 36 Tickets werden nicht als erledigt markiert. Ihre Aufgaben sind in d
 ## Dynamische Gesprächsaktualisierung
 
 I10 konkretisiert die bestehenden Fall-/Voice-Integrationspakete: Earnie baut ContextBuilder und Update-Kanal, Dario aktualisiert vor Turns und bricht veraltete Ausgabe ab, Valentin liefert gültige Runreferenzen, Luca gleicht Grafik/Chat ab, Lukas übernimmt den Abbruch. [Schnittstellen Abschnitt 9](interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario) beschreibt HTTP/SSE als Vorschlag. Die Schätzungen bleiben vorläufig und werden vor Umsetzung gegen die tatsächliche Restzeit geprüft. Die 55 geplanten Abnahmefälle enthalten Reconnect, laufende Fachänderung und Tempowechsel.
+
+
+**Ergänzter Prüfumfang:** Alle 24 Sponsor-Operationen und 191 vollständige DE/FR/IT/EN-Anzeigetexte sind im Backend implementiert. Sprachwechsel ohne finanzielle Invalidierung, beide Dossier-Sprachen und die acht gezielten Zusatzrechner sind automatisch und live geprüft. Siehe [Requirements](../reports/life-insurance-requirements.md).
+
+
+**Gemeinsamer Vertragsstand:** Vollständiger Fall-/Agent-/SSE-/Portal-/Summary-DTO im Shared-Paket, browserfähige Beispiele und zehn JSON-Schema-Exporte implementiert. 121 Tests bestehen. Rollen-/API-Integration siehe [Team-Leitfaden](team-api-guide.md); bestehende Persistenz und DB-Ausbau siehe [Architekturentscheid](persistence-and-api.md).

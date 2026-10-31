@@ -1,6 +1,6 @@
 # Pax LifeMap – detaillierter Umsetzungsplan für fünf Personen
 
-**Stand: 31.10.2026, Europe/Zurich · Workshop-Fassung 2.0.** Planungsgrundlage für einen funktionierenden BaselHack-Prototyp. Angular ist die ausdrückliche Stack-Entscheidung des Teams. Die hier beschriebenen App-Module, Endpunkte, Datenbanktabellen und Tickets sind geplant und noch nicht implementiert. Die Recherche, die archivierten API-Beispiele und der öffentliche Pax/vlot-Test existieren bereits.
+**Stand: 31.10.2026, Europe/Zurich · Workshop-Fassung 2.0.** Planungsgrundlage für einen funktionierenden BaselHack-Prototyp. Angular ist die ausdrückliche Stack-Entscheidung des Teams. Dieses Dokument beschreibt die Zielarchitektur. Der bestätigte Logik-Backend-PoC mit Lebensversicherungsbedarf, echten Rechen-APIs, Szenarien und gespeichertem Demo-Vertragsweg ist implementiert und geprüft; der [Implementierungsbericht](../reports/logic-backend-implementation.md) trennt vorhandenen Code von weiterer Integrationsarbeit. Für die bereits umgesetzten DTOs sind die [Laufzeitschemas](../../../code/packages/contracts/src/index.ts) maßgeblich. Die Recherche, die archivierten API-Beispiele und der öffentliche Pax/vlot-Test existieren bereits.
 
 ### Inhaltsverzeichnis
 
@@ -324,7 +324,7 @@ code/
   infra/                         # lokale Start-/Containerkonfiguration
 ```
 
-Diese Struktur ist vorgeschlagen; die Verzeichnisse werden erst bei der Umsetzung angelegt. Bestehende Quellen unter `documentation/` und Markenassets unter `assets/` werden nicht in App-Quellcodeordner verschoben.
+Die Struktur ist die Zielaufteilung. Der erste API-/Contracts-/Domain-Code ist angelegt; weitere Verzeichnisse entstehen nach Bedarf. Bestehende Quellen unter `documentation/` und Markenassets unter `assets/` werden nicht in App-Quellcodeordner verschoben.
 
 ### 6.3 Zuständigkeiten im Client
 

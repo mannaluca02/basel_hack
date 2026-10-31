@@ -1,6 +1,6 @@
 # Pax LifeMap – Workflow und Schnittstellen aus dem Workshop
 
-Stand: 31.10.2026 · Entwurf 1.1. Grundlage sind `IMG_7233.HEIC`, die bestätigten Bereiche aus `IMG_7232.HEIC` und der [aktualisierte Detailplan](implementation-plan.md). Die Rollen sind bestätigt; die folgenden Typnamen, Felder, Fehlercodes und Transportvorschläge konkretisieren die Skizze und sind noch keine implementierte API.
+Stand: 31.10.2026 · Entwurf 1.1. Grundlage sind `IMG_7233.HEIC`, die bestätigten Bereiche aus `IMG_7232.HEIC` und der [aktualisierte Detailplan](implementation-plan.md). Die Rollen sind bestätigt; die folgenden Typnamen, Felder, Fehlercodes und Transportvorschläge konkretisieren die Skizze und beschreiben die teamübergreifende Zielarchitektur. Die Backend-Anteile I02–I04/I07–I10 sind inzwischen implementiert; die [Requirements-Matrix](../reports/life-insurance-requirements.md) ordnet nachweisbaren Code und offene Team-Integration zu.
 
 ## 1. Der sichtbare Workflow
 
@@ -291,3 +291,24 @@ Die konkrete Anbieterschnittstelle für Tools oder Sitzungsupdates wird vor der 
 - **Lukas:** `started/ended/cancelled/error` korrekt übernehmen; Progress bleibt separat.
 
 **Durchstich:** Kunde bestätigt einen neuen Eigenheimwunsch. Während die Rechnung läuft, fragt der Agent sinnvoll weiter. Nach dem Resultat erklären Grafik und Sprache denselben Run. Eine weitere bestätigte Einkommensänderung während der Ausgabe stoppt die alte Aussage und hält den Avatar korrekt an. Nach künstlichem Verbindungsabbruch wird der aktuelle Kontext wiederhergestellt, ohne alte Antworten doppelt abzuspielen. Diese Konkretisierung gehört in die vorhandenen Integrationspakete; ihre Zeitschätzungen werden mit der echten Restzeit nochmals geprüft.
+
+
+## 10. Implementierter Backend-Anschluss (31.10.2026)
+
+Der [Start-/Integrationsleitfaden](../../../code/README.md) und `/api/openapi.json` beschreiben die ausführbaren Routen. Die TypeScript-/Zod-Verträge in `code/packages/contracts` sind für implementierte Payloads maßgeblich. Die obigen Turn-/Voice-Nachrichten bleiben die Integrationsaufgabe von Dario und Earnie; es wird keine dort noch fehlende Antwortgenerierung behauptet.
+
+Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt `/graph-context`, Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
+
+
+## 10. Implementierter Backend-Anschluss (31.10.2026)
+
+Der [Start-/Integrationsleitfaden](../../../code/README.md) und `/api/openapi.json` beschreiben die ausführbaren Routen. Die TypeScript-/Zod-Verträge in `code/packages/contracts` sind für implementierte Payloads maßgeblich. Die obigen Turn-/Voice-Nachrichten bleiben die Integrationsaufgabe von Dario und Earnie; es wird keine dort noch fehlende Antwortgenerierung behauptet.
+
+Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt `/graph-context`, Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
+
+
+## 11. Verbindlicher Shared-Vertrag v1 und Team-Anbindung
+
+Der vollständige `InsuranceCaseDto` sowie `AdvisorContext`, Kontext-SSE, `SummaryBundle` und `PortalDto` werden aus `@pax/contracts` importiert. Eingaben und Ausgaben sind Zod-validiert; Code und generierte OpenAPI-/JSON-Schemas verwenden dieselben Definitionen. [Team-API-Leitfaden](team-api-guide.md) und [Persistenz-/DB-Entscheid](persistence-and-api.md) sind für den aktuellen ausführbaren Anschluss massgeblich. Die historischen Abschnitte oben zeigen die Herleitung aus dem Workshop.
+
+Neu bereitgestellt sind ausserdem die Team-Nachrichtenschemas `VoiceLogSchema`, `AgentReplySchema`, `VoicePlaybackEventSchema` und `GraphExplanationRequestSchema`. Der entsprechende Transport bzw. STT/LLM/TTS/Avatar wird dadurch nicht als implementiert behauptet. Der aktuelle kanonische Locale-Wert ist `de|fr|it|en`; regionale Speech-Codes werden im Anbieter-Adapter abgebildet. Finanzielle Antwortreferenzen und Kundenbestätigung bleiben Pflicht.

@@ -2,7 +2,7 @@
   "plan_date": "2026-10-31",
   "plan_version": "2.0-workshop",
   "supersedes_plan_version": "1.0",
-  "implementation_status": "not_started",
+  "implementation_status": "logic_backend_implemented_team_acceptance_pending",
   "team_confirmed_by_user": true,
   "team_roles": {
     "Luca": "UI",
@@ -728,7 +728,7 @@
       "owner": "Valentin",
       "title": "Fachvertrag, GraphContext und Fortschrittsdaten",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [],
       "deliverable": "Gemeinsame Schemas für Datenreife, Geld, Zeit, Szenarien und Auswahlkontext.",
@@ -750,14 +750,16 @@
         "I07",
         "I09",
         "I10"
-      ]
+      ],
+      "implementation_note": "Vollständiger versionierter Shared-Fall-DTO, Unterobjekte, Agent-/SSE-/Portal-/Summary-Verträge und bereitgestellte Team-Nachrichten implementiert. Ausgabevalidierung, Browser-Typecheck und JSON-Schema-Exporte geprüft; Team-Integration bleibt gemeinsam abzunehmen.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-02",
       "owner": "Valentin",
       "title": "Logismata-Baseline und Antwortnormalisierung",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 3,
       "dependencies": [
         "LOG-01",
@@ -776,14 +778,16 @@
       "interface_contracts": [
         "I03",
         "I04"
-      ]
+      ],
+      "implementation_note": "Alle 24 Sponsor-Operationen implementiert und live geprüft; acht Zusatzrechner separat autorisiert. Originale Fachprüfpflichten bleiben erhalten.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-03",
       "owner": "Valentin",
       "title": "Budget und Kapitalzuordnung ohne Doppelzählung",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [
         "LOG-01",
@@ -802,14 +806,16 @@
       "interface_contracts": [
         "I04",
         "I09"
-      ]
+      ],
+      "implementation_note": "Budget, Netto-/Steuerbasis, Beiträge, Schulden, Kapital-Ledger und drei Säulen im gemeinsamen bestätigten Fall integriert; unbekannte Werte und Doppelzählungsfälle automatisch geprüft.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-04",
       "owner": "Valentin",
       "title": "Familien- und Pensionierungsphasen",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 3,
       "dependencies": [
         "LOG-03"
@@ -827,14 +833,16 @@
       "interface_contracts": [
         "I03",
         "I04"
-      ]
+      ],
+      "implementation_note": "Familienvariante und mehrphasige Pensionierung mit getrennten Erwerbs-/Rentenzeitpunkten, endlichem Kapital, gebundenen Sparbeträgen und gespeicherten Vergleichen implementiert; automatisierte und echte synthetische Variantenläufe bestanden. PK-Sonderfolgen bleiben fachlich prüfpflichtig.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-05",
       "owner": "Valentin",
       "title": "Eigenheimvergleich und Reserven",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2,
       "dependencies": [
         "LOG-03"
@@ -852,14 +860,16 @@
       "interface_contracts": [
         "I03",
         "I04"
-      ]
+      ],
+      "implementation_note": "Eigenmittellücke, explizite Kosten/Reserve, Kapitalzuordnungen und gespeicherter Vergleich im gemeinsamen Fall implementiert; gebundene Mittel bleiben ausgeschlossen. Automatisch und live geprüft, keine Kreditzusage.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-06",
       "owner": "Valentin",
       "title": "Demo-Vertragsstatus und Regeln für Übergänge",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 1.5,
       "dependencies": [
         "LOG-03",
@@ -879,14 +889,16 @@
       "interface_contracts": [
         "I02",
         "I08"
-      ]
+      ],
+      "implementation_note": "Vollständige gespeicherte Demo-State-Machine mit aktueller Empfehlung, getrenntem Review, Dokumenthash/Bestätigung, idempotenter Einreichung, Annahme, Demo-Police und Portal nach Neustart implementiert und geprüft. Keine echte Abschluss-API verfügbar.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "LOG-07",
       "owner": "Valentin",
       "title": "Fachtests, Quellenreview und Domain-Klärung",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented_pending_acceptance",
       "estimate_person_hours": 2.5,
       "dependencies": [
         "LOG-04",
@@ -910,7 +922,9 @@
         "I04",
         "I08",
         "I10"
-      ]
+      ],
+      "implementation_note": "121 Tests inklusive gemeinsamer DTOs, Privatfeld-/Querverweisprüfung und konkurrierender Falländerungen bestanden. Fach-/Teamabnahme und zukünftige DB-/Netzintegration bleiben getrennt offen.",
+      "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
       "id": "AI-01",
@@ -1185,5 +1199,22 @@
     }
   ],
   "interface_spec": "documentation/baselhack/catalog/interface-contracts.json",
-  "planned_acceptance_cases": 55
+  "planned_acceptance_cases": 55,
+  "implementation_report_path": "documentation/baselhack/reports/logic-backend-implementation.md",
+  "logic_backend_verification": {
+    "date": "2026-10-31",
+    "automated_tests_passed": 121,
+    "live_operations_verified": 24,
+    "data_classification": "synthetic",
+    "real_coverage_enabled": false,
+    "report": "documentation/baselhack/reports/life-insurance-requirements.md",
+    "supported_locales": [
+      "de",
+      "fr",
+      "it",
+      "en"
+    ],
+    "translation_keys": 191,
+    "shared_case_dto_version": "1.0"
+  }
 }

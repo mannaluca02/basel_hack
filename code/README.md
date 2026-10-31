@@ -1,0 +1,172 @@
+# Pax LifeMap – Lebensversicherungs-Backend
+
+Stand: 31.10.2026 · Valentin · Feature `feature/life-insurance-live-backend` · TypeScript/NestJS/Zod, Node 22.
+
+Das Backend bildet den bestätigten Workshop-Zuschnitt LOG-01–LOG-07 als funktionierenden PoC ab: ein geschützter gemeinsamer JSON-Fall, bedarfsorientierte Aufnahme, drei Säulen, Lebensversicherung, Szenarien, nachgelagerte Pax-Produktfamilien, Fachreview und gespeicherter Demo-Vertragsweg bis ins Portal. Die reguläre Anwendung verwendet echte Logismata-Rechner. Angular, KI-Dialog, Voice und Avatar werden durch Luca, Earnie, Dario und Lukas angebunden.
+
+Die [Requirements-Matrix](../documentation/baselhack/reports/life-insurance-requirements.md) trennt implementierte Backend-Funktionen, automatische Nachweise, Team-Integration und Produktionsfreigaben. Der [Implementierungsbericht](../documentation/baselhack/reports/logic-backend-implementation.md) beschreibt Architektur und fachliche Grenzen.
+
+## Start und Prüfung
+
+Im Verzeichnis `code/`:
+
+```bash
+npm ci --ignore-scripts
+npm test
+npm start
+```
+
+`npm start` lädt den bereits geschützten lokalen Token aus `../documentation/baselhack/private/logismata.env` oder der Serverumgebung. Benötigt wird `LOGISMATA_BEARER_TOKEN`; bei fehlendem Token startet der Live-Dienst nicht. Zugangsdaten werden weder geloggt noch ins Angular-Bundle eingebaut. Die unveränderte Vorlage `logismata.env.example` enthält keinen Token.
+
+Der Dienst bindet an `http://127.0.0.1:3000`; `PORT=3001 npm start` ändert den Port. Öffentliche Einstiege sind `/api/privacy`, `/api/status` und `/api/openapi.json`. Alle Fall-, Dokument-, Portal- und Gesprächsdaten benötigen eine Sitzung. Der Start gibt ausschließlich den Pfad der lokalen Zugangscode-Datei aus.
+
+Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichnis (0700), getrennte Kunden-/Reviewer-Zugangscodes und ein Schlüssel (0600), verschlüsselte Fall-/Sitzungsdaten sowie eine Prozesssperre. `.local/` ist Git-ignoriert. Der Speicher ist für einen lokalen Node-Prozess ausgelegt. Kein Deployment und keine Freigabe für echte Kundendaten sind eingerichtet.
+
+| Befehl | Wirkung |
+|---|---|
+| `npm test` | Vollständiger Build und 121 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
+| `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
+| `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
+| `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
+| `npm run demo` | Frühere Offline-Fachdemo ohne HTTP-Server |
+
+Der Live-Test erzeugt eine eigene temporäre verschlüsselte Datenbank und räumt sie anschließend auf. Die Reviewer-Rolle wird dort ausschließlich für den erfundenen Testfall simuliert; das ist keine fachliche Pax-Freigabe. Optional schreibt `LIFEMAP_LIVE_REPORT=/absoluter/pfad/report.json npm run test:live` einen bereinigten Nachweis ohne Token. Der lokale Beispieldatensatz steht in [insurance-household.json](fixtures/insurance-household.json).
+
+## Angular anbinden
+
+Für Lucas Angular-Anwendung wird ein Same-Origin-Proxy empfohlen, beispielsweise `proxy.conf.json`:
+
+```json
+{ "/api": { "target": "http://127.0.0.1:3000", "secure": false, "changeOrigin": true } }
+```
+
+Dann `ng serve --proxy-config proxy.conf.json` und im Client ausschließlich relative `/api/...`-URLs verwenden. Das vermeidet unterschiedliche Cookie-Sites zwischen `localhost` und `127.0.0.1`. Direkte lokale Origins `http://localhost:4200` und `http://127.0.0.1:4200` sind freigegeben; bei direkten Aufrufen müssen Cookies ausdrücklich mitgesendet werden.
+
+1. Vor Aufnahme `/api/privacy` anzeigen. Im PoC sind ausschließlich erfundene Daten zugelassen.
+2. `POST /api/sessions` mit `{ "accessCode": "<lokaler Zugangscode>" }`. Die Rolle wird serverseitig aus dem Code ermittelt. Die Antwort setzt ein HttpOnly-/SameSite-Strict-Cookie und liefert `csrfToken`, `expiresAt` sowie einen Bearer-Token für serverseitige Integration.
+3. Im Angular-Client `csrfToken` in `sessionStorage` halten, damit er einen Reload übersteht; bei Cookie-Authentisierung alle schreibenden Aufrufe mit `X-CSRF-Token` senden. Den Sitzungstoken nicht loggen. Die lokalen HTTP-Cookies sind für Loopback ausgelegt; produktive TLS-/Secure-Cookie-/IAM-Konfiguration ist ein gesondertes Release-Gate.
+4. `POST /api/cases` mit `{ "locale":"de", "timeBudgetMinutes":10, "noticeVersion":"lifemap-synthetic-v1", "dataClassification":"synthetic" }` erzeugt einen eigenen Fall. Neue Logins erzeugen getrennte anonyme Demo-Besitzer. Bestehende Cookies/Sitzungen können innerhalb ihrer einstündigen Gültigkeit nach Reload und Server-Neustart weiterverwendet werden. Das ersetzt kein Pax-Kundenlogin.
+5. `PATCH /api/cases/:id/draft` schreibt `financial`, `insurance`, `goals`, `reviewFlags` und `expectedCaseRevision`. Der vollständige Beispieldatensatz ist die Startvorlage; unbekannte Werte bleiben `null`. Der Server setzt Fall-ID und Profilversion selbst.
+6. `/questions` liefert gezielte Pflichtfelder und abhängig vom Zeitbudget eine oder drei nächste Fragen. `/confirmations` benötigt `expectedCaseRevision`, `confirmProfileAndAssumptions:true`, `allowSyntheticCalculatorTransfer:true` und `noticeVersion`. Nur der Kundenkontext bestätigt den unveränderlichen Profilstand.
+7. `/calculations` benötigt `expectedCaseRevision`, `expectedProfileVersion`, `scenarioVersionId` und `scenario`. Die Antwort enthält `run` mit lokalen Kennzahlen, Providerergebnissen, Risiko-/Kapitalbedarf, drei Säulen, Prüfgründen und gegebenenfalls Zeitachse.
+8. Für Varianten `/comparisons` mit `baselineRunId`, `variantRunId`, `expectedProfileVersion` verwenden. Differenzen werden serverseitig für die Kennzahlen am Bewertungsstichtag berechnet (`scope=valuation_snapshot_local_metrics`, `futureTimelineCompared=false`). Eine unveränderte aktuelle Jahresbilanz bei einem späteren Ruhestand bedeutet keine unveränderte Zukunft; dafür ist die separate Zeitachse maßgeblich.  unpassende Perioden, Datums-/Modellstände und prüfpflichtige Werte werden nicht als verlässliche Differenz ausgegeben. `/active-analysis` wählt einen gespeicherten Lauf ohne neue Providerkosten.
+9. `/recommendations` ist erst nach bestätigtem vollständigem Bedarf und verwertbarem aktuellem Lauf verfügbar. Fachprüfung und ausdrückliche Produktauswahl folgen vor dem Demo-Vertragsweg.
+
+Die vollständigen Routen und Eingabeschemas stehen in `/api/openapi.json`. Zod-Verfeinerungen, Personenbezüge und Workflow-Invarianten werden zusätzlich zur OpenAPI-Darstellung zur Laufzeit geprüft. Der gemeinsam importierbare Vertrag liegt in [packages/contracts](packages/contracts/src/index.ts); `LifeAnalysisSchema` validiert auch die komplette serverseitige Ausgabe.
+
+## Aufbau und gemeinsamer Fall
+
+| Modul | Aufgabe |
+|---|---|
+| `packages/contracts/src/financial.ts` | Geld in CHF-Rappen, Quellen/Bestätigung, finanzieller Snapshot, GraphContext |
+| `packages/contracts/src/insurance.ts` | Lebenssituation, Ziele, Schulden, Kinder, Versicherungsbedarf, Szenarien, Review-/Journey-Eingaben |
+| `packages/contracts/src/life-analysis.ts` | Validierter kompletter Rechenlauf, Risiko- und Zeitachsen-Ausgaben |
+| `packages/domain/src/` | Reine Budget-/Kapital-/Säulen-/Szenario-/Lebensversicherungsfunktionen |
+| `apps/api/src/calculation/` | Weiterverwendbarer NestJS-Rechenkern, Hash-/Versionsschutz |
+| `apps/api/src/logismata/` | Allowlist, 24 Request-/Response-Mapper, Live und exakter Replay |
+| `apps/api/src/insurance/engine.ts` | Gemeinsamer Fall, bestätigte Versionen, Analyse, Bedarf, Review, Fortschritt, Gesprächskontext |
+| `insurance/store.ts`, `auth.ts`, `http.ts` | Verschlüsselung, Besitzer/Rollen, Sitzungen, CSRF, Grenzen, geschützte HTTP-/SSE-Schnittstellen |
+| `insurance/products.ts`, `journey.ts`, `documents.ts` | Erklärbare Produktauswahl, Dokumentnachweise, gespeicherte Demo-State-Machine |
+| `insurance/advisory.ts`, `graph.ts`, `comparison.ts` | Bestätigbare KI-Vorschläge, exakte Grafikfakten, Variantenvergleich |
+| `insurance/dossier.ts`, `telemetry.ts` | Zwei Summary-Sichten desselben Snapshots, Druckexport, NPS und aggregierte Funnel-Signale |
+
+Earnie kann `createLifeRuntime()` bzw. `createLifeInsuranceApp()` verwenden oder diese Module in den gemeinsamen NestJS-Prozess einbinden. Der verschlüsselte Fall ist die zentrale JSON-Quelle. Ein zweiter unabhängiger Fallstore würde die Versionsgarantien umgehen und soll bei der Integration vermieden werden. Bei späterem Ersatz durch Pax-Storage bleiben Bestätigungs-, Review- und Transaktionsregeln erhalten.
+
+## Fachliche Rechenregeln
+
+- `null`, bestätigte Null, Schätzung und Fachreview bleiben getrennt. Jahres-/Monatsflüsse und einmaliges Kapital sind unterschiedliche Größen. Kapitalbestände werden nie über eine Zeitreihe summiert.
+- Bruttoeinkommen wird nicht als verfügbares Netto verwendet; bereits enthaltene Steuern, Beiträge und verschachtelte Ausgaben werden nicht doppelt abgezogen. Negative Budgets bleiben sichtbar. Rechner-Vorschläge überschreiben keine bestätigten Kundenangaben.
+- Aktiva besitzen Zuordnungen, Freigabezeitpunkte und optional Eigentümer. Gebundene 3a-/PK-Mittel sind nicht automatisch frei. Derselbe Vermögensteil finanziert nicht mehrfach verschiedene Ziele.
+- Invalidität und Todesfall bleiben nach Person sowie Krankheit/Unfall getrennt. Partnerlohn ist bereits im Provider-`IncomeTotal` enthalten und wird nicht erneut addiert. Deklarierte private Risiko-Renten werden einmal abgezogen. Ein vom Provider begrenzter Zielbedarf ersetzt den ausdrücklich erfassten Bedarf nicht.
+- Todesfallkapital ergibt sich aus einer offen gewählten endlichen Schutzdauer und Renditeannahme, zusätzlichen Einmalkosten/gegebenenfalls separater Schuldentilgung, bestehendem Todesfallkapital und der bestätigten Strategie zur Verwendung freier Mittel. Wer freie Mittel zuerst einsetzen will, erhält entsprechend weniger zusätzlichen Versicherungsbedarf. Wer sie für andere Ziele bewahren will, bestätigt diese Abwägung ausdrücklich.
+- Finanzierungsfähigkeit wird sowohl im Haushalt als auch für die betroffene Person geprüft. Der bestätigte persönliche Jahresrahmen ist keine berechnete Pax-Prämie. Zusätzliches Sparen und bereits laufende Vorsorge-/3a-Beiträge sind getrennt; der aktuell konservative 3a-Vorschlag zieht den gesamten erfassten bestehenden 3a-Beitrag von der persönlichen Grenze der ersten passenden Person ab.
+- Familienvarianten verwenden nur die bestätigte Lohn-/Betreuungskostenannahme. Bestehende PK-Leistungen werden nicht proportional zum Lohn umgerechnet; Auswirkungen bleiben prüfpflichtig. Betreuungs-/Unterhaltsdauer wird nicht pauschal mit 18 angenommen.
+- Eigenheim: Quote, Kaufnebenkosten, Reserve, Zins, Unterhalt und Amortisation sind sichtbare Annahmen. Finanzierungslücke und bedingte Folgekosten bleiben erkennbar. Keine Kreditzusage und keine stillschweigende 3a-Freigabe.
+- Pensionierung: Erwerbsende und Rentenbeginn je Person sind getrennte Zeitpunkte; dazwischen liegen Überbrückungsphasen. Arbeitsphasen verwenden den aktuellen Budgetbedarf, spätere Phasen den bestätigten Ruhestandsbedarf auf derselben Netto-/Preisbasis. Die monatliche nominale Projektion zeigt beschränktes Kapital und erste ungedeckte Entnahmen. Gebundene zusätzliche Sparbeträge finanzieren eine Überbrückung erst nach ausdrücklich angenommenem Freigabedatum. Voller Kapitalbezug und volle Rente aus demselben Vorsorgeasset werden ohne unterstützten Split abgewiesen.
+
+Geburtsmonate, konkrete Frühpensionierungskürzungen, Teilrenten, PK-Reglemente, Bezüger-/Begünstigtenrecht und Bezugs-/Steuerberechtigung benötigen Fachprüfung; keine Simulation stellt eine garantierte Rentenzusage dar. Die lokale Zeitachse ist ausdrücklich eine zusätzliche Liquiditätsillustration mit dem eingegebenen Zusatzsparen: bestehende private Prämien werden dort nicht nochmals pauschal als Vermögenszuwachs angesetzt. Bereits laufendes Sparen geht in die gesonderte Provider-Pensionierungsprojektion ein. Gebundene Bestände werden lokal zum eingegebenen nominalen Betrag freigegeben; unbekannte künftige Leistungen, Kosten oder Renditen aus bestehenden Verträgen werden nicht erfunden. Beide Modelle werden nicht addiert und ihre Abstimmung ist ein eigener Review-Grund. Beträge aus vlot und dem Musterfall werden nicht ohne identische Voraussetzungen mit diesen Läufen gleichgesetzt.
+
+## 24 echte Rechenoperationen
+
+`saving3aLimits`, `ageLimits`, `riskBase`, `risk`, `retirementBase`, `retirement`, `income`, `budgetProposal`, `saving`, `consumption`, `searchLocation`, `location`, `incomeFortuneTax`, `saving3a`, `capitalTax`, `purchaseP2`.
+
+Die sechs optionalen Schätzpfade werden über `/calculator-estimates` ausdrücklich vor Bestätigung aufgerufen; fehlende Steuer-/Konfessions-/Ortsangaben werden nachgefragt. Schätzungen verändern das Profil nicht. Die zusätzlichen acht Operationen sind ebenfalls implementiert und live geprüft: `taxBaseInfo`, `searchLocationGeo`, `estateGainFields`, `estateGainTax`, `inheritanceAll`, `inheritanceGroup`, `inheritanceBeneficiary`, `corporateEntityTax`. Sie werden ausdrücklich über die geschützte Zusatzrechner-Schnittstelle aufgerufen und verändern weder bestätigte Profile noch aktive Finanzläufe automatisch. Unternehmens-/Grundstückgewinn-/Erbschaftssteuern werden nicht ungefragt in jede Lebensversicherungsberatung eingerechnet.
+
+Der Providerzugang ist auf den dokumentierten Host und Operationspfade begrenzt. Maximal zwei gleichzeitige Requests, begrenzte Warteschlange, fünf Sekunden je Versuch, höchstens ein Retry bei vorübergehenden Fehlern, keine Redirects, keine Wiederholung bei 401/403. Fehler geben keine Token oder Provider-Payloads preis. Live-Fehler wechseln niemals still zu Replay; Replay trifft ausschließlich bei vollständigem identischem Operations-/Request-Hash.
+
+Ein HTTP-200 ist keine fachliche Freigabe. Die beobachteten Risikoantworten mit Code `0` bleiben `requires_review`; eine Reviewer-Entscheidung ist gesondert sichtbar und verändert diese ursprüngliche Datenqualität nicht.
+
+## Darios Agent dynamisch informieren
+
+Der Kunde kann `/agent-access` aufrufen; der kurzlebige Bearer-Token ist ausschließlich für Earnies serverseitige Integration bestimmt. Dieser Agent darf nur für den freigegebenen Fall Kontext/Events lesen und erlaubte Änderungen vorschlagen. Er darf weder den vollständigen Fall lesen noch Kundenangaben bestätigen, Reviews genehmigen oder Verträge auslösen.
+
+1. Earnie liest vor jeder Antwort `/advisor/context`. Dieser Stand enthält Versionen, aktuell zulässige Fakten, ausgewählte Grafikdaten, letzte passende Szenariodifferenz, Rückfrage, Sprache, Tempo und Fortschritt. Er enthält keine Provider-Tokens oder Gesundheitsrohdaten und erteilt keine Erlaubnis für externe Modellübertragung.
+2. `/advisor/events` liefert SSE-Ereignisse `advisor.context.updated` mit Referenzen und Kontextrevision, keine vollständigen finanziellen Datensätze. Nach einem Event wird der aktuelle Kontext neu gelesen. Reconnect liefert den aktuellen Snapshot; ein garantierter vollständiger Event-Replay wird nicht versprochen.
+3. Einkommens-/Profil-/Szenariowechsel können eine laufende Antwort ungültig machen. Earnie/Dario vergleichen Run, Profil, Kontext und Turn und verwerfen dann den alten Antwort-/Audiostand. Tempoänderungen und neue Vorschläge werden vor der nächsten Antwort eingelesen. Audio-Unterbrechung und Playback-Events implementiert Dario.
+4. Ein Transkript erzeugt nur `/advisor/proposals`. Der Kunde akzeptiert über `/accept`; danach bleiben Gesamtbestätigung und Neuberechnung getrennt notwendig. Eine Änderung des Entwurfs macht einen älteren Vorschlag ungültig.
+5. Luca setzt `/graph-context` mit exaktem Fall/Run/Profil/Szenario/Person/Kennzahl/Zeitraum. Zeitachsenbereiche bleiben Monatsserien; längere Bereiche erhalten eine kompakte Bereichszusammenfassung. Gesprochene Zahlen dürfen nur aus den passenden freigegebenen Fakten kommen.
+
+Der fachliche Fortschritt steht unter `context.progress`, einschließlich Pflichtgruppen und getrenntem `reviewOpen`. 100 % Aufnahme bedeutet keine 100 % Absicherung. Lukas nutzt diese Daten für den vereinbarten Fortschrittsring am Agenten.
+
+## Gespeicherter Demo-Vertragsweg
+
+`bestätigter Bedarf → aktueller Lauf → Empfehlung → getrennte Reviewer-Freigabe → explizite Produktauswahl → Demo-Konfiguration → Dokumentbestätigung → Demo-Antrag → Einreichung → Reviewer-Prüfung → Demo-Annahme → Demo-Police → Portal`.
+
+`/reviews` stellt eine prüfbare Übergabe bereit, auch bei noch unvollständiger Aufnahme. `/review-decisions` erfordert die separate Reviewer-Sitzung, alle offenen Gründe und fünf explizite Prüfkriterien. Reviewer können Rückfragen/Abbruch statt Freigabe wählen. Neu eröffnete Prüfung nimmt die Freigabe zurück.
+
+`/demo-quotes`, `/demo-applications`, `/demo-applications/submit`, `/demo-applications/start-review`, `/demo-applications/decisions`, `/demo-policies` sind getrennte Zustandsübergänge. Für Schreibaktionen sind aktuelle Revision und Idempotenzschlüssel nötig; gleiche Schlüssel mit anderer Nutzlast werden abgewiesen. Fehlende Dokumentbestätigung, abgelaufene Konfiguration, veralteter Lauf, fehlende persönliche Mittel oder nicht angenommener Antrag blockieren Folgeschritte. Antragsprüfung und Policenerstellung sind ausschließlich der Reviewer-Rolle erlaubt.
+
+Die bereitgestellten zwölf Pax-PDFs werden ausschließlich über eine feste Dokument-Allowlist ausgeliefert. Eine Demo-Konfiguration bindet Dokument-ID und SHA-256. Archivstand und notwendige Aktualitätsprüfung bleiben sichtbar. `/portal` lädt gespeicherte Review-/Konfigurations-/Antrags-/Policenobjekte. `/summaries` liefert zwei Sichten mit demselben `snapshotId`; `/dossier?format=html&audience=customer` ist ein escaped, druckbarer Export, den der Browser auch als PDF speichern kann. Kein automatischer Versand.
+
+Alle Prämien sind `null` mit `pax_tariff_api_unavailable`. Alle Policen tragen **DEMO – KEIN VERSICHERUNGSSCHUTZ**, `coverageInForce:false` und `legalEffect:'none'`. Echte Pax-Tarifierungs-, Underwriting-, Identitäts-/AML-, Signatur- und Policen-APIs wurden nicht bereitgestellt. Diese Übergänge sind deshalb ausdrücklich lokale Demo-Funktionen. Ein echter Abschluss wird durch den Backend-Code nicht freigeschaltet.
+
+## Datenschutz und technische Grenzen
+
+Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundendatenklassifikation und Gesundheitsrohdaten werden an der Eingabeschnittstelle abgewiesen. Fachwerte bleiben verschlüsselt gespeichert; Audit-Ereignisse enthalten technische IDs/Aktionen statt vollständiger Profile. Kunden dürfen ausschließlich eigene Fälle lesen. Die Reviewer-Rolle sieht Fälle erst nach einer Review-Anfrage. Agenten erhalten minimale fallgebundene Projektionen.
+
+Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
+
+Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Es gibt keine externen Analytics-/Modellaufrufe.
+
+
+## Vollständige Tool-Abdeckung und vier Sprachen
+
+Alle 24 Operationen der bereitgestellten APICalc-Spezifikation sind nun im Server-Allowlist-Adapter verfügbar und im erweiterten Live-Test ausgeführt. Die bisherigen 16 bleiben im bestehenden Beratungs-/Schätzweg; die zusätzlichen acht sind gezielte Zusatzwerkzeuge.
+
+`GET /api/cases/:id/calculator-tools` liefert Operationen, monetäre Eingabefelder und den isolierten fachlichen Geltungsbereich. `POST` auf denselben Pfad braucht `expectedCaseRevision`, `noticeVersion`, `allowSyntheticCalculatorTransfer:true`, `requestUnits:"CHF_CENTS"`, `operation` und `request`. Die Eigenschaftsnamen in `request` folgen der bereitgestellten API, **sämtliche monetären Werte sind ganze CHF-Rappen**. Der Server konvertiert erst an der Providergrenze. Nicht monetäre Felder wie Steuerort-ID, Jahre, Gruppen-/Begünstigtencodes oder Koordinaten werden nicht skaliert. Beispiel für eine isolierte Erbschafts-/Schenkungssteuerübersicht:
+
+```json
+{
+  "expectedCaseRevision": 2,
+  "noticeVersion": "lifemap-synthetic-v1",
+  "allowSyntheticCalculatorTransfer": true,
+  "requestUnits": "CHF_CENTS",
+  "operation": "inheritanceAll",
+  "request": { "TaxLocationID": 400100000, "Amount": 10000000 }
+}
+```
+
+Das Beispiel entspricht CHF 100’000. Ergebnisse behalten Begünstigtenalternativen getrennt; sie werden nicht summiert oder ungeprüft auf Lebensversicherungsauszahlungen angewendet. Fehlende Zustimmung, falsche Einheiten, Rappenbruchteile, unbekannte Operationen und fremde Fälle werden vor dem Provideraufruf abgewiesen. Geokoordinaten stammen ausschliesslich aus der ausdrücklich übergebenen synthetischen Anfrage; kein Geräte-/Browser-GPS wird abgefragt. Ausführungen sind verschlüsselt am Fall als `toolRuns` gespeichert.
+
+Die zentrale lokale Textsammlung enthält 191 vollständige Schlüssel in **DE/FR/IT/EN**. `GET /api/translations?locale=fr` liefert das passende Angular-/Agent-Wörterbuch; alternativ wird `Accept-Language` berücksichtigt. `/privacy` liefert zusätzlich einen lokalisierten `display`-Abschnitt. Fehler haben stabile technische `code`-Werte und eine übersetzte `message`; dafür `X-Locale` oder `Accept-Language` mitsenden.
+
+`PATCH /api/cases/:id/preferences` mit `{ "locale":"fr" }` wechselt die Sprache jederzeit. Profilversion, Rechenlauf, finanzielle Eingabehashes und Kandidatenidentitäten bleiben unverändert; die Kontextrevision steigt und SSE meldet die Änderung. Regelmässige Budgetanfragen und Orts-/Geosuche verwenden die passende Provider-Sprachnummer.
+
+Kundenlesbare Rückfragen, Produktbeschreibungen, Empfehlungsbegründungen/-bedingungen, Alternativen, Risiko-/Status-/Perioden-/Fortschrittsbeschriftungen, Disclaimer, Datenschutzanzeige und beide Dossier-Sichten werden lokalisiert. Rechenantworten ergänzen `presentation`; der gemeinsame Fall bietet dieselbe aktuelle Projektion unter `presentation`. Der HTML-Export nutzt die Fall-Locale, Schweizer Zahlenformate und lesbare Abschnitte anstelle technischer JSON-Blöcke. Technische IDs, Original-Provenienz und kanonische Rechendaten bleiben unverändert. **Luca soll die Präsentationsfelder und den Katalog rendern; Earnie/Dario verwenden die aktuelle `locale` vor jeder Antwort.** Angular-Oberfläche, generierter Dialog und reale Sprachausgabe müssen von den jeweiligen Teammitgliedern angebunden werden.
+
+Archivierte Vertrags-PDFs bleiben gekennzeichnete deutschsprachige Originale. Sie werden nicht maschinell als rechtsverbindliche französische, italienische oder englische Dokumente ausgegeben; dafür sind aktuelle von Pax freigegebene Sprachfassungen erforderlich. Dies wird auch im Übersetzungskatalog und im Dossier erklärt.
+
+
+## Gemeinsame vollständige Verträge und Datenhaltung
+
+Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjekte werden aus `@pax/contracts` importiert und dort aus Zod abgeleitet. Es gibt keine zweite handgeschriebene Backend-Definition dieser Fachdaten mehr. Private Besitz-/Sitzungs-/Idempotenzdaten bleiben serverseitige Ergänzungen und werden nicht im HTTP-Fall ausgegeben. Fallantworten tragen `schemaVersion:"1.0"`; Create, GET, Draft-Patch und Bestätigung verwenden dasselbe validierte Format. Auch Agent-Kontext, SSE, Rechenausgabe, Portal und Summary verwenden gemeinsame Laufzeitverträge.
+
+Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/baselhack/plans/persistence-and-api.md) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
+
+Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt zehn [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und 121 automatisierte Tests. VoiceLog, AgentReply und Playback sind bereitgestellte Team-Nachrichtenschemas; ihre tatsächlichen STT-/LLM-/TTS-/Avatar-Transporte bleiben die Implementierung der zuständigen Teammitglieder.
+
+## Dialogextraktion und Vorschlagspakete
+
+Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
+
+Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.

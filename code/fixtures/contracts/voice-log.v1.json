@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "messageId": "message_demo_01",
+  "caseId": "d3a1c87e-4b80-460b-97d6-1f3c4583122e",
+  "correlationId": "correlation_demo_01",
+  "turnId": "turn_demo_01",
+  "source": "voice",
+  "locale": "de",
+  "text": "Was bedeutet der jährliche Überschuss oder Fehlbetrag in dieser Grafik?",
+  "transcriptStatus": "final",
+  "dataClassification": "synthetic",
+  "expectedCaseRevision": 7
+}

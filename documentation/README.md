@@ -5,6 +5,7 @@ from the challenge hub, the Logismata API and the material PDFs.
 
 | File | Contents |
 |---|---|
+| [Logic backend implementation](baselhack/reports/logic-backend-implementation.md) | Runtime schemas, domain calculations, NestJS demo, Logismata adapter and validation evidence |
 | [Workflow and interface contracts](baselhack/plans/interface-contracts.md) | VoiceLog, shared case, calculation result, replies, playback and export contracts from the second photo |
 | [Workshop decisions](baselhack/plans/workshop-decisions.md) | Confirmed UI/roles, feature interpretation and explicit open details |
 | [Detailed Angular implementation plan](baselhack/plans/implementation-plan.md) | Screens, domain logic, AI, interfaces, state machine, security and 55 acceptance cases |

@@ -1,0 +1,2047 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "caseRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "contextRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "profileVersion": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "draftHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "draftDirty": {
+      "type": "boolean"
+    },
+    "locale": {
+      "type": "string",
+      "enum": [
+        "de",
+        "fr",
+        "it",
+        "en"
+      ]
+    },
+    "dataClassification": {
+      "type": "string",
+      "const": "synthetic"
+    },
+    "personIds": {
+      "maxItems": 2,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+      }
+    },
+    "draft": {
+      "type": "object",
+      "properties": {
+        "financial": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "schemaVersion": {
+                  "type": "string",
+                  "const": "1.0"
+                },
+                "caseId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                },
+                "caseRevision": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "profileVersion": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "dataClassification": {
+                  "type": "string",
+                  "enum": [
+                    "synthetic",
+                    "customer"
+                  ]
+                },
+                "valuationDate": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "priceBasis": {
+                  "type": "string",
+                  "const": "nominal"
+                },
+                "persons": {
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "birthYear": {
+                        "type": "integer",
+                        "minimum": 1900,
+                        "maximum": 2100
+                      },
+                      "employmentRateBps": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000
+                      },
+                      "income": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "CHF"
+                          },
+                          "unit": {
+                            "type": "string",
+                            "const": "cent"
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "month",
+                              "year",
+                              "once"
+                            ]
+                          },
+                          "origin": {
+                            "type": "string",
+                            "enum": [
+                              "user",
+                              "document",
+                              "api",
+                              "estimate",
+                              "synthetic"
+                            ]
+                          },
+                          "confirmation": {
+                            "type": "string",
+                            "enum": [
+                              "proposed",
+                              "confirmed"
+                            ]
+                          },
+                          "review": {
+                            "type": "string",
+                            "enum": [
+                              "unreviewed",
+                              "reviewed",
+                              "rejected"
+                            ]
+                          },
+                          "sourceRef": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "currency",
+                          "unit",
+                          "period",
+                          "origin",
+                          "confirmation",
+                          "review",
+                          "sourceRef"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "incomeBasis": {
+                        "type": "string",
+                        "enum": [
+                          "gross",
+                          "net_before_income_tax",
+                          "net_after_income_tax"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "birthYear",
+                      "employmentRateBps",
+                      "income",
+                      "incomeBasis"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "expenses": {
+                  "maxItems": 80,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "housing",
+                          "living",
+                          "tax",
+                          "provision",
+                          "debt",
+                          "reserve",
+                          "other"
+                        ]
+                      },
+                      "amount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "CHF"
+                          },
+                          "unit": {
+                            "type": "string",
+                            "const": "cent"
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "month",
+                              "year",
+                              "once"
+                            ]
+                          },
+                          "origin": {
+                            "type": "string",
+                            "enum": [
+                              "user",
+                              "document",
+                              "api",
+                              "estimate",
+                              "synthetic"
+                            ]
+                          },
+                          "confirmation": {
+                            "type": "string",
+                            "enum": [
+                              "proposed",
+                              "confirmed"
+                            ]
+                          },
+                          "review": {
+                            "type": "string",
+                            "enum": [
+                              "unreviewed",
+                              "reviewed",
+                              "rejected"
+                            ]
+                          },
+                          "sourceRef": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "currency",
+                          "unit",
+                          "period",
+                          "origin",
+                          "confirmation",
+                          "review",
+                          "sourceRef"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "includedInExpenseId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "category",
+                      "amount"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "safetyBuffer": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 1000000000000
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "const": "CHF"
+                    },
+                    "unit": {
+                      "type": "string",
+                      "const": "cent"
+                    },
+                    "period": {
+                      "type": "string",
+                      "enum": [
+                        "month",
+                        "year",
+                        "once"
+                      ]
+                    },
+                    "origin": {
+                      "type": "string",
+                      "enum": [
+                        "user",
+                        "document",
+                        "api",
+                        "estimate",
+                        "synthetic"
+                      ]
+                    },
+                    "confirmation": {
+                      "type": "string",
+                      "enum": [
+                        "proposed",
+                        "confirmed"
+                      ]
+                    },
+                    "review": {
+                      "type": "string",
+                      "enum": [
+                        "unreviewed",
+                        "reviewed",
+                        "rejected"
+                      ]
+                    },
+                    "sourceRef": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 240
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "currency",
+                    "unit",
+                    "period",
+                    "origin",
+                    "confirmation",
+                    "review",
+                    "sourceRef"
+                  ],
+                  "additionalProperties": false
+                },
+                "assets": {
+                  "maxItems": 40,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "amount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "CHF"
+                          },
+                          "unit": {
+                            "type": "string",
+                            "const": "cent"
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "month",
+                              "year",
+                              "once"
+                            ]
+                          },
+                          "origin": {
+                            "type": "string",
+                            "enum": [
+                              "user",
+                              "document",
+                              "api",
+                              "estimate",
+                              "synthetic"
+                            ]
+                          },
+                          "confirmation": {
+                            "type": "string",
+                            "enum": [
+                              "proposed",
+                              "confirmed"
+                            ]
+                          },
+                          "review": {
+                            "type": "string",
+                            "enum": [
+                              "unreviewed",
+                              "reviewed",
+                              "rejected"
+                            ]
+                          },
+                          "sourceRef": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "currency",
+                          "unit",
+                          "period",
+                          "origin",
+                          "confirmation",
+                          "review",
+                          "sourceRef"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "ownerPersonIds": {
+                        "minItems": 1,
+                        "maxItems": 2,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                        }
+                      },
+                      "liquidity": {
+                        "type": "string",
+                        "enum": [
+                          "free",
+                          "restricted"
+                        ]
+                      },
+                      "availableFrom": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      "pillar": {
+                        "type": "string",
+                        "enum": [
+                          "2",
+                          "3",
+                          "none"
+                        ]
+                      },
+                      "allocations": {
+                        "maxItems": 30,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "goalId": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                            },
+                            "amountCents": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 1000000000000
+                            }
+                          },
+                          "required": [
+                            "goalId",
+                            "amountCents"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "amount",
+                      "liquidity",
+                      "availableFrom",
+                      "pillar",
+                      "allocations"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "assetsConfirmed": {
+                  "type": "boolean"
+                },
+                "provisions": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "personId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "pillar": {
+                        "type": "string",
+                        "enum": [
+                          "1",
+                          "2",
+                          "3"
+                        ]
+                      },
+                      "event": {
+                        "type": "string",
+                        "enum": [
+                          "retirement",
+                          "disability_illness",
+                          "disability_accident",
+                          "death_illness",
+                          "death_accident"
+                        ]
+                      },
+                      "amount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "CHF"
+                          },
+                          "unit": {
+                            "type": "string",
+                            "const": "cent"
+                          },
+                          "period": {
+                            "type": "string",
+                            "enum": [
+                              "month",
+                              "year",
+                              "once"
+                            ]
+                          },
+                          "origin": {
+                            "type": "string",
+                            "enum": [
+                              "user",
+                              "document",
+                              "api",
+                              "estimate",
+                              "synthetic"
+                            ]
+                          },
+                          "confirmation": {
+                            "type": "string",
+                            "enum": [
+                              "proposed",
+                              "confirmed"
+                            ]
+                          },
+                          "review": {
+                            "type": "string",
+                            "enum": [
+                              "unreviewed",
+                              "reviewed",
+                              "rejected"
+                            ]
+                          },
+                          "sourceRef": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 240
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "currency",
+                          "unit",
+                          "period",
+                          "origin",
+                          "confirmation",
+                          "review",
+                          "sourceRef"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "personId",
+                      "pillar",
+                      "event",
+                      "amount"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "caseId",
+                "caseRevision",
+                "profileVersion",
+                "dataClassification",
+                "valuationDate",
+                "priceBasis",
+                "persons",
+                "expenses",
+                "safetyBuffer",
+                "assets",
+                "assetsConfirmed",
+                "provisions"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "insurance": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "relationship": {
+                  "type": "string",
+                  "enum": [
+                    "unknown",
+                    "single",
+                    "married",
+                    "cohabiting",
+                    "registered_partnership"
+                  ]
+                },
+                "relationshipSinceYear": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1900,
+                      "maximum": 2100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sharedChildren": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 30
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "taxLocationId": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "persons": {
+                  "maxItems": 2,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "personId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "providerSex": {
+                        "anyOf": [
+                          {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "const": 1
+                              },
+                              {
+                                "type": "number",
+                                "const": 2
+                              }
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "grossAnnualIncomeCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "withPillar2": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "pillar2Risk": {
+                        "type": "object",
+                        "properties": {
+                          "disabilityAnnualCents": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "disabilityChildAnnualCents": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "survivorAnnualCents": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "orphanAnnualCents": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 1000000000000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "disabilityAnnualCents",
+                          "disabilityChildAnnualCents",
+                          "survivorAnnualCents",
+                          "orphanAnnualCents"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "retirementPensionAnnualCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "currentPillar2CapitalCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "desiredWorkStopAge": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 18,
+                            "maximum": 100
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "disabilityNeedAnnualCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "deathNeedAnnualCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "protectionTermMonths": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 600
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "existingDeathCapitalCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "deathOneOffCostsCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "debtPayoffCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "debtTreatment": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "included_in_income_need",
+                              "pay_off_separately"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "deathNeedExcludesRepaidDebtService": {
+                        "type": "boolean"
+                      },
+                      "personalAffordableAnnualPremiumCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "personId",
+                      "providerSex",
+                      "grossAnnualIncomeCents",
+                      "withPillar2",
+                      "pillar2Risk",
+                      "retirementPensionAnnualCents",
+                      "currentPillar2CapitalCents",
+                      "desiredWorkStopAge",
+                      "disabilityNeedAnnualCents",
+                      "deathNeedAnnualCents",
+                      "protectionTermMonths",
+                      "existingDeathCapitalCents",
+                      "deathOneOffCostsCents",
+                      "debtPayoffCents",
+                      "debtTreatment",
+                      "deathNeedExcludesRepaidDebtService",
+                      "personalAffordableAnnualPremiumCents"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "children": {
+                  "maxItems": 30,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "birthYear": {
+                        "type": "integer",
+                        "minimum": 1900,
+                        "maximum": 2100
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "shared",
+                          "sole_custody",
+                          "goal_only",
+                          "expected"
+                        ]
+                      },
+                      "parentPersonIds": {
+                        "maxItems": 2,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                        }
+                      },
+                      "supportUntilMonth": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "goalId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "birthYear",
+                      "kind",
+                      "parentPersonIds",
+                      "supportUntilMonth",
+                      "goalId"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "debts": {
+                  "maxItems": 30,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                      },
+                      "ownerPersonIds": {
+                        "minItems": 1,
+                        "maxItems": 2,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                        }
+                      },
+                      "balanceCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "annualServiceCents": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "mortgage",
+                          "consumer",
+                          "education",
+                          "other"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "ownerPersonIds",
+                      "balanceCents",
+                      "annualServiceCents",
+                      "kind"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "debtsConfirmed": {
+                  "type": "boolean"
+                },
+                "existingPrivateRiskBenefitsConfirmed": {
+                  "type": "boolean"
+                },
+                "confession1": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "const": 1
+                        },
+                        {
+                          "type": "number",
+                          "const": 2
+                        },
+                        {
+                          "type": "number",
+                          "const": 3
+                        },
+                        {
+                          "type": "number",
+                          "const": 4
+                        },
+                        {
+                          "type": "number",
+                          "const": 9
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "confession2": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "const": 1
+                        },
+                        {
+                          "type": "number",
+                          "const": 2
+                        },
+                        {
+                          "type": "number",
+                          "const": 3
+                        },
+                        {
+                          "type": "number",
+                          "const": 4
+                        },
+                        {
+                          "type": "number",
+                          "const": 9
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "taxableFortuneCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "retirementNeedAnnualCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "annualReturnBps": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -5000,
+                      "maximum": 2000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "retirementHorizonAge": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 50,
+                      "maximum": 120
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "annualSavingCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "investmentKnowledgeConfirmed": {
+                  "type": "boolean"
+                },
+                "annualSavingIsAdditional": {
+                  "type": "boolean",
+                  "const": true
+                },
+                "existingAnnualRetirementSavingCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "existingAnnualPillar3aContributionCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "riskAppetite": {
+                  "type": "string",
+                  "enum": [
+                    "unknown",
+                    "low",
+                    "medium",
+                    "high"
+                  ]
+                },
+                "riskCapitalStrategy": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "use_free_assets_first",
+                        "preserve_assets_for_other_goals"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "relationship",
+                "relationshipSinceYear",
+                "sharedChildren",
+                "taxLocationId",
+                "persons",
+                "children",
+                "debts",
+                "debtsConfirmed",
+                "existingPrivateRiskBenefitsConfirmed",
+                "confession1",
+                "confession2",
+                "taxableFortuneCents",
+                "retirementNeedAnnualCents",
+                "annualReturnBps",
+                "retirementHorizonAge",
+                "annualSavingCents",
+                "investmentKnowledgeConfirmed",
+                "annualSavingIsAdditional",
+                "existingAnnualRetirementSavingCents",
+                "existingAnnualPillar3aContributionCents",
+                "riskAppetite",
+                "riskCapitalStrategy"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "goals": {
+          "maxItems": 20,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "family",
+                  "home",
+                  "retirement",
+                  "child_protection",
+                  "income_protection",
+                  "survivor_protection"
+                ]
+              },
+              "targetMonth": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "targetCapitalCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "targetMonth",
+              "priority",
+              "targetCapitalCents"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "reviewFlags": {
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "user_requested",
+              "complex_beneficiaries",
+              "cross_border",
+              "self_employed",
+              "medical_review_needed",
+              "investment_knowledge_missing",
+              "high_impact"
+            ]
+          }
+        }
+      },
+      "required": [
+        "financial",
+        "insurance",
+        "goals",
+        "reviewFlags"
+      ],
+      "additionalProperties": false
+    },
+    "fields": {
+      "maxItems": 3000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "personId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "value": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "confirmation": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "confirmed"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "value",
+          "confirmation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "proposalBatches": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "messageId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "turnId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "required": [
+              "messageId",
+              "turnId",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "requestHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expectedProfileVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "basisDraftHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "changes": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "value": {
+                  "$ref": "#/$defs/__schema1"
+                },
+                "personId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                }
+              },
+              "required": [
+                "path",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "accepted",
+              "superseded",
+              "rejected"
+            ]
+          },
+          "supersedesBatchIds": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            }
+          },
+          "supersedesProposalIds": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            }
+          },
+          "replacedByBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ambiguityIds": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            }
+          },
+          "resolvesAmbiguityIds": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,80}$"
+            }
+          },
+          "acceptedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "messageId",
+          "source",
+          "createdAt",
+          "requestHash",
+          "expectedProfileVersion",
+          "basisDraftHash",
+          "changes",
+          "status",
+          "supersedesBatchIds",
+          "supersedesProposalIds",
+          "replacedByBatchId",
+          "ambiguityIds",
+          "resolvesAmbiguityIds",
+          "acceptedAt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "ambiguities": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "personId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "messageId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "turnId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              }
+            },
+            "required": [
+              "messageId",
+              "turnId",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "de",
+              "fr",
+              "it",
+              "en"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "resolvedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolvedByBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolutionSourceRef": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dialogueStatus": {
+            "type": "string",
+            "enum": [
+              "needs_answer",
+              "awaiting_customer_acceptance",
+              "resolved"
+            ]
+          },
+          "answerBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "question",
+          "source",
+          "id",
+          "locale",
+          "createdAt",
+          "status",
+          "resolvedAt",
+          "resolvedByBatchId",
+          "resolutionSourceRef",
+          "dialogueStatus",
+          "answerBatchId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "writablePaths": {
+      "maxItems": 3000,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "noRawHealthData": {
+          "type": "boolean",
+          "const": true
+        },
+        "noProviderTokens": {
+          "type": "boolean",
+          "const": true
+        },
+        "noExternalAiTransferAuthorized": {
+          "type": "boolean",
+          "const": true
+        },
+        "customerConfirmationRequired": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "noRawHealthData",
+        "noProviderTokens",
+        "noExternalAiTransferAuthorized",
+        "customerConfirmationRequired"
+      ],
+      "additionalProperties": false
+    },
+    "proposals": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "path": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "family",
+                      "home",
+                      "retirement",
+                      "child_protection",
+                      "income_protection",
+                      "survivor_protection"
+                    ]
+                  },
+                  "targetMonth": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "targetCapitalCents": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "targetMonth",
+                  "priority",
+                  "targetCapitalCents"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "string",
+                "maxLength": 80
+              }
+            ]
+          },
+          "expectedProfileVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "basisDraftHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "accepted",
+              "superseded"
+            ]
+          },
+          "replacedByBatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,80}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "messageId",
+          "path",
+          "value",
+          "expectedProfileVersion",
+          "id",
+          "basisDraftHash",
+          "status"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "caseRevision",
+    "contextRevision",
+    "profileVersion",
+    "draftHash",
+    "draftDirty",
+    "locale",
+    "dataClassification",
+    "personIds",
+    "draft",
+    "fields",
+    "proposalBatches",
+    "ambiguities",
+    "writablePaths",
+    "policy",
+    "proposals"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      ]
+    },
+    "__schema1": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      ]
+    }
+  },
+  "title": "extractor-context-v1",
+  "description": "Pax synthetic-data PoC contract v1. Runtime Zod/domain reference checks and authorization remain authoritative; JSON Schema alone does not grant permission."
+}

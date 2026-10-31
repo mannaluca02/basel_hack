@@ -1,0 +1,32 @@
+{
+  "id": "0d1ea9bd-4811-4ee2-a948-c683bbf87e69",
+  "messageId": "synthetic_salary_correction",
+  "source": {
+    "messageId": "synthetic_salary_correction",
+    "turnId": "turn_salary_01",
+    "sourceRef": "synthetic:invented-dialogue"
+  },
+  "createdAt": "2026-10-31T09:48:57.687Z",
+  "requestHash": "b73398ca7acf0f7d3bd5e433f5beba8aff5667bc3c3e5adf2977ac3bd8424dd8",
+  "expectedProfileVersion": 1,
+  "basisDraftHash": "c6b30d9aaedc5538537b4fce0d62866dc31e0bb0276e88d76768e3f17af232cf",
+  "changes": [
+    {
+      "path": "financial.persons.0.income.value",
+      "value": 8300000,
+      "personId": "person_demo_1"
+    },
+    {
+      "path": "insurance.persons.0.grossAnnualIncomeCents",
+      "value": 11900000,
+      "personId": "person_demo_1"
+    }
+  ],
+  "status": "proposed",
+  "supersedesBatchIds": [],
+  "supersedesProposalIds": [],
+  "replacedByBatchId": null,
+  "ambiguityIds": [],
+  "resolvesAmbiguityIds": [],
+  "acceptedAt": null
+}
