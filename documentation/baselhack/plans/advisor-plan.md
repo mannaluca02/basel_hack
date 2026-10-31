@@ -40,7 +40,7 @@ Der AI Advisor fragt gezielt nach entscheidungsrelevanten Unbekannten und erklä
 
 **Ablagestruktur:** Redundante PDF-Kopien wurden zusammengeführt; alle Herkunftslinks bleiben im Katalog. Logo-ZIPs sind vollständig in `assets/pax/logos/` entpackt. Es wird standardmäßig kein ZIP erzeugt.
 
-**Zugang:** Der Bearer-Token ist mit ausdrücklicher Nutzerfreigabe ausschließlich unter `private/logismata.env` mit Dateirechten `0600` abgelegt. `private/` ist von Git und dem auslieferbaren Materialpaket ausgeschlossen. Das ausgelesene JWT-Ablaufdatum ist **03.11.2026, 23:59:59 Europe/Zurich**; die JWT-Signatur wurde bei dieser Metadatenprüfung nicht verifiziert. Für spätere Nutzung Zugang im Hub prüfen. Kein Token gehört ins Frontend oder in dieses Dokument.
+**Zugang:** Der Bearer-Token ist mit ausdrücklicher Nutzerfreigabe ausschließlich in der gitignorierten Root-`.env` mit Dateirechten `0600` abgelegt und nicht Teil des auslieferbaren Materialpakets. Das ausgelesene JWT-Ablaufdatum ist **03.11.2026, 23:59:59 Europe/Zurich**; die JWT-Signatur wurde bei dieser Metadatenprüfung nicht verifiziert. Für spätere Nutzung Zugang im Hub prüfen. Kein Token gehört ins Frontend oder in dieses Dokument.
 
 ## 3. Anforderungen an das Ergebnis
 

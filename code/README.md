@@ -16,7 +16,7 @@ npm test
 npm start
 ```
 
-`npm start` lädt den bereits geschützten lokalen Token aus `../documentation/baselhack/private/logismata.env` oder der Serverumgebung. Benötigt wird `LOGISMATA_BEARER_TOKEN`; bei fehlendem Token startet der Live-Dienst nicht. Zugangsdaten werden weder geloggt noch ins Angular-Bundle eingebaut. Die unveränderte Vorlage `logismata.env.example` enthält keinen Token.
+`npm start` lädt die gitignorierte Root-`.env` (Vorlage [`.env.example`](../.env.example)) oder die Serverumgebung. Benötigt wird `LOGISMATA_BEARER_TOKEN`; bei fehlendem Token startet der Live-Dienst nicht. Zugangsdaten werden weder geloggt noch ins Angular-Bundle eingebaut.
 
 Der Dienst bindet an `http://127.0.0.1:3000`; `PORT=3001 npm start` ändert den Port. Öffentliche Einstiege sind `/api/privacy`, `/api/status` und `/api/openapi.json`. Alle Fall-, Dokument-, Portal- und Gesprächsdaten benötigen eine Sitzung. Der Start gibt ausschließlich den Pfad der lokalen Zugangscode-Datei aus.
 

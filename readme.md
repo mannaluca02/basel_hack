@@ -19,7 +19,7 @@ Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller S
 - [Vollständiges Quellenverzeichnis](documentation/baselhack/references/README.md)
 - [Bereits vorhandene Challenge-Unterlagen](documentation/challenge_material/)
 
-Die lokalen API-Zugangsdaten liegen ausschließlich unter `documentation/baselhack/private/` und sind von Git ausgeschlossen. Eine Vorlage ohne Token steht unter `documentation/baselhack/logismata.env.example`.
+Alle lokalen Zugangsdaten (Logismata-Token, OpenAI-Schlüssel, Flags) stehen in einer einzigen Datei `.env` im Repo-Root, die von Git ausgeschlossen ist. Die Vorlage ohne echte Werte ist [`.env.example`](.env.example).
 
 ## Projektvorlage zum Ausfüllen
 

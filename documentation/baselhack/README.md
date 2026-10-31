@@ -57,5 +57,5 @@ Der Vorgang nutzt ausschließlich lokale Quellen, prüft deren Integrität und e
 Alle Katalogpfade sind relativ zur Repo-Wurzel; die Markdown-Links sind relativ zum jeweiligen Dokument.
 Der geprüfte Stand verwendete Python 3.14 und die in `requirements.txt` festgehaltenen Bibliotheken.
 
-Die Vorlage [logismata.env.example](logismata.env.example) enthält keinen echten Token.
-Autorisierte Zugangsdaten gehören ausschließlich nach `private/logismata.env` und werden nie mit Git geteilt.
+Die Vorlage [`.env.example`](../../.env.example) im Repo-Root enthält keinen echten Token.
+Autorisierte Zugangsdaten gehören ausschließlich in die gitignorierte Root-`.env` und werden nie mit Git geteilt.

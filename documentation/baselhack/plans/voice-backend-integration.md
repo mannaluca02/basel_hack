@@ -30,7 +30,7 @@ Die Demo verwendet einen Fake-Voice-Gateway und den synthetischen Rechner, eine 
 
 ## Lokalen Server konfigurieren
 
-`npm --prefix code start` liest die gitignorierte Root-`.env` und danach die geschützte Logismata-Datei. Werte in der bereits gesetzten Prozessumgebung haben Vorrang. Beispielnamen stehen in [`.env.example`](../../../.env.example):
+`npm --prefix code start` liest die gitignorierte Root-`.env`, die auch den Logismata-Token enthält. Werte in der bereits gesetzten Prozessumgebung haben Vorrang. Beispielnamen stehen in [`.env.example`](../../../.env.example):
 
 ```dotenv
 PAX_SYNTHETIC_VOICE_ENABLED=1

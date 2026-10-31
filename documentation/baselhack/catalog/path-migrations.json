@@ -152,7 +152,7 @@
   "documentation/baselhack/evidence/quicksale-demo-quote.jpg": "documentation/baselhack/evidence/screenshots/quicksale-demo-quote.jpg",
   "documentation/baselhack/evidence/risk-calculator-test.jpg": "documentation/baselhack/evidence/screenshots/risk-calculator-test.jpg",
   "documentation/baselhack/requirements.txt": "documentation/baselhack/requirements.txt",
-  "documentation/baselhack/logismata.env.example": "documentation/baselhack/logismata.env.example",
+  "documentation/baselhack/logismata.env.example": ".env.example",
   "documentation/baselhack/sources/web/product-page-index.json": "documentation/baselhack/catalog/source-links/product-page-index.json",
   "documentation/baselhack/sources/web/pax-brand-links.json": "documentation/baselhack/catalog/source-links/pax-brand-links.json",
   "documentation/baselhack/sources/web/pax-savings-links.json": "documentation/baselhack/catalog/source-links/pax-savings-links.json",

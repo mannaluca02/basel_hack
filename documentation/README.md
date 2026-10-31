@@ -29,7 +29,7 @@ from the challenge hub, the Logismata API and the material PDFs.
 
 - **Challenge:** "Pax Digital Advisor", an AI self-service pension advisor. Sponsor Pax, prize CHF 1,500.
 - **Hub:** https://pax-hackathon-2026.vercel.app (password protected, password in local `.env` as `PAX_HUB_PASSWORD`).
-- **API:** `https://baselhackathon2026.azurewebsites.net/viper`, the research token is local in `baselhack/private/logismata.env` as `LOGISMATA_BEARER_TOKEN`; application template variable: `LOGISMATA_TOKEN`.
+- **API:** `https://baselhackathon2026.azurewebsites.net/viper`, the token is local in the repo-root `.env` as `LOGISMATA_BEARER_TOKEN`.
 - **Token expiry:** 2026-11-03 23:59:59 (decoded from the JWT `exp` claim).
 - **Domain experts on site:** Cem and Claude (Pax), Friday and Sunday.
 - **Follow-up for winners:** further PoC work with the Pax innovation team, possible working-student positions or theses.
@@ -37,5 +37,5 @@ from the challenge hub, the Logismata API and the material PDFs.
 ## Secrets
 
 The hub password and the API token are **not** stored in tracked files, because this
-repository is on GitHub. The research token is stored in `baselhack/private/logismata.env` with permissions `0600`; the entire private directory is gitignored.
-For application setup, `.env.example` is the template for an optional local `.env` at the repo root. Its variable names differ from the research file, so map the token explicitly when configuring the application.
+repository is on GitHub. All local secrets and switches live in one gitignored file, `.env` at the repo root (permissions `0600`).
+[`.env.example`](../.env.example) is its template; the backend, the voice agent and the avatar prototype all read the same file.
