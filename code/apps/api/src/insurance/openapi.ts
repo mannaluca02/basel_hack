@@ -113,7 +113,7 @@ export function lifeOpenApi() {
   const questions=reference('QuestionsResponse',QuestionsResponseSchema),recommendation=reference('RecommendationPresentation',RecommendationPresentationSchema);
   const event=reference('AdvisorContextUpdated',AdvisorContextUpdatedSchema),error=reference('ApiError',ApiErrorSchema);
   const session=reference('SessionResponse',SessionResponseSchema),agentAccess=reference('AgentAccessResponse',AgentAccessResponseSchema);
-  const summary=reference('SummaryBundle',SummaryBundleSchema),portal=reference('PortalDto',PortalDtoSchema);
+  const summaryBundle=reference('SummaryBundle',SummaryBundleSchema),portal=reference('PortalDto',PortalDtoSchema);
   for(const [method,path,summary,schema] of endpoints) {
     const publicRoute=path.startsWith('/api/voice/')||['/api/privacy','/api/status','/api/sessions','/api/openapi.json','/api/translations'].includes(path);
     const parameters=[...path.matchAll(/\{(\w+)\}/g)].map(m=>({in:'path',name:m[1],required:true,schema:{type:'string'}}));
@@ -124,7 +124,7 @@ export function lifeOpenApi() {
       path.endsWith('/advisor/extractor-context')?extractor:path.endsWith('/advisor/proposal-batches')?batch:path.endsWith('/accept')?acceptance:path.endsWith('/resolve')?resolution:
       path.endsWith('/calculations')?analysis:path.endsWith('/advisor/context')?context:path.endsWith('/questions')?questions:
       path.endsWith('/recommendations')?recommendation:path.endsWith('/agent-access')?agentAccess:path==='/api/sessions'?session:
-      path.endsWith('/summaries')?summary:path.endsWith('/portal')?portal:undefined;
+      path.endsWith('/summaries')?summaryBundle:path.endsWith('/portal')?portal:undefined;
     const errors=Object.fromEntries([[400,'Invalid input'],[401,'Session required'],[403,'Role/CSRF forbidden'],[404,'Not found or unauthorized case'],[409,'Version, review or journey conflict'],[422,'Missing/unsupported domain data']].map(([code,description])=>[code,{description,content:{'application/json':{schema:error}}}]));
     const operation={summary,security:publicRoute?[]:[{bearerAuth:[]},{cookieAuth:[]}],parameters:[...parameters,...languageParameters],
       ...(schema?{requestBody:{required:true,content:{'application/json':{schema:reference(`${method}_${path.replace(/[^a-zA-Z0-9]/g,'_')}`,schema)}}}}:{}),
