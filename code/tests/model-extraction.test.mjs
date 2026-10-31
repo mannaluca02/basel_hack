@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {ModelExtractionNoticeSchema,ModelExtractionPermissionSchema,InsuranceCaseDtoSchema} from '@pax/contracts';
+import {ModelExtractionNoticeSchema,ModelExtractionPermissionSchema,InsuranceCaseDtoSchema,PRIVACY_NOTICE} from '@pax/contracts';
 import {createLifeRuntime} from '../apps/api/dist/insurance/runtime.js';
 import {createLifeInsuranceApp} from '../apps/api/dist/insurance/app.js';
 import {localizedCase} from '../apps/api/dist/insurance/i18n.js';
@@ -16,7 +16,7 @@ async function fixture(t,{enabled=true}={}){
  const r=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials,modelExtraction:{enabled}});
  t.after(async()=>{await r.close();await rm(directory,{recursive:true,force:true});});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'extraction-test')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:PRIVACY_NOTICE.version,dataClassification:'synthetic'});
  c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
  const agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken),get=()=>r.engine.caseFor(customer,c.id);
  const notice=r.modelExtraction.notice('de');
@@ -79,7 +79,7 @@ test('HTTP privacy notice lists the extraction recipient only when enabled and c
    assert.equal(p.recipients.some(r=>r.includes('intake extraction')),enabled);}
   const notice=(await call('GET','/api/extraction/privacy?locale=fr')).body;assert.equal(notice.locale,'fr');
   const token=(await call('POST','/api/sessions',null,{accessCode:credentials.customerAccessCode})).body.sessionToken;
-  const c=(await call('POST','/api/cases',token,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'})).body;
+   const c=(await call('POST','/api/cases',token,{locale:'de',timeBudgetMinutes:5,noticeVersion:PRIVACY_NOTICE.version,dataClassification:'synthetic'})).body;
   const granted=await call('POST',`/api/cases/${c.id}/extraction/consent`,token,{expectedCaseRevision:c.caseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
   if(!enabled){assert.equal(granted.status,503);assert.equal(granted.body.code,'MODEL_EXTRACTION_DISABLED');continue;}
   assert.equal(granted.status,201);assert.equal(granted.body.transferAllowed,true);

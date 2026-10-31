@@ -17,9 +17,9 @@ async function fixture(t,complete=true){
  t.after(async()=>{await r.close();await rm(directory,{recursive:true,force:true});});
  const login=await r.sessions.login(credentials.customerAccessCode,'customer'),customer=r.sessions.authenticate(login.sessionToken);
  const staff=r.sessions.authenticate((await r.sessions.login(credentials.reviewerAccessCode,'staff')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  if(complete){c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
-   c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});}
+   c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});}
  const get=()=>r.engine.caseFor(customer,c.id);
  const calculate=()=>r.engine.analyze(customer,c.id,{expectedCaseRevision:get().caseRevision,expectedProfileVersion:1,scenarioVersionId:'shared_baseline',scenario:{kind:'baseline'}});
  return {r,directory,login,customer,staff,c,get,calculate};
@@ -28,7 +28,7 @@ test('the shared full-case DTO validates empty, confirmed and calculated states 
  const f=await fixture(t,false);let dto=localizedCase(f.get());assert.equal(dto.schemaVersion,'1.0');assert.equal(dto.draft.financial,null);assert.deepEqual(dto.toolRuns,[]);
  assert.ok(!Object.hasOwn(dto,'ownerId'));assert.ok(!Object.hasOwn(dto,'idempotency'));assert.equal(InsuranceCaseDtoSchema.safeParse({...dto,ownerId:'forged'}).success,false);
  let c=await f.r.engine.patchDraft(f.customer,f.c.id,{...(await lifeDraft()),expectedCaseRevision:f.get().caseRevision});
- c=await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ c=await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  const result=await f.calculate();dto=localizedCase(f.get());assert.equal(dto.activeRunId,result.run.id);assert.deepEqual(InsuranceCaseDtoSchema.parse(dto),dto);
  assert.equal(InsuranceCaseDtoSchema.safeParse({...dto,schemaVersion:'2.0'}).success,false);
 });

@@ -9,6 +9,8 @@
  * derives a new financial figure from it.
  */
 
+import type { AdvisorContextUpdated } from '@pax/contracts';
+
 /** Common message header, section 3 of the contracts. */
 export interface MessageHeader {
   readonly schemaVersion: '1.0';
@@ -186,10 +188,5 @@ export type ContextUpdateReason =
   | 'review_state_changed'
   | 'conversation_preference_changed';
 
-export interface AdvisorContextUpdate extends MessageHeader {
-  readonly eventId: string;
-  readonly contextRevision: number;
-  readonly reason: ContextUpdateReason;
-  readonly contextRef: string;
-  readonly interruptPolicy: 'never' | 'if_current_answer_invalid' | 'immediate';
-}
+/** The runtime's event; `handover` is left out until the UI has a use for it. */
+export type AdvisorContextUpdate = Omit<AdvisorContextUpdated, 'handover'>;

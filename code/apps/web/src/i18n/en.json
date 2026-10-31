@@ -41,6 +41,14 @@
       "title": "An AI is involved",
       "body": "An AI assistant leads the conversation, asks questions and explains results. It does not calculate anything itself: all amounts come from Pax calculation tools. The AI only receives what it needs, without your name, full date of birth or health details."
     },
+    "extraction": {
+      "title": "Invented conversation excerpts go to OpenAI",
+      "body": "Explicitly invented conversation excerpts and demo values are sent to OpenAI to extract unconfirmed field proposals. This does not release real data: real customer, financial or health data must not be sent to external AI models."
+    },
+    "calculator": {
+      "title": "Invented calculation data goes to Logismata",
+      "body": "Separately, invented calculation data is sent to the authorised Logismata hackathon calculator only after you confirm the complete profile."
+    },
     "demo": {
       "title": "This is a demo",
       "body": "This prototype from BaselHack 2026 works with synthetic data only. Please do not enter any real personal data."
@@ -64,6 +72,62 @@
       "thinking": "Assistant is thinking",
       "speaking": "Assistant is speaking",
       "error": "Problem with the assistant"
+    }
+  },
+  "review": {
+    "title": "Review",
+    "loading": "Loading the current state.",
+    "noBatches": "No changes are proposed at the moment.",
+    "person": "Person {{number}}",
+    "gross": "Annual gross income",
+    "net": "Net after income tax",
+    "other": "Other detail",
+    "draft": "Current draft",
+    "stale": "This question no longer applies because the case changed. Please review the current state again.",
+    "offline": "No live connection. The state shown may be out of date; it reloads with your next action.",
+    "period": {
+      "year": "per year",
+      "month": "per month"
+    },
+    "status": {
+      "proposed": "Open for acceptance",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "superseded": "Replaced",
+      "outdated": "Outdated"
+    },
+    "open": "Review change",
+    "ambiguity": {
+      "open": "The answer is still outstanding.",
+      "answered": "The answer is ready to be taken over."
+    },
+    "signIn": {
+      "label": "Demo access code",
+      "submit": "Sign in"
+    },
+    "error": {
+      "transport": "The service cannot be reached. Nothing was repeated. Please check the state shown."
+    },
+    "profile": {
+      "title": "Complete profile",
+      "pendingAcceptance": "Decide the open changes first. The complete profile is not yet confirmed.",
+      "openAmbiguity": "Open questions prevent confirming the complete profile.",
+      "incomplete": "Details are still missing. The complete profile is not yet confirmed.",
+      "ready": "The complete profile is not yet confirmed.",
+      "confirmed": "Confirmed in version {{version}}.",
+      "review": "Review complete profile"
+    },
+    "question": {
+      "title": "Your decision",
+      "accept": "Apply change",
+      "reject": "Reject change",
+      "confirm": "Confirm complete profile",
+      "cancel": "Cancel",
+      "voice": "Please answer by voice.",
+      "profile": "Complete profile shown",
+      "allFields": "All details",
+      "assumptions": "Assumptions",
+      "notice": "Data processing notice"
     }
   }
 }

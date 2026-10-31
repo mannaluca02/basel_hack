@@ -34,7 +34,7 @@ export class CustomerConfirmations {
     }
     if(c.ambiguities.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422);
     if(!c.draftDirty)throw new WorkflowError('PROFILE_ALREADY_CONFIRMED');
-    return {draft:c.draft,changes:[],targetHash:sha256Json({target,draftHash:sha256Json(c.draft),noticeVersion:'lifemap-synthetic-v1'})};
+    return {draft:c.draft,changes:[],targetHash:sha256Json({target,draftHash:sha256Json(c.draft),noticeVersion:'lifemap-synthetic-v2'})};
   }
   async create(actor:Actor,id:string,input:unknown){
     this.customer(actor);const b=CreateConfirmationInputSchema.parse(input);
@@ -44,9 +44,9 @@ export class CustomerConfirmations {
       const target=this.target(c,b.target);
       if(b.target.kind==='confirm_profile'){
         // Validate the same complete-profile rules without committing a profile before the customer's answer.
-        const probe=structuredClone(db);this.engine.confirmInTransaction(actor,probe.cases[id]!,probe,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+        const probe=structuredClone(db);this.engine.confirmInTransaction(actor,probe.cases[id]!,probe,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
       }
-      const review={draft:target.draft,changes:target.changes,noticeVersion:'lifemap-synthetic-v1' as const,
+      const review={draft:target.draft,changes:target.changes,noticeVersion:'lifemap-synthetic-v2' as const,
         allowSyntheticCalculatorTransfer:b.target.kind==='confirm_profile',confirmProfileAndAssumptions:b.target.kind==='confirm_profile'};
       const questionText=confirmationQuestion(c,b.target,b.channel,target.changes);
       for(const old of c.confirmationRequests.filter(active)){old.status='invalidated';old.invalidationReason='new_question';}

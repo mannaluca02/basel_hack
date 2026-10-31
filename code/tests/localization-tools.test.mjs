@@ -22,16 +22,16 @@ before(async()=>{
 });
 after(async()=>{await app?.close();await rm(directory,{recursive:true,force:true});});
 async function newCase(locale='de',complete=false){
-  let response=await call('POST','/api/cases',{locale,timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});assert.equal(response.status,201);let c=response.body;
+  let response=await call('POST','/api/cases',{locale,timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});assert.equal(response.status,201);let c=response.body;
   if(complete){c=(await call('PATCH',`/api/cases/${c.id}/draft`,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision})).body;
-    c=(await call('POST',`/api/cases/${c.id}/confirmations`,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'})).body;}
+    c=(await call('POST',`/api/cases/${c.id}/confirmations`,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'})).body;}
   return c;
 }
 async function analyze(c){const result=await call('POST',`/api/cases/${c.id}/calculations`,{expectedCaseRevision:c.caseRevision,expectedProfileVersion:1,scenarioVersionId:'locale_baseline',scenario:{kind:'baseline'}});assert.equal(result.status,201);return result.body;}
 const archive=async op=>JSON.parse(await readFile(new URL(`../../documentation/baselhack/references/api/examples/${Operations[op].archive}.json`,import.meta.url),'utf8'));
 async function toolInput(op,c){const request=structuredClone((await archive(op)).request);delete request.Language;
   for(const name of AdditionalMoneyFields[op])if(typeof request[name]==='number')request[name]=Math.round(request[name]*100);
-  return {operation:op,request,requestUnits:'CHF_CENTS',expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v1',allowSyntheticCalculatorTransfer:true};}
+  return {operation:op,request,requestUnits:'CHF_CENTS',expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v2',allowSyntheticCalculatorTransfer:true};}
 
 test('translation catalogs cover identical customer keys in all four languages with no fallback',async()=>{
   const catalogs=[];
@@ -59,7 +59,7 @@ for(const [locale,language] of [['de',1],['fr',2],['it',3],['en',4]]){
     const translations=(await call('GET',`/api/translations?locale=${locale}`,undefined,{},null)).body.messages;
     assert.equal(questions.body.questions[0].text,translations['question.goals']);
     c=(await call('PATCH',`/api/cases/${c.id}/draft`,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision})).body;
-    c=(await call('POST',`/api/cases/${c.id}/confirmations`,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'})).body;
+    c=(await call('POST',`/api/cases/${c.id}/confirmations`,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'})).body;
     const start=provider.calls.length;const analysis=await analyze(c);assert.equal(analysis.presentation.locale,locale);
     assert.equal(provider.calls.slice(start).find(c=>c.operation==='budgetProposal').request.Language,language);
     const rec=await call('POST',`/api/cases/${c.id}/recommendations`,{});assert.equal(rec.body.locale,locale);

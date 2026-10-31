@@ -9,9 +9,9 @@ let r;
 try{
  r=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'voice-demo')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
- c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  const originalNet=structuredClone(c.draft.financial.persons[0].income),agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken);
  const get=()=>r.engine.caseFor(customer,c.id),path='insurance.persons.0.grossAnnualIncomeCents';
  const propose=(messageId,changes,extra={})=>{const ctx=r.extraction.context(agent,c.id);return r.extraction.proposeBatch(agent,c.id,{messageId,source:{messageId,turnId:`turn_${messageId}`,sourceRef:`synthetic:${messageId}`},expectedCaseRevision:ctx.caseRevision,expectedProfileVersion:ctx.profileVersion,basisDraftHash:ctx.draftHash,changes,...extra});};

@@ -14,9 +14,9 @@ async function fixture(t){
  const directory=await mkdtemp(join(tmpdir(),'pax-customer-confirm-'));let r=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials});
  t.after(async()=>{await r.close();await rm(directory,{recursive:true,force:true});});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'customer')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
- await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  const agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken);let counter=0;
  const get=()=>r.engine.caseFor(customer,c.id);
  const propose=async(changes,extra={})=>{const x=r.extraction.context(agent,c.id),messageId=`extract_${++counter}`;return r.extraction.proposeBatch(agent,c.id,{messageId,source:{messageId,turnId:`turn_${messageId}`,sourceRef:`synthetic:${messageId}`},expectedCaseRevision:x.caseRevision,expectedProfileVersion:x.profileVersion,basisDraftHash:x.draftHash,changes,...extra});};
@@ -122,7 +122,7 @@ test('the confirmation HTTP routes enforce cookie CSRF and expose shared request
  t.after(async()=>{await app.close();await rm(directory,{recursive:true,force:true});});await app.listen(0,'127.0.0.1');const base=await app.getUrl();
  const call=async(method,path,body,headers={})=>{const res=await fetch(base+path,{method,headers:{'Content-Type':'application/json',...headers},...(body?{body:JSON.stringify(body)}:{})});return {status:res.status,body:await res.json()};};
  const login=(await call('POST','/api/sessions',{accessCode:credentials.customerAccessCode})).body,auth={Authorization:`Bearer ${login.sessionToken}`};
- let c=(await call('POST','/api/cases',{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'},auth)).body;
+ let c=(await call('POST','/api/cases',{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'},auth)).body;
  c=(await call('PATCH',`/api/cases/${c.id}/draft`,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision},auth)).body;
  const path=`/api/cases/${c.id}/customer-confirmations`,body={expectedCaseRevision:c.caseRevision,target:{kind:'confirm_profile'},channel:'screen',questionTurnId:'http_profile_turn',questionReplyId:'http_profile_reply'};
  assert.equal((await call('POST',path,body,{Cookie:`pax_session=${login.sessionToken}`})).status,403);

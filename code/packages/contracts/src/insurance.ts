@@ -83,11 +83,11 @@ export type InsuranceIntake = z.infer<typeof InsuranceIntakeSchema>;
 export const DraftPatchSchema = DraftBaseSchema.partial().extend({expectedCaseRevision: z.number().int().positive()}).strict();
 export const ConfirmProfileSchema = z.object({
   expectedCaseRevision: z.number().int().positive(), confirmProfileAndAssumptions: z.literal(true),
-  allowSyntheticCalculatorTransfer: z.literal(true), noticeVersion: z.literal('lifemap-synthetic-v1'),
+  allowSyntheticCalculatorTransfer: z.literal(true), noticeVersion: z.literal('lifemap-synthetic-v2'),
 }).strict();
 export const CreateInsuranceCaseSchema = z.object({
   locale: LocaleSchema, timeBudgetMinutes: z.number().int().min(3).max(120),
-  noticeVersion: z.literal('lifemap-synthetic-v1'), dataClassification: z.literal('synthetic'),
+  noticeVersion: z.literal('lifemap-synthetic-v2'), dataClassification: z.literal('synthetic'),
 }).strict();
 export const RetirementScenarioSchema = z.object({
   kind: z.literal('retirement'), goalId: Id, startMonth: Month, endMonth: Month,
@@ -149,7 +149,7 @@ export const EMPTY_INSURANCE: InsuranceIntake = {
   confession1:null,confession2:null,taxableFortuneCents:null,
 };
 export const PRIVACY_NOTICE = {
-  version:'lifemap-synthetic-v1', dataMode:'synthetic_only',
+  version:'lifemap-synthetic-v2', dataMode:'synthetic_only',
   controller:'BaselHack prototype team; production controller and contacts require Pax release',
   purpose:'Self-service life-insurance needs and scenario demonstration using invented data',
   recipients:['Local encrypted prototype backend','Authorized Logismata hackathon calculator in live mode'],
@@ -157,3 +157,9 @@ export const PRIVACY_NOTICE = {
   retention:'Local demo data retained until deleted by its owner or the configured expiry; no statutory retention claim',
   productionUse:'Real customer processing, signatures, underwriting, AML and policy issuance require separate Pax-approved integrations and release',
 } as const;
+export type PrivacyNoticeResponse = Omit<typeof PRIVACY_NOTICE, 'externalAiTransfer' | 'recipients'> & {
+  externalAiTransfer: boolean;
+  recipients: readonly string[];
+  locale: z.infer<typeof LocaleSchema>;
+  display: Record<'title'|'purpose'|'recipients'|'storage'|'release', string>;
+};

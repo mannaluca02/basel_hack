@@ -18,9 +18,9 @@ async function fixture(t,options={}) {
   t.after(async()=>{await r.close();await rm(directory,{recursive:true,force:true});});
   const login=await r.sessions.login(credentials.customerAccessCode,'customer');const customer=r.sessions.authenticate(login.sessionToken);
   const staffLogin=await r.sessions.login(credentials.reviewerAccessCode,'staff');const staff=r.sessions.authenticate(staffLogin.sessionToken);
-  let c=await r.engine.createCase(customer,{locale:options.locale??'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+  let c=await r.engine.createCase(customer,{locale:options.locale??'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
   if(options.intake!==false){c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
-    c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});}
+    c=await r.engine.confirm(customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});}
   const get=()=>r.engine.caseFor(customer,c.id);
   const analyze=async(scenario={kind:'baseline'},version='baseline_v1')=>r.engine.analyze(customer,c.id,{expectedCaseRevision:get().caseRevision,expectedProfileVersion:get().confirmedVersions.at(-1).version,scenarioVersionId:version,scenario});
   const approve=async run=>r.engine.reviewDecision(staff,c.id,{runId:run.id,decision:'approved_for_demo',acknowledgedReasonCodes:r.engine.caseFor(staff,c.id).reviewTasks.filter(t=>t.runId===run.id).at(-1).reasons,
@@ -45,7 +45,7 @@ test('incomplete needs ask targeted questions and cannot produce a recommendatio
 test('unknown needs are not zero; insufficient intake cannot be confirmed',async t=> {
   const f=await fixture(t,{intake:false});const draft=await lifeDraft();draft.insurance.persons[0].deathNeedAnnualCents=null;
   const c=await f.r.engine.patchDraft(f.customer,f.c.id,{...draft,expectedCaseRevision:f.get().caseRevision});
-  await assert.rejects(f.r.engine.confirm(f.customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'}),e=>e.code==='NEEDS_INPUT');
+  await assert.rejects(f.r.engine.confirm(f.customer,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'}),e=>e.code==='NEEDS_INPUT');
   assert.ok(f.r.engine.questions(f.customer,c.id).mandatoryFields.some(p=>p.endsWith('deathNeedAnnualCents')));
 });
 test('own-person affordability caps pension saving and existing 3a contributions consume the ceiling',async t=> {
@@ -166,7 +166,7 @@ test('missing capital or pension income remains unknown in retirement phases',as
 test('draft estimate requires tax inputs instead of inventing a confession',async t=> {
   const f=await fixture(t);const d=structuredClone(f.get().draft);d.insurance.confession1=null;
   await f.r.engine.patchDraft(f.customer,f.c.id,{...d,expectedCaseRevision:f.get().caseRevision});
-  const result=await f.r.estimates.calculate(f.customer,f.c.id,{expectedCaseRevision:f.get().caseRevision,noticeVersion:'lifemap-synthetic-v1',allowSyntheticCalculatorTransfer:true,operations:['incomeFortuneTax']});
+  const result=await f.r.estimates.calculate(f.customer,f.c.id,{expectedCaseRevision:f.get().caseRevision,noticeVersion:'lifemap-synthetic-v2',allowSyntheticCalculatorTransfer:true,operations:['incomeFortuneTax']});
   assert.equal(result.results.length,0);assert.equal(result.blocked[0].operation,'incomeFortuneTax');assert.equal(result.profileMutated,false);
 });
 test('customer and advisor summaries share exact snapshot, values and review status',async t=> {
@@ -194,7 +194,7 @@ test('shared output schema validates the complete insurance and retirement respo
 test('free assets can meet death costs when the customer chooses self-funding',async t=>{
   const f=await fixture(t,{intake:false});const d=await lifeDraft();d.insurance.riskCapitalStrategy='use_free_assets_first';
   let c=await f.r.engine.patchDraft(f.customer,f.c.id,{...d,expectedCaseRevision:f.get().caseRevision});
-  await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+  await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
   const {run}=await f.analyze();const death=run.riskNeeds.filter(r=>r.event.startsWith('death'));
   assert.ok(death.every(r=>r.deathCapitalCents===0&&r.liquidAssetsAppliedCents===1000000));
   const rec=await f.r.engine.recommendation(f.customer,f.c.id);assert.ok(!rec.candidates.some(c=>c.productId==='pax_term_life'));
@@ -257,7 +257,7 @@ test('child recommendations identify the insured child separately from the fundi
   d.goals.push({id:'goal_child',kind:'child_protection',targetMonth:'2038-01',priority:3,targetCapitalCents:5000000});
   d.insurance.children=[{id:'child_demo',birthYear:2015,kind:'goal_only',parentPersonIds:['person_demo_1'],supportUntilMonth:null,goalId:'goal_child'}];
   let c=await f.r.engine.patchDraft(f.customer,f.c.id,{...d,expectedCaseRevision:f.get().caseRevision});
-  await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+  await f.r.engine.confirm(f.customer,f.c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
   await f.analyze();const rec=await f.r.engine.recommendation(f.customer,f.c.id);const child=rec.candidates.find(c=>c.productId==='pax_child');
   assert.equal(child.insuredChildId,'child_demo');assert.equal(child.personId,'person_demo_1');
 });

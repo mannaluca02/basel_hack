@@ -15,8 +15,8 @@ async function fixture(t,complete=true){
  const directory=await mkdtemp(join(tmpdir(),'pax-extraction-'));let r=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials});
  t.after(async()=>{await r.close();await rm(directory,{recursive:true,force:true});});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'customer')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
- const confirm=()=>r.engine.confirm(customer,c.id,{expectedCaseRevision:get().caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
+ const confirm=()=>r.engine.confirm(customer,c.id,{expectedCaseRevision:get().caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  const get=()=>r.engine.caseFor(customer,c.id);
  if(complete){c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});await confirm();}
  const agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken);
@@ -127,7 +127,7 @@ test('HTTP extraction routes, OpenAPI and optional Nest feature modules share th
  t.after(async()=>{await app.close();await rm(directory,{recursive:true,force:true});});await app.listen(0,'127.0.0.1');const base=await app.getUrl();
  const call=async(method,path,token,body)=>{const res=await fetch(base+path,{method,headers:{...(token?{Authorization:`Bearer ${token}`} :{}),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});return {status:res.status,body:await res.json()};};
  const customer=(await call('POST','/api/sessions',null,{accessCode:credentials.customerAccessCode})).body;
- const c=(await call('POST','/api/cases',customer.sessionToken,{locale:'fr',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'})).body;
+ const c=(await call('POST','/api/cases',customer.sessionToken,{locale:'fr',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
  const agent=(await call('POST',`/api/cases/${c.id}/agent-access`,customer.sessionToken,{})).body;
  assert.equal((await call('GET','/api/test-feature')).status,401);assert.equal((await call('GET','/api/test-feature',customer.sessionToken)).body.sameRuntime,true);
  const path=`/api/cases/${c.id}/advisor/extractor-context`;assert.equal((await call('GET',path)).status,401);

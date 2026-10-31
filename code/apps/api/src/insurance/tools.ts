@@ -21,7 +21,7 @@ const inputSchema=(op:AdditionalOperation)=>{
   }
   const schema=base.extend(fields);return op==='searchLocationGeo'?schema.omit({Language:true}):schema;
 };
-const common={expectedCaseRevision:z.number().int().positive(),noticeVersion:z.literal('lifemap-synthetic-v1'),allowSyntheticCalculatorTransfer:z.literal(true),requestUnits:z.literal('CHF_CENTS')};
+const common={expectedCaseRevision:z.number().int().positive(),noticeVersion:z.literal('lifemap-synthetic-v2'),allowSyntheticCalculatorTransfer:z.literal(true),requestUnits:z.literal('CHF_CENTS')};
 const option=<T extends AdditionalOperation>(operation:T)=>z.object({...common,operation:z.literal(operation),request:inputSchema(operation)}).strict();
 export const AdditionalToolRequestSchema=z.discriminatedUnion('operation',[
   option('taxBaseInfo'),option('searchLocationGeo'),option('estateGainFields'),option('estateGainTax'),

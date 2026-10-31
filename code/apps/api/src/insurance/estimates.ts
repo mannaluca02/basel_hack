@@ -8,7 +8,7 @@ import type { ProviderJob } from './provider-mapper.js';
 import type { NormalizedProviderResult } from '../logismata/normalize.js';
 
 export const EstimateRequestSchema=z.object({expectedCaseRevision:z.number().int().positive(),
-  noticeVersion:z.literal('lifemap-synthetic-v1'),allowSyntheticCalculatorTransfer:z.literal(true),
+  noticeVersion:z.literal('lifemap-synthetic-v2'),allowSyntheticCalculatorTransfer:z.literal(true),
   operations:z.array(z.enum(['income','budgetProposal','incomeFortuneTax','saving3a','capitalTax','purchaseP2'])).min(1).max(6),
   saving3a:z.object({years:z.number().int().min(1).max(100),initialCents:Cents,annualCents:Cents}).strict().optional(),
   capitalTax:z.object({paymentCents:Cents,paymentAge:z.number().int().min(18).max(100)}).strict().optional(),

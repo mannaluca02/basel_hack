@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouteReuseStrategy, Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -5,6 +7,7 @@ import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
 import { FakeDataSource, event, progress, risk } from './core/advisor/store/case-testing';
+import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './core/consent/consent';
 import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
@@ -190,6 +193,43 @@ describe('App', () => {
   });
 });
 
+describe('App review stand', () => {
+  async function renderWith(dataSource: 'mock' | 'api') {
+    localStorage.clear();
+    sessionStorage.clear();
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AdvisorDataSource, useValue: new FakeDataSource() },
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', dataSource },
+        },
+        provideI18nTesting(),
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('stays on screen above the tabs against the real backend', async () => {
+    const root = await renderWith('api');
+
+    expect(root.querySelector('main app-review-panel + router-outlet')).not.toBeNull();
+  });
+
+  it('is not shown for the scripted demo, which has no case service behind it', async () => {
+    const root = await renderWith('mock');
+
+    expect(root.querySelector('app-review-panel')).toBeNull();
+  });
+});
+
 describe('App before consent', () => {
   let source: FakeDataSource;
 
@@ -226,6 +266,8 @@ describe('App before consent', () => {
     ).toEqual([
       'Was aufgezeichnet wird',
       'Eine KI ist beteiligt',
+      'Erfundene Gesprächsausschnitte an OpenAI',
+      'Erfundene Rechendaten an Logismata',
       'Dies ist eine Demo',
       'Ein Mensch ist jederzeit erreichbar',
     ]);
@@ -233,6 +275,42 @@ describe('App before consent', () => {
     expect(root.querySelector('router-outlet')).toBeNull();
     // No rail yet, so the language can be chosen in the header before consenting.
     expect(root.querySelector('header app-language-switcher:not(.in-rail)')).not.toBeNull();
+    expect(source.connectionState.value).toBe('disconnected');
+  });
+
+  it.each([
+    ['de', /erfundene.*OpenAI.*Extraktion|Extraktion.*erfundene.*OpenAI/s, /keine Freigabe echter/],
+    ['fr', /fictifs.*OpenAI.*extraire/s, /n’autorise aucune donnée réelle/],
+    ['it', /inventati.*OpenAI.*estrarre/s, /non autorizza dati reali/],
+    ['en', /invented.*OpenAI.*extract/s, /does not release real/],
+  ] as const)(
+    '%s: names OpenAI, invented content and extraction, apart from the calculator',
+    async (lang, extraction, noRelease) => {
+      const { fixture, root } = await render();
+      await TestBed.inject(AppLanguage).use(lang);
+      await fixture.whenStable();
+
+      const sections = Array.from(
+        root.querySelectorAll('app-consent-screen section'),
+        (section) => section.textContent ?? '',
+      );
+      const model = sections.find((text) => text.includes('OpenAI'));
+      const calculator = sections.find((text) => text.includes('Logismata'));
+
+      expect(model).toMatch(extraction);
+      expect(model).toMatch(noRelease);
+      expect(calculator).toBeDefined();
+      expect(calculator).not.toBe(model);
+    },
+  );
+
+  it('asks again when the stored consent refers to an earlier notice', async () => {
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, '1');
+
+    const { root } = await render();
+
+    expect(CONSENT_NOTICE_VERSION).not.toBe('1');
+    expect(root.querySelector('app-consent-screen')).not.toBeNull();
     expect(source.connectionState.value).toBe('disconnected');
   });
 

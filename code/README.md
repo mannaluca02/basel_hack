@@ -45,7 +45,7 @@ Dann `ng serve --proxy-config proxy.conf.json` und im Client ausschließlich rel
 1. Vor Aufnahme `/api/privacy` anzeigen. Im PoC sind ausschließlich erfundene Daten zugelassen.
 2. `POST /api/sessions` mit `{ "accessCode": "<lokaler Zugangscode>" }`. Die Rolle wird serverseitig aus dem Code ermittelt. Die Antwort setzt ein HttpOnly-/SameSite-Strict-Cookie und liefert `csrfToken`, `expiresAt` sowie einen Bearer-Token für serverseitige Integration.
 3. Im Angular-Client `csrfToken` in `sessionStorage` halten, damit er einen Reload übersteht; bei Cookie-Authentisierung alle schreibenden Aufrufe mit `X-CSRF-Token` senden. Den Sitzungstoken nicht loggen. Die lokalen HTTP-Cookies sind für Loopback ausgelegt; produktive TLS-/Secure-Cookie-/IAM-Konfiguration ist ein gesondertes Release-Gate.
-4. `POST /api/cases` mit `{ "locale":"de", "timeBudgetMinutes":10, "noticeVersion":"lifemap-synthetic-v1", "dataClassification":"synthetic" }` erzeugt einen eigenen Fall. Neue Logins erzeugen getrennte anonyme Demo-Besitzer. Bestehende Cookies/Sitzungen können innerhalb ihrer einstündigen Gültigkeit nach Reload und Server-Neustart weiterverwendet werden. Das ersetzt kein Pax-Kundenlogin.
+4. `POST /api/cases` mit `{ "locale":"de", "timeBudgetMinutes":10, "noticeVersion":"lifemap-synthetic-v2", "dataClassification":"synthetic" }` erzeugt einen eigenen Fall. Neue Logins erzeugen getrennte anonyme Demo-Besitzer. Bestehende Cookies/Sitzungen können innerhalb ihrer einstündigen Gültigkeit nach Reload und Server-Neustart weiterverwendet werden. Das ersetzt kein Pax-Kundenlogin.
 5. `PATCH /api/cases/:id/draft` schreibt `financial`, `insurance`, `goals`, `reviewFlags` und `expectedCaseRevision`. Der vollständige Beispieldatensatz ist die Startvorlage; unbekannte Werte bleiben `null`. Der Server setzt Fall-ID und Profilversion selbst.
 6. `/questions` liefert gezielte Pflichtfelder und abhängig vom Zeitbudget eine oder drei nächste Fragen. `/confirmations` benötigt `expectedCaseRevision`, `confirmProfileAndAssumptions:true`, `allowSyntheticCalculatorTransfer:true` und `noticeVersion`. Nur der Kundenkontext bestätigt den unveränderlichen Profilstand.
 7. `/calculations` benötigt `expectedCaseRevision`, `expectedProfileVersion`, `scenarioVersionId` und `scenario`. Die Antwort enthält `run` mit lokalen Kennzahlen, Providerergebnissen, Risiko-/Kapitalbedarf, drei Säulen, Prüfgründen und gegebenenfalls Zeitachse.
@@ -126,7 +126,7 @@ Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundenda
 
 Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
 
-Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Es gibt keine externen Analytics-/Modellaufrufe.
+Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Diese Feedback-/Insights-Routen führen keine externen Analytics-/Modellaufrufe aus.
 
 
 ## Vollständige Tool-Abdeckung und vier Sprachen
@@ -138,7 +138,7 @@ Alle 24 Operationen der bereitgestellten APICalc-Spezifikation sind nun im Serve
 ```json
 {
   "expectedCaseRevision": 2,
-  "noticeVersion": "lifemap-synthetic-v1",
+  "noticeVersion": "lifemap-synthetic-v2",
   "allowSyntheticCalculatorTransfer": true,
   "requestUnits": "CHF_CENTS",
   "operation": "inheritanceAll",
@@ -169,7 +169,13 @@ Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm r
 
 Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
 
+Der erste vollständige Dialog-Moduldurchlauf ist über `npm run demo:erni-dialog` ohne externe Dienste und über `npm run demo:erni-dialog:openai` separat mit einem serverseitigen `OPENAI_API_KEY` ausführbar. Beide prüfen den Jahresbrutto-Pflichtfall und unverändertes Budget-Netto; der zweite sendet ausschließlich den eigens erfundenen Demo-Ausschnitt an OpenAI. [Startbefehle, Grenzen und Verarbeitungshinweis](apps/api/src/erni-dialog/README.md). Darios echter Voice-/Bestätigungsanschluss ist damit noch nicht abgenommen.
+
+Den Prüfstand im Angular-Client gegen den echten Fallservice startet `npm run demo:customer-review` mit synthetischen Daten; Details stehen im [Web-README](apps/web/README.md).
+
 Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.
+
+Die providerneutrale [Offline-Voice-Pipeline](apps/api/src/voice/README.md) prüft Audio → STT → Maskierung → Dialog → TTS → Wiedergabe über injizierte Adapter. `npm run test:voice` testet Ablauf, Abbruch und echte Runtime-Bestätigungen; `npm run evaluate:voice` liefert getrenntes Funktions-/Codequalitätsfeedback mit höchstens fünf Versuchen. Der verpflichtende Maskierungs-Hook bereitet die spätere Presidio-Mittelschicht vor. Echte STT-/TTS-Dienste und Browser-Audio sind damit noch nicht getestet.
 
 Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, Kontexten und SSE verfügbar. [Routen und Zuständigkeiten](../documentation/baselhack/plans/human-advisor-handover.md). `npm run demo:handover` prüft Request/Stoppsignal/Replay/Resume ohne Anruf oder externe API-Aufrufe.
 

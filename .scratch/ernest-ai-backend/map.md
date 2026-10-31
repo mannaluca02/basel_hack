@@ -45,8 +45,8 @@ Alle Tickets haben `Type: task`. `ready-for-agent` beschreibt den Triagezustand 
 
 | Nr. | Ticket / beobachtbares Ergebnis | Owner | Blocked by | Status |
 |---|---|---|---|---|
-| 01 | [Jahresbrutto aus einem finalen Dialog-Turn vorschlagen](issues/01-jahresbrutto-dialog-turn.md): tatsächlicher Modul-/Modell-/Tool-Weg bis zum unbestätigten Pflichtvorschlag | Earnie | Keine | ready-for-agent |
-| 02 | [Prüfstand und getrennte Kundenaktionen im Angular-Client anschließen](issues/02-kundenclient-pruefstand-bestaetigung.md): echter Prüfstand, korrekter Hinweis, getrennte Kundenaktionen | Angular-Besitzer; Valentin für gemeinsame Backend-Hinweise | Keine | ready-for-agent |
+| 01 | [Jahresbrutto aus einem finalen Dialog-Turn vorschlagen](issues/01-jahresbrutto-dialog-turn.md#answer): tatsächlicher Modul-/Modell-/Tool-Weg bis zum unbestätigten Pflichtvorschlag | Earnie | Keine | resolved |
+| 02 | [Prüfstand und getrennte Kundenaktionen im Angular-Client anschließen](issues/02-kundenclient-pruefstand-bestaetigung.md): echter Prüfstand, korrekter Hinweis, getrennte Kundenaktionen | Angular-Besitzer; Valentin für gemeinsame Backend-Hinweise | Keine | resolved |
 | 03 | [Eindeutige Korrekturen ohne Verlust zusammengehöriger Angaben übernehmen](issues/03-korrekturen-vorschlagspakete.md): nachvollziehbarer Nachfolger statt Datenverlust | Earnie | 01 | ready-for-agent |
 | 04 | [Personen- und Einkommensunklarheiten bis zur Antwortübernahme führen](issues/04-unklarheiten-dialogstatus.md): gezielte Klärung statt geratener Zuordnung/Jahresbasis | Earnie | 01 | ready-for-agent |
 | 05 | [Turns bei Wiederzustellung, Versionswechsel und Fehlern zuverlässig verarbeiten](issues/05-retries-konflikte-fehler.md): keine Duplikate oder veralteten Mutationen | Earnie | 01 | ready-for-agent |
@@ -116,5 +116,11 @@ Die elf Tickets, diese Übersicht, die Spezifikationsquellen und das referenzier
 Zum Einstieg diese Übersicht und die verbindlichen Quellen lesen, dann das konkrete Ticket öffnen. Empfohlen ist 01; 02 kann unabhängig beim Angular-Besitzer beginnen. Den aktuellen Code vor jeder Umsetzung prüfen und bereits erledigte Arbeit berücksichtigen. Nicht auf Basis einer veralteten Ticketkopie oder ohne erledigte Blocker starten. Ein Push startet kein Ticket automatisch; die Ausführung wird jeweils ausdrücklich beauftragt.
 
 Historische Aussagen in den Quellen über ausschließlich lokale Verfügbarkeit oder damals noch nicht angelegte Tickets beziehen sich auf deren Erstellungszeitpunkt. Die fachliche Rangfolge der Quellen und die drei Testgrenzen bleiben unverändert.
+
+## Umsetzungsnachweis 31.10.2026
+
+Ausschließlich **01** ist abgeschlossen; [Umsetzung und Prüfergebnisse](issues/01-jahresbrutto-dialog-turn.md#answer). Feature-Branch `feature/ernie-01-jahresbrutto-dialog-turn` basiert auf dem frisch abgerufenen `origin/main` **6f84c65**. Der vollständige finale Text-/Voice-Turn erzeugt den unbestätigten Jahresbrutto-Pflichtvorschlag, ohne Budget-Netto, Entwurf oder bestätigte Snapshots zu ändern. Build, Client-Typprüfung, 25 Vertragsschemas und **178/178 Tests** einschließlich 15 neuer vollständiger Dialog-Turn-Tests sind erfolgreich; nur der Modelltransport wurde simuliert. Keine echte OpenAI-Abnahme, keine Commits, Pushes oder Branch-Merges.
+
+02 kann weiterhin unabhängig beim vorgesehenen Besitzer starten. Durch 01 sind die direkten Blocker von 03–07 erfüllt; keines dieser Tickets wurde hier gestartet. Die übrigen Abhängigkeiten gelten unverändert. Die isolierte Testumgebung und das vorhandene Angular-Lockfile-Problem sind im Answer dokumentiert.
 
 ## Comments

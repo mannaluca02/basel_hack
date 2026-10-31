@@ -4,9 +4,10 @@ export const CONSENT_STORAGE_KEY = 'pax.consent';
 
 /**
  * Version of the privacy notice the consent refers to. Raise it when the notice changes in
- * substance, so an earlier consent no longer counts.
+ * substance, so an earlier consent no longer counts. It is the backend's `PRIVACY_NOTICE.version`:
+ * a case starts with this value, so the backend refuses a client still showing an older text.
  */
-export const CONSENT_NOTICE_VERSION = '1';
+export const CONSENT_NOTICE_VERSION = 'lifemap-synthetic-v2';
 
 /**
  * Whether the user has read the privacy notice and agreed (DSG/FADP, project rule 7). Nothing
@@ -42,7 +43,7 @@ export class Consent {
 }
 
 // Even reading `window.sessionStorage` throws when storage is blocked.
-function sessionStorageOf(document: Document): Storage | null {
+export function sessionStorageOf(document: Document): Storage | null {
   try {
     return document.defaultView?.sessionStorage ?? null;
   } catch {

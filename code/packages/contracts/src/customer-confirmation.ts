@@ -14,7 +14,7 @@ export const CreateConfirmationInputSchema=z.object({expectedCaseRevision:revisi
 export const CustomerConfirmationSchema=z.object({schemaVersion:z.literal('1.0'),id:Id,caseId:Id,target:ConfirmationTargetSchema,
   channel:z.enum(['voice','screen']),basisCaseRevision:revision,basisProfileVersion:revision.nullable(),basisDraftHash:hash,targetHash:hash,
   locale:LocaleSchema,questionId:Id,questionTurnId:Id,questionReplyId:Id,questionHash:hash,questionText:z.string().min(1).max(16000),
-  review:z.object({draft:DraftSchema,changes:z.array(ProposalChangeInputSchema).max(50),noticeVersion:z.literal('lifemap-synthetic-v1'),
+  review:z.object({draft:DraftSchema,changes:z.array(ProposalChangeInputSchema).max(50),noticeVersion:z.enum(['lifemap-synthetic-v1','lifemap-synthetic-v2']),
     allowSyntheticCalculatorTransfer:z.boolean(),confirmProfileAndAssumptions:z.boolean()}).strict(),
   createdAt:z.iso.datetime(),expiresAt:z.iso.datetime(),status:z.enum(['awaiting_presentation','awaiting_answer','consumed','cancelled','invalidated']),
   presentedAt:z.iso.datetime().nullable(),playbackId:Id.nullable(),answerMessageId:Id.nullable(),answeredAt:z.iso.datetime().nullable(),
@@ -42,4 +42,9 @@ export const CurrentCustomerConfirmationSchema=z.object({confirmation:CustomerCo
 export const ConfirmationOutcomeSchema=z.object({confirmation:CustomerConfirmationSchema,caseRevision:revision,contextRevision:revision,
   profileVersion:revision.nullable(),accepted:z.boolean(),confirmationStillRequired:z.boolean()}).strict();
 export type CustomerConfirmation=z.infer<typeof CustomerConfirmationSchema>;
+export type CreateConfirmationInput=z.infer<typeof CreateConfirmationInputSchema>;
+export type PresentConfirmationInput=z.infer<typeof PresentConfirmationInputSchema>;
+export type AnswerConfirmationInput=z.infer<typeof AnswerConfirmationInputSchema>;
+export type CancelConfirmationInput=z.infer<typeof CancelConfirmationInputSchema>;
+export type ConfirmationOutcome=z.infer<typeof ConfirmationOutcomeSchema>;
 export type ConfirmationTarget=z.infer<typeof ConfirmationTargetSchema>;

@@ -16,6 +16,9 @@
   </main>
 } @else {
   <main class="view" #view tabindex="-1">
+    @if (reviewEnabled) {
+      <app-review-panel />
+    }
     <router-outlet />
   </main>
 

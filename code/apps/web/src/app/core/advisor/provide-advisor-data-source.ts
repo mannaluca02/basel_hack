@@ -1,6 +1,7 @@
 import { EnvironmentProviders, inject, makeEnvironmentProviders } from '@angular/core';
 import { APP_ENVIRONMENT } from '../config/app-environment';
 import { AdvisorDataSource } from './advisor-data-source';
+import { ApiDataSource } from './api/api-data-source';
 import { MockDataSource } from './mock/mock-data-source';
 
 /**
@@ -17,8 +18,7 @@ export function provideAdvisorDataSource(): EnvironmentProviders {
           case 'mock':
             return new MockDataSource();
           case 'api':
-            // FE-20 (#27) adds the HTTP/SSE adapter.
-            throw new Error('dataSource "api" is not implemented yet (FE-20). Use "mock".');
+            return new ApiDataSource();
         }
       },
     },

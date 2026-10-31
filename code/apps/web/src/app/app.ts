@@ -20,10 +20,12 @@ import {
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CaseStore } from './core/advisor/store/case-store';
 import { WorkspaceTab } from './core/advisor/store/case-state';
+import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
+import { ReviewPanel } from './features/review/review-panel';
 
 interface TabLink {
   readonly id: WorkspaceTab;
@@ -43,6 +45,7 @@ interface TabLink {
     LanguageSwitcher,
     ConsentScreen,
     AgentDock,
+    ReviewPanel,
   ],
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,6 +75,9 @@ export class App {
 
   /** Until the user consents, only the privacy notice is shown: no workspace, no call. */
   protected readonly consented = this.consent.granted;
+
+  /** The review stand needs the real case service; the scripted mock has no packages to decide. */
+  protected readonly reviewEnabled = inject(APP_ENVIRONMENT).dataSource === 'api';
 
   /** Risks not yet addressed: the count badge on the Risks tab. */
   protected readonly openRisks = computed(

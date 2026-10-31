@@ -107,7 +107,7 @@ Anschließende ausdrückliche Gesamtbestätigung mit der **Revision aus der Anna
   "expectedCaseRevision": 9,
   "confirmProfileAndAssumptions": true,
   "allowSyntheticCalculatorTransfer": true,
-  "noticeVersion": "lifemap-synthetic-v1"
+  "noticeVersion": "lifemap-synthetic-v2"
 }
 ```
 

@@ -4,7 +4,7 @@ Stand: 31.10.2026. Gemeinsamer Backend-Teil aus [Ticket 02](../../../.scratch/er
 
 ## Was das Backend jetzt garantiert
 
-- Eigener Hinweis `extraction-synthetic-v1`, getrennt von Profil-/Rechnerhinweis (`lifemap-synthetic-v1`) und Sprachdemo (`voice-synthetic-v1`). Keine dieser Zustimmungen ersetzt eine andere.
+- Eigener Hinweis `extraction-synthetic-v1`, getrennt vom aktuellen Profil-/Rechnerhinweis (`lifemap-synthetic-v2`) und der Sprachdemo (`voice-synthetic-v1`). Keine dieser Zustimmungen ersetzt eine andere; ältere bestätigte Snapshots behalten ihre ursprüngliche Hinweisversion.
 - Der Hinweis nennt OpenAI (Responses API), den Zweck (Feldextraktion aus dem Gespräch) und genau die vereinbarte synthetische Projektion: erfundener Gesprächsausschnitt, pseudonyme Personen-ID, betroffene Feldwerte mit Einheit und Einkommensbasis, erlaubte Zielpfade, zugehörige Rückfragen. Ausgeschlossen: vollständiger Fall, Revisionen/Hashes/Berechtigungen, Zugangsdaten, Audio, Gesundheits- und echte Kundendaten.
 - `noticeHash` ist ein SHA-256 über Version, Empfänger, Umfang und alle vier Sprachtexte. Jede inhaltliche Änderung ergibt einen neuen Hash; eine gespeicherte Zustimmung zum alten Inhalt erlaubt dann keine Übertragung mehr (`blockedReason: notice_changed`).
 - Standardmäßig deaktiviert. Erst `PAX_SYNTHETIC_EXTRACTION_ENABLED=1` aktiviert den Weg; `/api/privacy` meldet dann `externalAiTransfer: true`, ergänzt den Empfänger und hängt den Text an `display.recipients` an, in DE/FR/IT/EN. Ist der Weg aus, behauptet kein Hinweis eine KI-Übertragung.

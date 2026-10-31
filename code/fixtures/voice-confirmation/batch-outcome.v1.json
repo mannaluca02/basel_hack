@@ -404,7 +404,7 @@
           "personId": "person_demo_1"
         }
       ],
-      "noticeVersion": "lifemap-synthetic-v1",
+      "noticeVersion": "lifemap-synthetic-v2",
       "allowSyntheticCalculatorTransfer": false,
       "confirmProfileAndAssumptions": false
     },
