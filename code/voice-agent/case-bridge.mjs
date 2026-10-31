@@ -114,8 +114,18 @@ export function createCaseBridge({ apiUrl, fetchImpl = fetch, log = console, tur
     const link = links.get(linkId);
     if (!link || link.expiresAt <= Date.now()) return null;
     if (link.state && Date.now() - link.stateAt < CASE_STATE_TTL_MS) return link.state;
-    const context = await call(link, "GET", `/api/cases/${link.caseId}/advisor/extractor-context`);
+    const [context, advice] = await Promise.all([
+      call(link, "GET", `/api/cases/${link.caseId}/advisor/extractor-context`),
+      call(link, "GET", `/api/cases/${link.caseId}/voice/agent-recommendation`).catch(() => ({ recommendation: null })),
+    ]);
+    const recommendation = advice.recommendation;
     link.state = {
+      recommendation: recommendation
+        ? {
+            reviewOpen: recommendation.reviewOpen,
+            products: recommendation.candidates.map((c) => ({ name: c.productName, suitabilityCheckRequired: c.suitabilityCheckRequired })),
+          }
+        : null,
       known: knownFromCase(context.draft),
       questions: (context.ambiguities ?? []).filter((a) => a.dialogueStatus === "needs_answer").map((a) => a.question),
       stop: context.handover?.stopDigitalConversation === true,

@@ -182,3 +182,18 @@ test('taking over proposals in one step only exists in the demo start',async()=>
   const c=(await request('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
   assert.equal((await request('POST',`/api/cases/${c.id}/demo-accept`,customer.sessionToken,{})).status,404);
 });
+
+test('the voice agent reads the rule-based recommendation it may talk about',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'pax-agent-rec-'));
+  const {app:demoApp}=await createLifeInsuranceApp({dataDirectory:dir,provider:new SyntheticTestProvider(),providerMode:'test',credentials,demoStart:true});
+  try{
+    await demoApp.listen(0,'127.0.0.1');const url=await demoApp.getUrl();
+    const start=await fetch(url+'/api/demo/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const cookie=start.headers.get('set-cookie').split(';')[0];const {caseId,csrfToken}=await start.json();
+    const grant=await (await fetch(`${url}/api/cases/${caseId}/agent-access`,{method:'POST',headers:{Cookie:cookie,'X-CSRF-Token':csrfToken,'Content-Type':'application/json'},body:'{}'})).json();
+    const result=await (await fetch(`${url}/api/cases/${caseId}/voice/agent-recommendation`,{headers:{Authorization:`Bearer ${grant.sessionToken}`}})).json();
+    assert.equal(result.recommendation.reviewOpen,true);
+    assert.deepEqual(result.recommendation.candidates.map(c=>c.productName),['Pax Erwerbsunfähigkeitsschutz','Pax Todesfallschutz']);
+    assert.equal(JSON.stringify(result).includes('needAmountCents'),false);
+  }finally{await demoApp.close();await rm(dir,{recursive:true,force:true});}
+});

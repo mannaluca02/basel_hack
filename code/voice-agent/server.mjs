@@ -524,7 +524,12 @@ app.get("/api/conversations/:sessionId/progress", async (request, response) => {
     known: knownSummary(log),
     ...progress(log),
     ...(log.caseLink
-      ? { case_linked: caseState !== null, case_questions: caseState?.questions ?? [], stop: caseState?.stop === true }
+      ? {
+          case_linked: caseState !== null,
+          case_questions: caseState?.questions ?? [],
+          case_recommendation: caseState?.recommendation ?? null,
+          stop: caseState?.stop === true,
+        }
       : {}),
   });
 });

@@ -24,6 +24,7 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/transcript','Read encrypted finalized transcript; scoped agent or owner only',undefined],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/turns','Customer client records a finalized customer/agent turn; never confirms facts',VoiceTurnInputSchema],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/extraction','Scoped agent maps sourced observations into one atomic proposal batch or explicit follow-ups',VoiceExtractionInputSchema],
+  ['get','/api/cases/{caseId}/voice/agent-recommendation','Owner or scoped agent reads the rule-based recommendation of the active run, product names in the case language',undefined],
   ['get','/api/cases/{caseId}/voice/agent-turns','Owner or scoped agent reads the call history recorded by a separate voice agent',undefined],
   ['post','/api/cases/{caseId}/voice/agent-turns','Scoped agent of a separate voice agent records final turns for the call history; changes no fact and no case revision',AgentVoiceTurnsSchema],
   ['post','/api/cases/{caseId}/voice/agent-observations','Scoped agent of a separately running voice agent maps quoted final customer turns into one atomic proposal batch',ExternalVoiceObservationsSchema],

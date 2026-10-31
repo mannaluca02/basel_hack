@@ -221,7 +221,10 @@ test("what the case already knows becomes questionnaire answers", async () => {
 
 test("the case state carries clarifications and the stop for a human advisor, read at most every few seconds", async () => {
   let reads = 0;
-  const fetchImpl = async () => {
+  const fetchImpl = async (url) => {
+    if (url.endsWith("/voice/agent-recommendation")) {
+      return json({ recommendation: { reviewOpen: true, candidates: [{ productName: "Pax FondsStar", suitabilityCheckRequired: true }] } });
+    }
     reads += 1;
     return json({
       draft: { financial: null, insurance: null },
@@ -235,7 +238,12 @@ test("the case state carries clarifications and the stop for a human advisor, re
   const bridge = createCaseBridge({ apiUrl: "http://backend", fetchImpl, log: quiet });
   const { linkId } = bridge.register({ caseId: CASE_ID, agentToken: TOKEN, expiresAt: new Date(Date.now() + 60_000).toISOString() });
   const state = await bridge.caseState(linkId);
-  assert.deepEqual(state, { known: {}, questions: ["Meinen Sie 2000 Franken pro Monat?"], stop: true });
+  assert.deepEqual(state, {
+    recommendation: { reviewOpen: true, products: [{ name: "Pax FondsStar", suitabilityCheckRequired: true }] },
+    known: {},
+    questions: ["Meinen Sie 2000 Franken pro Monat?"],
+    stop: true,
+  });
   await bridge.caseState(linkId);
   assert.equal(reads, 1);
 });

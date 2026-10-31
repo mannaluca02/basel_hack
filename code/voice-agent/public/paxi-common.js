@@ -33,12 +33,23 @@ function caseQuestionNote(progress) {
     : "";
 }
 
+/** The rule-based Pax recommendation for the case: the only solutions Paxi may propose. */
+function recommendationNote(progress) {
+  const rec = progress.case_recommendation;
+  if (!rec) return "";
+  if (!rec.products.length) return "The Pax analysis found no need for an additional contract right now; say so if the person asks for solutions.";
+  const names = rec.products.map((p) => (p.suitabilityCheckRequired ? `${p.name} (needs the suitability check with a colleague first)` : p.name));
+  return `The Pax analysis of this case points to: ${names.join(", ")}. When you propose plans, use only these, explain them from the person's situation${rec.reviewOpen ? ", and say that a Pax colleague still reviews them" : ""}.`;
+}
+
 /** The quiet note that tells Paxi what is known and what is still missing. */
 export function progressNote(progress) {
   const clarification = caseQuestionNote(progress);
+  const advice = recommendationNote(progress);
   if (progress.complete) {
     const planning = progress.open_planning ?? [];
     if (clarification) return clarification;
+    if (advice) return `${advice} ${planning.length ? `If the person has time, also find out: ${planning.join(", ")}.` : "Now summarise, propose these plans and say goodbye once."}`;
     return planning.length
       ? `The core and extended details are complete. If the person has time, find out these details for the calculation, compactly and in plain words: ${planning.join(", ")}. If they want to finish: summarise, propose your plans, say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.`
       : "Everything is complete. Now summarise and check, propose your plans (skill \"Proposing plans\"), then say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.";
@@ -97,7 +108,7 @@ export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, on
       }
       const note = progressNote(progress);
       // Only the open list matters for the note; known values alone do not trigger a new one.
-      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}|${progress.open_planning}|${progress.case_questions}`;
+      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}|${progress.open_planning}|${progress.case_questions}|${JSON.stringify(progress.case_recommendation ?? null)}`;
       if (key !== lastNote) {
         lastNote = key;
         onNote(note);
