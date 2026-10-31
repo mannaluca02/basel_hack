@@ -210,8 +210,14 @@
   background: none;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+}
+
 .toggle {
-  justify-self: start;
   min-height: 2.75rem;
   padding: 0 0.75rem;
   border: var(--stroke-border) solid var(--border-soft);
@@ -220,6 +226,22 @@
   background: none;
   font: inherit;
   font-size: 0.875rem;
+  cursor: pointer;
+}
+
+// "Show in Info" (FE-18): a quiet text link like "Show in Graphics" on a risk row.
+.jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  color: var(--text-brand);
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
 }
 

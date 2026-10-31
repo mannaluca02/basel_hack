@@ -133,6 +133,13 @@
   font-size: 0.875rem;
 }
 
+// Two links (Graphics, Info) sit side by side when there is room.
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5rem;
+}
+
 .jump {
   display: inline-flex;
   justify-self: start;

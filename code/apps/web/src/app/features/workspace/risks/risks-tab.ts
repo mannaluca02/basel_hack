@@ -19,6 +19,8 @@ import {
   RiskSeverity,
 } from '../../../core/advisor/ui-models';
 import { ChartJump } from '../../../core/layout/chart-jump';
+import { InfoJump } from '../../../core/layout/info-jump';
+import { infoForRisk, pushedInfo } from '../info/info-links';
 import { RiskRow } from './risk-row';
 
 /** How long the "updated" marker stays after a risk changed. */
@@ -50,7 +52,8 @@ function signature(risk: RiskItem): string {
  * The Risks tab (FE-16): the risks the logic backend has identified in the customer's life. Open
  * risks (identified or waiting for data) come first, the most severe on top; addressed risks
  * follow in their own section. New risks slide in during the call and are announced to screen
- * readers; a changed risk is tinted for a moment. "Show in Graphics" opens the related chart.
+ * readers; a changed risk is tinted for a moment. "Show in Graphics" opens the related chart,
+ * "Show in Info" the related info card (FE-18).
  */
 @Component({
   selector: 'app-risks-tab',
@@ -73,7 +76,9 @@ function signature(risk: RiskItem): string {
                 [risk]="risk"
                 [chartAvailable]="hasChart(risk)"
                 [updated]="updatedIds().has(risk.riskId)"
+                [infoAvailable]="infoFor(risk) !== null"
                 (showChart)="showChart(risk)"
+                (showInfo)="showInfo(risk)"
               />
             </li>
           }
@@ -91,7 +96,9 @@ function signature(risk: RiskItem): string {
                 [risk]="risk"
                 [chartAvailable]="hasChart(risk)"
                 [updated]="updatedIds().has(risk.riskId)"
+                [infoAvailable]="infoFor(risk) !== null"
                 (showChart)="showChart(risk)"
+                (showInfo)="showInfo(risk)"
               />
             </li>
           }
@@ -166,6 +173,7 @@ function signature(risk: RiskItem): string {
 export class RisksTab {
   private readonly store = inject(CaseStore);
   private readonly jump = inject(ChartJump);
+  private readonly infoJump = inject(InfoJump);
   private readonly transloco = inject(TranslocoService);
   private readonly injector = inject(EnvironmentInjector);
 
@@ -186,6 +194,7 @@ export class RisksTab {
   private readonly chartIds = computed(
     () => new Set(this.store.charts().map((chart) => chart.chartId)),
   );
+  private readonly pushedInfo = computed(() => pushedInfo(this.store.info()));
 
   /** Risks that changed in the last few seconds. */
   protected readonly updatedIds = signal<ReadonlySet<string>>(new Set());
@@ -214,6 +223,15 @@ export class RisksTab {
   protected showChart(risk: RiskItem): void {
     if (!risk.relatedChartId) return;
     this.jump.show({ chartId: risk.relatedChartId, event: IMPACT_EVENTS[risk.category] });
+  }
+
+  protected infoFor(risk: RiskItem): string | null {
+    return infoForRisk(risk, this.pushedInfo());
+  }
+
+  protected showInfo(risk: RiskItem): void {
+    const infoId = this.infoFor(risk);
+    if (infoId) this.infoJump.show(infoId);
   }
 
   private receive(risks: readonly RiskItem[], loaded: boolean): void {

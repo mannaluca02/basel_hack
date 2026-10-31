@@ -52,8 +52,8 @@ let nextId = 0;
 
 /**
  * One risk from the logic backend (FE-16) as a quiet row: severity, title and the gap. The row
- * opens to the explanation, the affected pillars and "Show in Graphics". Severity, status and
- * amount come as they are; the row only formats them (rule 3).
+ * opens to the explanation, the affected pillars, "Show in Graphics" and "Show in Info" (FE-18).
+ * Severity, status and amount come as they are; the row only formats them (rule 3).
  */
 @Component({
   selector: 'app-risk-row',
@@ -137,18 +137,35 @@ let nextId = 0;
           {{ pillarKeys[pillar] | transloco }}{{ last ? '' : ' · ' }}
         }
       </p>
-      @if (chartAvailable()) {
-        <button
-          type="button"
-          class="jump"
-          [attr.aria-describedby]="titleId"
-          (click)="showChart.emit()"
-        >
-          {{ 'risks.showInGraphics' | transloco }}
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </button>
+      @if (chartAvailable() || infoAvailable()) {
+        <div class="links">
+          @if (chartAvailable()) {
+            <button
+              type="button"
+              class="jump"
+              [attr.aria-describedby]="titleId"
+              (click)="showChart.emit()"
+            >
+              {{ 'risks.showInGraphics' | transloco }}
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </button>
+          }
+          @if (infoAvailable()) {
+            <button
+              type="button"
+              class="jump"
+              [attr.aria-describedby]="titleId"
+              (click)="showInfo.emit()"
+            >
+              {{ 'risks.showInInfo' | transloco }}
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </button>
+          }
+        </div>
       }
     </div>
   `,
@@ -163,6 +180,9 @@ export class RiskRow {
   /** Tints the row; the tab sets it for a few seconds after a change. */
   readonly updated = input(false);
   readonly showChart = output<void>();
+  /** The Info tab has a card for this risk, so "Show in Info" has somewhere to go. */
+  readonly infoAvailable = input(false);
+  readonly showInfo = output<void>();
 
   protected readonly open = signal(false);
   protected readonly titleId = `risk-row-title-${nextId}`;

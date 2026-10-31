@@ -87,7 +87,8 @@
       "after": "Après"
     },
     "neededLine": "Nécessaire : {{amount}}",
-    "payout": "Versement à la retraite ({{year}})"
+    "payout": "Versement à la retraite ({{year}})",
+    "showInInfo": "Afficher dans Info"
   },
   "risks": {
     "title": "Risques",
@@ -101,6 +102,7 @@
       "once": "{{amount}} en une fois"
     },
     "showInGraphics": "Afficher dans Graphiques",
+    "showInInfo": "Afficher dans Info",
     "severity": {
       "high": "Risque élevé",
       "medium": "Risque moyen",
@@ -128,7 +130,44 @@
     "announce": "{{speaker}}: {{text}}"
   },
   "info": {
-    "title": "Infos"
+    "title": "Infos",
+    "call": "Issu de l’entretien",
+    "empty": "Les explications sur votre situation apparaissent ici dès qu’elles sont abordées dans l’entretien.",
+    "basics": "Notions de base",
+    "new": "Nouveau",
+    "announce": "Nouvelle information : {{title}}",
+    "neutral": "Informations générales et neutres, sans publicité pour des produits.",
+    "category": {
+      "basics": "Notions de base",
+      "term": "Terme",
+      "assumption": "Hypothèse"
+    },
+    "glossary": {
+      "threePillars": {
+        "title": "Le système des trois piliers",
+        "body": "La prévoyance suisse repose sur trois piliers. Le 1er pilier (AVS/AI) couvre les besoins vitaux. Le 2e pilier (caisse de pension) doit, avec le 1er pilier, permettre de maintenir de manière appropriée le niveau de vie habituel. Le 3e pilier est la prévoyance privée facultative, pour des objectifs personnels et des lacunes."
+      },
+      "pillar1": {
+        "title": "1er pilier : AVS/AI",
+        "body": "La prévoyance étatique est obligatoire pour toutes les personnes qui vivent ou travaillent en Suisse. Elle verse des rentes à la retraite (AVS), aux survivants et en cas d’invalidité (AI). Les cotisations d’aujourd’hui financent les rentes d’aujourd’hui. Des années de cotisation manquantes réduisent la rente."
+      },
+      "pillar2": {
+        "title": "2e pilier : caisse de pension",
+        "body": "La prévoyance professionnelle est obligatoire pour les salariés à partir d’un certain salaire annuel. Salariés et employeurs versent des cotisations, et l’avoir est constitué individuellement pour chaque personne. À la retraite, elle verse une rente, un capital ou les deux. Les prestations figurent sur le certificat de prévoyance."
+      },
+      "pillar3a": {
+        "title": "Pilier 3a : prévoyance liée",
+        "body": "Toute personne ayant un revenu d’activité soumis à l’AVS peut verser chaque année jusqu’à un montant maximal légal et le déduire de son revenu imposable. L’avoir est bloqué et disponible au plus tôt cinq ans avant l’âge ordinaire de la retraite. Les exceptions comprennent notamment l’achat d’un logement, le passage à l’indépendance ou le départ définitif de Suisse."
+      },
+      "pillar3b": {
+        "title": "Pilier 3b : prévoyance libre",
+        "body": "Toute autre épargne privée, par exemple sur un compte d’épargne ou en titres. Il n’y a pas de montant maximal, et l’argent reste librement disponible. Le pilier 3b ne bénéficie généralement pas d’avantages fiscaux particuliers."
+      },
+      "gap": {
+        "title": "Lacune de prévoyance",
+        "body": "La différence entre le revenu dont vous avez besoin à la retraite, en cas d’invalidité ou de décès, et ce que votre prévoyance devrait alors verser. Son ampleur dépend de vos objectifs et de votre situation."
+      }
+    }
   },
   "demo": {
     "badge": "Démo",

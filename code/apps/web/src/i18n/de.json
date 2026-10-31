@@ -87,7 +87,8 @@
       "after": "Nachher"
     },
     "neededLine": "Benötigt: {{amount}}",
-    "payout": "Auszahlung bei Pensionierung ({{year}})"
+    "payout": "Auszahlung bei Pensionierung ({{year}})",
+    "showInInfo": "In Info zeigen"
   },
   "risks": {
     "title": "Risiken",
@@ -101,6 +102,7 @@
       "once": "{{amount}} einmalig"
     },
     "showInGraphics": "In Grafiken zeigen",
+    "showInInfo": "In Info zeigen",
     "severity": {
       "high": "Hohes Risiko",
       "medium": "Mittleres Risiko",
@@ -128,7 +130,44 @@
     "announce": "{{speaker}}: {{text}}"
   },
   "info": {
-    "title": "Info"
+    "title": "Info",
+    "call": "Aus dem Gespräch",
+    "empty": "Erklärungen zu Ihrer Situation erscheinen hier, sobald sie im Gespräch zur Sprache kommen.",
+    "basics": "Grundlagen",
+    "new": "Neu",
+    "announce": "Neue Information: {{title}}",
+    "neutral": "Allgemeine, neutrale Informationen ohne Produktwerbung.",
+    "category": {
+      "basics": "Grundlagen",
+      "term": "Begriff",
+      "assumption": "Annahme"
+    },
+    "glossary": {
+      "threePillars": {
+        "title": "Das Drei-Säulen-System",
+        "body": "Die Schweizer Vorsorge ruht auf drei Säulen. Die 1. Säule (AHV/IV) sichert den Existenzbedarf. Die 2. Säule (Pensionskasse) soll zusammen mit der 1. Säule die gewohnte Lebenshaltung in angemessener Weise ermöglichen. Die 3. Säule ist die freiwillige private Vorsorge für persönliche Ziele und Lücken."
+      },
+      "pillar1": {
+        "title": "1. Säule: AHV/IV",
+        "body": "Die staatliche Vorsorge ist für alle obligatorisch, die in der Schweiz wohnen oder arbeiten. Sie zahlt Renten im Alter (AHV), an Hinterlassene und bei Invalidität (IV). Die Beiträge von heute finanzieren die Renten von heute. Fehlende Beitragsjahre kürzen die Rente."
+      },
+      "pillar2": {
+        "title": "2. Säule: Pensionskasse",
+        "body": "Die berufliche Vorsorge ist für Angestellte ab einem bestimmten Jahreslohn obligatorisch. Arbeitnehmende und Arbeitgeber zahlen Beiträge, das Guthaben wird für jede Person einzeln angespart. Bei der Pensionierung gibt es eine Rente, Kapital oder beides. Die Leistungen stehen auf dem Pensionskassenausweis."
+      },
+      "pillar3a": {
+        "title": "Säule 3a: gebundene Vorsorge",
+        "body": "Wer ein AHV-pflichtiges Erwerbseinkommen hat, kann jedes Jahr bis zu einem gesetzlichen Höchstbetrag einzahlen und diesen vom steuerbaren Einkommen abziehen. Das Guthaben ist gebunden und frühestens fünf Jahre vor dem ordentlichen Rentenalter verfügbar. Ausnahmen sind unter anderem Wohneigentum, der Schritt in die Selbstständigkeit oder das definitive Verlassen der Schweiz."
+      },
+      "pillar3b": {
+        "title": "Säule 3b: freie Vorsorge",
+        "body": "Alles weitere private Sparen, zum Beispiel auf einem Sparkonto oder in Wertschriften. Es gibt keine Höchstbeträge, und das Geld bleibt frei verfügbar. Steuerlich ist die Säule 3b meist nicht besonders begünstigt."
+      },
+      "gap": {
+        "title": "Vorsorgelücke",
+        "body": "Die Differenz zwischen dem Einkommen, das Sie im Alter, bei Invalidität oder im Todesfall brauchen, und dem, was Ihre Vorsorge dann voraussichtlich leistet. Wie gross sie ist, hängt von Ihren Zielen und Ihrer Situation ab."
+      }
+    }
   },
   "demo": {
     "badge": "Demo",

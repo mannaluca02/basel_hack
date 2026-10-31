@@ -9,6 +9,7 @@ import {
   event,
   impactChart,
   incomeChart,
+  info,
   pillar3aChart,
   snapshot,
 } from '../../../core/advisor/store/case-testing';
@@ -16,6 +17,7 @@ import { ChartResult } from '../../../core/advisor/ui-models';
 import { Consent } from '../../../core/consent/consent';
 import { provideI18nTesting } from '../../../core/i18n/i18n-testing';
 import { ChartJump, ChartTarget } from '../../../core/layout/chart-jump';
+import { InfoJump } from '../../../core/layout/info-jump';
 import { ViewScroller } from '../../../core/layout/view-scroller';
 import { stubChartCanvas } from './graphics-testing';
 import { GraphicsTab } from './graphics-tab';
@@ -57,6 +59,7 @@ describe('GraphicsTab', () => {
   let source: FakeDataSource;
   let scroller: FakeScroller;
   let jump: FakeJump;
+  let infoJump: { show: ReturnType<typeof vi.fn> };
   let fixture: ComponentFixture<Shell>;
   let root: HTMLElement;
 
@@ -65,12 +68,14 @@ describe('GraphicsTab', () => {
     source.nextSnapshot = of(snapshot({ charts: initialCharts }));
     scroller = new FakeScroller();
     jump = new FakeJump();
+    infoJump = { show: vi.fn() };
     TestBed.configureTestingModule({
       providers: [
         provideI18nTesting(),
         { provide: AdvisorDataSource, useValue: source },
         { provide: ViewScroller, useValue: scroller },
         { provide: ChartJump, useValue: jump },
+        { provide: InfoJump, useValue: infoJump },
       ],
     });
     stubChartCanvas();
@@ -253,5 +258,27 @@ describe('GraphicsTab', () => {
     expect(second).not.toBe(first);
     expect(region()).not.toBe(second);
     expect(live()).toBe('Grafik aktualisiert: Lebensereignisse');
+  });
+
+  it('links a chart to the newest info card about it, or to the basics behind its type', async () => {
+    await start([incomeChart(), pillar3aChart(), chart()]);
+    const link = (chartId: string) =>
+      root.querySelector<HTMLButtonElement>(`app-chart-card[data-chart-id="${chartId}"] .jump`);
+    expect(link('chart_a')).toBeNull();
+    expect(link('chart_3a')?.textContent?.trim()).toBe('In Info zeigen');
+
+    link('chart_3a')?.click();
+    expect(infoJump.show).toHaveBeenLastCalledWith('glossary_pillar3a');
+
+    source.emit(
+      event('info', info({ infoId: 'info_3a', relatedChartId: 'chart_3a' })),
+      event(
+        'info',
+        info({ infoId: 'info_3a_tax', relatedChartId: 'chart_3a', at: '2026-10-31T10:05:00.000Z' }),
+      ),
+    );
+    await fixture.whenStable();
+    link('chart_3a')?.click();
+    expect(infoJump.show).toHaveBeenLastCalledWith('info_3a_tax');
   });
 });
