@@ -9,15 +9,14 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import type { CustomerSummary, PortalDto, SuitabilityCheck, SuitabilityView } from '@pax/contracts';
 import { CustomerApi } from '../../core/advisor/api/customer-api';
-import { FeedbackStage, JourneyApi, Recommendation } from '../../core/advisor/api/journey-api';
+import { JourneyApi, Recommendation } from '../../core/advisor/api/journey-api';
 import { CaseStore } from '../../core/advisor/store/case-store';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { LocaleFormat } from '../../core/i18n/locale-format';
-import { NpsCard } from './nps-card';
+import { DossierDialog } from './dossier-dialog';
 import { SuitabilityForm } from './suitability-form';
 
 type Step =
@@ -93,12 +92,11 @@ const DOCUMENT_KIND: Readonly<Record<string, string>> = {
  * and the policy never claims cover. In the demo start the Pax specialist's steps are simulated
  * by the backend (demo-review) and labelled as such; elsewhere the case waits for a real reviewer.
  *
- * Also the customer's documentation: product documents to acknowledge, the advice dossier, and an
- * NPS question for the reached stage.
+ * Also the customer's documentation: product documents to acknowledge and the advice dossier.
  */
 @Component({
   selector: 'app-journey-view',
-  imports: [TranslocoPipe, RouterLink, NgTemplateOutlet, NpsCard, SuitabilityForm],
+  imports: [TranslocoPipe, NgTemplateOutlet, SuitabilityForm, DossierDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './journey-view.html',
   styleUrl: './journey-view.scss',
@@ -120,6 +118,8 @@ export class JourneyView {
   protected readonly error = signal<string | null>(null);
   protected readonly selected = signal<ReadonlySet<string>>(new Set());
   protected readonly documentsRead = signal(false);
+  protected readonly dossierOpen = signal(false);
+  private dossierOpener: HTMLElement | null = null;
 
   protected readonly caseId = computed(() => this.customer.session()?.caseId ?? null);
 
@@ -196,13 +196,6 @@ export class JourneyView {
     });
   });
 
-  /** The NPS question fits the furthest stage reached. */
-  protected readonly npsStage = computed<FeedbackStage | null>(() => {
-    if (this.currentPolicy()) return 'portal';
-    if (this.recommendation()) return 'recommendation';
-    return this.summary()?.profileVersion ? 'advice' : null;
-  });
-
   protected readonly firstPerson = computed(
     () => this.store.canonical()?.draft.insurance?.persons[0]?.personId ?? '',
   );
@@ -255,8 +248,15 @@ export class JourneyView {
     return this.api.documentUrl(this.caseId() ?? '', documentId);
   }
 
-  protected dossierUrl(): string {
-    return this.api.dossierUrl(this.caseId() ?? '');
+  protected openDossier(opener: HTMLElement): void {
+    this.dossierOpener = opener;
+    this.dossierOpen.set(true);
+  }
+
+  protected closeDossier(): void {
+    this.dossierOpen.set(false);
+    this.dossierOpener?.focus();
+    this.dossierOpener = null;
   }
 
   protected time(value: string): string {

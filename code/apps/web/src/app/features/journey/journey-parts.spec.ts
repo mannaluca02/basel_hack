@@ -6,7 +6,6 @@ import { CUSTOMER_SESSION_KEY } from '../../core/advisor/api/customer-api';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
 import { InsightsView } from './insights-view';
-import { NpsCard } from './nps-card';
 import { SuitabilityForm } from './suitability-form';
 
 const CASE = 'case_parts';
@@ -81,26 +80,6 @@ describe('SuitabilityForm', () => {
       'passt nicht zu deinem Anlageprofil',
     );
     expect(checked).toHaveLength(1);
-  });
-});
-
-describe('NpsCard', () => {
-  it('records one score for the stage and thanks, also when it was already recorded', async () => {
-    const http = configure();
-    const fixture = TestBed.createComponent(NpsCard);
-    fixture.componentRef.setInput('caseId', CASE);
-    fixture.componentRef.setInput('stage', 'portal');
-    fixture.detectChanges();
-    const root = fixture.nativeElement as HTMLElement;
-    const scores = root.querySelectorAll<HTMLButtonElement>('.score');
-    expect(scores).toHaveLength(11);
-
-    scores[9].click();
-    const request = http.expectOne(`/api/cases/${CASE}/feedback`);
-    expect(request.request.body).toEqual({ stage: 'portal', score: 9 });
-    request.flush({ code: 'FEEDBACK_ALREADY_RECORDED' }, { status: 409, statusText: 'Conflict' });
-    await settle(fixture);
-    expect(root.textContent).toContain('Danke');
   });
 });
 

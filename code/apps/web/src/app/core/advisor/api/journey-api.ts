@@ -15,7 +15,6 @@ import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { CustomerApi } from './customer-api';
 
 export type Recommendation = CustomerSummary['recommendations'][number];
-export type FeedbackStage = 'advice' | 'recommendation' | 'portal';
 
 /** What the simulated Pax review of the demo did (POST demo-review). */
 export interface DemoReviewResult {
@@ -38,8 +37,8 @@ export interface Insights {
 
 /**
  * The backend's journey after the advice: recommendation → (suitability) → demo quote → demo
- * application → submission → Pax review → demo policy in the portal, plus NPS, the customer
- * dossier and the product documents. Every command carries the case revision and a fresh
+ * application → submission → Pax review → demo policy in the portal, plus the customer dossier,
+ * the product documents and, for the debug configurations, the product insights. Every command carries the case revision and a fresh
  * idempotency key; the backend refuses a stale one and the caller reloads.
  */
 @Injectable({ providedIn: 'root' })
@@ -114,18 +113,18 @@ export class JourneyApi {
     });
   }
 
-  feedback(caseId: string, stage: FeedbackStage, score: number): Promise<unknown> {
-    return this.post(`${this.caseUrl(caseId)}/feedback`, { stage, score });
-  }
-
   /** Demo start only: the reviewer's aggregate, for product management. */
   insights(): Promise<Insights> {
     return firstValueFrom(this.http.get<Insights>(`${this.base}/demo/insights`));
   }
 
-  /** Opens in a new tab with the session cookie; escaped print HTML from the backend. */
-  dossierUrl(caseId: string): string {
-    return `${this.caseUrl(caseId)}/dossier?audience=customer&format=html`;
+  /** The customer's advice dossier as escaped print HTML from the backend. */
+  dossierHtml(caseId: string): Promise<string> {
+    return firstValueFrom(
+      this.http.get(`${this.caseUrl(caseId)}/dossier?audience=customer&format=html`, {
+        responseType: 'text',
+      }),
+    );
   }
 
   documentUrl(caseId: string, documentId: string): string {

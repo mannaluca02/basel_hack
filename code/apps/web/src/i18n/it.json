@@ -551,7 +551,6 @@
     "dossierNote": "Tutti i dati, le ipotesi, le motivazioni e le fonti della tua consulenza, pronti da stampare.",
     "working": "In corso …",
     "error": "Non ha funzionato.",
-    "insightsLink": "Per Pax: approfondimenti per la gestione prodotti (demo)",
     "document": {
       "terms": "Condizioni d’assicurazione",
       "brochure": "Opuscolo",
@@ -631,13 +630,6 @@
         }
       }
     },
-    "nps": {
-      "question": "Con quale probabilità consiglieresti Pax a un’amica o a un collega?",
-      "low": "0 = per niente",
-      "high": "10 = molto probabile",
-      "thanks": "Grazie per il tuo riscontro!",
-      "score": "{{score}} su 10"
-    },
     "errors": {
       "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "Questa persona non ha reddito o patrimonio propri per sostenere il premio. Scegli le soluzioni per l’altra persona o parla con uno specialista Pax.",
       "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "Per questa persona non è ancora rilevato un importo che vuole destinare lei stessa ai premi.",
@@ -647,7 +639,11 @@
       "SUITABILITY_ADVISED_AGAINST": "La verifica dell’adeguatezza sconsiglia questo prodotto.",
       "QUOTE_EXPIRED": "L’offerta è scaduta. Richiedine una nuova.",
       "HUMAN_REVIEW_REQUIRED": "Prima uno specialista Pax deve verificare la consulenza."
-    }
+    },
+    "dossierTitle": "Dossier di consulenza",
+    "dossierClose": "Chiudi il dossier di consulenza",
+    "print": "Stampa",
+    "dossierFailed": "Non è stato possibile caricare il dossier di consulenza."
   },
   "insights": {
     "title": "Approfondimenti per la gestione prodotti",
@@ -662,7 +658,6 @@
     "handover": "Richieste di uno specialista Pax",
     "reasons": "Motivi di verifica più frequenti",
     "unavailable": "Questa vista esiste solo con l’avvio demo.",
-    "back": "Torna al contratto",
     "stage": {
       "intake": "Rilevamento",
       "profile_confirmed": "Profilo confermato",

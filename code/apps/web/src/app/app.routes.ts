@@ -43,12 +43,6 @@ export const routes: Routes = [
     title: 'journey.title',
     loadComponent: () => import('./features/journey/journey-view').then((m) => m.JourneyView),
   },
-  {
-    // Product management insights; reached from the journey in the demo start.
-    path: 'insights',
-    title: 'insights.title',
-    loadComponent: () => import('./features/journey/insights-view').then((m) => m.InsightsView),
-  },
   ...debugRoutes,
   { path: '**', redirectTo: 'graphics' },
 ];

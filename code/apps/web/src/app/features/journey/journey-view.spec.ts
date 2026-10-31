@@ -94,6 +94,17 @@ function portal(state: State) {
 }
 
 describe('JourneyView', () => {
+  beforeAll(() => {
+    // jsdom has no modal dialogs; the browser behaviour (focus trap, Esc) is native.
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+  });
+
   let fixture: ComponentFixture<JourneyView>;
   let http: HttpTestingController;
   let state: State;
@@ -135,6 +146,8 @@ describe('JourneyView', () => {
         if (path === url('/summaries')) request.flush(summaries(state));
         else if (path === url('/portal')) request.flush(portal(state));
         else if (path === url('/suitability')) request.flush({ checks: state.checks });
+        else if (path === url('/dossier?audience=customer&format=html'))
+          request.flush('<!doctype html><h1>Dossier Müller</h1>');
         else if (path === url()) request.flush({ id: CASE, caseRevision: revision });
         else request.flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
       }
@@ -283,10 +296,22 @@ describe('JourneyView', () => {
       'Demo – kein Versicherungsschutz',
     );
     expect(element().querySelector('.policy')?.textContent).toContain('Demo-Police Pax');
-    expect(element().querySelector<HTMLAnchorElement>('.portal a')?.getAttribute('href')).toBe(
-      url('/dossier?audience=customer&format=html'),
-    );
-    expect(element().querySelector('app-nps-card')).not.toBeNull();
+    expect(element().querySelector('app-nps-card')).toBeNull();
+
+    // The advice dossier opens in a dialog on the same page, loaded with the app's session.
+    const open = button('dossier')!;
+    open.click();
+    fixture.detectChanges();
+    await serve();
+    const dialog = element().querySelector<HTMLDialogElement>('app-dossier-dialog dialog')!;
+    expect(dialog.open).toBe(true);
+    const frame = dialog.querySelector('iframe')!;
+    expect(frame.getAttribute('sandbox')).toBe('allow-same-origin allow-modals');
+    expect(frame.srcdoc).toContain('Dossier Müller');
+    dialog.querySelector<HTMLButtonElement>('[data-action="close"]')!.click();
+    fixture.detectChanges();
+    expect(element().querySelector('app-dossier-dialog')).toBeNull();
+    expect(document.activeElement).toBe(open);
   });
 
   it('asks for the suitability check before a fund-linked product can be quoted', async () => {
