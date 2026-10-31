@@ -123,7 +123,9 @@ Skills are Markdown files in `skills/` that extend Paxi's opening prompt. Each s
 |---|---|
 | [`friendly-conversation.md`](skills/friendly-conversation.md) | Consultative conversation technique from the [research on friendly sales conversations](../../documentation/baselhack/research/friendly-sales-conversation.md): clear purpose, responsive follow-ups, tentative reflection, a reason before sensitive data, real choices, a summary with corrections before the goodbye, answers to hesitation ("Willst du mir etwas verkaufen?", "Ich habe schon eine Versicherung"), stopping on request, and a list of pressure tactics Paxi never uses. |
 
-The skill is a concise translation of the research, not the research itself. Where the research proposes something the team decided differently (asking once more after a first refusal, "a colleague of mine will get in touch"), the persona's decision applies. To add a skill, create a new `skills/<name>.md` with the front matter and restart the server; set `assigned: false` to keep a draft out of the prompt.
+| [`proposing-plans.md`](skills/proposing-plans.md) | Paxi proposes fitting plans itself at the end (need before product, based on section 8 of the [advisor plan](../../documentation/baselhack/plans/advisor-plan.md)): one to three plans with the matching Pax solution, no invented amounts, premiums or guarantees, and a suitability check before fund-linked products. A Pax colleague then assesses Paxi's proposals and gets in touch with the final assessment. |
+
+The skills are concise translations of their sources, not the sources themselves. Where the research proposes something the team decided differently (asking once more after a first refusal), the persona's decision applies. To add a skill, create a new `skills/<name>.md` with the front matter and restart the server; set `assigned: false` to keep a draft out of the prompt.
 
 ## Customer portfolio (`questionnaire.json`)
 
@@ -184,7 +186,7 @@ Each answer also carries its `tier`. Log `status` is `active`, `closed`, `discon
 
 ## Life context
 
-Paxi does not save small talk during the call, because every save makes the model pause. When the conversation ends, the server sends the transcript to the backend model once (`conversation-context.mjs`). It writes a `context` section into the log: a short summary, notes per topic (hobbies, work, family, housing, plans, finances, health, other) and `possible_needs` as starting points for a Pax specialist. These are internal only, never product recommendations, and always in German.
+Paxi does not save small talk during the call, because every save makes the model pause. When the conversation ends, the server sends the transcript to the backend model once (`conversation-context.mjs`). It writes a `context` section into the log: a short summary, notes per topic (hobbies, work, family, housing, plans, finances, health, other), `proposals` (the plans Paxi proposed, with need, Pax solution and the person's reaction, for the colleague's assessment) and `possible_needs` as further starting points for a Pax colleague. Always in German.
 
 ## How details are saved
 

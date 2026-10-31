@@ -597,7 +597,7 @@ Already saved: ${saved.length ? saved.join("; ") : "nothing yet"}.
 Still open: ${openLabels(log).join(", ") || "nothing"}.
 Now, in ${language} and using the informal form, ${
     firstSwitch
-      ? "say warmly in your own words what this conversation is for (getting to know them so a colleague of yours can prepare ideas that fit their life) and that it takes about ten minutes; if the history shows you already confirmed the language, do not confirm it again. If they already said their name, use it; otherwise ask how you may call them."
+      ? "say warmly in your own words what this conversation is for (getting to know them so you can propose plans that fit their life at the end) and that it takes about ten minutes; if the history shows you already confirmed the language, do not confirm it again. If they already said their name, use it; otherwise ask how you may call them."
       : "smoothly pick up the conversation where it left off."
   }`;
 }

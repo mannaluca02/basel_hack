@@ -30,8 +30,8 @@ export function progressNote(progress) {
   if (progress.complete) {
     const planning = progress.open_planning ?? [];
     return planning.length
-      ? `The core and extended details are complete. If the person has time, find out these details for the calculation, compactly and in plain words: ${planning.join(", ")}. If they want to finish, thank them, say a colleague of yours completes the rest, and say goodbye once.`
-      : "Everything is complete. When the conversation reaches a natural end, you may thank the person and say goodbye once.";
+      ? `The core and extended details are complete. If the person has time, find out these details for the calculation, compactly and in plain words: ${planning.join(", ")}. If they want to finish: summarise, propose your plans, say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.`
+      : "Everything is complete. Now summarise and check, propose your plans (skill \"Proposing plans\"), then say a colleague of yours will look at your proposals and get in touch with an assessment, and say goodbye once.";
   }
   const open = [...progress.open_core, ...progress.open_extended];
   const priority = progress.open_priority ?? [];

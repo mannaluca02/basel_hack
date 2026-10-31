@@ -16,13 +16,28 @@ export const contextSchema = {
         additionalProperties: false,
       },
     },
+    proposals: {
+      type: "array",
+      description: "The plans Paxi proposed at the end, in German, for the Pax colleague's assessment. Empty if Paxi proposed nothing.",
+      items: {
+        type: "object",
+        properties: {
+          plan: { type: "string", description: "The proposed step in one sentence." },
+          need: { type: "string", description: "The need or goal of the person it answers." },
+          pax_solution: { type: "string", description: "The Pax solution Paxi named, or an empty string." },
+          reaction: { type: "string", description: "How the person reacted, or an empty string." },
+        },
+        required: ["plan", "need", "pax_solution", "reaction"],
+        additionalProperties: false,
+      },
+    },
     possible_needs: {
       type: "array",
       description: "Pension or insurance topics a Pax colleague could explore, in German. Internal only.",
       items: { type: "string" },
     },
   },
-  required: ["summary", "notes", "possible_needs"],
+  required: ["summary", "notes", "proposals", "possible_needs"],
   additionalProperties: false,
 };
 
@@ -36,7 +51,7 @@ export async function extractContext(client, model, log) {
       instructions:
         "Du wertest ein lockeres Kennenlern-Gespräch zwischen Paxi (digitaler Begleiter von Pax) und einer Person aus. " +
         "Halte nur fest, was die Person selbst gesagt hat; erfinde nichts. Formuliere auf Deutsch, auch wenn das Gespräch in einer anderen Sprache war. " +
-        "possible_needs sind Ansatzpunkte für einen Pax-Kollegen oder eine Pax-Kollegin (z. B. Familie absichern, Wohneigentum, Selbständigkeit), keine Produktempfehlungen.",
+        "proposals sind die Pläne, die Paxi am Schluss selbst vorgeschlagen hat, so wie Paxi sie gesagt hat. possible_needs sind Ansatzpunkte für einen Pax-Kollegen oder eine Pax-Kollegin (z. B. Familie absichern, Wohneigentum, Selbständigkeit), keine Produktempfehlungen.",
       input: transcript,
       text: { format: { type: "json_schema", name: "conversation_context", strict: true, schema: contextSchema } },
     });
