@@ -83,3 +83,12 @@ export async function submitVoiceObservations(baseUrl:string,caseId:string,voice
   const response=await fetch(`${baseUrl}/api/cases/${encodeURIComponent(caseId)}/voice/sessions/${encodeURIComponent(voiceSessionId)}/extraction`,{method:'POST',headers:{Authorization:`Bearer ${agentToken}`,'Content-Type':'application/json'},body:JSON.stringify(VoiceExtractionInputSchema.parse(input))});
   const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return VoiceExtractionResponseSchema.parse(data);
 }
+/** Luca: show the current extraction notice, then let the customer accept exactly that content hash. */
+export async function acceptModelExtractionNotice(caseId:string,expectedCaseRevision:number,csrfToken:string,locale:'de'|'fr'|'it'|'en'){
+  const {ModelExtractionNoticeSchema,ModelExtractionConsentInputSchema,ModelExtractionPermissionSchema}=await import('@pax/contracts');
+  const notice=ModelExtractionNoticeSchema.parse(await (await fetch(`/api/extraction/privacy?locale=${locale}`)).json());
+  if(!notice.enabled)return null;
+  const body=ModelExtractionConsentInputSchema.parse({expectedCaseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
+  const response=await fetch(`/api/cases/${encodeURIComponent(caseId)}/extraction/consent`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify(body)});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return ModelExtractionPermissionSchema.parse(data);
+}

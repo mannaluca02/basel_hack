@@ -1,4 +1,4 @@
-import type { InsuranceCaseState,CustomerConfirmation,VoiceSession,StoredVoiceTurn,VoiceMappingIssue,VoiceObservation } from '@pax/contracts';
+import type { InsuranceCaseState,CustomerConfirmation,ModelExtractionConsent,VoiceSession,StoredVoiceTurn,VoiceMappingIssue,VoiceObservation } from '@pax/contracts';
 export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuote,DemoApplication,DemoPolicy,
   CaseEvent,ScenarioComparison,AgentProposal,LifeRun,RiskNeed } from '@pax/contracts';
 
@@ -6,7 +6,7 @@ export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuot
 export type Actor = { id:string;role:'customer'|'reviewer'|'advisor';caseId?:string;sessionHash:string;expiresAt:string;csrfHash?:string };
 export type AuditEvent = {id:string;at:string;actorId:string;action:string;caseId:string|null;profileVersion:number|null;outcome:string};
 export type InsuranceCase = InsuranceCaseState & {
-  ownerId:string;voiceSessions:StoredVoiceSession[];confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
+  ownerId:string;voiceSessions:StoredVoiceSession[];confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];modelExtractionConsent:(ModelExtractionConsent & {acceptedBy:string})|null;idempotency:Record<string,{fingerprint:string;result:unknown}>;
 };
 export type Database = {
   version:1;sessions:Record<string,Actor>;cases:Record<string,InsuranceCase>;audit:AuditEvent[];

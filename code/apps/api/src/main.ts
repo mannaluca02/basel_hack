@@ -18,7 +18,7 @@ export async function createDemoApp() {
 if(process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port=Number(process.env.PORT??3000);
   if(!Number.isInteger(port)||port<1||port>65535) throw new Error('Invalid PORT');
-  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',token:process.env.LOGISMATA_BEARER_TOKEN??'',voice:{enabled:process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1',
+  const {app,runtime}=await createLifeInsuranceApp({providerMode:'live',token:process.env.LOGISMATA_BEARER_TOKEN??'',modelExtraction:{enabled:process.env.PAX_SYNTHETIC_EXTRACTION_ENABLED==='1'},voice:{enabled:process.env.PAX_SYNTHETIC_VOICE_ENABLED==='1',
     ...(process.env.OPENAI_API_KEY?{openAiApiKey:process.env.OPENAI_API_KEY}:{}),
     ...(process.env.ELEVENLABS_API_KEY?{elevenLabsApiKey:process.env.ELEVENLABS_API_KEY}:{}),
     ...(process.env.ELEVENLABS_AGENT_ID?{elevenLabsAgentId:process.env.ELEVENLABS_AGENT_ID}:{}),

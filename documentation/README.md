@@ -6,6 +6,7 @@ from the challenge hub, the Logismata API and the material PDFs.
 | File | Contents |
 |---|---|
 | [Voice backend integration](baselhack/plans/voice-backend-integration.md) | Nest routes, shared observations, 37-field mapping, provider setup and Dario/Erni handoff |
+| [Model extraction notice](baselhack/plans/model-extraction-notice.md) | Separate OpenAI extraction notice, hash-bound customer consent and Earnie's server-side gate |
 | [Logic backend implementation](baselhack/reports/logic-backend-implementation.md) | Runtime schemas, domain calculations, NestJS demo, Logismata adapter and validation evidence |
 | [Workflow and interface contracts](baselhack/plans/interface-contracts.md) | VoiceLog, shared case, calculation result, replies, playback and export contracts from the second photo |
 | [Workshop decisions](baselhack/plans/workshop-decisions.md) | Confirmed UI/roles, feature interpretation and explicit open details |

@@ -7,6 +7,7 @@ import { CreateVoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceSessionSc
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,
   CreateConfirmationInputSchema,CustomerConfirmationSchema,PresentConfirmationInputSchema,AnswerConfirmationInputSchema,CancelConfirmationInputSchema,ConfirmationOutcomeSchema,CurrentCustomerConfirmationSchema,
   HumanHandoverCommandSchema,HumanHandoverViewSchema,HumanHandoverCommandResponseSchema,
+  ModelExtractionConsentInputSchema,RevokeModelExtractionConsentSchema,
   SessionResponseSchema,AgentAccessResponseSchema,ApiErrorSchema,SummaryBundleSchema,PortalDtoSchema } from '@pax/contracts';
 import { EstimateRequestSchema } from './estimates.js';
 import { AdditionalToolRequestSchema } from './tools.js';
@@ -21,6 +22,10 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/turns','Customer client records a finalized customer/agent turn; never confirms facts',VoiceTurnInputSchema],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/extraction','Scoped agent maps sourced observations into one atomic proposal batch or explicit follow-ups',VoiceExtractionInputSchema],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/close','Customer closes voice only; human handover remains a separate command',CloseVoiceSessionSchema],
+  ['get','/api/extraction/privacy','Read separate synthetic OpenAI intake-extraction notice and its content hash in DE/FR/IT/EN',undefined],
+  ['get','/api/cases/{caseId}/extraction/consent','Read whether the current extraction notice is accepted; owner or scoped agent',undefined],
+  ['post','/api/cases/{caseId}/extraction/consent','Customer accepts the current extraction notice hash; never authorizes full-case or real-data transfer',ModelExtractionConsentInputSchema],
+  ['post','/api/cases/{caseId}/extraction/consent/revoke','Customer withdraws extraction consent; allowed during human handover',RevokeModelExtractionConsentSchema],
   ['get','/api/privacy','Read processing notice',undefined],['get','/api/status','Read runtime capabilities',undefined],
   ['get','/api/translations','Read complete DE/FR/IT/EN customer presentation catalog; locale query or Accept-Language',undefined],
   ['get','/api/openapi.json','Read API specification',undefined],
