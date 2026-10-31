@@ -1,6 +1,6 @@
 import { effect, inject, untracked } from '@angular/core';
-import type { AdvisorContextUpdated } from '@pax/contracts';
-import { BehaviorSubject, EMPTY, Observable, Subject, from, map } from 'rxjs';
+import type { AdvisorContextUpdated, InsuranceCaseDto } from '@pax/contracts';
+import { BehaviorSubject, EMPTY, Observable, Subject, filter, from, map } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { AppLanguage } from '../../i18n/language';
 import {
@@ -12,7 +12,7 @@ import {
 } from '../advisor-data-source';
 import { CaseProjection, projectCase } from './case-projection';
 import { projectInfo, projectSummary, projectTranscript } from './summary-projection';
-import { CustomerApi } from './customer-api';
+import { CustomerApi, type CustomerSession } from './customer-api';
 
 type Projection = CaseProjection &
   Pick<AdvisorSnapshot, 'transcript' | 'info' | 'summary'>;
@@ -23,8 +23,9 @@ type Projection = CaseProjection &
  * projected view models as upserts. `CustomerReview` does its own reloading.
  *
  * Besides the case it loads the summaries of the current snapshot (summary sheet, Info tab) and
- * the call history a linked voice agent recorded (Chat tab). Replies stay empty: the backend has
- * no reply route.
+ * the call history of a linked voice agent and of the app's live voice (Chat tab). Replies stay
+ * empty: the backend has no reply route.
+ * The same snapshot carries the canonical case for Voice Lab; late former-session reads are ignored.
  */
 export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);
@@ -36,6 +37,7 @@ export class ApiDataSource extends AdvisorDataSource {
   private stream: EventSource | null = null;
   /** Only the newest reload may emit: an older one can answer last. */
   private reloads = 0;
+  private streamSession: CustomerSession | null = null;
 
   readonly events: Observable<AdvisorEvent> = this.eventStream.asObservable();
   readonly connection: Observable<ConnectionState> = this.connectionState.asObservable();
@@ -63,11 +65,14 @@ export class ApiDataSource extends AdvisorDataSource {
   }
 
   snapshot(): Observable<AdvisorSnapshot> {
-    const caseId = this.api.session()?.caseId;
-    if (!caseId) return EMPTY;
+    const session = this.api.session();
+    if (!session) return EMPTY;
+    const caseId = session.caseId;
     return from(this.project(caseId)).pipe(
-      map(({ contextRevision, projection }) => ({
+      filter(() => this.api.session() === session),
+      map(({ dto, contextRevision, projection }) => ({
         ...emptySnapshot(caseId),
+        canonical: dto,
         contextRevision,
         charts: projection.charts,
         risks: projection.risks,
@@ -84,18 +89,22 @@ export class ApiDataSource extends AdvisorDataSource {
    * start the backend hands out its ready case first.
    */
   connect(): void {
-    const caseId = this.api.session()?.caseId;
-    if (!caseId && this.demoStart) {
+    const session = this.api.session();
+    if (!session && this.demoStart) {
       this.startDemo();
       return;
     }
-    if (this.stream || !caseId) return;
+    if (!session || this.stream && this.streamSession === session) return;
+    if (this.stream) this.disconnect();
+    const caseId = session.caseId;
 
     this.connectionState.next('connecting');
     const stream = new EventSource(this.api.eventsUrl(caseId), { withCredentials: true });
-    stream.onopen = () => this.connectionState.next('connected');
+    const current = () => this.stream === stream && this.api.session() === session;
+    stream.onopen = () => { if (current()) this.connectionState.next('connected'); };
     // The browser retries on its own unless the server refused the stream.
     stream.onerror = () => {
+      if (!current()) return;
       if (stream.readyState !== EventSource.CLOSED) {
         this.connectionState.next('connecting');
         return;
@@ -108,16 +117,20 @@ export class ApiDataSource extends AdvisorDataSource {
       }
     };
     stream.addEventListener('advisor.context.updated', ({ data }) => {
+      if (!current()) return;
       const payload = JSON.parse(data as string) as AdvisorContextUpdated;
       this.eventStream.next({ type: 'context', payload });
       void this.push(caseId);
     });
     this.stream = stream;
+    this.streamSession = session;
   }
 
   disconnect(): void {
+    ++this.reloads;
     this.stream?.close();
     this.stream = null;
+    this.streamSession = null;
     if (this.connectionState.value !== 'disconnected') this.connectionState.next('disconnected');
   }
 
@@ -137,19 +150,23 @@ export class ApiDataSource extends AdvisorDataSource {
       });
   }
 
-  private async project(caseId: string): Promise<{ contextRevision: number; projection: Projection }> {
+  private async project(caseId: string): Promise<{ dto: InsuranceCaseDto; contextRevision: number; projection: Projection }> {
     // Only the case is required; the rest may not exist yet (no analysis, no voice agent).
-    const [dto, context, summaries, turns, suitability] = await Promise.all([
+    const [dto, context, summaries, agentTurns, voiceTurns, suitability] = await Promise.all([
       this.api.loadCase(caseId),
       this.api.loadContext(caseId).catch(() => null),
       this.api.loadSummaries(caseId).catch(() => null),
       this.api.loadAgentTurns(caseId).catch(() => []),
+      this.api.loadVoiceTurns(caseId).catch(() => []),
       this.api.loadSuitability(caseId).catch(() => null),
     ]);
+    // Paxi in its own window and the live voice in the app write separate histories.
+    const turns = [...agentTurns, ...voiceTurns].sort((a, b) => a.at.localeCompare(b.at));
     const language = this.language.language();
     const at = new Date().toISOString();
     const projection = projectCase(dto, context, language, at);
     return {
+      dto,
       contextRevision: dto.contextRevision,
       projection: {
         ...projection,
@@ -161,10 +178,10 @@ export class ApiDataSource extends AdvisorDataSource {
   }
 
   private async push(caseId: string): Promise<void> {
-    const reload = ++this.reloads;
+    const reload = ++this.reloads, session = this.api.session();
     try {
       const { projection } = await this.project(caseId);
-      if (reload !== this.reloads) return;
+      if (reload !== this.reloads || this.api.session() !== session) return;
       if (projection.progress) this.eventStream.next({ type: 'progress', payload: projection.progress });
       for (const chart of projection.charts) this.eventStream.next({ type: 'chart', payload: chart });
       for (const risk of projection.risks) this.eventStream.next({ type: 'risk', payload: risk });

@@ -240,7 +240,7 @@
     },
     "prompt": {
       "type": "string",
-      "maxLength": 16000
+      "maxLength": 32000
     },
     "replayed": {
       "type": "boolean"

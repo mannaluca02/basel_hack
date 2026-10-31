@@ -1,4 +1,161 @@
 {
+  "lab": {
+    "setup": {
+      "title": "1. Prepara il caso per il dialogo",
+      "prepare": "Prepara il caso demo",
+      "signedOut": "Accedi qui e carica la situazione inventata in un solo passaggio. La preparazione non apre né microfono né connessione al provider.",
+      "loading": "Verifica del caso. Puoi ricaricarlo qui o continuare la preparazione.",
+      "empty": "Questo caso è vuoto. Preparalo prima, poi scegli la persona e avvia il dialogo live.",
+      "incomplete": "Questo caso esistente contiene dati ma nessuna persona comune ai profili finanziario e assicurativo. Completalo nella verifica: la demo non sovrascrive dati o cronologia esistenti.",
+      "ready": "Il caso è pronto. Scegli la persona, configura gli skills e avvia il dialogo live con consenso separato.",
+      "choosePerson": "Scegli una persona esistente di questo caso.",
+      "working": "Attendi – operazione in corso …",
+      "running": "Il dialogo è in corso. Usa Interrompi subito per terminarlo.",
+      "consent": "2. Accetta l’avviso vocale visualizzato. Solo il clic su Avvia richiede il microfono.",
+      "provider": "Il provider live non è disponibile. Controlla la configurazione backend e ricarica il caso.",
+      "extractionUnavailable": "L’estrazione live è disattivata o irraggiungibile. Avvia il backend attuale con PAX_SYNTHETIC_VOICE_ENABLED=1 e OPENAI_API_KEY; la sola connessione vocale non raccoglie i dati.",
+      "extractionReady": "Estrazione live attiva: registro → IA → proposte",
+      "handover": "È stata richiesta una consulenza umana. Consenti di nuovo esplicitamente il dialogo digitale qui prima di iniziare una nuova conversazione.",
+      "liveReady": "3. Pronto: avvia il dialogo live e autorizza il microfono nel browser.",
+      "replayReady": "Pronto: il replay sintetico non richiede né microfono né consenso vocale."
+    },
+    "error": {
+      "microphoneDenied": "Accesso al microfono negato. Autorizzalo nelle impostazioni del sito del browser, poi avvia di nuovo il dialogo live.",
+      "microphoneMissing": "Nessun microfono trovato. Collega o seleziona un microfono, poi riprova.",
+      "sessionExpired": "La sessione o il caso è scaduto, ad esempio dopo un riavvio del server. Accedi nuovamente qui sotto e prepara la demo.",
+      "recover": "Impossibile completare l’operazione. Controlla la traccia API, poi ripeti la preparazione o ricarica il caso."
+    },
+    "avatarNotice": "Avatar: visualizzazione locale del livello audio. Non prova la trascrizione finale né la fine della riproduzione.",
+    "confirmedGross": "Ultimo reddito annuo lordo confermato",
+    "canonicalUnits": "Valore grezzo: denaro in centesimi CHF (100 centesimi = 1 CHF)",
+    "title": "Voice Lab",
+    "syntheticOnly": "Solo dati inventati",
+    "description": "Dialoga con Paxi e segui i veri payload API, dalla trascrizione al caso canonico e alla proiezione dello store.",
+    "apiRequired": "Avvia con npm --prefix code/apps/web run start:api. Il laboratorio richiede il backend dei casi sulla porta 3000.",
+    "demoCode": "Il codice pubblico precompilato funziona solo con il server start:voice-lab. Altrimenti usa il codice cliente locale.",
+    "baselineNotice": "La situazione iniziale contiene persone e importi inventati. Viene caricata come bozza non confermata.",
+    "connection": "Dialogo e avatar",
+    "synthetic": "Replay sintetico",
+    "live": "Live · microfono",
+    "speaker": "Persona che parla (attribuzione esplicita)",
+    "replayNotice": "Conversazione scritta su tutti gli otto campi, vere operazioni backend. Nessun microfono, riproduzione vocale o chiamata al modello. L’attività dell’avatar è simulata.",
+    "replay": "Riproduci l’intera conversazione",
+    "correction": "Correzione",
+    "smalltalk": "Conversazione / nessun risultato",
+    "configured": "configurato (non è un controllo di disponibilità)",
+    "unconfigured": "non configurato",
+    "voiceConsent": "Uso solo dati inventati e acconsento al trasferimento di audio e conversazione a OpenAI per questa demo.",
+    "start": "Avvia il dialogo live",
+    "liveNotice": "Dialogo GPT-Live con gli skills selezionati. L’IA analizza il registro della conversazione e aggiorna i dati a destra. Il live richiede estrazione attiva ed entrambi i consensi. I punti ambigui vengono chiariti; le modifiche si accettano nella revisione.",
+    "stop": "Interrompi subito",
+    "handover": "Richiedi un consulente umano",
+    "resume": "Consenti di nuovo il dialogo digitale",
+    "dialogue": "Conversazione",
+    "transcriptNotice": "Live: frammenti inviati come client-settled al cambio di interlocutore o dopo 1,5 s di silenzio. Non è prova di finalità del provider né di fine riproduzione.",
+    "noTurns": "Scegli le impostazioni e avvia il dialogo live.",
+    "canonical": "Caso canonico → vista",
+    "pending": "Pacchetti di proposte in attesa",
+    "confirmationNotice": "I dati rilevati sono proposte. Accettandoli modifichi la bozza; confermare l’intero profilo resta un’azione separata nella revisione.",
+    "refresh": "Ricarica il caso",
+    "storeProjection": "Proiezione presenter/store",
+    "canonicalPayload": "DTO canonico del caso",
+    "noCase": "Nessun caso caricato. Accedi.",
+    "trace": "Invio / ricezione · traccia payload",
+    "clearTrace": "Cancella la traccia",
+    "traceNotice": "Vere richieste/risposte HTTP, eventi del canale WebRTC e proiezioni locali esplicite. SDP e credenziali oscurati. Massimo 80 voci, payload grandi troncati. Pacchetti audio e payload interni dei modelli non vengono dichiarati osservati.",
+    "extraction": "Ultima estrazione lato server (model-v1 con consenso IA, altrimenti regole)",
+    "noTrace": "Nessun payload registrato.",
+    "review": "Verifica · accettazione e conferma del profilo",
+    "settings": {
+      "title": "Impostazioni della conversazione",
+      "source": "Skills da code/voice-agent/skills con assigned: true. La selezione vale dal prossimo avvio.",
+      "time": "Tempo disponibile",
+      "priority": "Argomento prioritario",
+      "natural": "Seguire naturalmente la conversazione",
+      "unavailable": "Le impostazioni del prompt non sono disponibili. Avvia il backend attuale e ricarica il caso."
+    },
+    "context": {
+      "title": "Cosa è stato raccolto dalla conversazione",
+      "logs": "Registro della conversazione",
+      "description": "Questo testo segue i dati raccolti dal backend e si aggiorna con la conversazione, comprese le correzioni.",
+      "empty": "Non sono ancora stati raccolti dati precisi dalla conversazione.",
+      "proposed": "Rilevato dalla conversazione, ma non ancora accettato:",
+      "accepted": "Già accettato nella bozza:",
+      "unclear": "La tua dichiarazione «{{quote}}» su {{field}} è ancora poco chiara e va precisata.",
+      "open": "Restano da chiarire: {{fields}}.",
+      "skipped": "Rimandato a dopo e ancora aperto: {{fields}}.",
+      "processing": "Il backend sta analizzando la nuova dichiarazione …",
+      "failed": "Non è stato possibile analizzare l’ultima dichiarazione. Il contesto raccolto resta visibile e la conversazione può continuare.",
+      "source": "Ultima dichiarazione analizzata dal backend",
+      "updated": "Il backend ha creato una proposta da questa dichiarazione. Il caso attuale viene ricaricato automaticamente.",
+      "noMatch": "Non ne è derivato un nuovo dato preciso. Il contesto già raccolto viene mantenuto.",
+      "needsClarification": "Il backend ha rilevato un dato poco chiaro che richiede una domanda di chiarimento.",
+      "reviewNeeded": "Questa dichiarazione non è stata raccolta interamente come proposta. Controlla la revisione o precisala nella conversazione.",
+      "details": "Dettagli tecnici e panoramica dei campi",
+      "fact": {
+        "income": "Hai indicato un reddito lordo di {{value}} all’anno.",
+        "employment": "Lavori con un grado di occupazione del {{value}}.",
+        "civilStatus": "Hai indicato «{{value}}» come stato civile.",
+        "pensionFund": "Alla domanda se hai una cassa pensione hai risposto «{{value}}».",
+        "pillar3a": "Versi {{value}} all’anno nel pilastro 3a.",
+        "housing": "I tuoi costi abitativi ammontano a {{value}} al mese.",
+        "retirement": "Vorresti andare in pensione a {{value}} anni.",
+        "risk": "Hai descritto la tua propensione al rischio come {{value}}."
+      }
+    },
+    "intake": {
+      "title": "Dati della conversazione",
+      "progress": "Raccolti",
+      "evaluating": "analisi in corso",
+      "yes": "sì",
+      "no": "no",
+      "done": "Grazie, ho tutti i dati. Ora puoi verificarli nella revisione.",
+      "extractionConsent": "Accetto che un piccolo estratto fittizio della conversazione sia trasmesso a OpenAI per l’estrazione con IA (consenso separato).",
+      "extractionBlocker": "Conferma il consenso separato per l’IA, altrimenti il laboratorio tornerebbe in silenzio a frasi rigide.",
+      "status": {
+        "open": "aperto",
+        "asking": "Paxi chiede",
+        "unclear": "poco chiaro",
+        "proposed": "proposto",
+        "accepted": "accettato",
+        "skipped": "saltato"
+      },
+      "field": {
+        "annual_gross_income_chf": "Reddito annuo lordo",
+        "employment_rate_percent": "Grado di occupazione",
+        "civil_status": "Stato civile",
+        "has_pension_fund": "Cassa pensione",
+        "pillar_3a_annual_contribution_chf": "Pilastro 3a all’anno",
+        "monthly_housing_cost_chf": "Costi abitativi al mese",
+        "desired_retirement_age": "Età di pensionamento desiderata",
+        "risk_appetite": "Propensione al rischio"
+      },
+      "question": {
+        "annual_gross_income_chf": "Qual è il tuo reddito annuo lordo in CHF? Indica esplicitamente che è lordo e annuo.",
+        "employment_rate_percent": "A quale percentuale lavori?",
+        "civil_status": "Qual è il tuo stato civile?",
+        "has_pension_fund": "Hai una cassa pensione?",
+        "pillar_3a_annual_contribution_chf": "Quanto versi all’anno nel pilastro 3a?",
+        "monthly_housing_cost_chf": "A quanto ammontano i tuoi costi abitativi al mese?",
+        "desired_retirement_age": "A che età vorresti andare in pensione?",
+        "risk_appetite": "Come descriveresti la tua propensione al rischio: bassa, media o alta?"
+      },
+      "value": {
+        "civil_status": {
+          "single": "celibe/nubile",
+          "married": "sposato",
+          "cohabiting": "convivenza",
+          "registered_partnership": "unione domestica registrata"
+        },
+        "risk_appetite": {
+          "low": "bassa",
+          "medium": "media",
+          "high": "alta"
+        }
+      },
+      "clarify": "È lordo e annuo?"
+    }
+  },
   "app": {
     "name": "Pax Digital Advisor"
   },
@@ -284,5 +441,17 @@
       "voiceOpened": "Paxi è aperto in una finestra separata. Quello che racconti appare qui come proposta da verificare.",
       "voiceFailed": "Impossibile collegare Paxi. L'agente vocale è avviato?"
     }
+  },
+  "voice": {
+    "start": "Conversazione dal vivo con Paxi",
+    "stop": "Termina la conversazione",
+    "title": "Parla con Paxi",
+    "begin": "Avvia la conversazione",
+    "cancel": "Annulla",
+    "connected": "Paxi è connesso e ascolta",
+    "pending": "Paxi ha sentito nuove informazioni.",
+    "accept": "Accetta e ricalcola",
+    "accepting": "Accettazione in corso …",
+    "acceptFailed": "L’accettazione non è riuscita. Riprova."
   }
 }

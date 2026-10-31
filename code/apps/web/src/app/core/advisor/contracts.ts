@@ -189,4 +189,4 @@ export type ContextUpdateReason =
   | 'conversation_preference_changed';
 
 /** The runtime's event; `handover` is left out until the UI has a use for it. */
-export type AdvisorContextUpdate = Omit<AdvisorContextUpdated, 'handover'>;
+export type AdvisorContextUpdate = Omit<AdvisorContextUpdated, 'handover'> & Partial<Pick<AdvisorContextUpdated, 'handover'>>;
