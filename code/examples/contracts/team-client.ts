@@ -70,3 +70,16 @@ export function handleDigitalStop(event:AdvisorContextUpdated,previousHandoverRe
   if(event.handover.stopDigitalConversation||event.handover.revision>previousHandoverRevision)stop();
   return event.handover.revision;
 }
+
+/** Dario: same-origin browser customer session. The connection response is ephemeral; never persist or log it. */
+export async function startCaseVoice(caseId:string,csrfToken:string,input:import('@pax/contracts').CreateVoiceSession){
+  const {CreateVoiceSessionSchema,VoiceSessionStartResponseSchema}=await import('@pax/contracts');
+  const response=await fetch(`/api/cases/${encodeURIComponent(caseId)}/voice/sessions`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify(CreateVoiceSessionSchema.parse(input))});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return VoiceSessionStartResponseSchema.parse(data);
+}
+/** Erni: server-side case grant. Observations are sourced to already-ingested final CUSTOMER turns. */
+export async function submitVoiceObservations(baseUrl:string,caseId:string,voiceSessionId:string,agentToken:string,input:import('@pax/contracts').VoiceExtractionInput){
+  const {VoiceExtractionInputSchema,VoiceExtractionResponseSchema}=await import('@pax/contracts');
+  const response=await fetch(`${baseUrl}/api/cases/${encodeURIComponent(caseId)}/voice/sessions/${encodeURIComponent(voiceSessionId)}/extraction`,{method:'POST',headers:{Authorization:`Bearer ${agentToken}`,'Content-Type':'application/json'},body:JSON.stringify(VoiceExtractionInputSchema.parse(input))});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return VoiceExtractionResponseSchema.parse(data);
+}

@@ -1,0 +1,32 @@
+{
+  "caseId": "24ce9c6a-a4f9-42bf-a7c3-237f3beca38e",
+  "caseRevision": 11,
+  "contextRevision": 18,
+  "handover": {
+    "status": "requested",
+    "revision": 1,
+    "wantsHumanAdvisor": true,
+    "leaveViewRequested": true,
+    "stopDigitalConversation": true,
+    "requestId": "bfe774b3-9bf6-4432-b06d-dafa052dad30",
+    "requestedAt": "2026-10-31T13:49:49.059Z",
+    "resumedAt": null,
+    "source": "voice"
+  },
+  "contact": {
+    "organization": "Pax",
+    "kind": "public_general_contact",
+    "phone": "+41612776666",
+    "displayPhone": "+41 61 277 66 66",
+    "sourceUrl": "https://www.pax.ch/de/kontakt-und-services",
+    "verifiedAt": "2026-10-31",
+    "automaticDialing": false,
+    "advisorAssigned": false
+  },
+  "command": {
+    "messageId": "demo_human_request",
+    "action": "request",
+    "replayed": false,
+    "changed": true
+  }
+}

@@ -1,6 +1,7 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {z} from 'zod';
 import {
+  CreateVoiceSessionSchema,VoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceTurnInputSchema,VoiceTranscriptSchema,CloseVoiceSessionSchema,VoiceObservationSchema,VoiceExtractionInputSchema,VoiceExtractionResponseSchema,
   HumanHandoverSchema,HumanHandoverCommandSchema,HumanHandoverViewSchema,HumanHandoverCommandResponseSchema,
   CreateConfirmationInputSchema,CustomerConfirmationSchema,PresentConfirmationInputSchema,AnswerConfirmationInputSchema,CancelConfirmationInputSchema,ConfirmationOutcomeSchema,
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,AmbiguityResolutionSchema,
@@ -9,6 +10,9 @@ import {
 } from '@pax/contracts';
 
 const documents={
+  'create-voice-session-v1':CreateVoiceSessionSchema,'voice-session-v1':VoiceSessionSchema,'voice-session-start-v1':VoiceSessionStartResponseSchema,
+  'voice-turn-input-v1':VoiceTurnInputSchema,'voice-transcript-v1':VoiceTranscriptSchema,'close-voice-session-v1':CloseVoiceSessionSchema,
+  'voice-observation-v1':VoiceObservationSchema,'voice-extraction-input-v1':VoiceExtractionInputSchema,'voice-extraction-response-v1':VoiceExtractionResponseSchema,
   'human-handover-v1':HumanHandoverSchema,'human-handover-command-v1':HumanHandoverCommandSchema,
   'human-handover-view-v1':HumanHandoverViewSchema,'human-handover-response-v1':HumanHandoverCommandResponseSchema,
   'create-confirmation-v1':CreateConfirmationInputSchema,'customer-confirmation-v1':CustomerConfirmationSchema,

@@ -4,7 +4,7 @@ import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor,type InsuranceCase } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
 export class HumanHandoverService {
-  constructor(readonly engine:LifeInsuranceEngine){}
+  constructor(readonly engine:LifeInsuranceEngine,readonly afterChange:()=>Promise<void>=async()=>{}){}
   private view(c:InsuranceCase){return HumanHandoverViewSchema.parse({caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,handover:c.handover,contact:PAX_HUMAN_ADVISOR_CONTACT});}
   read(actor:Actor,id:string){return this.view(this.engine.caseFor(actor,id,true));}
   async command(actor:Actor,id:string,input:unknown){
@@ -24,6 +24,7 @@ export class HumanHandoverService {
         // A late calculation may never reactivate the digital flow, even if the customer quickly resumes.
         c.latestAnalysisRequestId=null;c.graphContext=null;
         if(requested){
+          for(const s of c.voiceSessions)if(s.status==='active'||s.status==='starting'){s.status='interrupted';s.endedAt=instant;s.closeReason='human_handover';}
           const run=c.runs.find(r=>r.id===c.activeRunId),runId=run?.id??'intake';
           for(const rec of c.recommendations.filter(r=>r.runId===runId&&r.candidates.length)){rec.status='human_review_required';for(const p of rec.candidates)p.eligibility='human_review_required';}
           const review=c.reviewTasks.find(t=>t.runId===runId&&t.status==='open');
@@ -37,6 +38,7 @@ export class HumanHandoverService {
       return HumanHandoverCommandResponseSchema.parse({...this.view(c),command:{messageId:b.messageId,action:b.action,replayed:false,changed}});
     },{allowDuringHandover:true});
     if(result.handover.stopDigitalConversation)this.engine.digitalTasks.cancel(id);
+    await this.afterChange();
     return result;
   }
 }

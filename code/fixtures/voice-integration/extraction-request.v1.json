@@ -1,0 +1,20 @@
+{
+  "messageId": "income_extraction",
+  "expectedCaseRevision": 3,
+  "expectedProfileVersion": 1,
+  "basisDraftHash": "d50aa8e4ce0a4a17d13a2a62bddc9bef71d27519eab85ba10070c7bb0a4f4b1f",
+  "transcriptRevision": 1,
+  "observations": [
+    {
+      "fieldId": "annual_gross_income_chf",
+      "personId": "person_demo_1",
+      "sourceMessageId": "message_2",
+      "quote": "119000",
+      "value": 119000,
+      "precision": "exact",
+      "unit": "CHF",
+      "period": "year",
+      "basis": "gross"
+    }
+  ]
+}

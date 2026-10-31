@@ -174,3 +174,5 @@ Die neuen Context-Felder und der Paketstatus `rejected` erfordern, dass alle Tea
 ## OpenAI-Grenze
 
 `ExtractorContextSchema` bleibt der verbindliche Eingang für Ernis Orchestrierung, aber kein automatischer vollständiger Modellpayload. Die bestehende Policy `noExternalAiTransferAuthorized=true` bleibt unverändert. Diese Erweiterung führt keine externe KI-Transferfreigabe und keinen Modellaufruf ein. Ein tatsächlicher Anschluss muss weiterhin einen ausdrücklich synthetischen, minimalen Modellinput, serverseitige Schlüssel und den passenden Verarbeitungshinweis vorsehen. Reale Kunden-/Gesundheitsdaten sind nicht für diese Demo freigegeben.
+
+Für den tatsächlichen Voice-Anschluss gibt es inzwischen das [separate Nest-Voice-Modul](voice-backend-integration.md) mit eigener synthetischer Voice-Zustimmung. Die hier beschriebenen Bestätigungsbindungen und die Beschränkung des vollständigen Extraktionskontexts gelten weiterhin.

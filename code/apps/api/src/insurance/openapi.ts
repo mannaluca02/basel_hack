@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnalysisSchema,ReviewDecisionSchema,
+import { CreateVoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceSessionSchema,VoiceTranscriptSchema,VoiceTurnInputSchema,VoiceExtractionInputSchema,VoiceExtractionResponseSchema,CloseVoiceSessionSchema,
+  CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnalysisSchema,ReviewDecisionSchema,
   JourneyActionSchema,DemoApplicationDecisionSchema,GraphContextSchema,LifeAnalysisResponseSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,QuestionsResponseSchema,AdvisorContextUpdatedSchema,
   RecommendationPresentationSchema,CasePreferencesSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema,
@@ -11,6 +12,15 @@ import { EstimateRequestSchema } from './estimates.js';
 import { AdditionalToolRequestSchema } from './tools.js';
 
 const endpoints:[string,string,string,z.ZodType|undefined][]=[
+  ['get','/api/voice/providers','Read configured voice availability; no provider call',undefined],
+  ['get','/api/voice/privacy','Read separate synthetic voice processing notice in DE/FR/IT/EN',undefined],
+  ['get','/api/voice/portfolio','Read explicit handling of all 37 voice intake fields',undefined],
+  ['get','/api/cases/{caseId}/voice/sessions','Read own case voice session metadata',undefined],
+  ['post','/api/cases/{caseId}/voice/sessions','Customer opens consented voice session; short-lived connection replay only',CreateVoiceSessionSchema],
+  ['get','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/transcript','Read encrypted finalized transcript; scoped agent or owner only',undefined],
+  ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/turns','Customer client records a finalized customer/agent turn; never confirms facts',VoiceTurnInputSchema],
+  ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/extraction','Scoped agent maps sourced observations into one atomic proposal batch or explicit follow-ups',VoiceExtractionInputSchema],
+  ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/close','Customer closes voice only; human handover remains a separate command',CloseVoiceSessionSchema],
   ['get','/api/privacy','Read processing notice',undefined],['get','/api/status','Read runtime capabilities',undefined],
   ['get','/api/translations','Read complete DE/FR/IT/EN customer presentation catalog; locale query or Accept-Language',undefined],
   ['get','/api/openapi.json','Read API specification',undefined],
@@ -76,6 +86,7 @@ export function lifeOpenApi() {
       for(const child of Object.values(value))rewrite(child);};
     rewrite(json);schemas[name]=json;return {$ref:base};
   };
+  const voiceStart=reference('VoiceSessionStart',VoiceSessionStartResponseSchema),voiceSession=reference('VoiceSession',VoiceSessionSchema),voiceTranscript=reference('VoiceTranscript',VoiceTranscriptSchema),voiceExtraction=reference('VoiceExtraction',VoiceExtractionResponseSchema);
   const caseDto=reference('InsuranceCaseDto',InsuranceCaseDtoSchema);
   const analysis=reference('LifeAnalysisResponse',LifeAnalysisResponseSchema),context=reference('AdvisorContext',AdvisorContextSchema);
   const extractor=reference('ExtractorContext',ExtractorContextSchema),batch=reference('ProposalBatch',ProposalBatchSchema),acceptance=reference('ProposalAcceptance',ProposalAcceptanceSchema),resolution=reference('AmbiguityResolution',AmbiguityResolutionSchema);
@@ -86,10 +97,10 @@ export function lifeOpenApi() {
   const session=reference('SessionResponse',SessionResponseSchema),agentAccess=reference('AgentAccessResponse',AgentAccessResponseSchema);
   const summary=reference('SummaryBundle',SummaryBundleSchema),portal=reference('PortalDto',PortalDtoSchema);
   for(const [method,path,summary,schema] of endpoints) {
-    const publicRoute=['/api/privacy','/api/status','/api/sessions','/api/openapi.json','/api/translations'].includes(path);
+    const publicRoute=path.startsWith('/api/voice/')||['/api/privacy','/api/status','/api/sessions','/api/openapi.json','/api/translations'].includes(path);
     const parameters=[...path.matchAll(/\{(\w+)\}/g)].map(m=>({in:'path',name:m[1],required:true,schema:{type:'string'}}));
-    const languageParameters=['/api/translations','/api/privacy'].includes(path)?[{in:'query',name:'locale',required:false,schema:{type:'string',enum:['de','fr','it','en']}}]:[];
-    const responseSchema=(path==='/api/cases'&&method==='post')||path==='/api/cases/{caseId}'&&method==='get'||path.endsWith('/draft')||path.endsWith('/confirmations')?caseDto:
+    const languageParameters=['/api/translations','/api/privacy','/api/voice/privacy'].includes(path)?[{in:'query',name:'locale',required:false,schema:{type:'string',enum:['de','fr','it','en']}}]:[];
+    const responseSchema=path.includes('/voice/sessions')?(path.endsWith('/transcript')?voiceTranscript:path.endsWith('/extraction')?voiceExtraction:path.endsWith('/close')?voiceSession:path.endsWith('/turns')?{type:'object',properties:{voiceSession,replayed:{type:'boolean'}},required:['voiceSession','replayed'],additionalProperties:false}:method==='post'?voiceStart:{type:'object',properties:{caseId:{type:'string'},sessions:{type:'array',items:voiceSession}},required:['caseId','sessions'],additionalProperties:false}):(path==='/api/cases'&&method==='post')||path==='/api/cases/{caseId}'&&method==='get'||path.endsWith('/draft')||path.endsWith('/confirmations')?caseDto:
       path.endsWith('/handover')?method==='post'?handoverCommand:handover:
       path.endsWith('/customer-confirmations/current')?currentConfirmation:path.endsWith('/answer')&&path.includes('/customer-confirmations/')?outcome:path.includes('/customer-confirmations')?confirmation:
       path.endsWith('/advisor/extractor-context')?extractor:path.endsWith('/advisor/proposal-batches')?batch:path.endsWith('/accept')?acceptance:path.endsWith('/resolve')?resolution:

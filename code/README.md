@@ -172,3 +172,7 @@ Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorsc
 Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.
 
 Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, Kontexten und SSE verfügbar. [Routen und Zuständigkeiten](../documentation/baselhack/plans/human-advisor-handover.md). `npm run demo:handover` prüft Request/Stoppsignal/Replay/Resume ohne Anruf oder externe API-Aufrufe.
+
+## Voice am gemeinsamen Fall
+
+[Anbindung für Dario und Erni](../documentation/baselhack/plans/voice-backend-integration.md): Nest-Voice-Modul, serverseitige OpenAI-/ElevenLabs-Adapter, explizite synthetische Voice-Zustimmung, verschlüsselte finale Transkripte und quellengebundene atomare Vorschläge. `npm run demo:voice-integration` prüft den vollständigen Backend-Fluss ohne Mikrofon oder externe Modellaufrufe. `npm run contracts:voice-integration-examples` erzeugt die Team-JSON-Beispiele. Voice bleibt ohne `PAX_SYNTHETIC_VOICE_ENABLED=1` deaktiviert.
