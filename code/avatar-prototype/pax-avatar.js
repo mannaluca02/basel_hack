@@ -44,7 +44,8 @@ const BASE = {
   wL:1, wR:1, hL:1, hR:1, yL:0, yR:0, lidL:0, lidR:0, angleL:0, angleR:0,
   tilt:0, sway:0.6, speed:.6, breathe:.018, breathPeriod:4, glance:.08, pulse:0,
   nod:0, nodFace:0, nodDown:.27, nodUp:.44, nodGap:.15, nodSecond:0, nodInterval:3, nodJitter:.25, nodDelay:.2,
-  yaw:0, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4,
+  yaw:0, yawDir:0, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4,
+  beat:0, beatRefractory:.7, beatRaise:.15, gazeStep:0,
   hop:0, shake:0, speech:0, blinkDuration:.18, blinkGap:4,
 };
 export const EMOTIONS = {
@@ -58,7 +59,9 @@ export const EMOTIONS = {
   curious: { label:"Curious", subtitle:"Tell me more", hL:.9, hR:1.24, wL:.93, wR:.96, yL:3, yR:-4, tilt:-4, gx:-.12, pulse:.025, glance:.12,
     yaw:1, yawIn:.5, yawHold:1.25, yawOut:.6, yawInterval:4.5, yawJitter:.4, yawDelay:.4 },
   thinking: { label:"Thinking", subtitle:"Considering your question", gx:.25, gy:-.25, hL:1.2, hR:1.05, lidL:.23, lidR:.48, dots:1, glance:.035, speed:.4 },
-  explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.9, wR:.9, hL:1.22, hR:1.22, glance:.17, speed:1.2, speech:.025 },
+  explaining: { label:"Explaining", subtitle:"Clear and engaged", wL:.9, wR:.9, hL:1.22, hR:1.22, glance:0, speed:1.2, speech:.025,
+    beat:1, beatRefractory:.7, beatRaise:.15, gazeStep:1, blinkDuration:.7,
+    yaw:1, yawDir:-1, yawIn:.5, yawHold:1.2, yawOut:.6, yawInterval:6.5, yawJitter:.5, yawDelay:2 },
   reassuring: { label:"Reassuring", subtitle:"We can take this step by step", wL:1.08, wR:1.08, hL:.78, hR:.78, breathe:.026, breathPeriod:5.5, speed:.4, glance:.025, blinkDuration:.38, blinkGap:5 },
   empathetic: { label:"Empathetic", subtitle:"Quiet concern", gy:.25, angleL:-27, angleR:27, lidL:.34, lidR:.34, sway:.4, speed:.32, glance:.025, blinkDuration:.36, blinkGap:5 },
   pleased: { label:"Pleased", subtitle:"A warm welcome", smile:1, blush:1, hop:3, sway:1, speed:.65 },
@@ -79,9 +82,12 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
 
   let emotion = "neutral";
   const cur = { ...BASE };
-  let level = 0, levelSource = () => 0;
+  let level = 0, levelSource = () => 0, hasLevelSource = false;
+  let slowLevel = 0, onsetReady = true, beatAge = Infinity, beatStrength = 0, beatPose = 0;
+  let beatCooldown = 0, nextBeat = .8, nextEngagedGaze = 0;
+  const engagedGaze = { x:0, y:0 }, engagedTarget = { x:0, y:0 };
   let analyser = null, audioCtx = null, buf = null;
-  let blinkDuration = 0;
+  let blinkDuration = 0, blinkExitDuration = 0;
   let blinkT = 0, nextBlink = 3 + Math.random() * 3, saccade = { x: 0, y: 0 }, nextSaccade = 1.5;
   const gaze = { x: 0, y: 0 };
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -111,6 +117,8 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
 
   function setEmotion(key) {
     if (!Object.hasOwn(EMOTIONS, key) || key === emotion) return false;
+    // Carry the slower speaking blink through the first blink after a gesture exit.
+    if (EMOTIONS[emotion].beat && !EMOTIONS[key].beat && !blinkDuration) blinkExitDuration = cur.blinkDuration;
     emotion = key;
     if (EMOTIONS[key].nod) {
       const nodTarget = { ...BASE, ...EMOTIONS[key] };
@@ -121,13 +129,20 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
       const yawTarget = { ...BASE, ...EMOTIONS[key] };
       yawClock = -Math.max(yawTarget.yawDelay, blinkDuration ? nextBlink + blinkDuration - blinkT + .04 : 0);
       yawInterval = yawTarget.yawInterval + (Math.random() * 2 - 1) * yawTarget.yawJitter;
-      yawDirection = Math.sign(yawTarget.tilt) || 1;
+      yawDirection = yawTarget.yawDir || Math.sign(yawTarget.tilt) || 1;
     }
+    if (EMOTIONS[key].beat) { nextBeat = .8; nextEngagedGaze = 0; }
     if (key === "thinking") dotsEnteredAt = t;
     replay();
     return true;
   }
-  function setLevelSource(fn) { levelSource = fn || (() => 0); }
+  function setLevelSource(fn) {
+    levelSource = fn || (() => 0);
+    hasLevelSource = !!fn;
+    slowLevel = level = 0;
+    onsetReady = true;
+    nextBeat = .8;
+  }
   // Speech level from a MediaStream (e.g. the remote track of an OpenAI Realtime WebRTC call)
   // or from an <audio> element that plays TTS. Chrome only delivers samples from a remote
   // WebRTC stream if it is also played by an <audio> element.
@@ -203,13 +218,35 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     }
     yawPose = motion ? yawPose + (yawAmount * cur.yaw * yawDirection - yawPose) * (1 - Math.exp(-dt * 16)) : 0;
     const yawWidth = Math.abs(yawPose);
+    // Compare the speech envelope with a phrase-scale baseline, then require a fresh rise.
+    slowLevel += (level - slowLevel) * (1 - Math.exp(-dt * 1.8));
+    const onset = level - slowLevel;
+    if (onset < .025 || level < .04) onsetReady = true;
+    beatAge += dt;
+    beatCooldown -= dt;
+    if (target.beat && motion) {
+      nextBeat -= dt;
+      const audioBeat = hasLevelSource && onsetReady && level > .1 && onset > .07;
+      if (beatCooldown <= 0 && (hasLevelSource ? audioBeat : nextBeat <= 0)) {
+        beatAge = 0;
+        beatStrength = hasLevelSource ? Math.min(1, .65 + onset * 1.2) : .85 + Math.random() * .15;
+        beatCooldown = cur.beatRefractory;
+        onsetReady = false;
+        if (!hasLevelSource) nextBeat = Math.random() < .18 ? 2 + Math.random() : .7 + Math.random() * .9;
+      }
+    }
+    const beatEnvelope = beatAge < .15 ? (1 - Math.cos(Math.PI * beatAge / .15)) / 2
+      : beatAge < .5 ? (1 + Math.cos(Math.PI * (beatAge - .15) / .35)) / 2 : 0;
+    const beatTarget = beatEnvelope * beatStrength * cur.beat * (1 - yawWidth * .2);
+    beatPose = motion ? beatPose + (beatTarget - beatPose) * (1 - Math.exp(-dt * 24)) : 0;
+    const beatDip = beatPose * 2.8;
     const lift = -hop;
     const breath = Math.sin(breathPhase) * cur.breathe;
     const body = {
-      sx:1 + motion * (-breath * .28 + hop * .003 + nod * .01 / 5.5 - yawWidth * .035),
-      sy:1 + motion * (breath - hop * .003 - nod * .02 / 5.5),
+      sx:1 + motion * (-breath * .28 + hop * .003 + (nod + beatDip) * .01 / 5.5 - yawWidth * .035),
+      sy:1 + motion * (breath - hop * .003 - (nod + beatDip) * .02 / 5.5),
       rot:motion * (cur.tilt + Math.sin(phase) * .45 + shake * 2),
-      ty:motion * (nod + lift),
+      ty:motion * (nod + beatDip + lift),
     };
     let tx = motion * (Math.sin(phase) * cur.sway + shake * 2 + yawPose * 1.8);
     // Ease pose targets while the independent entry gestures finish continuously.
@@ -218,9 +255,9 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     for (const key in body) body[key] = pose[key];
     tx = pose.tx;
     set(P.char, { transform:`translate(${tx} ${body.ty}) translate(100 160) rotate(${body.rot} 0 -60) scale(${body.sx} ${body.sy}) translate(-100 -160)` });
-    set(P.shadow, { cx:100 + yawPose * 1.2, rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2 + nodPose * .6, opacity:1 + pose.lift * .04, fill:`rgba(54,5,115,${.18 + nodPose * .006})` });
-    const faceDip = nodPose * cur.nodFace / 5.5;
-    set(P.highlight, { cx:72 - yawPose * 1.5, cy:62 + nodPose * 1.5 / 5.5 });
+    set(P.shadow, { cx:100 + yawPose * 1.2, rx:48 * (1 - motion * breath * .28) + pose.lift * 1.2 + (nodPose + beatDip) * .6, opacity:1 + pose.lift * .04, fill:`rgba(54,5,115,${.18 + (nodPose + beatDip) * .006})` });
+    const faceDip = nodPose * cur.nodFace / 5.5 + beatPose * 1.5;
+    set(P.highlight, { cx:72 - yawPose * 1.5, cy:62 + (nodPose + beatDip) * 1.5 / 5.5 });
     for (const side of ["L", "R"]) set(P["blush" + side], { cx:(side === "L" ? 66 : 134) + yawPose * 4.5, cy:118 + faceDip });
     P.blushL.setAttribute("opacity", cur.blush * .8); P.blushR.setAttribute("opacity", cur.blush * .8);
 
@@ -235,7 +272,10 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
       if (blinkT > nextBlink) nextBlink = blinkT + .1;
     }
     else if (blinkT > nextBlink) {
-      if (!blinkDuration) blinkDuration = cur.blinkDuration;
+      if (!blinkDuration) {
+        blinkDuration = Math.max(cur.blinkDuration, blinkExitDuration);
+        blinkExitDuration = 0;
+      }
       const p = (blinkT - nextBlink) / blinkDuration;
       blink = p < 1 ? Math.abs(1 - 2 * p) : 1;
       if (p >= 1) { blinkDuration = 0; blinkT = 0; nextBlink = cur.blinkGap + Math.random() * 2; }
@@ -247,13 +287,25 @@ export function mountPaxAvatar(host, { onFrame } = {}) {
     }
     gaze.x += (saccade.x - gaze.x) * k;
     gaze.y += (saccade.y - gaze.y) * k;
-    const gx = (cur.gx + motion * cur.glance * (gaze.x + Math.sin(phase * 2))) * 9;
-    const gy = (cur.gy + motion * cur.glance * gaze.y) * 7;
+    if (target.gazeStep && motion) {
+      nextEngagedGaze -= dt;
+      if (nextEngagedGaze <= 0) {
+        const points = [[-1.4,0], [.9,-.45], [0,.35], [-.6,-.4]];
+        const point = points[Math.floor(Math.random() * points.length)];
+        engagedTarget.x = point[0]; engagedTarget.y = point[1];
+        nextEngagedGaze = .8 + Math.random() * 1.2;
+      }
+    }
+    const gazeEase = 1 - Math.exp(-dt * 25);
+    engagedGaze.x += (engagedTarget.x - engagedGaze.x) * gazeEase;
+    engagedGaze.y += (engagedTarget.y - engagedGaze.y) * gazeEase;
+    const gx = motion * (cur.gazeStep * engagedGaze.x + yawPose * 1.8 * cur.gazeStep) + (cur.gx + motion * cur.glance * (gaze.x + Math.sin(phase * 2))) * 9;
+    const gy = motion * cur.gazeStep * engagedGaze.y + (cur.gy + motion * cur.glance * gaze.y) * 7;
     for (const side of ["L", "R"]) {
       const sign = side === "L" ? -1 : 1;
       const far = Math.max(0, -sign * yawPose), near = Math.max(0, sign * yawPose);
       const cx = 100 + sign * 23 + gx + yawPose * 4.5 - sign * far * 1.5, cy = 101 + gy + cur["y" + side] + faceDip;
-      const pulse = 1 + motion * (cur.pulse * Math.sin(phase * 2) + cur.speech * level);
+      const pulse = 1 + motion * (beatPose * cur.beatRaise + cur.pulse * Math.sin(phase * 2) + cur.speech * level);
       const w = 11 * cur.size * cur["w" + side] * (1 - far * .15 + near * .05);
       const h = 11 * cur.size * cur.open * cur["h" + side] * pulse * (1 - nodPose * .06 / 5.5) * (blink + (1 - blink) * cur.smile);
       set(P["eye" + side], { cx, cy, rx:w, ry:Math.max(.3,h) });
