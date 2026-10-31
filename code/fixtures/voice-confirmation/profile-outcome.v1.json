@@ -397,7 +397,7 @@
         "reviewFlags": []
       },
       "changes": [],
-      "noticeVersion": "lifemap-synthetic-v1",
+      "noticeVersion": "lifemap-synthetic-v2",
       "allowSyntheticCalculatorTransfer": true,
       "confirmProfileAndAssumptions": true
     },

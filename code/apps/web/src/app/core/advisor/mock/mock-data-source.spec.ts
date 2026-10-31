@@ -37,25 +37,23 @@ function ofType<T extends AdvisorEventType>(events: readonly AdvisorEvent[], typ
   return events.filter((e): e is Extract<AdvisorEvent, { type: T }> => e.type === type);
 }
 
-function setup(dataSource: 'mock' | 'api' = 'mock') {
+function setup() {
   TestBed.configureTestingModule({
     providers: [
       provideI18nTesting(),
       provideAdvisorDataSource(),
-      { provide: APP_ENVIRONMENT, useValue: { production: false, apiBaseUrl: '/api', dataSource } },
+      {
+        provide: APP_ENVIRONMENT,
+        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
+      },
     ],
   });
 }
 
 describe('provideAdvisorDataSource', () => {
   it('uses the scripted mock when dataSource is "mock"', () => {
-    setup('mock');
+    setup();
     expect(TestBed.inject(AdvisorDataSource)).toBeInstanceOf(MockDataSource);
-  });
-
-  it('fails loudly for "api" until the real adapter exists', () => {
-    setup('api');
-    expect(() => TestBed.inject(AdvisorDataSource)).toThrowError(/FE-20/);
   });
 });
 
@@ -147,7 +145,7 @@ describe('MockDataSource', () => {
   const lastReply = (): AgentReply | undefined => ofType(received, 'reply').at(-1)?.payload;
 
   beforeEach(() => {
-    setup('mock');
+    setup();
     source = TestBed.inject(AdvisorDataSource);
     received = [];
     source.events.subscribe((event) => received.push(event));

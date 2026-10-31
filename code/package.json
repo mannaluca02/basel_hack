@@ -9,7 +9,7 @@
   "packageManager": "npm@10.9.8",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/api"
   ],
   "scripts": {
     "build": "tsc -b",
@@ -28,6 +28,7 @@
     "demo:voice-confirmation": "npm run build && node scripts/demo-voice-confirmation.mjs",
     "contracts:voice-examples": "npm run build && node scripts/demo-voice-confirmation.mjs --export",
     "demo:handover": "npm run build && node scripts/demo-human-handover.mjs",
+    "demo:customer-review": "npm run build && node scripts/demo-customer-review.mjs",
     "contracts:handover-examples": "npm run build && node scripts/demo-human-handover.mjs --export"
   },
   "devDependencies": {

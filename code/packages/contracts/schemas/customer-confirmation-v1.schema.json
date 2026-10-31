@@ -1516,7 +1516,10 @@
         },
         "noticeVersion": {
           "type": "string",
-          "const": "lifemap-synthetic-v1"
+          "enum": [
+            "lifemap-synthetic-v1",
+            "lifemap-synthetic-v2"
+          ]
         },
         "allowSyntheticCalculatorTransfer": {
           "type": "boolean"

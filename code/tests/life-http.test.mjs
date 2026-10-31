@@ -20,18 +20,28 @@ before(async()=>{
 });
 after(async()=>{await app?.close();await rm(directory,{recursive:true,force:true});});
 async function newCase(locale='de') {
-  const response=await request('POST','/api/cases',customer.sessionToken,{locale,timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+  const response=await request('POST','/api/cases',customer.sessionToken,{locale,timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
   assert.equal(response.status,201);return response.body;
 }
 async function confirmedCase() {
   let c=await newCase();c=(await request('PATCH',`/api/cases/${c.id}/draft`,customer.sessionToken,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision})).body;
-  const result=await request('POST',`/api/cases/${c.id}/confirmations`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+  const result=await request('POST',`/api/cases/${c.id}/confirmations`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
   assert.equal(result.status,201);return result.body;
 }
 test('public processing notice precedes data capture and reports live capabilities without credentials',async()=>{
-  const p=await request('GET','/api/privacy');assert.equal(p.body.externalAiTransfer,false);assert.equal(p.body.dataMode,'synthetic_only');
+  const p=await request('GET','/api/privacy');assert.equal(p.body.dataMode,'synthetic_only');
+  assert.equal(p.body.version,'lifemap-synthetic-v2');assert.equal(p.body.externalAiTransfer,'explicitly_synthetic_extraction_only');
+  for(const locale of ['de','fr','it','en']){
+    const {recipients}=(await request('GET',`/api/privacy?locale=${locale}`)).body.display;
+    assert.match(recipients,/OpenAI/);assert.match(recipients,/Logismata/);
+    assert.doesNotMatch(recipients,/keine externen KI-Modelle aufgerufen|Aucun modèle d’IA externe n’est appelé|Non sono chiamati modelli di IA esterni|No external AI models are called/);
+  }
   const status=await request('GET','/api/status');assert.equal(status.body.realCoverageCanBeActivated,false);assert.equal(status.body.operations.length,24);
   assert.ok(!JSON.stringify(status.body).includes('accessCode'));
+});
+test('a case cannot start on the superseded notice that denied any external AI transfer',async()=>{
+  const stale=await request('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+  assert.equal(stale.status,400);
 });
 test('case routes require authentication and do not accept a customer role override',async()=>{
   assert.equal((await request('GET','/api/cases')).status,401);
@@ -42,7 +52,7 @@ test('HTTP cookie session survives page reload but unsafe requests require the C
   const login=await request('POST','/api/sessions',null,{accessCode:credentials.customerAccessCode});
   const cookie=login.headers.get('set-cookie');assert.match(cookie,/HttpOnly/);assert.match(cookie,/SameSite=Strict/);
   const headers={Cookie:cookie.split(';')[0],Origin:'http://localhost:4200'};
-  const body={locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'};
+  const body={locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'};
   assert.equal((await request('POST','/api/cases',null,body,headers)).status,403);
   const okay=await request('POST','/api/cases',null,body,{...headers,'X-CSRF-Token':login.body.csrfToken});assert.equal(okay.status,201);
   assert.equal((await request('GET',`/api/cases/${okay.body.id}`,null,undefined,headers)).status,200);
@@ -53,7 +63,7 @@ test('customers cannot access another customer case or its PDF documents',async(
   const response=await fetch(`${base}/api/cases/${c.id}/documents/term_terms`,{headers:{Authorization:`Bearer ${other.sessionToken}`}});assert.equal(response.status,404);
 });
 test('real customer mode and raw health fields are rejected by the runtime boundary',async()=>{
-  const mode=await request('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'customer'});assert.equal(mode.status,400);
+  const mode=await request('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'customer'});assert.equal(mode.status,400);
   const c=await newCase();const health=await request('PATCH',`/api/cases/${c.id}/draft`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,medicalHistory:'do-not-reflect-private-health'});
   assert.equal(health.status,400);assert.ok(!JSON.stringify(health.body).includes('do-not-reflect-private-health'));
 });
@@ -82,7 +92,7 @@ test('HTTP end-to-end flow reaches a persisted, explicitly non-binding demo poli
 });
 test('SSE supplies context references, updates after tempo changes, and closes on revocation',async()=>{
   const session=(await request('POST','/api/sessions',null,{accessCode:credentials.customerAccessCode})).body;
-  const c=(await request('POST','/api/cases',session.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'})).body;
+  const c=(await request('POST','/api/cases',session.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
   const controller=new AbortController();
   const stream=await fetch(`${base}/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${session.sessionToken}`},signal:controller.signal});assert.equal(stream.status,200);
   const reader=stream.body.getReader();const first=new TextDecoder().decode((await reader.read()).value);assert.match(first,/advisor.context.updated/);assert.ok(!first.includes('grossAnnualIncome'));

@@ -12,9 +12,9 @@ const directory=await mkdtemp(join(tmpdir(),'pax-contract-examples-'));let runti
 try{
  runtime=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials});
  const actor=runtime.sessions.authenticate((await runtime.sessions.login(credentials.customerAccessCode,'local-example')).sessionToken);
- let c=await runtime.engine.createCase(actor,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await runtime.engine.createCase(actor,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  c=await runtime.engine.patchDraft(actor,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
- c=await runtime.engine.confirm(actor,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ c=await runtime.engine.confirm(actor,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  const {run}=await runtime.engine.analyze(actor,c.id,{expectedCaseRevision:c.caseRevision,expectedProfileVersion:1,scenarioVersionId:'baseline_v1',scenario:{kind:'baseline'}});
  await runtime.engine.recommendation(actor,c.id);
  await runtime.engine.selectGraph(actor,c.id,{caseId:c.id,profileVersion:1,scenarioVersionId:run.scenarioVersionId,runId:run.id,graphId:'household_budget',metricId:'cashflowAnnual',periodStart:run.local.periodStart,periodEnd:run.local.periodEnd});

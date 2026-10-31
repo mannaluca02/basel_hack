@@ -41,6 +41,14 @@
       "title": "Une IA intervient",
       "body": "Un assistant IA mène l’entretien, pose des questions et explique les résultats. Il ne calcule rien lui-même : tous les montants proviennent des outils de calcul de Pax. L’IA reçoit uniquement ce dont elle a besoin, sans votre nom, votre date de naissance complète ni vos données de santé."
     },
+    "extraction": {
+      "title": "Extraits d’entretien fictifs envoyés à OpenAI",
+      "body": "Des extraits d’entretien explicitement fictifs et des valeurs de démonstration sont transmis à OpenAI pour extraire des propositions de champs non confirmées. Cela n’autorise aucune donnée réelle : les vraies données de clients, financières ou de santé ne doivent pas être transmises à des modèles d’IA externes."
+    },
+    "calculator": {
+      "title": "Données de calcul fictives envoyées à Logismata",
+      "body": "Séparément, les données de calcul fictives ne sont transmises au calculateur Logismata autorisé du hackathon qu’après votre confirmation du profil complet."
+    },
     "demo": {
       "title": "Ceci est une démo",
       "body": "Ce prototype du BaselHack 2026 fonctionne uniquement avec des données synthétiques. Merci de ne saisir aucune donnée personnelle réelle."
@@ -64,6 +72,62 @@
       "thinking": "L’assistant réfléchit",
       "speaking": "L’assistant parle",
       "error": "Problème avec l’assistant"
+    }
+  },
+  "review": {
+    "title": "Vérification",
+    "loading": "Chargement de l’état actuel.",
+    "noBatches": "Aucune modification n’est proposée pour le moment.",
+    "person": "Personne {{number}}",
+    "gross": "Revenu annuel brut",
+    "net": "Net après impôt sur le revenu",
+    "other": "Autre information",
+    "draft": "Brouillon actuel",
+    "stale": "Cette question n’est plus valable, car le dossier a changé. Veuillez vérifier à nouveau l’état actuel.",
+    "offline": "Pas de connexion en direct. L’état affiché peut être obsolète ; il sera rechargé lors de votre prochaine action.",
+    "period": {
+      "year": "par an",
+      "month": "par mois"
+    },
+    "status": {
+      "proposed": "En attente d’acceptation",
+      "accepted": "Acceptée",
+      "rejected": "Refusée",
+      "superseded": "Remplacée",
+      "outdated": "Obsolète"
+    },
+    "open": "Vérifier la modification",
+    "ambiguity": {
+      "open": "La réponse est encore attendue.",
+      "answered": "La réponse est prête à être reprise."
+    },
+    "signIn": {
+      "label": "Code d’accès de démonstration",
+      "submit": "Se connecter"
+    },
+    "error": {
+      "transport": "Le service est injoignable. Rien n’a été répété. Veuillez vérifier l’état affiché."
+    },
+    "profile": {
+      "title": "Profil complet",
+      "pendingAcceptance": "Décidez d’abord des modifications en attente. Le profil complet n’est pas encore confirmé.",
+      "openAmbiguity": "Des questions ouvertes empêchent de confirmer le profil complet.",
+      "incomplete": "Des informations manquent encore. Le profil complet n’est pas encore confirmé.",
+      "ready": "Le profil complet n’est pas encore confirmé.",
+      "confirmed": "Confirmé en version {{version}}.",
+      "review": "Vérifier le profil complet"
+    },
+    "question": {
+      "title": "Votre décision",
+      "accept": "Reprendre la modification",
+      "reject": "Refuser la modification",
+      "confirm": "Confirmer le profil complet",
+      "cancel": "Annuler",
+      "voice": "Veuillez répondre oralement.",
+      "profile": "Profil complet affiché",
+      "allFields": "Toutes les informations",
+      "assumptions": "Hypothèses",
+      "notice": "Note sur le traitement des données"
     }
   }
 }

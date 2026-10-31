@@ -10,7 +10,7 @@ let r;
 try{
  r=await createLifeRuntime({dataDirectory:directory,provider,providerMode:'test',credentials});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'local-handover')).sessionToken);
- const c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ const c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  const agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken);
  const input={action:'request',messageId:'human_advisor_requested',expectedCaseRevision:c.caseRevision,source:'ui'};
  const requested=await r.handover.command(customer,c.id,input),context=r.engine.advisorContext(agent,c.id),extractor=r.extraction.context(agent,c.id);

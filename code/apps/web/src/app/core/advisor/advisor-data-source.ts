@@ -10,7 +10,7 @@ import { AgentPresentation, ChartResult, InfoItem, RiskItem, TranscriptEntry } f
 
 /**
  * One live update from the advisor backend. `type` matches the planned SSE event name, `payload`
- * the event data, so the API adapter (FE-20) maps an SSE message one to one.
+ * the event data, so `ApiDataSource` maps an SSE message one to one.
  * Items with an id (transcript entry, chart, risk, info, reply) are upserts: a known id replaces
  * the earlier version in place.
  */
@@ -65,7 +65,7 @@ export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 
 /**
  * The single seam between the UI and the advisor backend. `MockDataSource` replays a scripted
- * synthetic call; the HTTP/SSE adapter (FE-20) implements the same class against the backend.
+ * synthetic call; `ApiDataSource` implements the same class against the backend.
  * Select the implementation with `dataSource` in the environment, see `provideAdvisorDataSource`.
  */
 export abstract class AdvisorDataSource {

@@ -41,6 +41,14 @@
       "title": "È coinvolta un’IA",
       "body": "Un assistente IA conduce il colloquio, pone domande e spiega i risultati. Non calcola da sé: tutti gli importi provengono dagli strumenti di calcolo di Pax. L’IA riceve solo ciò che le serve, senza il suo nome, la data di nascita completa o dati sulla salute."
     },
+    "extraction": {
+      "title": "Estratti di colloquio inventati a OpenAI",
+      "body": "Estratti di colloquio esplicitamente inventati e valori dimostrativi sono trasmessi a OpenAI per estrarre proposte di campo non confermate. Ciò non autorizza dati reali: dati reali di clienti, finanziari o sanitari non devono essere trasmessi a modelli di IA esterni."
+    },
+    "calculator": {
+      "title": "Dati di calcolo inventati a Logismata",
+      "body": "Separatamente, i dati di calcolo inventati sono trasmessi al calcolatore Logismata autorizzato dell’hackathon solo dopo la conferma del profilo completo."
+    },
     "demo": {
       "title": "Questa è una demo",
       "body": "Questo prototipo del BaselHack 2026 funziona solo con dati sintetici. Non inserisca dati personali reali."
@@ -64,6 +72,62 @@
       "thinking": "L’assistente riflette",
       "speaking": "L’assistente parla",
       "error": "Problema con l’assistente"
+    }
+  },
+  "review": {
+    "title": "Verifica",
+    "loading": "Caricamento dello stato attuale.",
+    "noBatches": "Al momento non ci sono modifiche proposte.",
+    "person": "Persona {{number}}",
+    "gross": "Reddito annuo lordo",
+    "net": "Netto dopo le imposte sul reddito",
+    "other": "Altra informazione",
+    "draft": "Bozza attuale",
+    "stale": "Questa domanda non è più valida perché il caso è cambiato. Verifichi di nuovo lo stato attuale.",
+    "offline": "Nessuna connessione in tempo reale. Lo stato visualizzato può essere obsoleto; sarà ricaricato alla sua prossima azione.",
+    "period": {
+      "year": "all’anno",
+      "month": "al mese"
+    },
+    "status": {
+      "proposed": "In attesa di accettazione",
+      "accepted": "Accettata",
+      "rejected": "Rifiutata",
+      "superseded": "Sostituita",
+      "outdated": "Obsoleta"
+    },
+    "open": "Verifica la modifica",
+    "ambiguity": {
+      "open": "La risposta è ancora in sospeso.",
+      "answered": "La risposta è pronta per essere ripresa."
+    },
+    "signIn": {
+      "label": "Codice di accesso demo",
+      "submit": "Accedi"
+    },
+    "error": {
+      "transport": "Il servizio non è raggiungibile. Non è stato ripetuto nulla. Verifichi lo stato visualizzato."
+    },
+    "profile": {
+      "title": "Profilo completo",
+      "pendingAcceptance": "Decida prima le modifiche in sospeso. Il profilo completo non è ancora confermato.",
+      "openAmbiguity": "Le domande aperte impediscono la conferma del profilo completo.",
+      "incomplete": "Mancano ancora informazioni. Il profilo completo non è ancora confermato.",
+      "ready": "Il profilo completo non è ancora confermato.",
+      "confirmed": "Confermato nella versione {{version}}.",
+      "review": "Verifica il profilo completo"
+    },
+    "question": {
+      "title": "La sua decisione",
+      "accept": "Applica la modifica",
+      "reject": "Rifiuta la modifica",
+      "confirm": "Conferma il profilo completo",
+      "cancel": "Annulla",
+      "voice": "Risponda a voce.",
+      "profile": "Profilo completo visualizzato",
+      "allFields": "Tutte le informazioni",
+      "assumptions": "Ipotesi",
+      "notice": "Nota sul trattamento dei dati"
     }
   }
 }

@@ -45,7 +45,7 @@ Dann `ng serve --proxy-config proxy.conf.json` und im Client ausschließlich rel
 1. Vor Aufnahme `/api/privacy` anzeigen. Im PoC sind ausschließlich erfundene Daten zugelassen.
 2. `POST /api/sessions` mit `{ "accessCode": "<lokaler Zugangscode>" }`. Die Rolle wird serverseitig aus dem Code ermittelt. Die Antwort setzt ein HttpOnly-/SameSite-Strict-Cookie und liefert `csrfToken`, `expiresAt` sowie einen Bearer-Token für serverseitige Integration.
 3. Im Angular-Client `csrfToken` in `sessionStorage` halten, damit er einen Reload übersteht; bei Cookie-Authentisierung alle schreibenden Aufrufe mit `X-CSRF-Token` senden. Den Sitzungstoken nicht loggen. Die lokalen HTTP-Cookies sind für Loopback ausgelegt; produktive TLS-/Secure-Cookie-/IAM-Konfiguration ist ein gesondertes Release-Gate.
-4. `POST /api/cases` mit `{ "locale":"de", "timeBudgetMinutes":10, "noticeVersion":"lifemap-synthetic-v1", "dataClassification":"synthetic" }` erzeugt einen eigenen Fall. Neue Logins erzeugen getrennte anonyme Demo-Besitzer. Bestehende Cookies/Sitzungen können innerhalb ihrer einstündigen Gültigkeit nach Reload und Server-Neustart weiterverwendet werden. Das ersetzt kein Pax-Kundenlogin.
+4. `POST /api/cases` mit `{ "locale":"de", "timeBudgetMinutes":10, "noticeVersion":"lifemap-synthetic-v2", "dataClassification":"synthetic" }` erzeugt einen eigenen Fall. Neue Logins erzeugen getrennte anonyme Demo-Besitzer. Bestehende Cookies/Sitzungen können innerhalb ihrer einstündigen Gültigkeit nach Reload und Server-Neustart weiterverwendet werden. Das ersetzt kein Pax-Kundenlogin.
 5. `PATCH /api/cases/:id/draft` schreibt `financial`, `insurance`, `goals`, `reviewFlags` und `expectedCaseRevision`. Der vollständige Beispieldatensatz ist die Startvorlage; unbekannte Werte bleiben `null`. Der Server setzt Fall-ID und Profilversion selbst.
 6. `/questions` liefert gezielte Pflichtfelder und abhängig vom Zeitbudget eine oder drei nächste Fragen. `/confirmations` benötigt `expectedCaseRevision`, `confirmProfileAndAssumptions:true`, `allowSyntheticCalculatorTransfer:true` und `noticeVersion`. Nur der Kundenkontext bestätigt den unveränderlichen Profilstand.
 7. `/calculations` benötigt `expectedCaseRevision`, `expectedProfileVersion`, `scenarioVersionId` und `scenario`. Die Antwort enthält `run` mit lokalen Kennzahlen, Providerergebnissen, Risiko-/Kapitalbedarf, drei Säulen, Prüfgründen und gegebenenfalls Zeitachse.
@@ -138,7 +138,7 @@ Alle 24 Operationen der bereitgestellten APICalc-Spezifikation sind nun im Serve
 ```json
 {
   "expectedCaseRevision": 2,
-  "noticeVersion": "lifemap-synthetic-v1",
+  "noticeVersion": "lifemap-synthetic-v2",
   "allowSyntheticCalculatorTransfer": true,
   "requestUnits": "CHF_CENTS",
   "operation": "inheritanceAll",
@@ -168,6 +168,8 @@ Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm r
 ## Dialogextraktion und Vorschlagspakete
 
 Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
+
+Den Prüfstand im Angular-Client gegen den echten Fallservice startet `npm run demo:customer-review` mit synthetischen Daten; Details stehen im [Web-README](apps/web/README.md).
 
 Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.
 

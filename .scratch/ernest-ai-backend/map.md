@@ -46,7 +46,7 @@ Alle Tickets haben `Type: task`. `ready-for-agent` beschreibt den Triagezustand 
 | Nr. | Ticket / beobachtbares Ergebnis | Owner | Blocked by | Status |
 |---|---|---|---|---|
 | 01 | [Jahresbrutto aus einem finalen Dialog-Turn vorschlagen](issues/01-jahresbrutto-dialog-turn.md): tatsächlicher Modul-/Modell-/Tool-Weg bis zum unbestätigten Pflichtvorschlag | Earnie | Keine | ready-for-agent |
-| 02 | [Prüfstand und getrennte Kundenaktionen im Angular-Client anschließen](issues/02-kundenclient-pruefstand-bestaetigung.md): echter Prüfstand, korrekter Hinweis, getrennte Kundenaktionen | Angular-Besitzer; Valentin für gemeinsame Backend-Hinweise | Keine | ready-for-agent |
+| 02 | [Prüfstand und getrennte Kundenaktionen im Angular-Client anschließen](issues/02-kundenclient-pruefstand-bestaetigung.md): echter Prüfstand, korrekter Hinweis, getrennte Kundenaktionen | Angular-Besitzer; Valentin für gemeinsame Backend-Hinweise | Keine | resolved |
 | 03 | [Eindeutige Korrekturen ohne Verlust zusammengehöriger Angaben übernehmen](issues/03-korrekturen-vorschlagspakete.md): nachvollziehbarer Nachfolger statt Datenverlust | Earnie | 01 | ready-for-agent |
 | 04 | [Personen- und Einkommensunklarheiten bis zur Antwortübernahme führen](issues/04-unklarheiten-dialogstatus.md): gezielte Klärung statt geratener Zuordnung/Jahresbasis | Earnie | 01 | ready-for-agent |
 | 05 | [Turns bei Wiederzustellung, Versionswechsel und Fehlern zuverlässig verarbeiten](issues/05-retries-konflikte-fehler.md): keine Duplikate oder veralteten Mutationen | Earnie | 01 | ready-for-agent |

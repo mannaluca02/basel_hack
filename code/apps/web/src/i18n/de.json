@@ -41,6 +41,14 @@
       "title": "Eine KI ist beteiligt",
       "body": "Ein KI-Assistent führt das Gespräch, stellt Fragen und erklärt Ergebnisse. Er rechnet nicht selbst: Alle Beträge stammen aus den Berechnungswerkzeugen von Pax. Die KI erhält nur, was sie braucht, ohne Namen, vollständiges Geburtsdatum oder Gesundheitsangaben."
     },
+    "extraction": {
+      "title": "Erfundene Gesprächsausschnitte an OpenAI",
+      "body": "Um unbestätigte Feldvorschläge zu erkennen (Extraktion), werden ausdrücklich erfundene Gesprächsausschnitte und Demo-Werte an OpenAI übermittelt. Das ist keine Freigabe echter Daten: Echte Kunden-, Finanz- oder Gesundheitsdaten dürfen nicht an externe KI-Modelle gehen."
+    },
+    "calculator": {
+      "title": "Erfundene Rechendaten an Logismata",
+      "body": "Getrennt davon gehen erfundene Rechendaten erst nach Ihrer Bestätigung des Gesamtprofils an den autorisierten Logismata-Hackathon-Rechner."
+    },
     "demo": {
       "title": "Dies ist eine Demo",
       "body": "Dieser Prototyp vom BaselHack 2026 arbeitet nur mit synthetischen Daten. Bitte geben Sie keine echten persönlichen Daten ein."
@@ -64,6 +72,62 @@
       "thinking": "Assistent denkt nach",
       "speaking": "Assistent spricht",
       "error": "Störung beim Assistenten"
+    }
+  },
+  "review": {
+    "title": "Prüfstand",
+    "loading": "Der aktuelle Stand wird geladen.",
+    "noBatches": "Zurzeit liegen keine vorgeschlagenen Änderungen vor.",
+    "person": "Person {{number}}",
+    "gross": "Bruttojahreseinkommen",
+    "net": "Netto nach Einkommenssteuer",
+    "other": "Weitere Angabe",
+    "draft": "Aktueller Entwurf",
+    "stale": "Diese Frage gilt nicht mehr, weil sich der Fall geändert hat. Bitte prüfen Sie den aktuellen Stand erneut.",
+    "offline": "Keine Live-Verbindung. Der angezeigte Stand kann veraltet sein; er wird bei Ihrer nächsten Aktion neu geladen.",
+    "period": {
+      "year": "pro Jahr",
+      "month": "pro Monat"
+    },
+    "status": {
+      "proposed": "Zur Annahme offen",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt",
+      "superseded": "Ersetzt",
+      "outdated": "Veraltet"
+    },
+    "open": "Änderung prüfen",
+    "ambiguity": {
+      "open": "Die Antwort steht noch aus.",
+      "answered": "Die Antwort liegt zur Übernahme bereit."
+    },
+    "signIn": {
+      "label": "Demo-Zugangscode",
+      "submit": "Anmelden"
+    },
+    "error": {
+      "transport": "Der Dienst ist nicht erreichbar. Es wurde nichts wiederholt. Bitte prüfen Sie den angezeigten Stand."
+    },
+    "profile": {
+      "title": "Gesamtprofil",
+      "pendingAcceptance": "Zuerst offene Änderungen entscheiden. Das Gesamtprofil ist noch nicht bestätigt.",
+      "openAmbiguity": "Offene Rückfragen verhindern die Bestätigung des Gesamtprofils.",
+      "incomplete": "Es fehlen noch Angaben. Das Gesamtprofil ist noch nicht bestätigt.",
+      "ready": "Das Gesamtprofil ist noch nicht bestätigt.",
+      "confirmed": "Bestätigt in Version {{version}}.",
+      "review": "Gesamtprofil prüfen"
+    },
+    "question": {
+      "title": "Ihre Entscheidung",
+      "accept": "Änderung übernehmen",
+      "reject": "Änderung ablehnen",
+      "confirm": "Gesamtprofil bestätigen",
+      "cancel": "Abbrechen",
+      "voice": "Bitte antworten Sie per Sprache.",
+      "profile": "Angezeigtes Gesamtprofil",
+      "allFields": "Alle Angaben",
+      "assumptions": "Annahmen",
+      "notice": "Verarbeitungshinweis"
     }
   }
 }

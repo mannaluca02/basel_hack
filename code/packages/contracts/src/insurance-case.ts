@@ -45,7 +45,7 @@ export const AcceptProposalInputSchema=z.object({expectedCaseRevision:revision,a
 export const CasePreferencesSchema=z.object({timeBudgetMinutes:z.number().int().min(3).max(120).optional(),locale:LocaleSchema.optional()}).strict()
   .refine(b=>b.locale!==undefined||b.timeBudgetMinutes!==undefined,'At least one preference is required');
 export const ConfirmedProfileSchema=z.object({version:revision,draft:DraftSchema,confirmedAt:timestamp,confirmedBy:Id,
-  noticeVersion:z.literal('lifemap-synthetic-v1'),calculatorTransferAllowed:z.literal(true)}).strict();
+  noticeVersion:z.enum(['lifemap-synthetic-v1','lifemap-synthetic-v2']),calculatorTransferAllowed:z.literal(true)}).strict();
 export const CalculatorEstimateSchema=z.object({id:Id,draftHash:hash,at:timestamp,results:z.array(ProviderResultSchema).max(50)}).strict();
 export const CalculatorToolRunSchema=z.object({id:Id,createdAt:timestamp,operation:ProviderResultSchema.shape.operation,requestUnits:z.literal('CHF_CENTS'),
   request:z.record(z.string(),z.json()),result:ProviderResultSchema,scope:z.literal('isolated_calculator_estimate'),profileMutated:z.literal(false),

@@ -945,10 +945,10 @@ export const Messages = {
     "en": "This prototype demonstrates pension and life insurance advice using invented data only."
   },
   "privacy.recipients": {
-    "de": "Erfundene Rechendaten werden nach Ihrer Bestätigung an den autorisierten Logismata-Hackathon-Rechner übertragen. Es werden keine externen KI-Modelle aufgerufen.",
-    "fr": "Après votre confirmation, les données de calcul fictives sont transmises au calculateur Logismata autorisé du hackathon. Aucun modèle d’IA externe n’est appelé.",
-    "it": "Dopo la conferma, i dati di calcolo inventati sono trasmessi al calcolatore Logismata autorizzato dell’hackathon. Non sono chiamati modelli di IA esterni.",
-    "en": "After your confirmation, invented calculation data is sent to the authorised Logismata hackathon calculator. No external AI models are called."
+    "de": "Erfundene Rechendaten werden nach Ihrer Bestätigung an den autorisierten Logismata-Hackathon-Rechner übertragen. Getrennt davon werden ausdrücklich erfundene Gesprächsausschnitte und Demo-Jahresbruttowerte zur Extraktion unbestätigter Feldvorschläge an OpenAI übermittelt. Das ist keine Freigabe echter Kundendaten: Diese dürfen nicht an externe KI-Modelle gehen.",
+    "fr": "Après votre confirmation, les données de calcul fictives sont transmises au calculateur Logismata autorisé du hackathon. Séparément, des extraits de conversation explicitement fictifs et des revenus annuels bruts de démonstration sont transmis à OpenAI pour extraire des propositions de champs non confirmées. Cela n’autorise aucune donnée réelle de client : celles-ci ne doivent pas être transmises à des modèles d’IA externes.",
+    "it": "Dopo la conferma, i dati di calcolo inventati sono trasmessi al calcolatore Logismata autorizzato dell’hackathon. Separatamente, estratti di conversazione esplicitamente inventati e redditi annui lordi dimostrativi sono trasmessi a OpenAI per estrarre proposte di campo non confermate. Ciò non autorizza dati reali di clienti: questi non devono essere trasmessi a modelli di IA esterni.",
+    "en": "After your confirmation, invented calculation data is sent to the authorised Logismata hackathon calculator. Separately, explicitly invented conversation excerpts and demo annual gross incomes are sent to OpenAI to extract unconfirmed field proposals. This does not release real customer data, which must not be sent to external AI models."
   },
   "privacy.storage": {
     "de": "Lokale Falldaten werden verschlüsselt gespeichert und nach Löschung oder Fallablauf bereinigt. Bitte geben Sie keine echten Kunden- oder Gesundheitsdaten ein.",

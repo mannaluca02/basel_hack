@@ -10,9 +10,9 @@ let r;
 try{
  r=await createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials});
  const customer=r.sessions.authenticate((await r.sessions.login(credentials.customerAccessCode,'local-demo')).sessionToken);
- let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+ let c=await r.engine.createCase(customer,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
  c=await r.engine.patchDraft(customer,c.id,{...(await lifeDraft()),expectedCaseRevision:c.caseRevision});
- const confirm=()=>r.engine.confirm(customer,c.id,{expectedCaseRevision:r.engine.caseFor(customer,c.id).caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+ const confirm=()=>r.engine.confirm(customer,c.id,{expectedCaseRevision:r.engine.caseFor(customer,c.id).caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
  await confirm();const agent=r.sessions.authenticate((await r.sessions.agentToken(customer,c.id)).sessionToken),context=r.extraction.context(agent,c.id);
  const input=ProposalBatchInputSchema.parse({messageId:'synthetic_salary_correction',source:{messageId:'synthetic_salary_correction',turnId:'turn_salary_01',sourceRef:'synthetic:invented-dialogue'},
    expectedCaseRevision:context.caseRevision,expectedProfileVersion:context.profileVersion,basisDraftHash:context.draftHash,

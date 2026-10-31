@@ -21,18 +21,18 @@ try {
   const codes=await runtime.store.credentials();
   const customer=await call('POST','/api/sessions',null,{accessCode:codes.customerAccessCode});
   const reviewer=await call('POST','/api/sessions',null,{accessCode:codes.reviewerAccessCode});
-  let c=await call('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v1',dataClassification:'synthetic'});
+  let c=await call('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
   const path=`/api/cases/${c.id}`;
   const draft=JSON.parse(await readFile(new URL('../fixtures/insurance-household.json',import.meta.url),'utf8'));
   draft.financial.valuationDate=new Date().toISOString().slice(0,10);
   c=await call('PATCH',`${path}/draft`,customer.sessionToken,{...draft,expectedCaseRevision:c.caseRevision});
-  c=await call('POST',`${path}/confirmations`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v1'});
+  c=await call('POST',`${path}/confirmations`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
   report.stages.push('profile_confirmed');
   const locations=await call('POST',`${path}/locations`,customer.sessionToken,{search:'Basel',allowSyntheticCalculatorTransfer:true});
   if(!locations.locations.length)throw new Error('Live location search returned no Basel location');
   report.operations.push('searchLocation');
   const estimates=await call('POST',`${path}/calculator-estimates`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,
-    noticeVersion:'lifemap-synthetic-v1',allowSyntheticCalculatorTransfer:true,
+    noticeVersion:'lifemap-synthetic-v2',allowSyntheticCalculatorTransfer:true,
     operations:['income','budgetProposal','incomeFortuneTax','saving3a','capitalTax','purchaseP2'],
     saving3a:{years:20,initialCents:0,annualCents:100000},capitalTax:{paymentCents:25000000,paymentAge:65},
     purchaseP2:{investmentCents:500000,years:5,conversionBps:600}});
@@ -43,7 +43,7 @@ try {
     const request=structuredClone(example.request);delete request.Language;
     for(const name of AdditionalMoneyFields[operation])if(typeof request[name]==='number')request[name]=Math.round(request[name]*100);
     c=await call('GET',path,customer.sessionToken);
-    const extra=await call('POST',`${path}/calculator-tools`,customer.sessionToken,{operation,request,requestUnits:'CHF_CENTS',expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v1',allowSyntheticCalculatorTransfer:true});
+    const extra=await call('POST',`${path}/calculator-tools`,customer.sessionToken,{operation,request,requestUnits:'CHF_CENTS',expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v2',allowSyntheticCalculatorTransfer:true});
     if(extra.result.provenance.mode!=='live')throw new Error('Additional tool did not use live provider');report.operations.push(operation);
   }
   const retirement={kind:'retirement',goalId:'goal_retirement',startMonth:'2047-01',endMonth:'2055-12',incomeBasis:'net_after_income_tax',
