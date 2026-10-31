@@ -6,6 +6,7 @@ import {
   AdvisorEvent,
   AdvisorSnapshot,
   ConnectionState,
+  emptySnapshot,
 } from '../advisor-data-source';
 import { MOCK_CALL_SCRIPT, MOCK_CASE_ID, ScriptStep } from './mock-call-script';
 
@@ -92,25 +93,9 @@ export class MockDataSource extends AdvisorDataSource {
   }
 }
 
-export function emptySnapshot(caseId: string): AdvisorSnapshot {
-  return {
-    caseId,
-    contextRevision: 0,
-    agent: { activity: 'idle', at: new Date(0).toISOString() },
-    progress: null,
-    transcript: [],
-    replies: [],
-    charts: [],
-    risks: [],
-    info: [],
-    analysis: null,
-    summary: null,
-  };
-}
-
 /**
  * The mock backend's own state, so `snapshot()` can answer like the real one. Not the UI store:
- * the version guard against late results lives in FE-05.
+ * the version guard against late results lives in `applyCaseEvent` (store/case-state.ts).
  */
 export function applyEvent(state: AdvisorSnapshot, event: AdvisorEvent): AdvisorSnapshot {
   switch (event.type) {
