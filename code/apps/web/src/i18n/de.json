@@ -298,7 +298,8 @@
     "request": "Mit einer Pax-Beratungsperson sprechen",
     "requested": "Ihre Anfrage für eine persönliche Beratung ist gespeichert, die digitale Beratung pausiert. Pax erreichen Sie unter",
     "resume": "Digital weitermachen",
-    "failed": "Das hat nicht geklappt. Bitte erneut versuchen oder Pax direkt anrufen."
+    "failed": "Das hat nicht geklappt. Bitte erneut versuchen oder Pax direkt anrufen.",
+    "prompt": "Lieber persönlich?"
   },
   "summary": {
     "title": "Zusammenfassung",
@@ -319,7 +320,6 @@
     "suitabilityRequired": "Angemessenheitsprüfung erforderlich",
     "unknown": "noch unbekannt",
     "empty": "Die Zusammenfassung erscheint, sobald genug über Ihre Situation bekannt ist.",
-    "human": "Persönliche Beratung",
     "pillar": {
       "pillar1": "1. Säule (AHV)",
       "pillar2": "2. Säule (Pensionskasse)",

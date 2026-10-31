@@ -298,7 +298,8 @@
     "request": "Parlare con un consulente Pax",
     "requested": "La sua richiesta di consulenza personale è registrata, la consulenza digitale è in pausa. Può contattare Pax al",
     "resume": "Continuare in digitale",
-    "failed": "Non ha funzionato. Riprovi o chiami Pax direttamente."
+    "failed": "Non ha funzionato. Riprovi o chiami Pax direttamente.",
+    "prompt": "Preferisce di persona?"
   },
   "summary": {
     "title": "Riepilogo",
@@ -319,7 +320,6 @@
     "suitabilityRequired": "Verifica dell’adeguatezza necessaria",
     "unknown": "ancora sconosciuto",
     "empty": "Il riepilogo appare non appena si sa abbastanza sulla sua situazione.",
-    "human": "Consulenza personale",
     "pillar": {
       "pillar1": "1° pilastro (AVS)",
       "pillar2": "2° pilastro (cassa pensione)",

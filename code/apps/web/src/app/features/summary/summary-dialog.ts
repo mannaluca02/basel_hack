@@ -201,10 +201,9 @@ const SWIPE_CLOSE_PX = 80;
         <p class="empty">{{ 'summary.empty' | transloco }}</p>
       }
 
-      <section aria-labelledby="summary-human" class="human">
-        <h3 id="summary-human">{{ 'summary.human' | transloco }}</h3>
+      <footer class="human">
         <app-human-advisor-status placement="sheet" />
-      </section>
+      </footer>
     </dialog>
   `,
   styles: `
@@ -344,6 +343,12 @@ const SWIPE_CLOSE_PX = 80;
 
     .empty {
       color: var(--text-muted);
+    }
+
+    .human {
+      margin-top: 1.5rem;
+      padding-top: 0.75rem;
+      border-top: var(--stroke-s) solid var(--border-soft);
     }
   `,
 })

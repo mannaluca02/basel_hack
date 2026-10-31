@@ -298,7 +298,8 @@
     "request": "Parler à un·e conseiller·ère Pax",
     "requested": "Votre demande de conseil personnel est enregistrée, le conseil numérique est en pause. Vous joignez Pax au",
     "resume": "Continuer en numérique",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer ou appeler Pax directement."
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer ou appeler Pax directement.",
+    "prompt": "Plutôt en personne ?"
   },
   "summary": {
     "title": "Résumé",
@@ -319,7 +320,6 @@
     "suitabilityRequired": "Vérification du caractère approprié requise",
     "unknown": "encore inconnu",
     "empty": "Le résumé apparaît dès que l’on en sait assez sur votre situation.",
-    "human": "Conseil personnel",
     "pillar": {
       "pillar1": "1er pilier (AVS)",
       "pillar2": "2e pilier (caisse de pension)",

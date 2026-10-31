@@ -298,7 +298,8 @@
     "request": "Talk to a Pax advisor",
     "requested": "Your request for personal advice is saved and the digital advice is paused. You can reach Pax at",
     "resume": "Continue digitally",
-    "failed": "That did not work. Please try again or call Pax directly."
+    "failed": "That did not work. Please try again or call Pax directly.",
+    "prompt": "Rather talk in person?"
   },
   "summary": {
     "title": "Summary",
@@ -319,7 +320,6 @@
     "suitabilityRequired": "Suitability check required",
     "unknown": "not known yet",
     "empty": "The summary appears once enough is known about your situation.",
-    "human": "Personal advice",
     "pillar": {
       "pillar1": "Pillar 1 (AHV)",
       "pillar2": "Pillar 2 (pension fund)",
