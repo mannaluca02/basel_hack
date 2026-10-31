@@ -117,6 +117,10 @@ export class ProtectedLifeController {
   }
   @Post('cases/:caseId/agent-access') agent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});this.r.engine.caseFor(req.actor,uuid(id));return this.r.sessions.agentToken(req.actor,id);}
   @Get('cases/:caseId/advisor/context') context(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.advisorContext(req.actor,uuid(id));}
+  @Get('cases/:caseId/advisor/extractor-context') extractorContext(@Req() req:Request,@Param('caseId') id:string){return this.r.extraction.context(req.actor,uuid(id));}
+  @Post('cases/:caseId/advisor/proposal-batches') batch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.extraction.proposeBatch(req.actor,uuid(id),body);}
+  @Post('cases/:caseId/advisor/proposal-batches/:batchId/accept') acceptBatch(@Req() req:Request,@Param('caseId') id:string,@Param('batchId') batchId:string,@Body() body:unknown){return this.r.extraction.acceptBatch(req.actor,uuid(id),batchId,body);}
+  @Post('cases/:caseId/ambiguities/:ambiguityId/resolve') resolveAmbiguity(@Req() req:Request,@Param('caseId') id:string,@Param('ambiguityId') ambiguityId:string,@Body() body:unknown){return this.r.extraction.resolveAmbiguity(req.actor,uuid(id),ambiguityId,body);}
   @Post('cases/:caseId/advisor/proposals') propose(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.advisory.propose(req.actor,uuid(id),body);}
   @Post('cases/:caseId/advisor/proposals/:proposalId/accept') accept(@Req() req:Request,@Param('caseId') id:string,@Param('proposalId') proposalId:string,@Body() body:unknown){return this.r.advisory.accept(req.actor,uuid(id),proposalId,body);}
   @Post('cases/:caseId/graph-context') graph(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.selectGraph(req.actor,uuid(id),body);}
@@ -135,7 +139,7 @@ export class ProtectedLifeController {
           const eventId=state.last?.id??`snapshot_${version}`;const reason=state.last?.reason??'snapshot';
           subscriber.next({type:'advisor.context.updated',id:eventId,data:AdvisorContextUpdatedSchema.parse({schemaVersion:'1.0',messageId:eventId,caseId:id,
             correlationId:eventId,eventId,contextRevision:version,reason,contextRef:`/api/cases/${id}/advisor/context`,
-            interruptPolicy:['conversation_preference_changed','agent_proposal_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
+            interruptPolicy:['conversation_preference_changed','agent_proposal_available','agent_proposal_batch_available','estimate_available'].includes(reason)?'refresh_before_next_turn':'if_current_answer_invalid'})});
         }catch{subscriber.complete();}
       };
       const timer=setInterval(poll,250);poll();return ()=>clearInterval(timer);
@@ -156,7 +160,7 @@ export class ProtectedLifeController {
 @Module({})
 export class LifeHttpModule {
   static register(runtime:LifeRuntime):DynamicModule {
-    return {module:LifeHttpModule,controllers:[PublicLifeController,ProtectedLifeController],providers:[LifeSessionGuard,
+    return {module:LifeHttpModule,global:true,exports:[LIFE_RUNTIME,LifeSessionGuard],controllers:[PublicLifeController,ProtectedLifeController],providers:[LifeSessionGuard,
       {provide:LIFE_RUNTIME,useValue:runtime},{provide:'STORAGE_LIFECYCLE',useValue:{onModuleDestroy:()=>runtime.close()}}]};
   }
 }

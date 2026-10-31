@@ -5,6 +5,7 @@ import { SessionService } from './auth.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { DemoJourneyService } from './journey.js';
 import { DossierService } from './dossier.js';
+import { ExtractionWorkflow } from './extraction.js';
 import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
 import { ProductDocuments } from './documents.js';
@@ -38,7 +39,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
         db.audit=db.audit.filter(a=>Date.parse(a.at)>Date.now()-86400_000);
       }).catch(()=>{});
     },60_000);cleanup.unref();
-    return {store,sessions,engine,documents,journey,dossier,advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
+    return {store,sessions,engine,documents,journey,dossier,extraction:new ExtractionWorkflow(engine),advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);await store.close();}}};
   }catch(error){await store.close();throw error;}
 }

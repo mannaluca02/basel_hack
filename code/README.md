@@ -164,3 +164,7 @@ Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjek
 Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/baselhack/plans/persistence-and-api.md) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
 
 Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt zehn [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und 121 automatisierte Tests. VoiceLog, AgentReply und Playback sind bereitgestellte Team-Nachrichtenschemas; ihre tatsächlichen STT-/LLM-/TTS-/Avatar-Transporte bleiben die Implementierung der zuständigen Teammitglieder.
+
+## Dialogextraktion und Vorschlagspakete
+
+Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.

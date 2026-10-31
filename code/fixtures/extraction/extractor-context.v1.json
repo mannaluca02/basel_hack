@@ -1,0 +1,1302 @@
+{
+  "schemaVersion": "1.0",
+  "caseId": "a3fa6cf7-f5bb-4b36-95b5-8fd1f61959b1",
+  "caseRevision": 3,
+  "contextRevision": 3,
+  "profileVersion": 1,
+  "draftHash": "c6b30d9aaedc5538537b4fce0d62866dc31e0bb0276e88d76768e3f17af232cf",
+  "draftDirty": false,
+  "locale": "de",
+  "dataClassification": "synthetic",
+  "personIds": [
+    "person_demo_1",
+    "person_demo_2"
+  ],
+  "draft": {
+    "financial": {
+      "schemaVersion": "1.0",
+      "caseId": "a3fa6cf7-f5bb-4b36-95b5-8fd1f61959b1",
+      "caseRevision": 3,
+      "profileVersion": 1,
+      "dataClassification": "synthetic",
+      "valuationDate": "2026-10-31",
+      "priceBasis": "nominal",
+      "persons": [
+        {
+          "id": "person_demo_1",
+          "birthYear": 1985,
+          "employmentRateBps": 10000,
+          "income": {
+            "value": 8400000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:person1-net-income"
+          },
+          "incomeBasis": "net_after_income_tax"
+        },
+        {
+          "id": "person_demo_2",
+          "birthYear": 1987,
+          "employmentRateBps": 8000,
+          "income": {
+            "value": 4800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:person2-net-income"
+          },
+          "incomeBasis": "net_after_income_tax"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "housing",
+          "category": "housing",
+          "amount": {
+            "value": 240000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:rent"
+          }
+        },
+        {
+          "id": "living",
+          "category": "living",
+          "amount": {
+            "value": 300000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:living"
+          }
+        },
+        {
+          "id": "tax",
+          "category": "tax",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:tax-already-in-net"
+          }
+        },
+        {
+          "id": "provision",
+          "category": "provision",
+          "amount": {
+            "value": 50000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:existing-contributions"
+          }
+        },
+        {
+          "id": "debt",
+          "category": "debt",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-debt-service"
+          }
+        },
+        {
+          "id": "reserve",
+          "category": "reserve",
+          "amount": {
+            "value": 80000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "month",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:regular-reserve-saving"
+          }
+        }
+      ],
+      "safetyBuffer": {
+        "value": 50000,
+        "currency": "CHF",
+        "unit": "cent",
+        "period": "month",
+        "origin": "synthetic",
+        "confirmation": "confirmed",
+        "review": "unreviewed",
+        "sourceRef": "demo:chosen-buffer"
+      },
+      "assets": [
+        {
+          "id": "cash",
+          "amount": {
+            "value": 10000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:cash"
+          },
+          "liquidity": "free",
+          "availableFrom": "2026-10-31",
+          "pillar": "none",
+          "allocations": [
+            {
+              "goalId": "existing_emergency_reserve",
+              "amountCents": 1000000
+            }
+          ]
+        },
+        {
+          "id": "pillar3_account",
+          "amount": {
+            "value": 5000000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "once",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:restricted-3a"
+          },
+          "liquidity": "restricted",
+          "availableFrom": "2026-10-31",
+          "pillar": "3",
+          "allocations": []
+        }
+      ],
+      "assetsConfirmed": true,
+      "provisions": [
+        {
+          "id": "p1_person1",
+          "personId": "person_demo_1",
+          "pillar": "1",
+          "event": "retirement",
+          "amount": {
+            "value": 2800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "estimate",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar1-person1"
+          }
+        },
+        {
+          "id": "p2_person1",
+          "personId": "person_demo_1",
+          "pillar": "2",
+          "event": "retirement",
+          "amount": {
+            "value": 3600000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar2-person1"
+          }
+        },
+        {
+          "id": "p3_person1",
+          "personId": "person_demo_1",
+          "pillar": "3",
+          "event": "retirement",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-pillar3-annuity-person1"
+          }
+        },
+        {
+          "id": "p1_person2",
+          "personId": "person_demo_2",
+          "pillar": "1",
+          "event": "retirement",
+          "amount": {
+            "value": 2400000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "estimate",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar1-person2"
+          }
+        },
+        {
+          "id": "p2_person2",
+          "personId": "person_demo_2",
+          "pillar": "2",
+          "event": "retirement",
+          "amount": {
+            "value": 1800000,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:illustrative-pillar2-person2"
+          }
+        },
+        {
+          "id": "p3_person2",
+          "personId": "person_demo_2",
+          "pillar": "3",
+          "event": "retirement",
+          "amount": {
+            "value": 0,
+            "currency": "CHF",
+            "unit": "cent",
+            "period": "year",
+            "origin": "synthetic",
+            "confirmation": "confirmed",
+            "review": "unreviewed",
+            "sourceRef": "demo:no-pillar3-annuity-person2"
+          }
+        }
+      ]
+    },
+    "insurance": {
+      "relationship": "married",
+      "relationshipSinceYear": 2015,
+      "sharedChildren": 0,
+      "taxLocationId": 400100000,
+      "persons": [
+        {
+          "personId": "person_demo_1",
+          "providerSex": 1,
+          "grossAnnualIncomeCents": 12000000,
+          "withPillar2": true,
+          "pillar2Risk": {
+            "disabilityAnnualCents": 4000000,
+            "disabilityChildAnnualCents": 800000,
+            "survivorAnnualCents": 3000000,
+            "orphanAnnualCents": 800000
+          },
+          "retirementPensionAnnualCents": 4000000,
+          "currentPillar2CapitalCents": 10000000,
+          "desiredWorkStopAge": 65,
+          "disabilityNeedAnnualCents": 15000000,
+          "deathNeedAnnualCents": 10000000,
+          "protectionTermMonths": 240,
+          "existingDeathCapitalCents": 0,
+          "deathOneOffCostsCents": 1000000,
+          "debtPayoffCents": 0,
+          "debtTreatment": "included_in_income_need",
+          "deathNeedExcludesRepaidDebtService": false,
+          "personalAffordableAnnualPremiumCents": 400000
+        },
+        {
+          "personId": "person_demo_2",
+          "providerSex": 2,
+          "grossAnnualIncomeCents": 8000000,
+          "withPillar2": true,
+          "pillar2Risk": {
+            "disabilityAnnualCents": 2400000,
+            "disabilityChildAnnualCents": 800000,
+            "survivorAnnualCents": 3000000,
+            "orphanAnnualCents": 800000
+          },
+          "retirementPensionAnnualCents": 2400000,
+          "currentPillar2CapitalCents": 10000000,
+          "desiredWorkStopAge": 65,
+          "disabilityNeedAnnualCents": 15000000,
+          "deathNeedAnnualCents": 10000000,
+          "protectionTermMonths": 240,
+          "existingDeathCapitalCents": 0,
+          "deathOneOffCostsCents": 1000000,
+          "debtPayoffCents": 0,
+          "debtTreatment": "included_in_income_need",
+          "deathNeedExcludesRepaidDebtService": false,
+          "personalAffordableAnnualPremiumCents": 300000
+        }
+      ],
+      "children": [],
+      "debts": [],
+      "debtsConfirmed": true,
+      "existingPrivateRiskBenefitsConfirmed": true,
+      "confession1": 4,
+      "confession2": 4,
+      "taxableFortuneCents": 10000000,
+      "retirementNeedAnnualCents": 9600000,
+      "annualReturnBps": 0,
+      "retirementHorizonAge": 88,
+      "annualSavingCents": 600000,
+      "investmentKnowledgeConfirmed": true,
+      "annualSavingIsAdditional": true,
+      "existingAnnualRetirementSavingCents": 500000,
+      "existingAnnualPillar3aContributionCents": 600000,
+      "riskAppetite": "medium",
+      "riskCapitalStrategy": "preserve_assets_for_other_goals"
+    },
+    "goals": [
+      {
+        "id": "goal_family",
+        "kind": "family",
+        "targetMonth": "2028-01",
+        "priority": 1,
+        "targetCapitalCents": null
+      },
+      {
+        "id": "goal_home",
+        "kind": "home",
+        "targetMonth": "2031-01",
+        "priority": 2,
+        "targetCapitalCents": 100000000
+      },
+      {
+        "id": "goal_retirement",
+        "kind": "retirement",
+        "targetMonth": "2050-01",
+        "priority": 3,
+        "targetCapitalCents": 100000000
+      }
+    ],
+    "reviewFlags": []
+  },
+  "fields": [
+    {
+      "path": "financial.valuationDate",
+      "value": "2026-10-31",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.0.birthYear",
+      "personId": "person_demo_1",
+      "value": 1985,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.0.employmentRateBps",
+      "personId": "person_demo_1",
+      "value": 10000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.0.income.value",
+      "personId": "person_demo_1",
+      "value": 8400000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.0.income.period",
+      "personId": "person_demo_1",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.0.incomeBasis",
+      "personId": "person_demo_1",
+      "value": "net_after_income_tax",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.1.birthYear",
+      "personId": "person_demo_2",
+      "value": 1987,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.1.employmentRateBps",
+      "personId": "person_demo_2",
+      "value": 8000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.1.income.value",
+      "personId": "person_demo_2",
+      "value": 4800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.1.income.period",
+      "personId": "person_demo_2",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.persons.1.incomeBasis",
+      "personId": "person_demo_2",
+      "value": "net_after_income_tax",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.0.category",
+      "value": "housing",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.0.amount.value",
+      "value": 240000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.0.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.1.category",
+      "value": "living",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.1.amount.value",
+      "value": 300000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.1.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.2.category",
+      "value": "tax",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.2.amount.value",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.2.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.3.category",
+      "value": "provision",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.3.amount.value",
+      "value": 50000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.3.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.4.category",
+      "value": "debt",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.4.amount.value",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.4.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.5.category",
+      "value": "reserve",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.5.amount.value",
+      "value": 80000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.expenses.5.amount.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.safetyBuffer.value",
+      "value": 50000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.safetyBuffer.period",
+      "value": "month",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.0.amount.value",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.0.amount.period",
+      "value": "once",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.0.liquidity",
+      "value": "free",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.0.availableFrom",
+      "value": "2026-10-31",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.0.pillar",
+      "value": "none",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.1.amount.value",
+      "value": 5000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.1.amount.period",
+      "value": "once",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.1.liquidity",
+      "value": "restricted",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.1.availableFrom",
+      "value": "2026-10-31",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assets.1.pillar",
+      "value": "3",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.assetsConfirmed",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.0.personId",
+      "value": "person_demo_1",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.0.pillar",
+      "value": "1",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.0.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.0.amount.value",
+      "value": 2800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.0.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.1.personId",
+      "value": "person_demo_1",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.1.pillar",
+      "value": "2",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.1.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.1.amount.value",
+      "value": 3600000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.1.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.2.personId",
+      "value": "person_demo_1",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.2.pillar",
+      "value": "3",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.2.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.2.amount.value",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.2.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.3.personId",
+      "value": "person_demo_2",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.3.pillar",
+      "value": "1",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.3.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.3.amount.value",
+      "value": 2400000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.3.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.4.personId",
+      "value": "person_demo_2",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.4.pillar",
+      "value": "2",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.4.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.4.amount.value",
+      "value": 1800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.4.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.5.personId",
+      "value": "person_demo_2",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.5.pillar",
+      "value": "3",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.5.event",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.5.amount.value",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "financial.provisions.5.amount.period",
+      "value": "year",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.relationship",
+      "value": "married",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.relationshipSinceYear",
+      "value": 2015,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.sharedChildren",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.taxLocationId",
+      "value": 400100000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.providerSex",
+      "personId": "person_demo_1",
+      "value": 1,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.grossAnnualIncomeCents",
+      "personId": "person_demo_1",
+      "value": 12000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.withPillar2",
+      "personId": "person_demo_1",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.pillar2Risk.disabilityAnnualCents",
+      "personId": "person_demo_1",
+      "value": 4000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.pillar2Risk.disabilityChildAnnualCents",
+      "personId": "person_demo_1",
+      "value": 800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.pillar2Risk.survivorAnnualCents",
+      "personId": "person_demo_1",
+      "value": 3000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.pillar2Risk.orphanAnnualCents",
+      "personId": "person_demo_1",
+      "value": 800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.retirementPensionAnnualCents",
+      "personId": "person_demo_1",
+      "value": 4000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.currentPillar2CapitalCents",
+      "personId": "person_demo_1",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.desiredWorkStopAge",
+      "personId": "person_demo_1",
+      "value": 65,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.disabilityNeedAnnualCents",
+      "personId": "person_demo_1",
+      "value": 15000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.deathNeedAnnualCents",
+      "personId": "person_demo_1",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.protectionTermMonths",
+      "personId": "person_demo_1",
+      "value": 240,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.existingDeathCapitalCents",
+      "personId": "person_demo_1",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.deathOneOffCostsCents",
+      "personId": "person_demo_1",
+      "value": 1000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.debtPayoffCents",
+      "personId": "person_demo_1",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.debtTreatment",
+      "personId": "person_demo_1",
+      "value": "included_in_income_need",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.deathNeedExcludesRepaidDebtService",
+      "personId": "person_demo_1",
+      "value": false,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.0.personalAffordableAnnualPremiumCents",
+      "personId": "person_demo_1",
+      "value": 400000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.providerSex",
+      "personId": "person_demo_2",
+      "value": 2,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.grossAnnualIncomeCents",
+      "personId": "person_demo_2",
+      "value": 8000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.withPillar2",
+      "personId": "person_demo_2",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.pillar2Risk.disabilityAnnualCents",
+      "personId": "person_demo_2",
+      "value": 2400000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.pillar2Risk.disabilityChildAnnualCents",
+      "personId": "person_demo_2",
+      "value": 800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.pillar2Risk.survivorAnnualCents",
+      "personId": "person_demo_2",
+      "value": 3000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.pillar2Risk.orphanAnnualCents",
+      "personId": "person_demo_2",
+      "value": 800000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.retirementPensionAnnualCents",
+      "personId": "person_demo_2",
+      "value": 2400000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.currentPillar2CapitalCents",
+      "personId": "person_demo_2",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.desiredWorkStopAge",
+      "personId": "person_demo_2",
+      "value": 65,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.disabilityNeedAnnualCents",
+      "personId": "person_demo_2",
+      "value": 15000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.deathNeedAnnualCents",
+      "personId": "person_demo_2",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.protectionTermMonths",
+      "personId": "person_demo_2",
+      "value": 240,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.existingDeathCapitalCents",
+      "personId": "person_demo_2",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.deathOneOffCostsCents",
+      "personId": "person_demo_2",
+      "value": 1000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.debtPayoffCents",
+      "personId": "person_demo_2",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.debtTreatment",
+      "personId": "person_demo_2",
+      "value": "included_in_income_need",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.deathNeedExcludesRepaidDebtService",
+      "personId": "person_demo_2",
+      "value": false,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.persons.1.personalAffordableAnnualPremiumCents",
+      "personId": "person_demo_2",
+      "value": 300000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.debtsConfirmed",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.existingPrivateRiskBenefitsConfirmed",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.confession1",
+      "value": 4,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.confession2",
+      "value": 4,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.taxableFortuneCents",
+      "value": 10000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.retirementNeedAnnualCents",
+      "value": 9600000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.annualReturnBps",
+      "value": 0,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.retirementHorizonAge",
+      "value": 88,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.annualSavingCents",
+      "value": 600000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.investmentKnowledgeConfirmed",
+      "value": true,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.existingAnnualRetirementSavingCents",
+      "value": 500000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.existingAnnualPillar3aContributionCents",
+      "value": 600000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.riskAppetite",
+      "value": "medium",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "insurance.riskCapitalStrategy",
+      "value": "preserve_assets_for_other_goals",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.0.kind",
+      "value": "family",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.0.targetMonth",
+      "value": "2028-01",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.0.priority",
+      "value": 1,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.0.targetCapitalCents",
+      "value": null,
+      "confirmation": "proposed"
+    },
+    {
+      "path": "goals.1.kind",
+      "value": "home",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.1.targetMonth",
+      "value": "2031-01",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.1.priority",
+      "value": 2,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.1.targetCapitalCents",
+      "value": 100000000,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.2.kind",
+      "value": "retirement",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.2.targetMonth",
+      "value": "2050-01",
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.2.priority",
+      "value": 3,
+      "confirmation": "confirmed"
+    },
+    {
+      "path": "goals.2.targetCapitalCents",
+      "value": 100000000,
+      "confirmation": "confirmed"
+    }
+  ],
+  "proposalBatches": [],
+  "ambiguities": [],
+  "writablePaths": [
+    "financial.valuationDate",
+    "financial.persons.0.birthYear",
+    "financial.persons.0.employmentRateBps",
+    "financial.persons.0.income.value",
+    "financial.persons.0.income.period",
+    "financial.persons.0.incomeBasis",
+    "financial.persons.1.birthYear",
+    "financial.persons.1.employmentRateBps",
+    "financial.persons.1.income.value",
+    "financial.persons.1.income.period",
+    "financial.persons.1.incomeBasis",
+    "financial.expenses.0.category",
+    "financial.expenses.0.amount.value",
+    "financial.expenses.0.amount.period",
+    "financial.expenses.1.category",
+    "financial.expenses.1.amount.value",
+    "financial.expenses.1.amount.period",
+    "financial.expenses.2.category",
+    "financial.expenses.2.amount.value",
+    "financial.expenses.2.amount.period",
+    "financial.expenses.3.category",
+    "financial.expenses.3.amount.value",
+    "financial.expenses.3.amount.period",
+    "financial.expenses.4.category",
+    "financial.expenses.4.amount.value",
+    "financial.expenses.4.amount.period",
+    "financial.expenses.5.category",
+    "financial.expenses.5.amount.value",
+    "financial.expenses.5.amount.period",
+    "financial.safetyBuffer.value",
+    "financial.safetyBuffer.period",
+    "financial.assets.0.amount.value",
+    "financial.assets.0.amount.period",
+    "financial.assets.0.liquidity",
+    "financial.assets.0.availableFrom",
+    "financial.assets.0.pillar",
+    "financial.assets.1.amount.value",
+    "financial.assets.1.amount.period",
+    "financial.assets.1.liquidity",
+    "financial.assets.1.availableFrom",
+    "financial.assets.1.pillar",
+    "financial.assetsConfirmed",
+    "financial.provisions.0.personId",
+    "financial.provisions.0.pillar",
+    "financial.provisions.0.event",
+    "financial.provisions.0.amount.value",
+    "financial.provisions.0.amount.period",
+    "financial.provisions.1.personId",
+    "financial.provisions.1.pillar",
+    "financial.provisions.1.event",
+    "financial.provisions.1.amount.value",
+    "financial.provisions.1.amount.period",
+    "financial.provisions.2.personId",
+    "financial.provisions.2.pillar",
+    "financial.provisions.2.event",
+    "financial.provisions.2.amount.value",
+    "financial.provisions.2.amount.period",
+    "financial.provisions.3.personId",
+    "financial.provisions.3.pillar",
+    "financial.provisions.3.event",
+    "financial.provisions.3.amount.value",
+    "financial.provisions.3.amount.period",
+    "financial.provisions.4.personId",
+    "financial.provisions.4.pillar",
+    "financial.provisions.4.event",
+    "financial.provisions.4.amount.value",
+    "financial.provisions.4.amount.period",
+    "financial.provisions.5.personId",
+    "financial.provisions.5.pillar",
+    "financial.provisions.5.event",
+    "financial.provisions.5.amount.value",
+    "financial.provisions.5.amount.period",
+    "insurance.relationship",
+    "insurance.relationshipSinceYear",
+    "insurance.sharedChildren",
+    "insurance.taxLocationId",
+    "insurance.persons.0.providerSex",
+    "insurance.persons.0.grossAnnualIncomeCents",
+    "insurance.persons.0.withPillar2",
+    "insurance.persons.0.pillar2Risk.disabilityAnnualCents",
+    "insurance.persons.0.pillar2Risk.disabilityChildAnnualCents",
+    "insurance.persons.0.pillar2Risk.survivorAnnualCents",
+    "insurance.persons.0.pillar2Risk.orphanAnnualCents",
+    "insurance.persons.0.retirementPensionAnnualCents",
+    "insurance.persons.0.currentPillar2CapitalCents",
+    "insurance.persons.0.desiredWorkStopAge",
+    "insurance.persons.0.disabilityNeedAnnualCents",
+    "insurance.persons.0.deathNeedAnnualCents",
+    "insurance.persons.0.protectionTermMonths",
+    "insurance.persons.0.existingDeathCapitalCents",
+    "insurance.persons.0.deathOneOffCostsCents",
+    "insurance.persons.0.debtPayoffCents",
+    "insurance.persons.0.debtTreatment",
+    "insurance.persons.0.deathNeedExcludesRepaidDebtService",
+    "insurance.persons.0.personalAffordableAnnualPremiumCents",
+    "insurance.persons.1.providerSex",
+    "insurance.persons.1.grossAnnualIncomeCents",
+    "insurance.persons.1.withPillar2",
+    "insurance.persons.1.pillar2Risk.disabilityAnnualCents",
+    "insurance.persons.1.pillar2Risk.disabilityChildAnnualCents",
+    "insurance.persons.1.pillar2Risk.survivorAnnualCents",
+    "insurance.persons.1.pillar2Risk.orphanAnnualCents",
+    "insurance.persons.1.retirementPensionAnnualCents",
+    "insurance.persons.1.currentPillar2CapitalCents",
+    "insurance.persons.1.desiredWorkStopAge",
+    "insurance.persons.1.disabilityNeedAnnualCents",
+    "insurance.persons.1.deathNeedAnnualCents",
+    "insurance.persons.1.protectionTermMonths",
+    "insurance.persons.1.existingDeathCapitalCents",
+    "insurance.persons.1.deathOneOffCostsCents",
+    "insurance.persons.1.debtPayoffCents",
+    "insurance.persons.1.debtTreatment",
+    "insurance.persons.1.deathNeedExcludesRepaidDebtService",
+    "insurance.persons.1.personalAffordableAnnualPremiumCents",
+    "insurance.debtsConfirmed",
+    "insurance.existingPrivateRiskBenefitsConfirmed",
+    "insurance.confession1",
+    "insurance.confession2",
+    "insurance.taxableFortuneCents",
+    "insurance.retirementNeedAnnualCents",
+    "insurance.annualReturnBps",
+    "insurance.retirementHorizonAge",
+    "insurance.annualSavingCents",
+    "insurance.investmentKnowledgeConfirmed",
+    "insurance.existingAnnualRetirementSavingCents",
+    "insurance.existingAnnualPillar3aContributionCents",
+    "insurance.riskAppetite",
+    "insurance.riskCapitalStrategy",
+    "goals.0.kind",
+    "goals.0.targetMonth",
+    "goals.0.priority",
+    "goals.0.targetCapitalCents",
+    "goals.1.kind",
+    "goals.1.targetMonth",
+    "goals.1.priority",
+    "goals.1.targetCapitalCents",
+    "goals.2.kind",
+    "goals.2.targetMonth",
+    "goals.2.priority",
+    "goals.2.targetCapitalCents",
+    "goals_add",
+    "financial.persons_add",
+    "financial.expenses_add",
+    "financial.assets_add",
+    "financial.provisions_add",
+    "insurance.persons_add",
+    "insurance.children_add",
+    "insurance.debts_add"
+  ],
+  "policy": {
+    "noRawHealthData": true,
+    "noProviderTokens": true,
+    "noExternalAiTransferAuthorized": true,
+    "customerConfirmationRequired": true
+  },
+  "proposals": []
+}

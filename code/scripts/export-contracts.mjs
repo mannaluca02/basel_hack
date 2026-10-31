@@ -1,11 +1,14 @@
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {z} from 'zod';
 import {
+  ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,AmbiguityResolutionSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,LifeAnalysisResponseSchema,
   VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,GraphExplanationRequestSchema,SummaryBundleSchema,PortalDtoSchema,
 } from '@pax/contracts';
 
 const documents={
+  'ambiguity-resolution-v1':AmbiguityResolutionSchema,
+  'extractor-context-v1':ExtractorContextSchema,'proposal-batch-input-v1':ProposalBatchInputSchema,'proposal-batch-v1':ProposalBatchSchema,'proposal-acceptance-v1':ProposalAcceptanceSchema,
   'insurance-case-v1':InsuranceCaseDtoSchema,'advisor-context-v1':AdvisorContextSchema,
   'context-updated-v1':AdvisorContextUpdatedSchema,'life-analysis-response-v1':LifeAnalysisResponseSchema,
   'voice-log-v1':VoiceLogSchema,'agent-reply-v1':AgentReplySchema,'voice-playback-v1':VoicePlaybackEventSchema,

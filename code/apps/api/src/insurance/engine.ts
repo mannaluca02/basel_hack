@@ -54,6 +54,7 @@ export class LifeInsuranceEngine {
     });
   }
   activeRun(c:InsuranceCase):LifeRun {
+    if(c.ambiguities.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422);
     const run=c.runs.find(r=>r.id===c.activeRunId);
     if(c.draftDirty||!run||run.profileVersion!==currentVersion(c)?.version||run.status==='stale')throw new WorkflowError('STALE_CONTEXT');
     return run;
@@ -71,7 +72,7 @@ export class LifeInsuranceEngine {
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),
         locale:body.locale,timeBudgetMinutes:body.timeBudgetMinutes,caseRevision:1,contextRevision:1,
         draft:{financial:null,insurance:null,goals:[],reviewFlags:[]},draftDirty:true,confirmedVersions:[],latestAnalysisRequestId:null,activeRunId:null,
-        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],proposals:[],estimates:[],comparisons:[],idempotency:{}};
+        runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
   }
@@ -96,19 +97,24 @@ export class LifeInsuranceEngine {
     });
   }
   questions(actor:Actor,id:string) {
-    const c=this.caseFor(actor,id,true);const fields=intakeQuestions(c.draft);
+    const c=this.caseFor(actor,id,true),ambiguities=c.ambiguities.filter(a=>a.status==='open');
+    const fields=[...new Set([...ambiguities.map(a=>a.path),...intakeQuestions(c.draft)])];
     return QuestionsResponseSchema.parse({profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
       mandatoryFields:fields,questions:fields.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
-        text:questionText(c.locale,path)})),
+        text:ambiguities.find(a=>a.path===path&&a.locale===c.locale)?.question??questionText(c.locale,path)})),
       pace:c.timeBudgetMinutes<=10?'compact':'detailed'});
   }
   async confirm(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=ConfirmProfileSchema.parse(input);
     return this.edit(actor,id,body.expectedCaseRevision,(c,db)=>{
-      const missing=intakeQuestions(c.draft);if(missing.length)throw new WorkflowError('NEEDS_INPUT',422,missing);
+      if(c.ambiguities?.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422,c.ambiguities.filter(a=>a.status==='open').map(a=>a.path));
+      const draft=DraftSchema.parse(c.draft);
+      const f=draft.financial;
+      if(f)for(const field of [...f.persons.map(p=>p.income),...f.expenses.map(e=>e.amount),f.safetyBuffer,...f.assets.map(a=>a.amount),...f.provisions.map(p=>p.amount)])if(field.value!==null)field.confirmation='confirmed';
+      const missing=intakeQuestions(draft);if(missing.length)throw new WorkflowError('NEEDS_INPUT',422,missing);
       if(!c.draftDirty&&currentVersion(c))return c;
       if(c.confirmedVersions.length>=20)throw new WorkflowError('PROFILE_VERSION_CAPACITY',429);
-      const draft=DraftSchema.parse(c.draft);const financial=draft.financial!;
+      const financial=draft.financial!;
       const budget=calculateBudget(financial),capital=calculateCapital(financial);
       if(budget.status==='needs_input'||capital.status==='needs_input')throw new WorkflowError('NEEDS_INPUT',422,[...budget.issues,...capital.issues].map(i=>i.path));
       const intake=draft.insurance!;
@@ -124,7 +130,7 @@ export class LifeInsuranceEngine {
   }
   async analyze(actor:Actor,id:string,input:unknown,signal?:AbortSignal) {
     this.role(actor,'customer');const body=RunAnalysisSchema.parse(input);
-    const initial=this.caseFor(actor,id);const initialVersion=currentVersion(initial);
+    const initial=this.caseFor(actor,id);if(initial.ambiguities.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422);const initialVersion=currentVersion(initial);
     if(initial.runs.length>=20)throw new WorkflowError('RUN_CAPACITY',429);
     if(!initialVersion||initial.draftDirty||initialVersion.version!==body.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
     const localScenario=body.scenario.kind==='retirement'?{kind:'baseline' as const}:body.scenario;
@@ -137,6 +143,7 @@ export class LifeInsuranceEngine {
       if(body.scenario.kind==='retirement')timeline=retirementTimeline(initialVersion.draft.financial!,body.scenario);
     }catch{throw new WorkflowError('SCENARIO_INPUT_INVALID',422);}
     const started=await this.edit(actor,id,body.expectedCaseRevision,(c,db)=>{
+      if(c.ambiguities.some(a=>a.status==='open'))throw new WorkflowError('UNRESOLVED_AMBIGUITIES',422);
       const version=currentVersion(c);if(!version||c.draftDirty||version.version!==body.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
       if(body.scenario.kind==='retirement') {
         const goalId=body.scenario.goalId;if(!version.draft.goals.some(g=>g.id===goalId&&g.kind==='retirement'))throw new WorkflowError('RETIREMENT_GOAL_REQUIRED',422);
@@ -267,7 +274,7 @@ export class LifeInsuranceEngine {
     });
   }
   advisorContext(actor:Actor,id:string) {
-    const c=this.caseFor(actor,id,true);const run=!c.draftDirty?c.runs.find(r=>r.id===c.activeRunId&&r.status!=='stale'):null;
+    const c=this.caseFor(actor,id,true);const run=!c.draftDirty&&!c.ambiguities.some(a=>a.status==='open')?c.runs.find(r=>r.id===c.activeRunId&&r.status!=='stale'):null;
     const questions=this.questions(actor,id);const approved=run?this.approved(c,run):false;
     const facts=run?.local.metrics.filter(m=>m.value!==null&&['valid','estimated'].includes(m.status)).map(m=>({metricId:m.id,value:m.value,
       currency:m.currency,unit:m.unit,period:m.period,status:m.status,runId:run.id,profileVersion:run.profileVersion,scenarioVersionId:run.scenarioVersionId,humanReviewedForDemo:approved}))??[];
@@ -280,8 +287,8 @@ export class LifeInsuranceEngine {
       maximumKnown:values.length?Math.max(...values):null,unknownPoints:selected.series.length-values.length}}:selected;
     return AdvisorContextSchema.parse({caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
       runId:run?.id??null,scenarioVersionId:run?.scenarioVersionId??null,calculationInputHash:run?.inputHash??null,
-      locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:c.graphContext,
-      contextId:c.graphContext?sha256Json(c.graphContext):null,
+      locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:run?c.graphContext:null,
+      contextId:run&&c.graphContext?sha256Json(c.graphContext):null,
       selectedGraphFacts:projected,
       maySpeakSelectedAmounts:!!run&&run.status==='current'&&!!c.graphContext&&
         (!!selected&&(['valid','estimated'].includes(selected.metric.status)||approved))&&

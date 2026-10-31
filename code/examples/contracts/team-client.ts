@@ -1,4 +1,5 @@
 import {
+  ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,type ExtractorContext,type ProposalBatchInput,type ProposalBatch,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,ApiErrorSchema,
   VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,
   type InsuranceCaseDto,type AdvisorContext,type AdvisorContextUpdated,
@@ -28,4 +29,15 @@ export function parsePlayback(input:unknown):VoicePlaybackEvent{return VoicePlay
 /** Lukas renders server-calculated progress; audio state arrives through real playback callbacks. */
 export function avatarInputs(context:AdvisorContext,playback:VoicePlaybackEvent|null):{progress:WholeLifeProgress;speaking:boolean}{
   return {progress:context.progress,speaking:playback?.event==='started'};
+}
+
+/** Earnie: extraction reads an explicit, authorized projection; the full case remains inaccessible to an agent. */
+export async function readExtractorContext(baseUrl:string,caseId:string,agentToken:string):Promise<ExtractorContext>{
+  const response=await fetch(`${baseUrl}/api/cases/${encodeURIComponent(caseId)}/advisor/extractor-context`,{headers:{Authorization:`Bearer ${agentToken}`}});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return ExtractorContextSchema.parse(data);
+}
+export async function submitProposalBatch(baseUrl:string,caseId:string,agentToken:string,input:ProposalBatchInput):Promise<ProposalBatch>{
+  const body=ProposalBatchInputSchema.parse(input);
+  const response=await fetch(`${baseUrl}/api/cases/${encodeURIComponent(caseId)}/advisor/proposal-batches`,{method:'POST',headers:{Authorization:`Bearer ${agentToken}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const data:unknown=await response.json();if(!response.ok)throw ApiErrorSchema.parse(data);return ProposalBatchSchema.parse(data);
 }

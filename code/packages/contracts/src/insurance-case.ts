@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Id,Cents,Month,DateOnly,StatusSchema,IssueSchema,GraphContextSchema } from './financial.js';
 import { DraftSchema,GoalSchema,LocaleSchema } from './insurance.js';
+import { ProposalBatchSchema,CaseAmbiguitySchema,ExtractorContextBaseSchema } from './proposal-workflow.js';
 import { LifeAnalysisSchema,ProviderResultSchema } from './life-analysis.js';
 
 export const CASE_DTO_VERSION='1.0' as const;
@@ -38,7 +39,7 @@ export const ScenarioComparisonSchema=z.object({id:Id,scope:z.literal('valuation
     baselineValue:signed.nullable(),variantValue:signed.nullable(),delta:signed.nullable(),status:StatusSchema}).strict()).max(500)}).strict();
 export const AdvisorProposalInputSchema=z.object({messageId:z.string().regex(/^[A-Za-z0-9_-]{1,80}$/),path:z.string().max(200),
   value:z.union([z.number().finite(),z.boolean(),z.null(),GoalSchema,z.string().max(80)]),expectedProfileVersion:revision.nullable()}).strict();
-export const AgentProposalSchema=AdvisorProposalInputSchema.extend({id:Id,basisDraftHash:hash,status:z.enum(['proposed','accepted'])}).strict();
+export const AgentProposalSchema=AdvisorProposalInputSchema.extend({id:Id,basisDraftHash:hash,status:z.enum(['proposed','accepted','superseded']),replacedByBatchId:Id.nullable().optional()}).strict();
 export const AcceptProposalInputSchema=z.object({expectedCaseRevision:revision,accept:z.literal(true)}).strict();
 export const CasePreferencesSchema=z.object({timeBudgetMinutes:z.number().int().min(3).max(120).optional(),locale:LocaleSchema.optional()}).strict()
   .refine(b=>b.locale!==undefined||b.timeBudgetMinutes!==undefined,'At least one preference is required');
@@ -57,6 +58,7 @@ export const InsuranceCaseStateSchema=z.object({
   runs:z.array(LifeAnalysisSchema).max(20),reviewTasks:z.array(ReviewTaskSchema),recommendations:z.array(RecommendationSchema).max(20),
   quotes:z.array(DemoQuoteSchema).max(200),applications:z.array(DemoApplicationSchema).max(200),policies:z.array(DemoPolicySchema).max(200),
   graphContext:GraphContextSchema.nullable(),events:z.array(CaseEventSchema).max(100),proposals:z.array(AgentProposalSchema).max(100),
+  proposalBatches:z.array(ProposalBatchSchema).max(100).default([]),ambiguities:z.array(CaseAmbiguitySchema).max(100).default([]),
   estimates:z.array(CalculatorEstimateSchema).max(10),comparisons:z.array(ScenarioComparisonSchema).max(50),
   toolRuns:z.array(CalculatorToolRunSchema).max(40).optional(),
 }).strict();
@@ -81,11 +83,26 @@ export const CasePresentationSchema=z.object({locale:LocaleSchema,activeRun:RunP
 export const InsuranceCaseDtoSchema=InsuranceCaseStateSchema.extend({schemaVersion:z.literal(CASE_DTO_VERSION),toolRuns:z.array(CalculatorToolRunSchema).max(40),presentation:CasePresentationSchema}).strict()
   .superRefine((c,ctx)=>{
     const fail=(path:string,message:string)=>ctx.addIssue({code:'custom',path:[path],message});
-    for(const key of ['confirmedVersions','runs','reviewTasks','recommendations','quotes','applications','policies','events','proposals','estimates','comparisons','toolRuns'] as const){
+    for(const key of ['confirmedVersions','runs','reviewTasks','recommendations','quotes','applications','policies','events','proposals','proposalBatches','ambiguities','estimates','comparisons','toolRuns'] as const){
       const items=c[key]??[];const ids=items.map(x=>'id'in x?x.id:x.version);
       if(new Set(ids).size!==ids.length)fail(key,'Duplicate identity');
     }
     const versions=new Map(c.confirmedVersions.map(v=>[v.version,v])),runs=new Map(c.runs.map(r=>[r.id,r]));
+    const batches=new Map(c.proposalBatches.map(b=>[b.id,b]));
+    for(const b of c.proposalBatches){
+      if(b.status==='superseded'&&(!b.replacedByBatchId||!batches.get(b.replacedByBatchId)?.supersedesBatchIds.includes(b.id)))fail('proposalBatches','Missing supersession link');
+      if(b.status!=='superseded'&&b.replacedByBatchId!==null)fail('proposalBatches','Unexpected replacement link');
+      if((b.status==='accepted')!==(b.acceptedAt!==null))fail('proposalBatches','Acceptance timestamp mismatch');
+      if(b.ambiguityIds.some(id=>!c.ambiguities.some(a=>a.id===id)))fail('proposalBatches','Unknown ambiguity');
+      for(const id of b.supersedesBatchIds)if(batches.get(id)?.replacedByBatchId!==b.id)fail('proposalBatches','Invalid superseded batch');
+      for(const id of b.supersedesProposalIds)if(!c.proposals.some(p=>p.id===id&&p.status==='superseded'&&p.replacedByBatchId===b.id))fail('proposalBatches','Invalid superseded proposal');
+    }
+    for(const a of c.ambiguities){
+      if(a.status==='open'&&(a.resolvedAt!==null||a.resolvedByBatchId!==null||a.resolutionSourceRef!==null))fail('ambiguities','Open ambiguity has resolution');
+      if(a.status==='resolved'&&(!a.resolvedAt||!a.resolutionSourceRef))fail('ambiguities','Resolved ambiguity lacks source');
+      if(a.resolvedByBatchId&&!(batches.get(a.resolvedByBatchId)?.status==='accepted'&&batches.get(a.resolvedByBatchId)?.resolvesAmbiguityIds.includes(a.id)))fail('ambiguities','Invalid resolution batch');
+    }
+
     if(c.draft.financial&&c.draft.financial.caseId!==c.id)fail('draft','Foreign financial case');
     for(const [index,v] of c.confirmedVersions.entries())if(v.version!==index+1||!v.draft.financial||v.draft.financial.caseId!==c.id||v.draft.financial.profileVersion!==v.version)fail('confirmedVersions','Invalid confirmed profile reference');
     for(const r of c.runs)if(!versions.has(r.profileVersion)||r.local.caseId!==c.id||r.local.runId!==r.id||r.local.profileVersion!==r.profileVersion||r.local.scenarioVersionId!==r.scenarioVersionId)fail('runs','Invalid run reference');
@@ -119,3 +136,6 @@ export type RiskNeed=z.infer<typeof import('./life-analysis.js').RiskNeedSchema>
 export type RunPresentation=z.infer<typeof RunPresentationSchema>;
 export type CalculatorToolRun=z.infer<typeof CalculatorToolRunSchema>;
 export const LifeAnalysisResponseSchema=z.object({caseRevision:revision,contextRevision:revision,run:LifeAnalysisSchema,presentation:RunPresentationSchema}).strict();
+
+export const ExtractorContextSchema=ExtractorContextBaseSchema.extend({proposals:z.array(AgentProposalSchema).max(100)}).strict();
+export type ExtractorContext=z.infer<typeof ExtractorContextSchema>;

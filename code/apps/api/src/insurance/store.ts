@@ -42,6 +42,7 @@ export class EncryptedCaseStore {
         decipher.setAAD(AAD);decipher.setAuthTag(Buffer.from(e.tag,'base64'));
         const decoded=Buffer.concat([decipher.update(Buffer.from(e.ciphertext,'base64')),decipher.final()]);
         state=Root.parse(JSON.parse(decoded.toString('utf8'))) as Database;
+        for(const c of Object.values(state.cases)){c.proposalBatches??=[];c.ambiguities??=[];}
       }
       return new EncryptedCaseStore(dir,key,state,lockId);
     } catch {await unlink(lockPath).catch(()=>{});throw new WorkflowError('STORE_INTEGRITY_OR_KEY_FAILURE',500);}

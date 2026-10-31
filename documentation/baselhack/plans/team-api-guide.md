@@ -1,5 +1,7 @@
 # Gemeinsamer Fall und Team-Schnittstellen
 
+Aktuelle Erweiterung für Ernis Modul: [Extraktor-Projektion, atomare Vorschlagspakete, Korrekturen und Unklarheiten](erni-extractor-integration.md). Für neue Extraktion die dort beschriebene Paket-API verwenden.
+
 Stand: 31.10.2026 · ausführbarer Vertragsstand `schemaVersion: "1.0"` · synthetischer PoC.
 
 Alle Team-Komponenten importieren ihre Fachdaten-/Nachrichtentypen aus **`@pax/contracts`**. Das Paket enthält Zod-Schemas und daraus abgeleitete TypeScript-Typen, ohne NestJS-, Node- oder Domain-Laufzeitabhängigkeit. Der vollständige Fall ist `InsuranceCaseDto` bzw. dessen Alias `InsuranceCase`; das Laufzeitschema heisst `InsuranceCaseDtoSchema` bzw. `InsuranceCaseSchema`.

@@ -3349,5 +3349,7 @@
       "displayLabel": "DEMO – KEIN VERSICHERUNGSSCHUTZ",
       "documentsLanguageNotice": "Die verlinkten Originalunterlagen sind deutschsprachige Archivdokumente. Für einen echten Abschluss sind die aktuellen Unterlagen in der passenden Sprache erforderlich."
     }
-  }
+  },
+  "proposalBatches": [],
+  "ambiguities": []
 }

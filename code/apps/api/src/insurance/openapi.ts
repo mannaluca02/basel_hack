@@ -3,6 +3,7 @@ import { CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnal
   JourneyActionSchema,DemoApplicationDecisionSchema,GraphContextSchema,LifeAnalysisResponseSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,QuestionsResponseSchema,AdvisorContextUpdatedSchema,
   RecommendationPresentationSchema,CasePreferencesSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema,
+  ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,
   SessionResponseSchema,AgentAccessResponseSchema,ApiErrorSchema,SummaryBundleSchema,PortalDtoSchema } from '@pax/contracts';
 import { EstimateRequestSchema } from './estimates.js';
 import { AdditionalToolRequestSchema } from './tools.js';
@@ -39,6 +40,10 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases/{caseId}/dossier','Export JSON or escaped print HTML',undefined],
   ['get','/api/cases/{caseId}/advisor/context','Read minimal current conversational context',undefined],
   ['post','/api/cases/{caseId}/agent-access','Create case-scoped 15-minute agent token; keep server-side',z.object({})],
+  ['get','/api/cases/{caseId}/advisor/extractor-context','Read authorized current extraction state; no history, credentials or external-AI permission',undefined],
+  ['post','/api/cases/{caseId}/advisor/proposal-batches','Propose a source-bound atomic change set and ambiguities; agent only',ProposalBatchInputSchema],
+  ['post','/api/cases/{caseId}/advisor/proposal-batches/{batchId}/accept','Customer accepts all changes into draft; profile confirmation still required',AcceptProposalInputSchema],
+  ['post','/api/cases/{caseId}/ambiguities/{ambiguityId}/resolve','Customer resolves an ambiguity without changing profile values',ResolveAmbiguityInputSchema],
   ['post','/api/cases/{caseId}/advisor/proposals','Agent proposes a whitelisted draft change',AdvisorProposalInputSchema],
   ['post','/api/cases/{caseId}/advisor/proposals/{proposalId}/accept','Customer accepts a proposal; profile confirmation is still separate',AcceptProposalInputSchema],
   ['get','/api/cases/{caseId}/advisor/events','Subscribe to versioned SSE context events',undefined],
@@ -63,6 +68,7 @@ export function lifeOpenApi() {
   };
   const caseDto=reference('InsuranceCaseDto',InsuranceCaseDtoSchema);
   const analysis=reference('LifeAnalysisResponse',LifeAnalysisResponseSchema),context=reference('AdvisorContext',AdvisorContextSchema);
+  const extractor=reference('ExtractorContext',ExtractorContextSchema),batch=reference('ProposalBatch',ProposalBatchSchema),acceptance=reference('ProposalAcceptance',ProposalAcceptanceSchema),resolution=reference('AmbiguityResolution',AmbiguityResolutionSchema);
   const questions=reference('QuestionsResponse',QuestionsResponseSchema),recommendation=reference('RecommendationPresentation',RecommendationPresentationSchema);
   const event=reference('AdvisorContextUpdated',AdvisorContextUpdatedSchema),error=reference('ApiError',ApiErrorSchema);
   const session=reference('SessionResponse',SessionResponseSchema),agentAccess=reference('AgentAccessResponse',AgentAccessResponseSchema);
@@ -72,6 +78,7 @@ export function lifeOpenApi() {
     const parameters=[...path.matchAll(/\{(\w+)\}/g)].map(m=>({in:'path',name:m[1],required:true,schema:{type:'string'}}));
     const languageParameters=['/api/translations','/api/privacy'].includes(path)?[{in:'query',name:'locale',required:false,schema:{type:'string',enum:['de','fr','it','en']}}]:[];
     const responseSchema=(path==='/api/cases'&&method==='post')||path==='/api/cases/{caseId}'&&method==='get'||path.endsWith('/draft')||path.endsWith('/confirmations')?caseDto:
+      path.endsWith('/advisor/extractor-context')?extractor:path.endsWith('/advisor/proposal-batches')?batch:path.endsWith('/accept')?acceptance:path.endsWith('/resolve')?resolution:
       path.endsWith('/calculations')?analysis:path.endsWith('/advisor/context')?context:path.endsWith('/questions')?questions:
       path.endsWith('/recommendations')?recommendation:path.endsWith('/agent-access')?agentAccess:path==='/api/sessions'?session:
       path.endsWith('/summaries')?summary:path.endsWith('/portal')?portal:undefined;

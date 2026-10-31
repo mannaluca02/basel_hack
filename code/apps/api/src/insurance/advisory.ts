@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { z } from 'zod';
-import { DraftSchema,GoalSchema,AdvisorProposalInputSchema,AcceptProposalInputSchema } from '@pax/contracts';
+import { AdvisorProposalInputSchema,AcceptProposalInputSchema } from '@pax/contracts';
+import { applyChanges } from './draft-proposals.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
@@ -34,19 +34,7 @@ export class AdvisoryTools {
       const p=c.proposals.find(x=>x.id===proposalId);if(!p||p.status!=='proposed')throw new WorkflowError('PROPOSAL_NOT_OPEN');
       if((c.confirmedVersions.at(-1)?.version??null)!==p.expectedProfileVersion)throw new WorkflowError('STALE_CONTEXT');
       if(sha256Json(c.draft)!==p.basisDraftHash)throw new WorkflowError('STALE_PROPOSAL');
-      if(p.path==='goals_add') {
-        c.draft=DraftSchema.parse({...c.draft,goals:[...c.draft.goals,GoalSchema.parse(p.value)]});p.status='accepted';
-        c.draftDirty=true;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
-        this.engine.touch(c,'draft_changed');this.engine.audit(db,actor,c,'agent_goal_accepted');
-        return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,confirmationStillRequired:true,draft:c.draft};
-      }
-      const copy=structuredClone(c.draft);const keys=p.path.split('.');let node:unknown=copy;
-      for(const key of keys.slice(0,-1)) {
-        if(typeof node!=='object'||node===null||!Object.hasOwn(node,key))throw new WorkflowError('PATCH_TARGET_MISSING',422);
-        node=(node as Record<string,unknown>)[key];
-      }
-      if(typeof node!=='object'||node===null||!Object.hasOwn(node,keys.at(-1)!))throw new WorkflowError('PATCH_TARGET_MISSING',422);
-      (node as Record<string,unknown>)[keys.at(-1)!]=p.value;c.draft=DraftSchema.parse(copy);p.status='accepted';
+      c.draft=applyChanges(c.draft,[{path:p.path,value:p.value}],id,`conversation:${p.messageId}`,false);p.status='accepted';
       c.draftDirty=true;c.activeRunId=null;c.latestAnalysisRequestId=null;c.graphContext=null;
       this.engine.touch(c,'draft_changed');this.engine.audit(db,actor,c,'agent_proposal_accepted');
       return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,confirmationStillRequired:true,draft:c.draft};
