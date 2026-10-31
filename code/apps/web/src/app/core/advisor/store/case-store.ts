@@ -1,6 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, filter, switchMap } from 'rxjs';
+import { Consent } from '../../consent/consent';
 import { AdvisorDataSource, AdvisorEvent } from '../advisor-data-source';
 import {
   CaseState,
@@ -22,10 +23,14 @@ type UnreadIds = Readonly<Record<WorkspaceTab, ReadonlySet<string>>>;
  * On every (re)connect the store loads a fresh snapshot (contracts 9.3, step 6). Events that
  * arrive while it loads are held back and applied on top of it, so nothing is lost and the
  * guard drops the ones the snapshot already contains.
+ *
+ * Before the user has consented (`Consent`), the store does not connect and drops every event
+ * and snapshot, so no case data is processed without consent.
  */
 @Injectable({ providedIn: 'root' })
 export class CaseStore {
   private readonly source = inject(AdvisorDataSource);
+  private readonly consent = inject(Consent);
   private readonly state = signal<CaseState>(initialCaseState());
   private readonly unreadIds = signal<UnreadIds>(noUnread());
   private readonly loadedState = signal(false);
@@ -67,11 +72,14 @@ export class CaseStore {
     const destroyRef = inject(DestroyRef);
     // Subscribe to events before the first snapshot request so no event slips through.
     this.source.events
-      .pipe(takeUntilDestroyed(destroyRef))
+      .pipe(
+        filter(() => this.consent.granted()),
+        takeUntilDestroyed(destroyRef),
+      )
       .subscribe((event) => this.receive(event));
     this.source.connection
       .pipe(
-        filter((state) => state === 'connected'),
+        filter((state) => state === 'connected' && this.consent.granted()),
         switchMap(() => {
           this.pending ??= [];
           return this.source.snapshot().pipe(
@@ -94,8 +102,9 @@ export class CaseStore {
       });
   }
 
-  /** Starts or resumes the live call. */
+  /** Starts or resumes the live call. Does nothing before consent. */
   connect(): void {
+    if (!this.consent.granted()) return;
     this.source.connect();
   }
 

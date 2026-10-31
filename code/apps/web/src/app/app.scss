@@ -17,6 +17,14 @@
   height: 100dvh;
 }
 
+// Before consent: header and privacy notice only, no rail.
+:host(.gated) {
+  grid-template:
+    'bar' auto
+    'view' minmax(0, 1fr)
+    / minmax(0, 1fr);
+}
+
 @media (min-width: 768px) {
   :host {
     --tab-size: 3.25rem;
@@ -30,7 +38,6 @@
   grid-area: bar;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
   min-width: 0;
   padding: 0.5rem 1rem;
@@ -47,6 +54,23 @@
   text-overflow: ellipsis;
 }
 
+// Always visible: the whole app runs on synthetic data only.
+.demo {
+  flex: none;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  color: var(--text-inverse);
+  background: var(--bg-brand-purple);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bar app-language-switcher {
+  margin-left: auto;
+}
+
 .view {
   grid-area: view;
   min-width: 0;
@@ -55,6 +79,12 @@
   padding: 1rem;
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
   padding-left: max(1rem, env(safe-area-inset-left));
+
+  // Focused by script only, as the landing point after consent; not a control, so no ring.
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 .rail {
