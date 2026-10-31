@@ -10,6 +10,9 @@
 import { createProgressPoller, isGoodbye, isSpeech, postJson as post, wordsOf } from "./paxi-common.js";
 
 const FLUSH_INTERVAL_MS = 1000;
+// Reply emotions the avatar knows (ReplyEmotion in code/avatar-prototype/pax-avatar.d.ts).
+const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "shocked", "empathetic", "pleased", "recovering", "presenting_offer"];
+const EMOTION_QUESTIONS = { "session.input_transcript.delta": "reply_emotion", "session.output_transcript.delta": "emotion" };
 const HANDOFF_CLOSE_TIMEOUT_MS = 5000;
 const FINAL_CLOSE_TIMEOUT_MS = 15_000;
 // Same thresholds as the avatar prototype: GPT-Live has no speech or playback boundary
@@ -32,6 +35,14 @@ const GOODBYE_MS = 7000;
 const OWN_WORDS_SHARE = 0.5;
 // Echo transcripts arrive a little after the audio, so the filter outlasts the intro.
 const ECHO_TAIL_MS = 2000;
+// The intro gets quieter the moment the microphone hears a voice clearly louder than the
+// intro's own echo (measured during its first second), long before the transcript arrives.
+// If the transcript does not confirm the person's own words, the volume comes back.
+const ECHO_CALIBRATION_MS = 1200;
+const VOICE_OVER_ECHO = 2.5;
+const MIN_VOICE_LEVEL = 0.02;
+const DUCKED_VOLUME = 0.2;
+const DUCK_RELEASE_MS = 2500;
 
 /**
  * @param {object} options
@@ -78,6 +89,7 @@ export function createPaxiVoice({
   let inactiveWarnedAt = null;
   let closingForInactivity = false;
   let resumeId = null;
+  let startPriorities;
   let poller = null;
   let agentTurnText = "";
   let goodbyeTimer;
@@ -141,6 +153,11 @@ export function createPaxiVoice({
     monitors = monitors.filter((m) => m !== entry);
   }
 
+  // The ID the next audible segment will get, so emotions that arrive early can be tied to it.
+  function upcomingPlaybackId() {
+    return playbackId ?? `paxi-${conversationId ?? "call"}-${playbackSequence + 1}`;
+  }
+
   function endPlayback(event) {
     if (!playbackId) return;
     emit(onAvatarEvent, { type: "playback", event, playbackId });
@@ -152,9 +169,11 @@ export function createPaxiVoice({
     for (const m of monitors) {
       m.analyser.getFloatTimeDomainData(m.samples);
       const rms = Math.sqrt(m.samples.reduce((sum, n) => sum + n * n, 0) / m.samples.length);
+      if (!m.output) duckIntroOnVoice(rms, now);
       if (rms > LEVEL_THRESHOLD) {
         m.lastSound = now;
-        lastActivity = now;
+        // Only Paxi's voice keeps the conversation "active"; microphone noise does not.
+        if (m.output) lastActivity = now;
         if (m.active) continue;
         m.active = true;
         if (m.output) {
@@ -266,8 +285,10 @@ export function createPaxiVoice({
     const audio = new Audio(`${baseUrl}${session.intro.url}`);
     audio.crossOrigin = "anonymous";
     const words = new Set(wordsOf(session.intro.text));
-    intro = { audio, words, endedAt: null, pending: [] };
+    intro = { audio, words, session, endedAt: null, pending: [], startedAt: performance.now(), echoLevel: 0, duckedAt: null };
     audio.addEventListener("ended", () => endIntro("ended"));
+    // The recorded welcome is a warm greeting; the avatar shows it as soon as it is audible.
+    emit(onAvatarEvent, { type: "emotion", emotion: "pleased", playbackId: upcomingPlaybackId() });
     try {
       await audio.play();
     } catch (error) {
@@ -279,22 +300,45 @@ export function createPaxiVoice({
     const stream = audio.captureStream();
     intro.monitor = monitor(stream, true);
     emit(onAudioStream, stream);
-    const startMs = performance.now() - session.connectedAt;
-    const fragment = { speaker: "agent", text: session.intro.text, start_ms: startMs, end_ms: startMs + audio.duration * 1000 };
-    pendingFragments.push({ sessionId: session.id, fragment });
-    emit(onTranscript, { speaker: "agent", text: fragment.text, startMs: fragment.start_ms, endMs: fragment.end_ms });
+    intro.startMs = performance.now() - session.connectedAt;
+    emit(onTranscript, { speaker: "agent", text: session.intro.text, startMs: intro.startMs, endMs: intro.startMs });
   }
 
   function endIntro(reason) {
     if (!intro || intro.endedAt) return;
     intro.endedAt = performance.now();
     intro.audio.pause();
+    // Logged with the time it really played, so the next turn is not merged into it.
+    if (intro.startMs !== undefined) {
+      const fragment = {
+        speaker: "agent",
+        text: intro.session.intro.text,
+        start_ms: intro.startMs,
+        end_ms: intro.endedAt - intro.session.connectedAt,
+      };
+      pendingFragments.push({ sessionId: intro.session.id, fragment });
+    }
     if (intro.monitor) stopMonitor(intro.monitor);
     endPlayback(reason === "interrupted" ? "cancelled" : "ended");
     lastActivity = performance.now();
     lastUserAt = performance.now();
     // Hand the avatar back the session's own voice.
     if (current?.stream) emit(onAudioStream, current.stream);
+  }
+
+  function duckIntroOnVoice(rms, now) {
+    if (!intro || intro.endedAt) return;
+    if (now - intro.startedAt < ECHO_CALIBRATION_MS) {
+      intro.echoLevel = Math.max(intro.echoLevel, rms);
+      return;
+    }
+    if (rms > Math.max(MIN_VOICE_LEVEL, intro.echoLevel * VOICE_OVER_ECHO)) {
+      if (!intro.duckedAt) intro.audio.volume = DUCKED_VOLUME;
+      intro.duckedAt = now;
+    } else if (intro.duckedAt && now - intro.duckedAt > DUCK_RELEASE_MS) {
+      intro.duckedAt = null;
+      intro.audio.volume = 1;
+    }
   }
 
   // Decides whether a user transcript fragment is the person or the intro echoing back.
@@ -306,7 +350,8 @@ export function createPaxiVoice({
       return [fragment];
     }
     intro.pending.push(fragment);
-    const words = wordsOf(intro.pending.map((f) => f.text).join(" "));
+    // Noise tags like "[clear throat]" never stop the intro.
+    const words = wordsOf(intro.pending.map((f) => f.text).join(" ").replace(/\[[^\]]*\]?/g, " "));
     const own = words.filter((word) => !intro.words.has(word)).length;
     if (words.length === 0 || own / words.length < OWN_WORDS_SHARE) return [];
     // The person is speaking: stop the intro and let their words through.
@@ -393,6 +438,25 @@ export function createPaxiVoice({
     }, 1200);
   }
 
+  // --- Avatar emotions -----------------------------------------------------------------------
+
+  // GPT-Live classifies each transcript fragment (session.triggers on the server). Results can
+  // arrive late or out of order, so per direction only newer fragments than the last applied
+  // one count. Invalid or failed answers leave the face as it is (AVATAR-INTERFACE.md).
+  function handleEmotion(session, envelope) {
+    if (envelope.delegation_id != null || session.retired || session.audio.muted) return;
+    const result = envelope.event;
+    if (result?.type !== "decision.completed") return;
+    const direction = session.emotionSources[envelope.source_event_type];
+    const source = direction?.events.get(envelope.source_event_id);
+    if (!source || source.index <= direction.applied) return;
+    const name = EMOTION_QUESTIONS[envelope.source_event_type];
+    const answer = result.decision?.answers?.find((a) => a?.type === "choice" && a.name === name);
+    if (!answer || !REPLY_EMOTIONS.includes(answer.choice)) return;
+    direction.applied = source.index;
+    emit(onAvatarEvent, { type: "emotion", emotion: answer.choice, playbackId: source.playbackId });
+  }
+
   // --- Session events ------------------------------------------------------------------
 
   function handleEvent(session, event) {
@@ -412,9 +476,15 @@ export function createPaxiVoice({
         break;
       case "session.input_transcript.delta":
       case "session.output_transcript.delta": {
-        // A muted, retiring session may still talk; nobody hears it, so it is not logged.
-        if (session.retired || session.audio.muted) break;
+        // Remember which playback segment this fragment belongs to, for its emotion result.
+        const direction = session.emotionSources[event.type];
+        if (event.event_id && !direction.events.has(event.event_id)) {
+          direction.events.set(event.event_id, { index: ++direction.index, playbackId: upcomingPlaybackId() });
+        }
         const speaker = event.type === "session.input_transcript.delta" ? "user" : "agent";
+        // A muted, retiring session may still talk; nobody hears it, so its words are not
+        // logged. The person's words are kept: they keep talking while the voice switches.
+        if (speaker === "agent" && (session.retired || session.audio.muted)) break;
         const fragment = { speaker, text: event.delta, start_ms: event.start_ms, end_ms: event.end_ms };
         const accepted = speaker === "user" ? filterIntroEcho(session, fragment) : [fragment];
         for (const f of accepted) {
@@ -441,6 +511,9 @@ export function createPaxiVoice({
         if (item.name === "set_language") handleSetLanguage(session, item);
         break;
       }
+      case "decision.event":
+        handleEmotion(session, event);
+        break;
       case "session.closed":
         if (session.retired) endRetired(session, event.usage);
         else if (session === current) finish("closed", event.usage);
@@ -455,7 +528,15 @@ export function createPaxiVoice({
     const peer = new RTCPeerConnection();
     const audio = new Audio();
     audio.autoplay = true;
-    const session = { peer, audio, previous, ready: false, retired: false, ended: false };
+    const session = {
+      peer,
+      audio,
+      previous,
+      ready: false,
+      retired: false,
+      ended: false,
+      emotionSources: Object.fromEntries(Object.keys(EMOTION_QUESTIONS).map((type) => [type, { index: 0, applied: 0, events: new Map() }])),
+    };
     sessions.push(session);
 
     peer.addEventListener("track", (event) => {
@@ -485,7 +566,12 @@ export function createPaxiVoice({
     try {
       await peer.setLocalDescription(await peer.createOffer());
       await waitForIceGathering(peer);
-      const result = await postJson("/api/session", { sdp: peer.localDescription.sdp, continueFrom, resume: previous ? undefined : resumeId });
+      const result = await postJson("/api/session", {
+        sdp: peer.localDescription.sdp,
+        continueFrom,
+        resume: previous ? undefined : resumeId,
+        priorities: previous ? undefined : startPriorities,
+      });
       Object.assign(session, {
         id: result.session.id,
         voice: result.voice,
@@ -549,9 +635,10 @@ export function createPaxiVoice({
      * Pass { resume: conversationId } to continue a conversation that was closed, for
      * example after inactivity; Paxi then picks up where it left off.
      */
-    async start({ resume } = {}) {
+    async start({ resume, priorities } = {}) {
       if (running) return;
       resumeId = resume ?? null;
+      startPriorities = priorities;
       running = true;
       finishing = false;
       conversationId = undefined;
@@ -584,6 +671,27 @@ export function createPaxiVoice({
         status("error", error instanceof Error ? error.message : String(error));
         throw error;
       }
+    },
+
+    /**
+     * Steers Paxi from outside: these questionnaire fields (IDs from questionnaire.json)
+     * should come next, for example because a calculation needs them. Paxi brings them up
+     * at the next natural moment. An empty list clears the priorities.
+     */
+    async prioritize(fieldIds, source = "app") {
+      if (!current?.id) {
+        startPriorities = fieldIds;
+        return null;
+      }
+      const result = await postJson(`/api/conversations/${current.id}/priorities`, { fields: fieldIds, source });
+      if (result.labels.length && current?.ready) {
+        send(current, {
+          type: "session.thinking.append",
+          delegation_id: null,
+          content: `The app now especially needs: ${result.open_priority.join(", ") || result.labels.join(", ")}. At the next natural moment, steer the conversation there, without breaking off what the person is telling you.`,
+        });
+      }
+      return result;
     },
 
     /** Ends the conversation gracefully; the log is completed on the server. */

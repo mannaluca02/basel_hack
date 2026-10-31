@@ -2,8 +2,7 @@
 // Creates WebRTC sessions (API key stays here) and owns the JSON conversation log.
 import express from "express";
 import OpenAI from "openai";
-import { randomUUID } from "node:crypto";
-import { access, mkdir, readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -16,7 +15,6 @@ import {
 } from "./conversation-log.mjs";
 import { extractAnswers } from "./answer-extractor.mjs";
 import { extractContext } from "./conversation-context.mjs";
-import { conversationToken, ELEVENLABS_VOICE_ID, ensureAgent } from "./elevenlabs.mjs";
 import { detectLanguage } from "./language-detect.mjs";
 import { customVoices } from "./paxi-voice.mjs";
 
@@ -107,7 +105,7 @@ const openLabels = (log) => labelsOf([...openFields(log, "core"), ...openFields(
 
 // Paxi's prompt, shared by all voice providers: persona.md, language, today's date and
 // what to find out. Saving happens by itself (answer-extractor.mjs), so Paxi only talks.
-function paxiPrompt({ language, voicePrompt }) {
+function paxiPrompt({ language, voicePrompt, priorities = [] }) {
   const languageRule = language
     ? `Current conversation language: ${languages[language].name}, spoken with native pronunciation. If the person starts speaking another of your languages, follow them.`
     : `Languages: you speak German, French, Italian and English, each with native pronunciation. Continue in the language the person speaks.`;
@@ -132,13 +130,17 @@ ${topicList("core")}
 Also part of the picture; find these out too, whenever they fit:
 ${topicList("extended")}
 
-Only wrap up when the app's note says that everything is complete or handed to a colleague. If the person wants to stop before that, tell them in one sentence that only a few quick questions are left and ask them right away. If they still want to go, say that a colleague of yours will complete the rest with them.`;
+${
+    priorities.length
+      ? `Right now the app especially needs: ${labelsOf(priorities).join(", ")}. Steer the conversation there early, in a natural way.\n\n`
+      : ""
+  }Only wrap up when the app's note says that everything is complete or handed to a colleague. If the person wants to stop before that, tell them in one sentence that only a few quick questions are left and ask them right away. If they still want to go, say that a colleague of yours will complete the rest with them.`;
 }
 
 // GPT-Live adds OpenAI's recommended policies (backchannel, interruption, delegation).
 // gpt-live-1 delegates on <|SpawnThinking|>; the only backend task left is the language.
-function liveInstructions(voiceOption, language) {
-  return `${paxiPrompt({ language, voicePrompt: voiceOption.prompt })}
+function liveInstructions(voiceOption, language, priorities) {
+  return `${paxiPrompt({ language, voicePrompt: voiceOption.prompt, priorities })}
 
 ## Policies
 
@@ -168,6 +170,34 @@ function today() {
 }
 
 const backendInstructions = `Du hilfst Paxi bei der Sprachwahl. Die Person wählt ihre Sprache, indem sie einfach in ihr spricht. Wenn sie nach der Begrüssung zum ersten Mal spricht oder in eine andere Sprache wechselt, rufe set_language mit dieser Sprache auf (de, fr, it oder en). Spricht sie weiter in der bereits gesetzten Sprache, rufe set_language nicht erneut auf. Gib danach nur eine sehr knappe, sachliche Rückmeldung für Paxi, nichts zum Vorlesen.`;
+
+// Avatar emotions, as in Lukas's prototype (code/avatar-prototype/server.mjs, AVATAR-INTERFACE.md):
+// GPT-Live classifies every transcript fragment. The person's words predict the tone of the
+// reply ("reply_emotion"), Paxi's own words refine it ("emotion"). Keep the values in sync
+// with ReplyEmotion in pax-avatar.d.ts.
+const EMOTION_CHOICES = [
+  { value: "neutral", description: "Sachlicher, ruhiger Grundzustand ohne besonderen Anlass. Im Zweifel neutral." },
+  { value: "acknowledging", description: "Kurze Bestätigung oder Zusammenfassung: Ich habe dich verstanden. Keine neue Erklärung oder Erfolgsmeldung." },
+  { value: "curious", description: "Offene Rückfrage zu Wünschen, Lebenssituation oder fehlenden Angaben der Person." },
+  { value: "explaining", description: "Paxi erklärt Zusammenhänge, Berechnungen, Vorsorgelücken oder nächste Optionen sachlich und engagiert." },
+  { value: "shocked", description: "Nur bei echtem Schock: etwas wirklich Unerwartetes oder Alarmierendes wurde gesagt. Nicht bei blosser Sorge, Überraschung oder Belastung." },
+  { value: "empathetic", description: "Persönlicher Verlust, Krankheit oder Belastung: stilles Mitgefühl zeigen." },
+  { value: "pleased", description: "Warme Begrüssung, Willkommen oder freundliche Freude über eine gute Nachricht." },
+  { value: "recovering", description: "Paxi hat etwas missverstanden, korrigiert sich oder muss einen Versuch beziehungsweise eine Erklärung wiederholen." },
+  { value: "presenting_offer", description: "Nur wenn gerade eine konkrete Offerte oder ein fertiges Ergebnis tatsächlich präsentiert wird. Nicht bei einer Ankündigung oder blossen Zustimmung." },
+];
+const emotionTriggers = [
+  {
+    type: "decisions",
+    event_type: "session.input_transcript.delta",
+    decisions: { questions: [{ type: "choice", name: "reply_emotion", instructions: "Welche Emotion soll Paxi in der Antwort auf die aktuellen Worte der Person zeigen?", choices: EMOTION_CHOICES }] },
+  },
+  {
+    type: "decisions",
+    event_type: "session.output_transcript.delta",
+    decisions: { questions: [{ type: "choice", name: "emotion", instructions: "Welche Emotion passt zu dem, was Paxi gerade sagt?", choices: EMOTION_CHOICES }] },
+  },
+];
 
 const setLanguageTool = {
   type: "function",
@@ -238,6 +268,8 @@ app.post("/api/session", sameOrigin, async (request, response) => {
     return;
   }
   const earlierLog = previous?.log ?? resumed;
+  // Questions another part of the app wants answered first (see /priorities).
+  const priorities = validPriorities(request.body.priorities) ?? earlierLog?.priorities ?? [];
   const language = earlierLog?.language ?? null;
   const voiceOption = language ? voiceByKey.get(languages[language].voiceKey) : startVoice;
   const playIntro = !earlierLog && introUrl !== null;
@@ -251,32 +283,44 @@ app.post("/api/session", sameOrigin, async (request, response) => {
 
   client ??= new OpenAI({ maxRetries: 0 });
   try {
-    const result = await client.live.create({
-      session: {
-        model: liveModel,
-        instructions: liveInstructions(voiceOption, language),
-        audio: { output: { voice: voiceOption.voice } },
-        input: [...history, { role: "developer", content: [{ type: "input_text", text: opening }] }],
-        delegation: {
-          type: "responses",
-          responses: {
-            model: backendModel,
-            instructions: [
-              backendInstructions,
-              ...(language ? [`Die Sprache ist bereits auf ${language} gesetzt; rufe set_language nur auf, wenn die Person in eine andere Sprache wechselt.`] : []),
-            ].join("\n"),
-            tools: [setLanguageTool],
-            tool_choice: "auto",
-            parallel_tool_calls: false,
-          },
+    const sessionConfig = {
+      model: liveModel,
+      instructions: liveInstructions(voiceOption, language, priorities),
+      audio: { output: { voice: voiceOption.voice } },
+      input: [...history, { role: "developer", content: [{ type: "input_text", text: opening }] }],
+      delegation: {
+        type: "responses",
+        responses: {
+          model: backendModel,
+          instructions: [
+            backendInstructions,
+            ...(language ? [`Die Sprache ist bereits auf ${language} gesetzt; rufe set_language nur auf, wenn die Person in eine andere Sprache wechselt.`] : []),
+          ].join("\n"),
+          tools: [setLanguageTool],
+          tool_choice: "auto",
+          parallel_tool_calls: false,
         },
       },
-      transport: { type: "webrtc", sdp: request.body.sdp },
-    });
+      triggers: emotionTriggers,
+    };
+    const create = (session) => client.live.create({ session, transport: { type: "webrtc", sdp: request.body.sdp } });
+    let result;
+    let emotions = true;
+    try {
+      result = await create(sessionConfig);
+    } catch (error) {
+      // Voice must work even if the project may not use Decisions: retry once without them.
+      if (!(error instanceof OpenAI.APIError) || error.status >= 500 || !/trigger|decision/i.test(error.message)) throw error;
+      console.warn("Emotion triggers rejected, starting without avatar emotions:", error.status, error.message);
+      const { triggers, ...voiceOnly } = sessionConfig;
+      result = await create(voiceOnly);
+      emotions = false;
+    }
 
     const sessionId = result.session.id;
     const log = earlierLog ?? createLog({ conversationId: sessionId, questionnaire, model: liveModel });
     conversations.set(log.conversationId, log);
+    if (!earlierLog && priorities.length) setPriorities(log, priorities, "start");
     if (resumed) {
       log.status = "active";
       log.endedAt = null;
@@ -296,6 +340,7 @@ app.post("/api/session", sameOrigin, async (request, response) => {
       // The browser sends this as commentary, so Paxi speaks first (or stays quiet during the intro).
       greeting: opening,
       intro: playIntro ? { url: introUrl, text: welcomeText } : null,
+      emotions,
       // Spoken live if the browser cannot play the intro.
       fallbackGreeting: playIntro ? greeting() : null,
     });
@@ -421,85 +466,6 @@ function knownSummary(log) {
     .join("; ");
 }
 
-// --- ElevenLabs ----------------------------------------------------------------------------
-
-const RESUME_GREETINGS = {
-  de: "Hey, schön, dass du wieder da bist! Machen wir dort weiter, wo wir aufgehört haben.",
-  fr: "Hey, content que tu sois de retour ! On reprend là où on s'était arrêtés.",
-  it: "Ehi, che bello che sei tornato! Riprendiamo da dove ci eravamo fermati.",
-  en: "Hey, good to have you back! Let's pick up where we left off.",
-};
-
-app.get("/api/providers", (_request, response) =>
-  response.json({
-    providers: [
-      { key: "gpt-live", label: "OpenAI GPT-Live", available: Boolean(process.env.OPENAI_API_KEY) },
-      { key: "elevenlabs", label: "ElevenLabs", available: Boolean(process.env.ELEVENLABS_API_KEY) },
-    ],
-  }),
-);
-
-// Starts (or resumes) a conversation with ElevenLabs. The answers are still filled in by
-// the extractor from the transcript, exactly like with GPT-Live.
-app.post("/api/elevenlabs/session", sameOrigin, async (request, response) => {
-  if (!process.env.ELEVENLABS_API_KEY) {
-    response.status(503).json({ error: "Set ELEVENLABS_API_KEY in the repo root .env" });
-    return;
-  }
-  const resumed = request.body?.resume ? await loadConversation(request.body.resume) : null;
-  if (request.body?.resume && (!resumed || resumed.status === "active")) {
-    response.status(404).json({ error: "Conversation cannot be resumed" });
-    return;
-  }
-  try {
-    await mkdir(resolve(here, "data"), { recursive: true });
-    const agentId = await ensureAgent(resolve(here, "data/elevenlabs-agent.json"));
-    const token = await conversationToken(agentId);
-    const sessionId = `el_${randomUUID()}`;
-    const log = resumed ?? createLog({ conversationId: sessionId, questionnaire, model: "elevenlabs" });
-    conversations.set(log.conversationId, log);
-    if (resumed) {
-      log.status = "active";
-      log.endedAt = null;
-      log.events.push({ type: "conversation_resumed", at: new Date().toISOString() });
-    }
-    const offsetMs = resumed ? Date.now() - Date.parse(log.startedAt) : 0;
-    const entry = addSession(log, { sessionId, voice: `elevenlabs:${ELEVENLABS_VOICE_ID}`, language: log.language, offsetMs });
-    sessions.set(sessionId, { log, entry });
-    await persist(log);
-
-    const opening = resumed
-      ? `${resumption(log)}
-
-The conversation so far:
-${log.transcript
-          .slice(-30)
-          .map((turn) => `${turn.speaker === "user" ? "Person" : "Paxi"}: ${turn.text.trim()}`)
-          .join("\n")}`
-      : "The welcome was played to the person as a recording. Wait for their first words; they choose the language. Use language detection to switch to their language right away.";
-    response.status(201).json({
-      provider: "elevenlabs",
-      token,
-      sessionId,
-      conversationId: log.conversationId,
-      offsetMs,
-      language: log.language,
-      prompt: `${paxiPrompt({ language: log.language })}
-
-## Now
-
-${opening}
-
-Never mention tools, systems or saving. Notes in square brackets that start with "App note" come from the app, not from the person: follow them, never read them out.`,
-      firstMessage: resumed ? RESUME_GREETINGS[log.language ?? "de"] : "",
-      intro: resumed || !introUrl ? null : { url: introUrl, text: welcomeText },
-    });
-  } catch (error) {
-    console.error("ElevenLabs session failed", error.status, error.message);
-    response.status(error.status === 401 ? 502 : (error.status ?? 502)).json({ error: error.message });
-  }
-});
-
 // Called by the browser when the backend model calls set_language ({ language }), or with
 // the person's first words ({ text }) so the voice switch does not depend on the model.
 app.post("/api/conversations/:sessionId/language", sameOrigin, async (request, response) => {
@@ -531,15 +497,47 @@ app.post("/api/conversations/:sessionId/language", sameOrigin, async (request, r
 
 // What is still missing; the browser also hands this to Paxi as quiet context.
 function progress(log) {
-  const core = openFields(log, "core");
-  const extended = openFields(log, "extended");
+  const priorities = log.priorities ?? [];
+  // Prioritised details first, in the order they were given.
+  const byPriority = (ids) =>
+    [...ids].sort((a, b) => (priorities.indexOf(a) + 1 || Infinity) - (priorities.indexOf(b) + 1 || Infinity));
+  const core = byPriority(openFields(log, "core"));
+  const extended = byPriority(openFields(log, "extended"));
   return {
+    open_priority: labelsOf([...core, ...extended].filter((id) => priorities.includes(id))),
     open_core: labelsOf(core),
     open_extended: labelsOf(extended),
     core_complete: core.length === 0,
     complete: core.length === 0 && extended.length === 0,
   };
 }
+
+// --- Priorities: another part of the app steers which questions come first ----------------
+
+function validPriorities(value) {
+  if (!Array.isArray(value)) return null;
+  return [...new Set(value.filter((id) => fieldsById.has(id)))];
+}
+
+function setPriorities(log, priorities, source) {
+  log.priorities = priorities;
+  log.events.push({ type: "priorities_set", at: new Date().toISOString(), fields: priorities, source });
+}
+
+// For example Earnie's advisor backend or the UI: { "fields": ["annual_gross_income_chf", ...] }.
+// An empty list clears the priorities. The browser passes the result on to Paxi.
+app.post("/api/conversations/:sessionId/priorities", sameOrigin, async (request, response) => {
+  const session = findSession(request, response);
+  if (!session) return;
+  const priorities = validPriorities(request.body?.fields);
+  if (!priorities) {
+    response.status(400).json({ error: "fields must be a list of questionnaire field IDs" });
+    return;
+  }
+  setPriorities(session.log, priorities, typeof request.body?.source === "string" ? request.body.source.slice(0, 60) : "api");
+  await persist(session.log);
+  response.json({ priorities, labels: labelsOf(priorities), ...progress(session.log) });
+});
 
 // status "handoff" ends only this session; the conversation continues in the next one.
 app.post("/api/conversations/:sessionId/close", sameOrigin, async (request, response) => {

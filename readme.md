@@ -2,6 +2,7 @@
 
 Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller Stand: Recherche, Quellen und Bauplan; eine eigene Advisor-App ist noch nicht implementiert.
 
+- [Voice-Feature: Setup, Integration und API](code/voice-agent/README.md)
 - [Bestätigte Workshop-Entscheide und Rollen](documentation/baselhack/plans/workshop-decisions.md)
 - [Workflow und Schnittstellen aus dem Workshop](documentation/baselhack/plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](documentation/baselhack/plans/implementation-plan.md)

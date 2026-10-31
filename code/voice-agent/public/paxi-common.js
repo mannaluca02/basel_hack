@@ -1,4 +1,4 @@
-// Helpers shared by the GPT-Live and the ElevenLabs voice clients.
+// Helpers for the Paxi voice client (kept separate so other clients can reuse them).
 
 export function wordsOf(text) {
   return text.toLowerCase().match(/[\p{L}']+/gu) ?? [];
@@ -31,8 +31,10 @@ export function progressNote(progress) {
     return "Everything is complete. When the conversation reaches a natural end, you may thank the person and say goodbye once.";
   }
   const open = [...progress.open_core, ...progress.open_extended];
+  const priority = progress.open_priority ?? [];
   return [
     progress.known ? `Already known (never ask again): ${progress.known}.` : "",
+    priority.length ? `The app especially needs these next: ${priority.join(", ")}. Steer the conversation there at the next natural moment.` : "",
     `Still open: ${open.join(", ")}. Find these out naturally in the conversation, in whatever order fits. Do not wrap up or say goodbye yet.`,
   ]
     .filter(Boolean)
@@ -76,7 +78,7 @@ export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, in
       version = progress.version;
       const note = progressNote(progress);
       // Only the open list matters for the note; known values alone do not trigger a new one.
-      const key = `${progress.complete}|${progress.open_core}|${progress.open_extended}`;
+      const key = `${progress.complete}|${progress.open_priority}|${progress.open_core}|${progress.open_extended}`;
       if (key !== lastNote) {
         lastNote = key;
         onNote(note);

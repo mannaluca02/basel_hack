@@ -1,7 +1,6 @@
 // Demo page: wires paxi-voice.js to Lukas's avatar and a small test UI.
 import { createPaxiVoice } from "./paxi-voice.js";
-import { mountPaxAvatar } from "/avatar/pax-avatar.js";
-import { createAvatarController } from "/avatar/pax-avatar-controller.js";
+import { createPaxAvatar, EMOTIONS } from "/avatar/pax-avatar.js";
 
 const $ = (id) => document.getElementById(id);
 const TURN_GAP_MS = 1200;
@@ -9,12 +8,19 @@ const TURN_GAP_MS = 1200;
 const questionnaire = await fetch("/api/questionnaire").then((response) => response.json());
 $("questionnaire-title").textContent = questionnaire.title;
 
-const avatar = createAvatarController(mountPaxAvatar($("avatar")));
+const avatar = createPaxAvatar($("avatar"));
+// Shows which expression the avatar currently has, to check the emotions from the transcript.
+setInterval(() => {
+  const { face } = avatar.state;
+  $("face").textContent = `Paxi: ${EMOTIONS[face]?.label ?? face}`;
+}, 300);
 const captured = {};
 let turns = [];
 // Set when Paxi closed the call for inactivity; the next tap continues that conversation.
 let resumable = null;
 const tierTitles = { core: "Kernangaben", extended: "Wenn es passt" };
+// Fields another part of the app wants first. In the demo: tap a field, or ?priorities=id,id.
+const priorities = new Set(new URLSearchParams(location.search).get("priorities")?.split(",").filter(Boolean) ?? []);
 
 function renderAnswers() {
   $("answers").replaceChildren(
@@ -27,12 +33,14 @@ function renderAnswers() {
 }
 
 function renderField(field) {
-  const card = document.createElement("div");
+  const card = document.createElement("button");
   const answer = captured[field.id];
-  card.className = "answer" + (answer ? ` ${answer.status}` : "");
+  card.className = "answer" + (answer ? ` ${answer.status}` : "") + (priorities.has(field.id) ? " priority" : "");
+  card.title = "Antippen: Paxi soll das bevorzugt fragen";
+  card.addEventListener("click", () => togglePriority(field.id));
   const label = document.createElement("div");
   label.className = "label";
-  label.textContent = field.label;
+  label.textContent = (priorities.has(field.id) ? "★ " : "") + field.label;
   const value = document.createElement("div");
   value.className = "value";
   value.textContent = !answer ? "–" : answer.status === "declined" ? "Möchte es nicht sagen – Kollege klärt es" : String(answer.value);
@@ -40,6 +48,13 @@ function renderField(field) {
   return card;
 }
 renderAnswers();
+
+async function togglePriority(fieldId) {
+  if (priorities.has(fieldId)) priorities.delete(fieldId);
+  else priorities.add(fieldId);
+  renderAnswers();
+  await paxi.prioritize([...priorities], "demo").catch((error) => console.error("Priorities failed", error));
+}
 
 // Same grouping rule as the server log, so the captions match the saved JSON.
 function showFragment({ speaker, text, startMs, endMs }) {
@@ -77,7 +92,6 @@ const statusText = {
 
 const callbacks = {
   onAudioStream: (stream) => avatar.attachAudio(stream),
-  onLevelSource: (level) => avatar.setLevelSource(() => level()),
   onAvatarEvent: (event) => avatar.handle(event),
   onTranscript: showFragment,
   onAnswer: ({ fieldId, value, status }) => {
@@ -90,7 +104,6 @@ const callbacks = {
     $("status").textContent = state === "error" ? `${statusText.error}: ${detail}` : statusText[inactive ? "inactive" : state];
     const active = state === "connecting" || state === "connected" || state === "switching";
     $("avatar").disabled = active;
-    $("provider").disabled = active;
     $("stop").hidden = !active;
     $("hint").textContent = active ? "" : inactive ? "Tippe auf Paxi, um weiterzumachen." : "Tippe auf Paxi, um das Gespräch zu starten.";
     if (paxi?.logUrl) {
@@ -100,26 +113,7 @@ const callbacks = {
   },
 };
 
-// The AI source is chosen before the call. The ElevenLabs client is only loaded when needed.
-const { providers } = await fetch("/api/providers").then((response) => response.json());
-for (const { key, label, available } of providers) {
-  $("provider").add(new Option(available ? label : `${label} (kein API-Key)`, key, false, false));
-  $("provider").lastElementChild.disabled = !available;
-}
-const clients = {};
-async function clientFor(provider) {
-  if (!clients[provider]) {
-    clients[provider] =
-      provider === "elevenlabs"
-        ? (await import("./paxi-voice-elevenlabs.js")).createPaxiElevenLabs(callbacks)
-        : createPaxiVoice(callbacks);
-  }
-  return clients[provider];
-}
-let paxi = await clientFor($("provider").value);
-$("provider").addEventListener("change", async () => {
-  paxi = await clientFor($("provider").value);
-});
+const paxi = createPaxiVoice(callbacks);
 
 $("avatar").addEventListener("click", () => {
   if (paxi.running) return;
@@ -131,7 +125,7 @@ $("avatar").addEventListener("click", () => {
     for (const key of Object.keys(captured)) delete captured[key];
     renderAnswers();
   }
-  avatar.setLevelSource(null);
-  paxi.start({ resume }).catch(() => {});
+  avatar.reset();
+  paxi.start({ resume, priorities: [...priorities] }).catch(() => {});
 });
 $("stop").addEventListener("click", () => paxi.stop());

@@ -3,20 +3,49 @@
 Voice side of Pax LifeMap (owner: Dario). The browser talks to OpenAI GPT-Live-1 over WebRTC.
 Paxi has a relaxed chat in du-form, like a broker who gets to know you, and picks up the questionnaire details (`questionnaire.json`) along the way. It never pitches products. Paxi only talks: after each turn of the person, the server reads the transcript and fills in every detail that was said (see [How details are saved](#how-details-are-saved)).
 
-Two voice providers can be chosen before a call: **OpenAI GPT-Live** (default) and **ElevenLabs**.
-
 Each conversation is written to `data/conversations/<conversationId>.json`. The file holds the transcript (both speakers, grouped into turns), the questionnaire answers, the session events and, after the call, the extracted life context. `data/` is gitignored because it contains personal data.
 
 ## Run the demo
 
+Requires Node.js 22 or newer, npm, a browser with microphone/WebRTC support and an OpenAI project key with access to the configured models.
+
+From the repository root:
+
 ```bash
+cd code/voice-agent
 npm install
 npm start
 ```
 
-Put `OPENAI_API_KEY` (and optionally `ELEVENLABS_API_KEY`) in the repo root `.env` (see `.env.example`) and open http://localhost:3000. Choose the AI source, then tap Paxi to start; microphone access needs `localhost` or HTTPS. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
+Put `OPENAI_API_KEY` in the repo root `.env` (see `.env.example`) and open http://localhost:3000. Tap Paxi to start; microphone access needs `localhost` or HTTPS. The demo page only exists to test how Paxi behaves in a conversation. It shows Lukas's avatar (served from `../avatar-prototype`), the transcript, the questionnaire and a link to the JSON log.
 
 `npm test` runs the log and validation tests.
+
+## Configuration
+
+The server reads the repository-root `.env`, not a file inside `code/voice-agent`. Create it from [`.env.example`](../../.env.example) if it does not already exist, then set `OPENAI_API_KEY`. Restart the server after configuration or prompt changes.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `OPENAI_API_KEY` | Required to start a call | Server-side credentials; never put this key in browser code. |
+| `PORT` | `3000` | HTTP port; the server binds to `127.0.0.1`. |
+| `LIVE_MODEL` | `gpt-live-1` | Live speech model. |
+| `LIVE_BACKEND_MODEL` | `gpt-6-luna` | Language delegation/detection, answer extraction and final context extraction. |
+| `LIVE_VOICE` | `juni` | Initial/German voice key: `juni`, `nuri`, `flitz`, `brise`, `gleam`, or a configured custom key. |
+| `LIVE_VOICE_ID` | Unset | Registers the optional custom voice key `paxi`. Set `LIVE_VOICE=paxi` to use it initially. |
+| `LIVE_VOICE_ID_IT` | Unset | Registers `paxi-it` for Italian. Without it, Italian falls back to `paxi` if configured, otherwise `juni`. |
+
+Use `http://localhost:<PORT>` exactly. Mutating API requests must carry that exact `Origin`; `127.0.0.1`, another port or another app origin is rejected. `baseUrl` in the client does not enable cross-origin access. Integration behind another origin requires corresponding server origin/CORS changes.
+
+## Architecture and data flow
+
+1. The browser obtains the microphone and posts a WebRTC SDP offer to the local server. The server creates the Live session and returns its SDP answer; audio then travels between the browser and the Live service.
+2. `public/paxi-voice.js` manages playback, the recorded intro, session switching, silence timers and avatar events. It posts transcript fragments to the server approximately every second.
+3. The server waits 1.5 seconds after transcript updates before scheduling answer extraction. Extracted values pass questionnaire validation before being saved. This runs asynchronously, so transcript display and saved answers can arrive at different times.
+4. The browser polls progress, emits answer callbacks and sends Paxi a quiet note of known and missing details. Language changes can create another Live session within the same conversation.
+5. Closing the conversation saves its status and starts final context extraction. The `context` section can appear after the close response; it is absent when there were no user turns and contains an error marker if extraction fails.
+
+Relevant implementation files: [server](server.mjs), [browser client](public/paxi-voice.js), [shared browser helpers](public/paxi-common.js), [answer extractor](answer-extractor.mjs), [log and validation](conversation-log.mjs), and [context extractor](conversation-context.mjs).
 
 ## Use it in the app
 
@@ -25,10 +54,13 @@ Put `OPENAI_API_KEY` (and optionally `ELEVENLABS_API_KEY`) in the repo root `.en
 ```js
 import { createPaxiVoice } from "./paxi-voice.js";
 
+import { createPaxAvatar } from "../avatar-prototype/pax-avatar.js";
+
+const avatar = createPaxAvatar(hostElement);
 const paxi = createPaxiVoice({
   baseUrl: "",                                        // where the voice-agent server runs
   onAudioStream: (stream) => avatar.attachAudio(stream), // called again after a voice switch
-  onAvatarEvent: (event) => avatar.handle(event),        // activity + playback, see AVATAR-INTERFACE.md
+  onAvatarEvent: (event) => avatar.handle(event),        // activity, playback and emotion, see AVATAR-INTERFACE.md
   onTranscript: ({ speaker, text, startMs, endMs }) => {},
   onAnswer: ({ fieldId, value }) => {},
   onStatus: ({ state, detail, conversationId }) => {},   // connecting | connected | switching | ended | error
@@ -38,11 +70,44 @@ paxiButton.onclick = () => paxi.start(); // must run from a click: browsers requ
 // After Paxi closed the call for inactivity (onStatus: { state: "ended", detail: "inactive", conversationId }):
 paxiButton.onclick = () => paxi.start({ resume: conversationId });
 paxi.stop();
+
+// Another part of the app (e.g. Earnie's advisor backend) can steer which questions come first:
+paxi.start({ priorities: ["annual_gross_income_chf", "has_pension_fund"] });
+paxi.prioritize(["housing"]); // during the call; [] clears the priorities
 ```
 
-For ElevenLabs, `public/paxi-voice-elevenlabs.js` has the same interface (`createPaxiElevenLabs`). ElevenLabs does not hand out the audio stream, so it calls `onLevelSource(level)` instead of `onAudioStream`; the demo passes that to `avatar.setLevelSource`.
+The server part (`server.mjs`) keeps the API key, creates the GPT-Live sessions, fills in the answers and writes the log. In the full solution these routes move into the NestJS backend as the VoiceAdapter.
 
-The server part (`server.mjs`) keeps the API keys, creates the GPT-Live sessions and ElevenLabs tokens, fills in the answers and writes the log. In the full solution these routes move into the NestJS backend as the VoiceAdapter.
+### Client lifecycle and callbacks
+
+`start({ resume?, priorities? })` is asynchronous and must be called from a user gesture. Catch its rejection to show microphone or connection errors. Calling it while already running has no effect. `stop()` requests a graceful close; use the `ended` status to update the UI. `running` reports the current client flag and `logUrl` is `null` until a conversation has been created.
+
+`onTranscript` receives fragments, not complete turns; append them in the UI. Its `startMs`/`endMs` use the conversation timeline. `onAnswer` receives `{ fieldId, value, status }` for `captured` and final `declined` updates; `declined_once` is available through the progress API but does not trigger this callback. `onStatus` includes `conversationId` once available; retain it to resume later. Reattach the stream on every `onAudioStream` call, including voice switches. Avatar activity/playback/emotion event shapes are documented in [AVATAR-INTERFACE.md](../avatar-prototype/AVATAR-INTERFACE.md). Call `avatar.reset()` before starting a new conversation.
+
+### Avatar emotions from the transcript
+
+Paxi's face follows the conversation, as described in Lukas's [AVATAR-INTERFACE.md](../avatar-prototype/AVATAR-INTERFACE.md) (option A). Every session is created with two Decisions triggers: the person's transcript fragments predict the tone of Paxi's reply (`reply_emotion`), and Paxi's own words refine it (`emotion`). The nine emotions and their descriptions (`EMOTION_CHOICES` in `server.mjs`) match `ReplyEmotion` in `pax-avatar.d.ts`. The browser ties each `decision.event` to the transcript fragment it came from and to the matching playback segment, drops older results per direction, and sends `{ type: "emotion", emotion, playbackId }` to the avatar, which queues and stabilises them. The recorded intro shows `pleased`.
+
+If the OpenAI project may not use Decisions (`api.decisions.write`), session creation is retried once without the triggers; voice keeps working and the response says `emotions: false`.
+
+### HTTP API reference
+
+All request bodies below are JSON. The browser module already handles these calls for normal app integration.
+
+| Method and path | Request / result |
+|---|---|
+| `GET /api/questionnaire` | Returns the questionnaire, including suitability fields. |
+| `POST /api/session` | `{ sdp, priorities?, continueFrom?, resume? }`; returns HTTP 201 with the Live result plus `conversationId`, `language`, `voice`, `offsetMs`, `greeting`, `intro`, and `fallbackGreeting`. `continueFrom` is an active session ID for a voice handoff; `resume` is a non-active conversation ID. Use one continuation mode at a time. |
+| `POST /api/conversations/:sessionId/transcript` | `{ fragments: [{ speaker, text, start_ms, end_ms }] }`; speaker is `user` or `agent`, times are session-relative milliseconds. Accepted fragments are offset and merged in the log. Returns 204. |
+| `GET /api/conversations/:sessionId/progress?since=0` | Returns answer `version`, `changes`, `known`, `open_priority`, `open_core`, `open_extended`, `core_complete`, and `complete`. Use the returned version as the next `since`. Open-field lists contain labels. |
+| `POST /api/conversations/:sessionId/language` | `{ language: "de" }` (`de`, `fr`, `it`, `en`) or `{ text: "Bonjour…" }`; returns `{ ok, language, voice, switch_voice }`, or `{ ok: false, reason }`. |
+| `POST /api/conversations/:sessionId/priorities` | `{ fields: ["annual_gross_income_chf"], source?: "advisor" }`; returns accepted `priorities`, `labels` and progress. Unknown/suitability IDs are filtered out; `[]` clears priorities. |
+| `POST /api/conversations/:sessionId/close` | `{ status?: "closed", usage? }`; returns 204. `inactive` and `disconnected` set those conversation statuses; `handoff` closes only the current session. Other status values close the conversation as `closed`. |
+| `GET /api/conversations/:sessionId` | Returns the complete conversation log shared by that session. |
+
+The first session ID is also the conversation ID. After a voice switch, use the current session ID for API operations and keep the original conversation ID for resume. Session lookup is in memory: after a server restart, old session URLs return 404, but `POST /api/session` can load a non-active conversation from disk using `resume` and create a new session.
+
+Typical errors are 400 for missing SDP or a non-array priority list, 403 for an unexpected/missing Origin, 404 for unknown sessions or invalid continuation/resume requests, and 503 when the API key is missing. Upstream session-creation failures return an error status with `Live session creation failed`.
 
 ## Persona and conversation style
 
@@ -65,7 +130,7 @@ Sources: the shared contracts (`InsuranceIntakeSchema`, `PersonSchema`, `GoalSch
 `examples/` holds two real test conversations from the demo, one per provider, pseudonymised (name and personal details replaced with demo values; everything else unchanged):
 
 - [`conversation-gpt-live.json`](examples/conversation-gpt-live.json): OpenAI GPT-Live, German, 26 turns. Shows the conversational style and nine details filled in from the conversation, including inferred ones (relationship year, child's birth year) and the extracted life context.
-- [`conversation-elevenlabs.json`](examples/conversation-elevenlabs.json): ElevenLabs, 46 turns. Starts in French, switches to German on request, and shows how Paxi handles off-topic and provocative input.
+- [`conversation-elevenlabs.json`](examples/conversation-elevenlabs.json): recorded with the former ElevenLabs integration (removed again), 46 turns. Same log format. Starts in French, switches to German on request, and shows how Paxi handles off-topic and provocative input.
 
 ## Log format
 
@@ -115,9 +180,18 @@ Refusals are recognised from the transcript too: one refusal marks the detail `d
 
 The previous approach, where the model saved each confirmed detail through a tool call, lost details: the model only called the tool now and then, and Paxi worked through the list like a form.
 
+## Priorities from outside
+
+Other parts of the app can steer Paxi's questions, for example when a calculation needs the income first. Field IDs come from `questionnaire.json`:
+
+- in the browser: `paxi.start({ priorities: [...] })` or `paxi.prioritize([...])` during the call
+- on the server: `POST /api/conversations/:sessionId/priorities` with `{ "fields": [...], "source": "advisor" }`
+
+Paxi gets a quiet note to steer there at the next natural moment, without cutting off what the person is telling. Prioritised details then come first in every progress note, and the log records each change as `priorities_set`. In the demo, tap a field (★) or open `/?priorities=annual_gross_income_chf,has_pension_fund`.
+
 ## Intro
 
-Every call starts with the recorded intro `public/intro.mp3` (four short clips: "Hi, ich bin Paxi! In welcher Sprache kann ich dir helfen?", then the same question in French, Italian and English; the text is in `welcome.txt`). It is normalised to the same loudness as Paxi's voice (-25 LUFS). The browser plays it itself while the microphone already runs, so the person can interrupt it just by speaking: as soon as their own words show up in the transcript, the intro stops. Without headphones, the intro can echo back through the microphone; transcript text that mostly repeats the intro's words is ignored.
+Every call starts with the recorded intro `public/intro.mp3` (four short clips: "Hi, ich bin Paxi! In welcher Sprache kann ich dir helfen?", then the same question in French, Italian and English; the text is in `welcome.txt`). It is normalised to the same loudness as Paxi's voice (-25 LUFS). The browser plays it itself while the microphone already runs, so the person can interrupt it just by speaking. As soon as the microphone hears a voice clearly louder than the intro's own echo (measured during its first second), the intro drops to 20 % volume; as soon as the person's first words show up in the transcript, it stops and Paxi answers in their language. If the transcript does not confirm real words within 2.5 seconds, the volume comes back. Without headphones, the intro can echo back through the microphone; transcript text that mostly repeats the intro's words is ignored.
 
 A GPT-Live audio fixture was tried first, but GPT-Live drops all input while a fixture plays, so it could not be interrupted. If `public/intro.mp3` is missing, Paxi says `welcome.txt` live instead.
 
@@ -130,23 +204,17 @@ ffmpeg -i w1.mp3 -i w2.mp3 -i w3.mp3 -i w4.mp3 -filter_complex "[0:a]apad=pad_du
 ## Conversation rules
 
 - **A conversation, not a checklist.** Paxi asks open questions that invite a story, follows what the person brings up and never asks for what is already known (`persona.md`).
-- **Paxi takes the initiative.** After 8 seconds of silence, Paxi asks a light question, asks for an open detail or picks up an earlier topic (at most twice in a row); before a language is chosen, it asks again in all four languages. With ElevenLabs, its built-in turn timeout does this.
+- **Paxi takes the initiative.** After 8 seconds of silence, Paxi asks a light question, asks for an open detail or picks up an earlier topic (at most twice in a row); before a language is chosen, it asks again in all four languages.
 - **Today's date.** Every session gets today's date (Europe/Zurich) in the Live and backend prompts, so ages and durations are calculated correctly.
 - **Declined details.** If the person does not want to give a detail, Paxi accepts it, changes the topic and asks gently once more later; a second refusal goes to a Pax colleague (see above).
 - **Never wraps up early.** Paxi may only say goodbye once every core and extended detail is known or handed to a colleague. If it starts to say goodbye before that, the app notices and asks it to carry on with what is open. Once everything is complete, Paxi's goodbye ends the call automatically.
 - **Fast mode.** If the person is in a hurry, Paxi drops the small talk and asks the open core details one short question at a time.
-- **Inactivity.** Breathing, background noise and fillers ("[sniff]", "mhm", "ähm") do not count as speech. If the person says nothing for 30 seconds, Paxi says it will close the call in about 30 seconds and that they can simply continue later. After another 30 seconds of silence it says goodbye and closes the call (log status `inactive`). `paxi.start({ resume: conversationId })` continues the same conversation and log: Paxi welcomes the person back and continues with what is still open. The demo does this on the next tap.
+- **Inactivity.** Breathing, background noise and fillers ("[sniff]", "mhm", "ähm") do not count as speech, and neither does microphone noise, so Paxi's own initiative after 8 seconds is not delayed by them either. If the person says nothing for 30 seconds, Paxi says it will close the call in about 30 seconds and that they can simply continue later. After another 30 seconds of silence it says goodbye and closes the call (log status `inactive`). `paxi.start({ resume: conversationId })` continues the same conversation and log: Paxi welcomes the person back and continues with what is still open. The demo does this on the next tap.
 - **"A colleague of mine".** Paxi never says "Pax specialist" or "Fachperson"; it always says that a colleague of theirs will get in touch.
-
-## ElevenLabs
-
-Choose "ElevenLabs" in the AI source switcher before the call. The server creates a "Paxi (Pax LifeMap)" agent in your ElevenLabs account on first use (voice `v3V1d2rk6528UrLKRuy8`, built-in language detection for de/fr/it/en) and remembers its ID in `data/elevenlabs-agent.json`; when the agent configuration in `elevenlabs.mjs` changes, it is updated. Every call gets a short-lived WebRTC token from the server, and the Paxi prompt (persona, today's date, open details, the conversation so far when resuming) is passed as an override, so the agent itself holds no customer data.
-
-The API key needs the **ElevenLabs Agents** permission (`convai_read` and `convai_write`). One multilingual voice covers all four languages, so there is no voice switch. The intro, the extraction, the log, the inactivity close and resuming work the same as with GPT-Live. Optional: `ELEVENLABS_VOICE_ID`, `ELEVENLABS_LLM` (default `gpt-6-luna`) and `ELEVENLABS_AGENT_ID` (use an existing agent).
 
 ## Language and voice switch
 
-Paxi greets in German, French, Italian and English, asks "In welcher Sprache kann ich Ihnen helfen?" and tells the person to simply start speaking in their language. GPT-Live fixes the voice for each session, so switching voices works like this:
+Paxi greets in German, French, Italian and English, asks which language the person prefers and tells the person to simply start speaking in their language. GPT-Live fixes the voice for each session, so switching voices works like this:
 
 1. The browser collects the person's first words (during or after the welcome). After a 0.7 s pause, the server detects their language (`language-detect.mjs`: a word list for the usual openings, the backend model for anything unclear). Later language changes in the call come from the backend's `set_language` tool.
 2. If that language has a different native voice, the browser mutes the current session and starts a new one with that voice. The new session gets the conversation so far as text history plus the answers already saved, and continues without greeting again.
@@ -173,5 +241,25 @@ They print `LIVE_VOICE_ID_IT=voice_…` and `LIVE_VOICE_ID=voice_…`; add those
 - If Paxi sounds choppy, try headphones first. GPT-Live listens while it speaks, so without headphones it can hear itself through the speakers and stop or restart mid-sentence. The page turns on the browser's echo cancellation, but laptop speakers can still leak.
 
 - Voice, model and delegation mode are fixed when the session starts. Set `LIVE_VOICE_ID` (or `LIVE_VOICE`), `LIVE_MODEL` and `LIVE_BACKEND_MODEL` in `.env`.
-- `status: "captured"` means the person confirmed the value by voice and it passed validation. It is not yet the confirmed case state (I02) from the [interface contracts](../../documentation/baselhack/plans/interface-contracts.md).
+- `status: "captured"` means a value was extracted from the transcript and passed validation; it may be inferred and is not an explicit confirmation by the person. It is not yet the confirmed case state (I02) from the [interface contracts](../../documentation/baselhack/plans/interface-contracts.md).
 - Only local origins can create sessions. Add authentication before deploying anywhere else.
+
+## Troubleshooting and verification
+
+| Symptom | Check |
+|---|---|
+| Microphone cannot start | Allow microphone access and use localhost or HTTPS. Start from a click/tap and check that another application is not blocking the device. |
+| HTTP 403 | Open the demo using `http://localhost:<PORT>`; the Origin must match exactly. |
+| Page loads but a call fails | Check `OPENAI_API_KEY`, model access and the server's error output. The page can load without credentials. |
+| Answers appear late or are missing | Extraction is asynchronous. Check server output for `Answer extraction failed`; inspect the transcript and ensure the field is not suitability-only. |
+| No final context yet | Wait for the post-close extraction and reload the log. Check for `context.error` or `Context extraction failed` in server output. |
+| Italian uses the German voice | Configure `LIVE_VOICE_ID_IT` and restart; see [Custom voices](#custom-voices). |
+| Resume returns 404 | Supply the original conversation ID. Only non-active logs can be resumed; an abruptly terminated server may leave a log marked active. |
+
+Run `npm test` inside `code/voice-agent` for the automated log/validation and language-detection tests. These do not make a live voice call. For a manual smoke test, start the demo, allow the microphone, speak in one supported language, give a name and an income, and check the transcript, captured answers and JSON log. Switch language, stop the call and resume the same conversation; verify that its ID and previous answers are retained. A live smoke test uses the configured API account.
+
+## Data handling and deployment limits
+
+The prototype persists transcripts, extracted personal details, refusal notes, usage/events and life context as local JSON; it does not persist raw audio files. Audio is sent to the Live service, and transcript text is sent to the backend model for extraction. Git exclusion of `data/` prevents normal commits, but does not provide encryption, access control or a retention policy.
+
+The server has a local Origin check on writes, no user authentication, and unauthenticated questionnaire/progress/log reads. It has no automatic log deletion. Before a hosted integration, implement authentication and conversation ownership checks, agree consent/retention handling, and configure the intended origin and HTTPS. The current implementation is a local demo, not the shared confirmed case store.
