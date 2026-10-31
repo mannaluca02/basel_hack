@@ -77,4 +77,23 @@ describe('VoiceCall', () => {
     expect(call.state()).toBe('idle');
     expect(TestBed.inject(VoiceAgentLink).windowOpen).toBe(true);
   });
+
+  it('cancels the voice notice back to idle; mute and interrupt do nothing without Paxi', async () => {
+    const { call, http } = setup('http://localhost:3100');
+    call.start();
+    http.expectOne((r) => r.url === '/api/voice/privacy').flush({ version: 'voice-synthetic-v1', enabled: true, text: 'Hinweis' });
+    await Promise.resolve();
+    expect(call.state()).toBe('notice');
+    call.cancel();
+    expect(call.state()).toBe('idle');
+
+    TestBed.resetTestingModule();
+    const scripted = setup().call;
+    scripted.toggleMute();
+    expect(scripted.muted()).toBe(true);
+    scripted.stopSpeaking();
+    scripted.toggleMute();
+    expect(scripted.muted()).toBe(false);
+  });
 });
+

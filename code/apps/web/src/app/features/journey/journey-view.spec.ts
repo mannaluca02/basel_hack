@@ -329,6 +329,32 @@ describe('JourneyView', () => {
     expect(button('quote')!.disabled).toBe(true);
   });
 
+  it('unlocks the quote once the suitability check of the fund-linked product is suitable', async () => {
+    state.recommendation = 'ready';
+    state.candidates = [candidate('cand_fonds', 'pax_fondsstar', 'Pax FondsStar')];
+    await setup();
+    const box = element().querySelector<HTMLInputElement>('.candidate input[type="checkbox"]')!;
+    box.checked = true;
+    box.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    const form = element().querySelector('app-suitability-form')!;
+    const premium = form.querySelector<HTMLInputElement>('input[name="premium"]')!;
+    premium.value = '2400';
+    premium.dispatchEvent(new Event('input'));
+    const confirm = form.querySelector<HTMLInputElement>('input[name="confirm"]')!;
+    confirm.checked = true;
+    confirm.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    form.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    const check = await command('/suitability');
+    expect(check.request.body).toMatchObject({ productId: 'pax_fondsstar', personId: 'person_1' });
+    check.flush({ productId: 'pax_fondsstar', personId: 'person_1', profileVersion: 1, result: 'suitable', reasons: [] });
+    await serve();
+
+    expect(element().querySelector('app-suitability-form')).toBeNull();
+    expect(button('quote')!.disabled).toBe(false);
+  });
+
   it('waits for a real Pax specialist outside the demo start', async () => {
     await setup(false);
     expect(element().textContent).toContain('Pax-Fachperson prüft die Beratung');

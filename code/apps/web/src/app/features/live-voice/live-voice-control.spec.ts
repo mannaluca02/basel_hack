@@ -182,4 +182,23 @@ describe('LiveVoiceControl', () => {
     expect(mic()).toBeNull();
     expect(element().querySelector('[data-action="accept"]')).not.toBeNull();
   });
+
+  it('closes the consent panel with Cancel or Escape, without starting', async () => {
+    await setup();
+    mic()!.click();
+    fixture.detectChanges();
+    const cancel = Array.from(element().querySelectorAll<HTMLButtonElement>('.panel button')).find((b) => b.textContent?.includes('Abbrechen'))!;
+    cancel.click();
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).toBeNull();
+
+    mic()!.click();
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).not.toBeNull();
+    element().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).toBeNull();
+    expect(microphone).not.toHaveBeenCalled();
+  });
 });
+
