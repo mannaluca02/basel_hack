@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start:api": "ng serve --configuration api",
+    "start:demo": "ng serve --configuration demo",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

@@ -1,5 +1,5 @@
 import { ExternalVoiceObservationsSchema } from '../voice/service.js';
-import { LoadPersonaSchema,StandardAnalysesSchema } from './demo-journey.js';
+import { DemoStartSchema,LoadPersonaSchema,StandardAnalysesSchema } from './demo-journey.js';
 import { z } from 'zod';
 import { CreateVoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceSessionSchema,VoiceTranscriptSchema,VoiceTurnInputSchema,VoiceExtractionInputSchema,VoiceExtractionResponseSchema,CloseVoiceSessionSchema,
   CreateInsuranceCaseSchema,DraftPatchSchema,ConfirmProfileSchema,RunAnalysisSchema,ReviewDecisionSchema,
@@ -36,6 +36,7 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['delete','/api/sessions/current','Revoke current session and close its event streams',undefined],
   ['get','/api/cases','List authorized cases',undefined],['post','/api/cases','Create synthetic life-insurance case',CreateInsuranceCaseSchema],
   ['get','/api/cases/{caseId}','Read own case',undefined],['patch','/api/cases/{caseId}/draft','Update unconfirmed draft',DraftPatchSchema],
+  ['post','/api/demo/start','Local demo only (PAX_DEMO_START=1): shared customer session with the confirmed, calculated Mueller persona; no access code',DemoStartSchema],
   ['post','/api/cases/{caseId}/demo-profile','Load a synthetic Pax persona as unconfirmed draft; confirmation still required',LoadPersonaSchema],
   ['post','/api/cases/{caseId}/standard-analyses','Run the standard family/home/retirement/baseline scenarios of the confirmed profile, then derive the recommendation',StandardAnalysesSchema],
   ['post','/api/cases/{caseId}/confirmations','Confirm profile and calculator transfer',ConfirmProfileSchema],

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import type { AdvisorContextUpdated } from '@pax/contracts';
 import { BehaviorSubject, EMPTY, Observable, Subject, from, map } from 'rxjs';
+import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { AppLanguage } from '../../i18n/language';
 import {
   AdvisorDataSource,
@@ -23,6 +24,8 @@ import { CustomerApi } from './customer-api';
 export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);
   private readonly language = inject(AppLanguage);
+  private readonly demoStart = inject(APP_ENVIRONMENT).demoStart === true;
+  private starting: Promise<void> | null = null;
   private readonly eventStream = new Subject<AdvisorEvent>();
   private readonly connectionState = new BehaviorSubject<ConnectionState>('disconnected');
   private stream: EventSource | null = null;
@@ -46,9 +49,16 @@ export class ApiDataSource extends AdvisorDataSource {
     );
   }
 
-  /** Waits for a customer session; `CustomerReview` calls it again after the sign-in. */
+  /**
+   * Waits for a customer session; `CustomerReview` calls it again after the sign-in. In the demo
+   * start the backend hands out its ready case first.
+   */
   connect(): void {
     const caseId = this.api.session()?.caseId;
+    if (!caseId && this.demoStart) {
+      this.startDemo();
+      return;
+    }
     if (this.stream || !caseId) return;
 
     this.connectionState.next('connecting');
@@ -56,8 +66,16 @@ export class ApiDataSource extends AdvisorDataSource {
     stream.onopen = () => this.connectionState.next('connected');
     // The browser retries on its own unless the server refused the stream.
     stream.onerror = () => {
-      if (stream.readyState === EventSource.CLOSED) this.disconnect();
-      else this.connectionState.next('connecting');
+      if (stream.readyState !== EventSource.CLOSED) {
+        this.connectionState.next('connecting');
+        return;
+      }
+      this.disconnect();
+      // A refused stream in the demo usually means the stored session expired: start again.
+      if (this.demoStart) {
+        this.api.clearSession();
+        this.startDemo();
+      }
     };
     stream.addEventListener('advisor.context.updated', ({ data }) => {
       const payload = JSON.parse(data as string) as AdvisorContextUpdated;
@@ -71,6 +89,22 @@ export class ApiDataSource extends AdvisorDataSource {
     this.stream?.close();
     this.stream = null;
     if (this.connectionState.value !== 'disconnected') this.connectionState.next('disconnected');
+  }
+
+  private startDemo(): void {
+    if (this.starting) return;
+    this.connectionState.next('connecting');
+    this.starting = this.api
+      .startDemo()
+      .then(() => {
+        this.starting = null;
+        this.connect();
+      })
+      .catch((error: unknown) => {
+        this.starting = null;
+        console.error('ApiDataSource: the demo start failed; is the backend running with PAX_DEMO_START=1?', error);
+        this.connectionState.next('disconnected');
+      });
   }
 
   private async project(caseId: string): Promise<{ contextRevision: number; projection: CaseProjection }> {

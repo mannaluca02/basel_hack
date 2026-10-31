@@ -12,6 +12,7 @@ npm run build      # production build incl. service worker -> dist/web
 npm run check:tokens  # no colour literals outside tokens.css, WCAG AA text contrast in both themes
 npm run check:i18n    # missing/empty/extra keys per language, unknown keys used in src/app
 npm run start:api     # dev server against the real case service, /api proxied to port 3000
+npm run start:demo    # same, but opens on a ready synthetic case: no sign-in, no review stand
 ```
 
 This app keeps its own lockfile. The types of `@pax/contracts` come from its build, so run `npm ci && npm run build` in `code/` first.
@@ -47,3 +48,8 @@ This app keeps its own lockfile. The types of `@pax/contracts` come from its bui
 Environment files ship in the public bundle. Never put the Logismata token or any other secret in them.
 
 The service worker only registers in production builds (`ng build` + a static server), not under `ng serve`.
+
+## Demo start
+
+`npm run dev:demo` in `code/` starts the case backend with `PAX_DEMO_START=1` (live calculator) and this app with `--configuration demo`. On start the app calls `POST /api/demo/start`; the backend signs in a customer itself, loads the Mueller persona, confirms it and calculates the standard scenarios. All visitors share that case while its session lasts, so reloads do not create new cases. The UI is the normal workspace, without sign-in and review stand.
+

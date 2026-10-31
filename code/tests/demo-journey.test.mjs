@@ -92,3 +92,30 @@ test('the voice agent route stays closed while voice processing is off',async()=
   const result=await request('POST',`/api/cases/${c.id}/voice/agent-observations`,grant.sessionToken,{});
   assert.equal(result.status,503);
 });
+
+test('the demo start is closed unless the server opts in',async()=>{
+  const result=await request('POST','/api/demo/start',null,{});
+  assert.equal(result.status,404);
+});
+
+test('the demo start hands out one calculated Mueller case without an access code',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'pax-demo-start-'));
+  const {app:demoApp}=await createLifeInsuranceApp({dataDirectory:dir,provider:new SyntheticTestProvider(),providerMode:'test',credentials,demoStart:true});
+  try{
+    await demoApp.listen(0,'127.0.0.1');const url=await demoApp.getUrl();
+    const start=async body=>{const r=await fetch(url+'/api/demo/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {status:r.status,cookie:r.headers.get('set-cookie'),body:await r.json()};};
+    const first=await start({});
+    assert.equal(first.status,201,JSON.stringify(first.body));
+    assert.equal(first.body.sessionToken,undefined);
+    assert.match(first.cookie,/^pax_session=[A-Za-z0-9_-]+; HttpOnly/);
+    const cookie=first.cookie.split(';')[0];
+    const c=await (await fetch(`${url}/api/cases/${first.body.caseId}`,{headers:{Cookie:cookie}})).json();
+    assert.equal(c.confirmedVersions.length,1);
+    assert.deepEqual(c.runs.map(r=>r.scenarioVersionId),['standard_family_v1','standard_home_v1','standard_retirement_v1','standard_baseline_v1']);
+    assert.equal(c.recommendations.length,1);
+    const again=await start({});
+    assert.equal(again.body.caseId,first.body.caseId);
+    const fresh=await start({fresh:true});
+    assert.notEqual(fresh.body.caseId,first.body.caseId);
+  }finally{await demoApp.close();await rm(dir,{recursive:true,force:true});}
+});

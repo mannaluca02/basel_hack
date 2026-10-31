@@ -15,4 +15,9 @@ export interface AppEnvironment {
    * build has no voice agent. Must be `localhost` so the browser grants the microphone.
    */
   readonly voiceAgentUrl?: string;
+  /**
+   * Demo start: the backend (started with PAX_DEMO_START=1) hands out a ready, calculated
+   * synthetic case, so there is no sign-in and no review stand.
+   */
+  readonly demoStart?: boolean;
 }

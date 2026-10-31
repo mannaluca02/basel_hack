@@ -13,7 +13,10 @@ import { FakeEventSource } from './review-testing';
 
 const CASE_ID = 'case_api';
 
-function setup(session: object | null = { csrfToken: 'csrf_1', caseId: CASE_ID }) {
+function setup(
+  session: object | null = { csrfToken: 'csrf_1', caseId: CASE_ID },
+  demoStart = false,
+) {
   sessionStorage.clear();
   if (session) sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(session));
   FakeEventSource.reset();
@@ -26,7 +29,7 @@ function setup(session: object | null = { csrfToken: 'csrf_1', caseId: CASE_ID }
       provideAdvisorDataSource(),
       {
         provide: APP_ENVIRONMENT,
-        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api' },
+        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart },
       },
     ],
   });
@@ -50,6 +53,21 @@ describe('ApiDataSource', () => {
 
     expect(FakeEventSource.instances).toEqual([]);
     expect(states).toEqual(['disconnected']);
+  });
+
+  it('takes the ready demo case from the backend when started as a demo', async () => {
+    const { source, http } = setup(null, true);
+
+    source.connect();
+    const start = http.expectOne('/api/demo/start');
+    expect(start.request.method).toBe('POST');
+    start.flush({ csrfToken: 'csrf_demo', caseId: CASE_ID, expiresAt: '2026-10-31T13:00:00.000Z' });
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(FakeEventSource.instances.map((s) => s.url)).toEqual([
+      `/api/cases/${CASE_ID}/advisor/events`,
+    ]);
+    expect(TestBed.inject(CustomerApi).session()).toEqual({ csrfToken: 'csrf_demo', caseId: CASE_ID });
   });
 
   it('streams the case events with the session cookie and reports the connection', () => {

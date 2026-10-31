@@ -62,6 +62,12 @@ export class PublicLifeController {
   @Get('extraction/privacy') extractionPrivacy(@Query('locale') selected:unknown,@Req() req:Request){return this.r.modelExtraction.notice(selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected));}
   @Get('translations') translations(@Query('locale') selected:unknown,@Req() req:Request){return catalog(selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected));}
   @Get('openapi.json') openapi(){return lifeOpenApi();}
+  @Post('demo/start') async demoStart(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
+    if(!this.r.demo.startEnabled)throw new WorkflowError('NOT_FOUND',404);
+    if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
+    const {sessionToken,...session}=await this.r.demo.start(input);
+    res.setHeader('Set-Cookie',`pax_session=${sessionToken}; HttpOnly; SameSite=Strict; Path=/api; Max-Age=3600`);return {...session,role:'customer'};
+  }
   @Post('sessions') async login(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
     if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
     const body=z.object({accessCode:z.string().min(1).max(200)}).strict().parse(input);

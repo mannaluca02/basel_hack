@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { DraftSchema,type InsuranceDraft,type LifeScenario } from '@pax/contracts';
 import type { LifeInsuranceEngine } from './engine.js';
+import type { SessionService } from './auth.js';
+import type { BootstrapCredentials } from './store.js';
 import { WorkflowError,type Actor } from './types.js';
 
 /**
@@ -15,6 +17,7 @@ export const DEMO_PERSONAS={
 export type DemoPersonaId=keyof typeof DEMO_PERSONAS;
 
 export const LoadPersonaSchema=z.object({persona:z.enum(Object.keys(DEMO_PERSONAS) as [DemoPersonaId]),expectedCaseRevision:z.number().int().positive()}).strict();
+export const DemoStartSchema=z.object({locale:z.enum(['de','fr','it','en']).default('de'),fresh:z.boolean().default(false)}).strict();
 export const StandardAnalysesSchema=z.object({expectedProfileVersion:z.number().int().positive()}).strict();
 
 export async function personaDraft(id:DemoPersonaId,today=new Date()):Promise<InsuranceDraft> {
@@ -73,8 +76,44 @@ export function standardScenarios(draft:InsuranceDraft,today=new Date()):{scenar
   return out;
 }
 
+type DemoSession={sessionToken:string;csrfToken:string;expiresAt:string;caseId:string};
+
 export class DemoJourney {
-  constructor(private readonly engine:LifeInsuranceEngine){}
+  private current:Promise<DemoSession>|null=null;
+  /** `demoStart` is null unless the server was started with the explicit demo flag. */
+  constructor(private readonly engine:LifeInsuranceEngine,private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null){}
+
+  get startEnabled(){return this.demoStart!==null;}
+
+  /**
+   * Demo start without an access code: one customer session with the Mueller persona, confirmed
+   * and calculated. Every caller shares it while it is valid, so reloads do not pile up cases.
+   */
+  async start(input:unknown):Promise<DemoSession> {
+    if(!this.demoStart)throw new WorkflowError('NOT_FOUND',404);
+    const body=DemoStartSchema.parse(input??{});
+    const reusable=this.current&&!body.fresh?await this.current.catch(()=>null):null;
+    if(reusable&&this.valid(reusable))return reusable;
+    this.current=this.prepare(body.locale);
+    return this.current;
+  }
+
+  private valid(session:DemoSession){
+    try{const actor=this.demoStart!.sessions.authenticate(session.sessionToken);this.engine.caseFor(actor,session.caseId);
+      return Date.parse(session.expiresAt)>Date.now()+60_000;}
+    catch{return false;}
+  }
+
+  private async prepare(locale:'de'|'fr'|'it'|'en'):Promise<DemoSession> {
+    const {sessions,credentials}=this.demoStart!;
+    const login=await sessions.login(credentials.customerAccessCode,'demo-start');
+    const actor=sessions.authenticate(login.sessionToken);
+    let c=await this.engine.createCase(actor,{locale,timeBudgetMinutes:30,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
+    c=await this.loadPersona(actor,c.id,{persona:'mueller',expectedCaseRevision:c.caseRevision});
+    await this.engine.confirm(actor,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
+    await this.runStandardAnalyses(actor,c.id,{expectedProfileVersion:1});
+    return {sessionToken:login.sessionToken,csrfToken:login.csrfToken,expiresAt:login.expiresAt,caseId:c.id};
+  }
 
   async loadPersona(actor:Actor,caseId:string,input:unknown) {
     const body=LoadPersonaSchema.parse(input);

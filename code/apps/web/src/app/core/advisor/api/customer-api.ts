@@ -60,6 +60,17 @@ export class CustomerApi {
     this.keep({ csrfToken, caseId });
   }
 
+  /** Demo start: the backend's ready synthetic case, without an access code. */
+  async startDemo(fresh = false): Promise<void> {
+    const { csrfToken, caseId } = await firstValueFrom(
+      this.http.post<CustomerSession>(`${this.base}/demo/start`, {
+        locale: this.language.language(),
+        fresh,
+      }),
+    );
+    this.keep({ csrfToken, caseId });
+  }
+
   clearSession(): void {
     this.sessionState.set(null);
     try {

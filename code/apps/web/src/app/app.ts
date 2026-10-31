@@ -81,8 +81,12 @@ export class App {
   /** Until the user consents, only the privacy notice is shown: no workspace, no call. */
   protected readonly consented = this.consent.granted;
 
-  /** The review stand needs the real case service; the scripted mock has no packages to decide. */
-  protected readonly reviewEnabled = inject(APP_ENVIRONMENT).dataSource === 'api';
+  /**
+   * The review stand needs the real case service; the scripted mock has no packages to decide,
+   * and the demo start comes with an already confirmed case.
+   */
+  protected readonly reviewEnabled =
+    inject(APP_ENVIRONMENT).dataSource === 'api' && !inject(APP_ENVIRONMENT).demoStart;
 
   /** Risks not yet addressed: the count badge on the Risks tab. */
   protected readonly openRisks = computed(
