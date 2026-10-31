@@ -16,12 +16,14 @@ Square Pax Beratercharakter ("Soft Block"): eyes only, no mouth. Eleven expressi
 
 ```js
 import { createPaxAvatar } from "./pax-avatar.js";
-const avatar = createPaxAvatar(hostElement);
+const avatar = createPaxAvatar(hostElement, { emotionHoldMs: 5000 });
 avatar.attachAudio(remoteStream); // stream, media element, level callback, or null to detach
 avatar.handle(event);
 // Design/demo: avatar.show("pleased"); always replays entry motion.
 // Read avatar.state; call avatar.reset() between sessions and avatar.destroy() on teardown.
 ```
+
+`emotionHoldMs` sets the minimum interval between reply-emotion changes per instance (default `5000`, `0` disables it). Activity states cannot bypass it; the latest candidate waits until expiry. Repeated answers do not extend the hold. The live demo sets it in `realtime.html`.
 
 ## Expressions and listening
 
@@ -43,6 +45,12 @@ node code/avatar-prototype/server.mjs
 
 The pages use ES modules, so they need the server; double-clicking the HTML file does not work.
 
+Run the timing regression tests without a microphone or API calls:
+
+```sh
+node --test code/avatar-prototype/pax-avatar.test.mjs code/avatar-prototype/openai-realtime-adapter.test.mjs
+```
+
 The voice model is fixed to `gpt-live-1`. Optional env vars: `PORT`, `HOST` (default `127.0.0.1`), `OPENAI_REALTIME_VOICE` (default `marin`). `OPENAI_REALTIME_MODEL`, `OPENAI_NOISE_REDUCTION`, and `OPENAI_VAD_THRESHOLD` are no longer used.
 
 ## Live API connection
@@ -55,7 +63,7 @@ For a request to see the pension picture or speak to a human advisor, Live deleg
 
 If session creation gets a 4xx mentioning triggers, decisions, or delegation, the server retries once with voice only and returns `X-Avatar-Decisions: disabled`; the adapter logs “emotions/actions disabled”. The API rejection is recorded in the server log with the key redacted. Startup and shutdown use `session.started` / `session.closed`.
 
-Live does not expose Realtime's configurable `audio.input.noise_reduction` or `turn_detection`, so those fields are omitted. Browser echo cancellation, noise suppression, and automatic gain control remain enabled. Live has no equivalent of Realtime speech-start/stop or output-buffer playback boundary events. The adapter detects local microphone and remote audio energy, with 600 ms silence splitting segments. AvatarEvent shapes stay unchanged, but segment boundaries are approximate; natural pauses and server interruptions both produce `ended`. Closing active playback produces `cancelled`. Emotion decisions can finish after speech starts, so emotion-before-playback is not guaranteed with Live.
+Live does not expose Realtime's configurable `audio.input.noise_reduction` or `turn_detection`, so those fields are omitted. Browser echo cancellation, noise suppression, and automatic gain control remain enabled. Live has no equivalent of Realtime speech-start/stop or output-buffer playback boundary events. The adapter detects local microphone and remote audio energy. Listening requires 150 ms of sustained microphone energy; thinking follows 1.2 s of silence. This activity smoothing is separate from the renderer’s 5 s reply-emotion hold. Remote playback starts immediately on energy and ends after 600 ms silence. AvatarEvent shapes stay unchanged, but segment boundaries are approximate; natural pauses and server interruptions both produce `ended`. Closing active playback produces `cancelled`. Emotion decisions can finish after speech starts, so emotion-before-playback is not guaranteed with Live.
 
 Official OpenAI documentation:
 - [GPT-Live 1 model](https://developers.openai.com/api/docs/models/gpt-live-1)

@@ -2,6 +2,9 @@
 // sessionUrl exchanges SDP on the backend; the API key stays there.
 import { REPLY_EMOTIONS as MODEL_EMOTIONS } from "./pax-avatar.js";
 
+const INPUT_ONSET_MS = 150;
+const INPUT_SILENCE_MS = 1200;
+
 export async function connectOpenAIRealtime({ sessionUrl, audioElement, onAudioStream, onAvatarEvent, onTranscript, onLog = () => {} }) {
   const logged = new Set();
   const log = (message) => { try { onLog(message); } catch {} };
@@ -70,7 +73,7 @@ export async function connectOpenAIRealtime({ sessionUrl, audioElement, onAudioS
     const analyser = context.createAnalyser();
     analyser.fftSize = 1024;
     source.connect(analyser);
-    monitors.push({ source, analyser, samples: new Float32Array(analyser.fftSize), output, active: false, lastSound: 0 });
+    monitors.push({ source, analyser, samples: new Float32Array(analyser.fftSize), output, active: false, lastSound: 0, soundSince: null });
   };
   pc.ontrack = ({ track, streams }) => {
     const stream = streams[0] || new MediaStream([track]);
@@ -179,15 +182,21 @@ export async function connectOpenAIRealtime({ sessionUrl, audioElement, onAudioS
         const rms = Math.sqrt(m.samples.reduce((sum, n) => sum + n * n, 0) / m.samples.length);
         if (rms > 0.015) {
           m.lastSound = now;
+          m.soundSince ??= now;
           if (!m.active) {
+            // Reject clicks/noise before changing activity; output playback starts immediately.
+            if (!m.output && now - m.soundSince < INPUT_ONSET_MS) continue;
             m.active = true;
             if (m.output) { playing = true; playback("started"); }
             else onAvatarEvent({ type: "activity", state: "listening" });
           }
-        } else if (m.active && now - m.lastSound > 600) {
-          m.active = false;
-          if (m.output) { playback("ended"); playing = false; playbackId = `${playbackId.slice(0, playbackId.lastIndexOf("-"))}-${++sequence}`; }
-          else onAvatarEvent({ type: "activity", state: "thinking" });
+        } else {
+          m.soundSince = null;
+          if (m.active && now - m.lastSound > (m.output ? 600 : INPUT_SILENCE_MS)) {
+            m.active = false;
+            if (m.output) { playback("ended"); playing = false; playbackId = `${playbackId.slice(0, playbackId.lastIndexOf("-"))}-${++sequence}`; }
+            else onAvatarEvent({ type: "activity", state: "thinking" });
+          }
         }
       }
     }, 50);

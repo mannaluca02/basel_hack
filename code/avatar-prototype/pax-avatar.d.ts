@@ -27,4 +27,8 @@ export interface PaxAvatar {
 
 export const EMOTIONS: Readonly<Record<Face, { label: string; subtitle: string }>>;
 export const REPLY_EMOTIONS: readonly ReplyEmotion[];
-export function createPaxAvatar(host: HTMLElement): PaxAvatar;
+export interface PaxAvatarOptions {
+  /** Minimum interval between reply emotion changes in milliseconds. Default 5000; 0 disables the hold. */
+  emotionHoldMs?: number;
+}
+export function createPaxAvatar(host: HTMLElement, options?: PaxAvatarOptions): PaxAvatar;

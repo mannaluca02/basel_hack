@@ -78,7 +78,6 @@ let mountId = 0;
 
 export const REPLY_EMOTIONS = ["neutral", "acknowledging", "curious", "explaining", "shocked", "empathetic", "pleased", "recovering", "presenting_offer"];
 const HOLD_AFTER_REPLY_MS = 1500;
-const EMOTION_HOLD_MS = 2000;
 const MAX_FINISHED_IDS = 50;
 
 const POSES = Object.fromEntries(Object.entries(EMOTIONS).map(([key, value]) => [key, { ...BASE, ...value }]));
@@ -93,7 +92,8 @@ function set(el, key, value) {
 }
 const fmt = (value) => Math.round(value * 10000) / 10000;
 
-export function createPaxAvatar(host) {
+export function createPaxAvatar(host, { emotionHoldMs = 5000 } = {}) {
+  if (!Number.isFinite(emotionHoldMs) || emotionHoldMs < 0) throw new RangeError("emotionHoldMs must be a finite non-negative number");
   const id = `pax-${++mountId}-`;
   host.innerHTML = SVG.replace(/id="(pax\w+)"/g, (_, name) => `id="${id}${name}"`)
     .replace(/url\(#(pax\w+)\)/g, (_, name) => `url(#${id}${name})`);
@@ -391,7 +391,7 @@ export function createPaxAvatar(host) {
 
   function setReplyEmotion(emotion) {
     clearTimeout(pendingTimer); pendingEmotion = null;
-    if (emotion !== replyEmotion) emotionChangedAt = Date.now();
+    emotionChangedAt = Date.now();
     replyEmotion = emotion;
     render();
   }
@@ -412,22 +412,29 @@ export function createPaxAvatar(host) {
     switch (ev?.type) {
       case "activity":
         if (!["idle", "listening", "thinking"].includes(ev.state)) return false;
-        if (ev.state === "listening" && activity === "idle" && !playing) { replyEmotion = "neutral"; clearPending(); }   // a new turn starts from neutral
+        if (ev.state === "listening" && activity === "idle" && !playing) {
+          clearPending();
+          if (Date.now() - emotionChangedAt >= emotionHoldMs) { replyEmotion = "neutral"; emotionChangedAt = -Infinity; }
+        }
         activity = ev.state;
         render();
         return true;
 
       case "emotion":
         if (!REPLY_EMOTIONS.includes(ev.emotion) || isFinished(ev.playbackId)) return false;
-        // While the user speaks or the advisor thinks, keep that face; render() shows it at playback start.
-        if (activity !== "idle") { setReplyEmotion(ev.emotion); return true; }
-        if (ev.emotion === replyEmotion) { clearPending(); return true; }
-        if (ev.emotion === "neutral") return true;   // sticky: no drop to neutral mid-reply
-        const wait = EMOTION_HOLD_MS - (Date.now() - emotionChangedAt);
+        // Activity affects the visible face, never the minimum hold between reply emotions.
+        if (ev.emotion === replyEmotion) {
+          if (emotionChangedAt === -Infinity) setReplyEmotion(ev.emotion);
+          else clearPending();
+          return true;
+        }
+        const wait = emotionHoldMs - (Date.now() - emotionChangedAt);
         if (wait <= 0) { setReplyEmotion(ev.emotion); return true; }
-        pendingEmotion = ev.emotion; clearTimeout(pendingTimer);
+        pendingEmotion = { emotion: ev.emotion, playbackId: ev.playbackId }; clearTimeout(pendingTimer);
         pendingTimer = setTimeout(() => {
-          if (pendingEmotion && activity === "idle") setReplyEmotion(pendingEmotion);
+          const next = pendingEmotion;
+          clearPending();
+          if (next && !destroyed && !isFinished(next.playbackId)) setReplyEmotion(next.emotion);
         }, wait);
         return true;
 
@@ -439,11 +446,12 @@ export function createPaxAvatar(host) {
         } else {
           if (playing && playing !== ev.playbackId) return false;   // not the audible one
           finish(ev.playbackId); playing = null;
+          if (pendingEmotion?.playbackId === ev.playbackId) clearPending();
           if (ev.event === "cancelled") { clearPending(); activity = "listening"; render(); return true; }
           render();
           relaxTimer = setTimeout(() => {
-            if (!playing && activity === "idle") { clearPending(); replyEmotion = "neutral"; render(); }
-          }, HOLD_AFTER_REPLY_MS);
+            if (!playing && activity === "idle") { clearPending(); replyEmotion = "neutral"; emotionChangedAt = -Infinity; render(); }
+          }, Math.max(HOLD_AFTER_REPLY_MS, emotionHoldMs - (Date.now() - emotionChangedAt)));
         }
         return true;
     }
