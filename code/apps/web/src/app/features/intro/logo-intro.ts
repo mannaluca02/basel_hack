@@ -6,7 +6,7 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import { PAX_LOGO_DOT, PAX_LOGO_LETTERS, PAX_LOGO_VIEWBOX } from '../../core/brand/pax-logo';
+import { PAX_LOGO_DOT, PAX_LOGO_LETTERS, PAX_LOGO_VIEWBOX } from './logo-geometry';
 
 /** The "."'s closed eyes, in logo units (Dario's demo intro, fitted to the official dot). */
 const EYES = [9.19, 24.55].map((x) => ({ x, y: 117.1, width: 6.2, height: 9, rx: 3.1 }));

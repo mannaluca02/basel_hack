@@ -1,6 +1,12 @@
 <header class="bar" [inert]="introShown()">
-  <app-pax-logo class="logo" />
-  <span class="brand">{{ 'app.product' | transloco }}</span>
+  <!-- Pax logo: positive on the light page, negative (white dot) in the dark theme. -->
+  <span class="brand">
+    <picture>
+      <source srcset="brand/pax-logo-negative.svg" media="(prefers-color-scheme: dark)" />
+      <img class="logo" src="brand/pax-logo-positive.svg" alt="Pax" width="62" height="20" />
+    </picture>
+    <span class="product">{{ 'app.product' | transloco }}</span>
+  </span>
   <span class="demo">
     <span aria-hidden="true">{{ 'demo.badge' | transloco }}</span>
     <span class="visually-hidden">{{ 'demo.label' | transloco }}</span>
@@ -65,6 +71,16 @@
           }
         </a>
       }
+      @if (liveVoice) {
+        <a class="tab" routerLink="/journey" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
+          <span class="glyph">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 3h7l5 5v13H7ZM14 3v5h5M10 14.5l1.8 1.8L15.5 12.5" />
+            </svg>
+          </span>
+          <span class="label">{{ 'nav.journey' | transloco }}</span>
+        </a>
+      }
       @if (debugVoice) {
         <a class="tab" routerLink="/voice-lab" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
           <span class="glyph">
@@ -73,6 +89,14 @@
             </svg>
           </span>
           <span class="label">{{ 'lab.title' | transloco }}</span>
+        </a>
+        <a class="tab" routerLink="/insights" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
+          <span class="glyph">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 20h16M7 16v-5M12 16V6M17 16v-8" />
+            </svg>
+          </span>
+          <span class="label">{{ 'insights.title' | transloco }}</span>
         </a>
       }
     </nav>

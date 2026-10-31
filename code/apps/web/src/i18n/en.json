@@ -16,8 +16,7 @@
       "extractionUnavailable": "Live extraction is disabled or unreachable in the backend. Start the current debug backend with PAX_SYNTHETIC_VOICE_ENABLED=1 and OPENAI_API_KEY; a voice connection alone does not capture details.",
       "extractionReady": "Live extraction active: conversation logs → AI → field proposals",
       "handover": "Human advice has been requested. Explicitly allow digital dialogue again here before starting another conversation.",
-      "liveReady": "3. Ready: start the live conversation and allow microphone access in your browser.",
-      "replayReady": "Ready: synthetic replay needs neither a microphone nor voice consent."
+      "liveReady": "3. Ready: start the live conversation and allow microphone access in your browser."
     },
     "error": {
       "microphoneDenied": "Microphone access was denied. Allow it in your browser’s site settings, then click Start live conversation again.",
@@ -26,22 +25,15 @@
       "recover": "The operation could not finish. Check the API trace, then retry preparation or Reload case."
     },
     "avatarNotice": "Avatar: local audio-level visualization. Not evidence of transcript finality or completed playback.",
-    "confirmedGross": "Last confirmed annual gross income",
     "canonicalUnits": "Raw value: money in CHF cents (100 cents = CHF 1)",
     "title": "Voice Lab",
-    "syntheticOnly": "Invented data only",
     "description": "Talk with Paxi and follow real API payloads from transcripts through the canonical case to the visible store projection.",
     "apiRequired": "Start with npm --prefix code/apps/web run start:api. This lab needs the case backend on port 3000.",
     "demoCode": "The prefilled public demo code works only with the dedicated start:voice-lab server. Otherwise use your local customer access code.",
     "baselineNotice": "The baseline contains invented people and amounts. It is loaded as an unconfirmed draft.",
     "connection": "Dialogue & avatar",
-    "synthetic": "Synthetic replay",
     "live": "Live · microphone",
     "speaker": "Speaking person (explicit attribution)",
-    "replayNotice": "Authored conversation across all eight fields, real backend writes. No microphone, speech playback or model call. Avatar activity is simulated.",
-    "replay": "Replay whole conversation",
-    "correction": "Correction",
-    "smalltalk": "Smalltalk / no match",
     "configured": "configured (not a health check)",
     "unconfigured": "not configured",
     "voiceConsent": "I will use invented details only and consent to sending audio/conversation data to OpenAI for this voice demo.",
@@ -109,7 +101,6 @@
       "evaluating": "evaluating",
       "yes": "yes",
       "no": "no",
-      "done": "Thank you, that is everything I need. You can now check it in the review.",
       "extractionConsent": "I agree that a small, invented conversation excerpt is sent to OpenAI for AI extraction (separate consent).",
       "extractionBlocker": "Confirm the separate AI consent, otherwise the lab would silently fall back to rigid sentences.",
       "status": {
@@ -170,7 +161,8 @@
     "risks": "Risks",
     "chat": "Chat",
     "info": "Info",
-    "unread": "New since your last visit"
+    "unread": "New since your last visit",
+    "journey": "Contract"
   },
   "graphics": {
     "title": "Graphics",
@@ -522,6 +514,167 @@
     "accept": "Accept and recalculate",
     "accepting": "Accepting …",
     "acceptFailed": "Accepting did not work. Please try again."
+  },
+  "journey": {
+    "title": "Contract",
+    "intro": "From the recommendation through quote and application to the policy in the customer portal. Everything is a demo with invented data: no contract, no insurance cover.",
+    "steps": {
+      "label": "Progress",
+      "recommendation": "Recommendation",
+      "quote": "Quote",
+      "application": "Application",
+      "review": "Review by Pax",
+      "policy": "Policy"
+    },
+    "stepState": {
+      "done": "done"
+    },
+    "locked": "The recommendation follows once your life situation, finances and all three pillars are captured and confirmed.",
+    "noContract": "Your situation needs no new contract right now.",
+    "adviceReview": "A Pax specialist reviews the advice before you can request a quote.",
+    "waitingReview": "Waiting for the review by a Pax specialist.",
+    "simulateReview": "Simulate the Pax review (demo)",
+    "simulatedNote": "In the demo a simulated Pax specialist account takes this step. In reality a Pax specialist reviews it.",
+    "choose": "Choose the solutions you would like a quote for.",
+    "need": "Need",
+    "why": "Why",
+    "requestQuote": "Request a quote",
+    "quoteTitle": "Your quote",
+    "premium": "Premium: calculated with the Pax tariff (not connected in the demo).",
+    "validUntil": "Valid until {{time}}",
+    "documents": "Product documents",
+    "readDocuments": "I have read all product documents.",
+    "createApplication": "Create the application",
+    "applicationTitle": "Your application",
+    "compliance": "Needed for a real contract, not performed in the demo:",
+    "submit": "Submit the application",
+    "submitted": "Your application is submitted.",
+    "needsInformation": "Pax needs more information. Please contact your Pax specialist.",
+    "declined": "The application was declined.",
+    "portal": "Customer portal",
+    "noPolicy": "No policy yet.",
+    "policyDemo": "Demo – no insurance cover",
+    "issued": "Issued on {{date}}",
+    "contextChanged": "Your details have changed since. The policy refers to the earlier advice.",
+    "dossier": "Open the advice dossier",
+    "dossierNote": "All details, assumptions, reasons and sources of your advice, ready to print.",
+    "working": "Working …",
+    "error": "That did not work.",
+    "document": {
+      "terms": "Insurance terms",
+      "brochure": "Brochure",
+      "kid": "Key information document"
+    },
+    "suitability": {
+      "title": "Suitability check for {{product}}",
+      "intro": "Fund-linked products need a suitability check first, following the Pax form. The result is not binding; a Pax specialist does the binding check and signature.",
+      "annualPremium": "Desired yearly premium (CHF)",
+      "singleInvestment": "Desired single investment (CHF)",
+      "amountHint": "Fill in at least one of the two.",
+      "netIncome": "Net income per year",
+      "netWorth": "Assets",
+      "savingCapacity": "Saving capacity per year",
+      "investmentCapacity": "Possible single amount",
+      "goal": "Investment goal",
+      "horizon": "Investment horizon",
+      "experience": "Experience with securities",
+      "lossReaction": "If your investment lost 30 %, you would …",
+      "guarantee": "Guaranteed part (%)",
+      "strategy": "Chosen investment strategy",
+      "confirm": "I confirm that these answers are my own.",
+      "submit": "Evaluate the check",
+      "suitable": "Suitable: the chosen strategy matches your profile.",
+      "advisedAgainst": "Advised against:",
+      "reason": {
+        "NOT_AFFORDABLE": "The amount exceeds your saving or investment capacity.",
+        "STRATEGY_DOES_NOT_MATCH_PROFILE": "The chosen strategy does not match your investment profile.",
+        "HORIZON_TOO_SHORT": "The investment horizon is shorter than ten years."
+      },
+      "option": {
+        "netIncome": {
+          "under_75k": "under CHF 75,000",
+          "75k_150k": "CHF 75,000–150,000",
+          "150k_250k": "CHF 150,000–250,000",
+          "over_250k": "over CHF 250,000"
+        },
+        "asset": {
+          "under_10k": "under CHF 10,000",
+          "10k_50k": "CHF 10,000–50,000",
+          "50k_150k": "CHF 50,000–150,000",
+          "150k_300k": "CHF 150,000–300,000",
+          "over_300k": "over CHF 300,000"
+        },
+        "saving": {
+          "under_1k": "under CHF 1,000",
+          "1k_3k": "CHF 1,000–3,000",
+          "3k_7k": "CHF 3,000–7,000",
+          "over_7k": "over CHF 7,000"
+        },
+        "goal": {
+          "low_risk": "As little risk as possible",
+          "moderate_risk": "Some risk for more return",
+          "high_risk": "Higher risk for high return"
+        },
+        "horizon": {
+          "under_10_years": "under 10 years",
+          "10_to_15_years": "10 to 15 years",
+          "over_15_years": "over 15 years"
+        },
+        "experience": {
+          "none": "None",
+          "knowledge_only": "Knowledge only",
+          "experience": "Some experience",
+          "extensive": "Extensive experience"
+        },
+        "loss": {
+          "sell_all": "… sell everything",
+          "sell_part": "… sell a part",
+          "hold": "… wait",
+          "buy_more": "… buy more"
+        },
+        "strategy": {
+          "conservative": "Conservative",
+          "balanced": "Balanced",
+          "dynamic": "Dynamic"
+        }
+      }
+    },
+    "errors": {
+      "PERSONAL_FUNDS_NOT_SUPPORTED_BY_OWN_RESOURCES": "This person has no own income or assets to carry the premium. Choose the solutions for the other person or talk to a Pax specialist.",
+      "PERSONAL_AFFORDABILITY_NOT_ESTABLISHED": "This person has no amount yet that they want to spend on premiums themselves.",
+      "HOUSEHOLD_AFFORDABILITY_NOT_ESTABLISHED": "The household budget leaves no room for an additional premium right now.",
+      "ALTERNATIVE_PRODUCTS_CANNOT_BE_STACKED": "Choose only one of the saving solutions; they are alternatives to each other.",
+      "SUITABILITY_CHECK_REQUIRED": "The suitability check for the fund-linked product is still missing.",
+      "SUITABILITY_ADVISED_AGAINST": "The suitability check advises against this product.",
+      "QUOTE_EXPIRED": "The quote has expired. Please request a new one.",
+      "HUMAN_REVIEW_REQUIRED": "A Pax specialist has to review the advice first."
+    },
+    "dossierTitle": "Advice dossier",
+    "dossierClose": "Close the advice dossier",
+    "print": "Print",
+    "dossierFailed": "The advice dossier could not be loaded."
+  },
+  "insights": {
+    "title": "Product management insights",
+    "intro": "Aggregate signals of all demo cases: no amounts, no free text, no personal data.",
+    "cases": "Cases",
+    "stages": "Current step",
+    "dropoffs": "Possible drop-offs",
+    "dropoffNote": "No policy and no change for ten minutes: a signal, not a confirmed drop-off.",
+    "nps": "NPS",
+    "responses": "{{count}} responses",
+    "noNps": "No responses yet",
+    "handover": "Requests for a Pax specialist",
+    "reasons": "Most frequent review reasons",
+    "unavailable": "This view exists only in the demo start.",
+    "stage": {
+      "intake": "Intake",
+      "profile_confirmed": "Profile confirmed",
+      "analysis": "Analysis",
+      "recommendation": "Recommendation",
+      "application_submitted": "Application submitted",
+      "demo_policy": "Demo policy"
+    }
   },
   "paxi": {
     "hint": "Tap the microphone at the bottom right to talk to Paxi."

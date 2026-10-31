@@ -40,7 +40,7 @@
 .bar {
   grid-area: bar;
   display: grid;
-  grid-template-columns: auto minmax(0, auto) auto 1fr auto;
+  grid-template-columns: minmax(0, auto) auto 1fr auto;
   align-items: center;
   column-gap: 0.75rem;
   min-height: 3.5rem;
@@ -51,14 +51,24 @@
   border-bottom: var(--stroke-border) solid var(--border-soft);
 }
 
-.logo {
-  height: 1.75rem;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
-.brand {
+.logo {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 1.25rem;
+}
+
+.product {
   min-width: 0;
   overflow: hidden;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -70,19 +80,18 @@
   color: var(--text-inverse);
   background: var(--bg-brand-purple);
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  // Pax Brand: no uppercase.
+  font-weight: var(--font-weight-bold);
 }
 
 // Its column stays when the switcher is hidden, so the header keeps its layout.
 .language {
-  grid-column: 5;
+  grid-column: 4;
 }
 
 // Phones: the product name gives way, the logo still names the app.
 @media (max-width: 479px) {
-  .brand {
+  .product {
     display: none;
   }
 }
@@ -192,7 +201,7 @@
 }
 
 .tab--active .label {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .glyph {

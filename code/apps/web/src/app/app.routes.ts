@@ -37,6 +37,12 @@ export const routes: Routes = [
     data: keepAlive,
     loadComponent: () => import('./features/workspace/info/info-tab').then((m) => m.InfoTab),
   },
+  {
+    // Recommendation → quote → application → demo policy in the customer portal.
+    path: 'journey',
+    title: 'journey.title',
+    loadComponent: () => import('./features/journey/journey-view').then((m) => m.JourneyView),
+  },
   ...debugRoutes,
   { path: '**', redirectTo: 'graphics' },
 ];

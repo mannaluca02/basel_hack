@@ -57,6 +57,14 @@ describe('App', () => {
     return { fixture, root, navigate };
   }
 
+  it('shows the Pax logo in the header, the dark variant in the dark theme', async () => {
+    const { root } = await renderShell();
+
+    expect(root.querySelector('.bar img.logo')?.getAttribute('src')).toBe('brand/pax-logo-positive.svg');
+    expect(root.querySelector('.bar img.logo')?.getAttribute('alt')).toBe('Pax');
+    expect(root.querySelector('.bar source')?.getAttribute('media')).toBe('(prefers-color-scheme: dark)');
+  });
+
   it('renders one link per workspace tab in the tab bar at the bottom, Graphics first', async () => {
     const { root } = await renderShell();
     const links = root.querySelectorAll('.tabbar nav a');
@@ -91,11 +99,10 @@ describe('App', () => {
     expect(root.querySelector('.tabbar app-agent-dock')).toBeNull();
   });
 
-  it('shows the Pax logo and the product in the header', async () => {
+  it('names the product next to the logo', async () => {
     const { root } = await renderShell();
 
-    expect(root.querySelector('header app-pax-logo svg')?.getAttribute('aria-label')).toBe('Pax');
-    expect(root.querySelector('header .brand')?.textContent).toBe('Digital Advisor');
+    expect(root.querySelector('header .brand .product')?.textContent).toBe('Digital Advisor');
   });
 
   it('offers the language switcher in the header only once Paxi is in the corner', async () => {
@@ -370,6 +377,76 @@ describe('App review stand', () => {
     const root = await renderWith('mock');
 
     expect(root.querySelector('app-review-panel')).toBeNull();
+  });
+});
+
+describe('App voice per configuration', () => {
+  async function renderWith(environment: Record<string, unknown>) {
+    localStorage.clear();
+    sessionStorage.clear();
+    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AdvisorDataSource, useValue: new FakeDataSource() },
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', ...environment },
+        },
+        provideI18nTesting(),
+        provideFakePaxAvatar(),
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('drives the scripted call from the call bar in the mock', async () => {
+    const root = await renderWith({ dataSource: 'mock' });
+
+    expect(root.querySelector('app-call-controls')).not.toBeNull();
+  });
+
+  it('leaves the call to the live voice against the backend, without a call bar', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true });
+
+    expect(root.querySelector('app-call-controls')).toBeNull();
+  });
+
+  it('shows the call bar for Paxi in its own window in the paxi configuration', async () => {
+    const root = await renderWith({
+      dataSource: 'api',
+      demoStart: true,
+      voiceAgentUrl: 'http://localhost:3100',
+    });
+
+    expect(root.querySelector('app-call-controls')).not.toBeNull();
+  });
+
+  it('links the contract journey against the backend, not in the scripted mock', async () => {
+    const api = await renderWith({ dataSource: 'api', demoStart: true });
+    expect(api.querySelector('.tabbar a[href="/journey"]')).not.toBeNull();
+    TestBed.resetTestingModule();
+    const mock = await renderWith({ dataSource: 'mock' });
+    expect(mock.querySelector('.tabbar a[href="/journey"]')).toBeNull();
+  });
+
+  it('links the Voice Lab only in the debug configurations', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true });
+
+    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).toBeNull();
+    expect(root.querySelector('.tabbar a[href="/insights"]')).toBeNull();
+  });
+
+  it('adds the Voice Lab tab to the tab bar with debugVoice', async () => {
+    const root = await renderWith({ dataSource: 'api', demoStart: true, debugVoice: true });
+
+    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).not.toBeNull();
+    expect(root.querySelector('.tabbar a[href="/insights"]')).not.toBeNull();
   });
 });
 

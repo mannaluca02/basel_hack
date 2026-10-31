@@ -133,7 +133,7 @@ let nextId = 0;
     .declined.shown {
       margin-top: 0.75rem;
       color: var(--text-error);
-      font-weight: 700;
+      font-weight: var(--font-weight-bold);
     }
 
     .actions {
@@ -151,7 +151,8 @@ let nextId = 0;
       color: var(--text-default);
       background: var(--bg-default);
       font: inherit;
-      font-weight: 700;
+      // Pax Brand: Medium for buttons.
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
     }
 

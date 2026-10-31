@@ -81,11 +81,18 @@
   --stroke-border: 0.075rem;
   --stroke-focusring: 0.125rem;
 
-  /* Font. Pax uses "Civil Premium", which is licensed; add it in front once the team has access. */
-  --font-family: system-ui, -apple-system, sans-serif;
+  /* Font. Pax uses "Civil Premium" (Pax Civil), which is licensed: it applies where installed,
+     otherwise the system font, as on ui.pax.ch. Pax Brand allows only three weights: Bold for
+     headings and highlights, Medium for CTAs and buttons, Regular for text. No Semi-Bold. */
+  --font-family: 'Civil Premium', 'Pax Civil', system-ui, -apple-system, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
 
   /* Semantic: light */
   --bg-default: var(--color-neutral-white);
+  /* Printable documents (the advice dossier): white paper in both themes. */
+  --bg-paper: var(--color-neutral-white);
   --bg-muted: var(--color-neutral-gray-1);
   --bg-brand: var(--color-brand-pax-green);
   --bg-brand-contrast: var(--color-brand-contrast-green);
@@ -134,9 +141,8 @@
   --chart-7: var(--color-chart-silver);
   --chart-8: var(--color-chart-beige);
 
-  /* Pax logo: Pax Green letters, the "." in Deep Purple (positive version). */
+  /* Pax logo letters in the intro: Pax Green. */
   --logo-letters: var(--color-brand-pax-green);
-  --logo-dot: var(--color-brand-deep-purple);
   /* Logo intro before consent: the negative logo on Pax Purple, in both themes. */
   --intro-bg: var(--color-brand-pax-purple);
   --intro-dot: var(--color-neutral-white);
@@ -184,8 +190,5 @@
     /* Pax Green on gray-4 is 1.16:1; on gray-7 it is 7.62:1. */
     --border-track: var(--color-neutral-gray-7);
     --border-warning: var(--color-neutral-gray-2);
-
-    /* Negative logo on the dark page. */
-    --logo-dot: var(--color-neutral-white);
   }
 }

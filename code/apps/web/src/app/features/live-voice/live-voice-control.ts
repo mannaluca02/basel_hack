@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CustomerApi } from '../../core/advisor/api/customer-api';
 import { VoiceAgentLink } from '../../core/advisor/api/voice-agent-link';
@@ -46,7 +54,9 @@ let nextId = 0;
           @if (live.active()) {
             <rect x="7" y="7" width="10" height="10" rx="1.5" />
           } @else {
-            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3M5 11a7 7 0 0 0 14 0M12 18v3" />
+            <path
+              d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3M5 11a7 7 0 0 0 14 0M12 18v3"
+            />
           }
         </svg>
         <span class="label">{{ (live.active() ? 'voice.stop' : 'voice.start') | transloco }}</span>
@@ -57,7 +67,11 @@ let nextId = 0;
           <h2 [id]="titleId">{{ 'voice.title' | transloco }}</h2>
           <p class="notice">{{ live.notice() }}</p>
           <label class="consent">
-            <input type="checkbox" [checked]="live.consent()" (change)="live.consent.set($any($event.target).checked)" />
+            <input
+              type="checkbox"
+              [checked]="live.consent()"
+              (change)="live.consent.set($any($event.target).checked)"
+            />
             <span>{{ 'lab.voiceConsent' | transloco }}</span>
           </label>
           @if (live.extractionNotice(); as extraction) {
@@ -76,10 +90,18 @@ let nextId = 0;
             <p class="status" role="status">{{ blocker | transloco }}</p>
           }
           <div class="actions">
-            <button type="button" class="action action--primary" data-action="start" [disabled]="!!blocker()" (click)="start()">
+            <button
+              type="button"
+              class="action action--primary"
+              data-action="start"
+              [disabled]="!!blocker()"
+              (click)="start()"
+            >
               {{ 'voice.begin' | transloco }}
             </button>
-            <button type="button" class="action" (click)="open.set(false)">{{ 'voice.cancel' | transloco }}</button>
+            <button type="button" class="action" (click)="open.set(false)">
+              {{ 'voice.cancel' | transloco }}
+            </button>
           </div>
         </section>
       }
@@ -101,7 +123,13 @@ let nextId = 0;
     @if (offerAccept() && !open() && !(shown() && errorLabel())) {
       <section class="card" role="status">
         <p>{{ (acceptFailed() ? 'voice.acceptFailed' : 'voice.pending') | transloco }}</p>
-        <button type="button" class="action action--primary" data-action="accept" [disabled]="accepting()" (click)="accept()">
+        <button
+          type="button"
+          class="action action--primary"
+          data-action="accept"
+          [disabled]="accepting()"
+          (click)="accept()"
+        >
           {{ (accepting() ? 'voice.accepting' : 'voice.accept') | transloco }}
         </button>
       </section>
@@ -257,6 +285,7 @@ let nextId = 0;
       color: var(--text-default);
       background: var(--bg-default);
       font: inherit;
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
 
       &:disabled {
@@ -296,7 +325,8 @@ export class LiveVoiceControl {
   protected readonly acceptFailed = signal(false);
   /** Demo start: Paxi heard something that is not accepted yet. */
   protected readonly offerAccept = computed(
-    () => this.demoStart && this.live.caseReady() && (this.store.projection()?.pending.length ?? 0) > 0,
+    () =>
+      this.demoStart && this.live.caseReady() && (this.store.projection()?.pending.length ?? 0) > 0,
   );
   protected readonly panelId = `live-voice-panel-${nextId}`;
   protected readonly titleId = `live-voice-title-${nextId++}`;

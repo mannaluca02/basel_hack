@@ -25,7 +25,6 @@ import {
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CaseStore } from './core/advisor/store/case-store';
 import { WorkspaceTab } from './core/advisor/store/case-state';
-import { PaxLogo } from './core/brand/pax-logo';
 import { APP_ENVIRONMENT } from './core/config/app-environment';
 import { Consent } from './core/consent/consent';
 import { LanguageSwitcher } from './core/i18n/language-switcher';
@@ -65,7 +64,6 @@ type Phase = 'intro' | 'waking' | 'ready';
     RouterLink,
     RouterLinkActive,
     TranslocoPipe,
-    PaxLogo,
     LanguageSwitcher,
     ConsentBanner,
     LogoIntro,

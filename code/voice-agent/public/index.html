@@ -71,6 +71,13 @@
     42%, 46%, 50% { transform: translate(.65px, -.25px) rotate(.8deg); }
   }
   @media (prefers-reduced-motion: reduce) { #intro-sleeper { animation: none; } }
+  #show-visual { font: inherit; margin-top: 8px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--purple); background: #fff; color: var(--purple); cursor: pointer; }
+  #show-visual[hidden], #visual[hidden] { display: none; }
+  #visual { margin: 0; width: min(100%, 420px); background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  #visual figcaption { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  #visual .bar { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; font-size: 12px; margin: 4px 0; }
+  #visual .bar span:last-child { height: 18px; border-radius: 4px; background: var(--purple); color: #fff; font-size: 11px; padding: 0 6px; display: flex; align-items: center; }
+  #visual .bar.gap span:last-child { background: #e0a100; }
 </style>
 </head>
 <body>
@@ -86,12 +93,19 @@
   <button id="avatar" aria-label="Gespräch mit Paxi starten"></button>
   <div id="hint">Tippe auf Paxi, um das Gespräch zu starten.</div>
   <div id="caption"></div>
+  <figure id="visual" hidden>
+    <figcaption>Beispiel: Einkommen heute und ab der Pension (CHF pro Jahr)</figcaption>
+    <div class="bar"><span>Heute</span><span style="width:100%">85'000</span></div>
+    <div class="bar"><span>Ab Pension (AHV + PK)</span><span style="width:61%">52'000</span></div>
+    <div class="bar gap"><span>Lücke</span><span style="width:39%">33'000</span></div>
+  </figure>
   <button id="stop" hidden>Gespräch beenden</button>
 </main>
 <aside inert>
   <h2>Status</h2>
   <div id="status">Bereit.</div>
   <div id="face"></div>
+  <button id="show-visual" hidden title="Zeigt eine Beispielgrafik und gibt sie Paxi, das sie nach dem aktuellen Thema kommentiert">Grafik zeigen (Test)</button>
   <a id="download" hidden target="_blank">Gesprächslog (JSON)</a>
   <h2 id="questionnaire-title">Fragebogen</h2>
   <div id="answers"></div>

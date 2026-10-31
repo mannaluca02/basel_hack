@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { PAX_LOGO_LETTERS } from '../../core/brand/pax-logo';
+import { PAX_LOGO_LETTERS } from './logo-geometry';
 import { LogoIntro } from './logo-intro';
 
 describe('LogoIntro', () => {

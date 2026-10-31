@@ -83,8 +83,15 @@ npm --prefix code/apps/web run build
 npm --prefix code/apps/web run ng -- build web --configuration debug
 npm --prefix code/apps/web run check:tokens
 npm --prefix code/apps/web run check:i18n
-npm --prefix code test
+npm --prefix code test   # inkl. tests/live-voice-journey.test.mjs und tests/paxi-in-process.test.mjs
 ```
+
+`tests/live-voice-journey.test.mjs` fährt den Weg der App End-to-End über HTTP: Demo-Start, Zustimmung,
+Voice-Session mit den Gesprächseinstellungen, Gesprächsbeiträge, `model-v1`, Vorschlag, Chat-Verlauf,
+`demo-accept` mit Neuberechnung, Schliessen; dazu menschliche Übergabe und Folgegespräch nach der
+Bestätigung. Nur OpenAI (GPT-Live-Gateway, Responses-Transport) ist ersetzt.
+`tests/paxi-in-process.test.mjs` prüft, dass Paxi im fremden Prozess auf eigenem Port startet und seine
+Origin-Prüfungen behält.
 
 In der App: Demo starten → Mikrofon-Knopf → beide Häkchen → **Gespräch starten** → Mikrofon erlauben.
 Im Demo-Start gibt es kein Review: Neben der Tab-Leiste erscheint dann **Übernehmen und neu berechnen**

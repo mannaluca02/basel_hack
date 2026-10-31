@@ -50,7 +50,7 @@
   padding: 0.125rem 0.5rem;
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
@@ -246,7 +246,7 @@
   background: none;
   font: inherit;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 }
 

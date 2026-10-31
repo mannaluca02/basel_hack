@@ -13,6 +13,14 @@ export function isSpeech(text) {
   return words.some((word) => !FILLERS.has(word) && word.length > 1);
 }
 
+// Paxi only speaks German, French, Italian and English, all written in Latin script.
+// GPT-Live sometimes transcribes noise or echo as words in another script (Arabic,
+// Thai, …); such words are noise and are removed. Returns the remaining text.
+const FOREIGN_LETTER = /(?!\p{Script=Latin})\p{L}/u;
+export function withoutForeignScript(text) {
+  return text.replace(/\S+/g, (word) => (FOREIGN_LETTER.test(word) ? "" : word));
+}
+
 // "Ciao" is left out on purpose: in Italian it is also a greeting.
 const GOODBYES = [
   "tschüss", "tschüs", "tschau", "adieu", "uf wiederluege", "uf wiederhöre", "mach's gut", "machs gut", "bis bald", "auf wiedersehen", "auf wiederhören",
@@ -92,18 +100,26 @@ export async function postJson(baseUrl, path, body) {
  * Polls the server for answers the extractor found in the conversation. Calls onChanges
  * with new answers, and onNote whenever what is open changes, so Paxi gets a quiet note.
  */
-export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, onStop, intervalMs = 1500 }) {
+export function createProgressPoller({ baseUrl, sessionId, onChanges, onNote, onStop, onCommands, onLost, intervalMs = 1500 }) {
   let version = 0;
+  let commandSeq = 0; // last steering command from the backend that was handed on
   let lastNote = "";
   let latest = null;
   const tick = async () => {
     try {
-      const response = await fetch(`${baseUrl}/api/conversations/${sessionId()}/progress?since=${version}`);
+      const response = await fetch(`${baseUrl}/api/conversations/${sessionId()}/progress?since=${version}&commands=${commandSeq}`);
+      // The server no longer knows this session, for example after a restart.
+      if (response.status === 404) onLost?.();
       if (!response.ok) return;
       const progress = await response.json();
       latest = progress;
       if (progress.changes.length) onChanges(progress.changes);
       version = progress.version;
+      const commands = (progress.commands ?? []).filter((command) => command.seq > commandSeq);
+      if (commands.length) {
+        commandSeq = commands.at(-1).seq;
+        onCommands?.(commands);
+      }
       // The customer asked for a human advisor: the digital conversation ends right away.
       if (progress.stop) {
         onStop?.();

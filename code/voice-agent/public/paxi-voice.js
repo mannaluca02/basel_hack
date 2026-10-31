@@ -7,7 +7,7 @@
 //   button.onclick = () => paxi.start();   // must run from a user action (microphone, audio)
 //   paxi.stop();
 
-import { createProgressPoller, isGoodbye, isSpeech, postJson as post, wordsOf } from "./paxi-common.js";
+import { createProgressPoller, isGoodbye, isSpeech, postJson as post, withoutForeignScript, wordsOf } from "./paxi-common.js";
 
 const FLUSH_INTERVAL_MS = 1000;
 // Reply emotions the avatar knows (ReplyEmotion in code/avatar-prototype/pax-avatar.d.ts).
@@ -21,6 +21,25 @@ const LEVEL_THRESHOLD = 0.015;
 const SILENCE_MS = 600;
 // Pause after the person's first words before their language is detected.
 const FIRST_WORDS_PAUSE_MS = 700;
+// At most one note about misread foreign-script words per this interval.
+const FOREIGN_NOTE_GAP_MS = 15_000;
+// Charts can change several times in a row (each recalculation); only the latest counts.
+const VISUAL_UPDATE_DEBOUNCE_MS = 1200;
+// After an end request, the call closes at the latest after this, even without a goodbye.
+const END_FALLBACK_MS = 15_000;
+// A confirmation question counts as presented once Paxi said this share of its words.
+const QUESTION_COVERAGE = 0.85;
+// Pause after the person's answer to a confirmation question before it counts as final.
+const ANSWER_PAUSE_MS = 1200;
+// A confirmation question that was not fully played by then is cancelled.
+const QUESTION_TIMEOUT_MS = 30_000;
+// The question is sent once Paxi has been quiet this long, and sent again after this if Paxi did not start it.
+const QUESTION_QUIET_MS = 500;
+const QUESTION_RETRY_MS = 5000;
+// GPT-Live has no event to cancel an answer in progress; an appended instruction interrupts the
+// model's current speech (Live delegation guide, "direction to stop speaking").
+const STOP_INSTRUCTION =
+  "The person just asked you to stop talking. Stop speaking right away and do not continue, finish or repeat what you were saying. This applies only to what you were saying at this moment: when the person speaks again, answer them normally.";
 // Paxi takes the initiative after this much silence, at most twice in a row.
 const IDLE_MS = 8000;
 const MAX_NUDGES = 2;
@@ -63,6 +82,8 @@ export function createPaxiVoice({
   onTranscript = () => {},
   onAnswer = () => {},
   onStatus = () => {},
+  onConfirmation = () => {},
+  onServerLost = () => {},
 } = {}) {
   let microphone;
   let audioContext;
@@ -101,6 +122,17 @@ export function createPaxiVoice({
   let userTurnText = "";
   let userGoodbyeTimer;
   let personSaidGoodbye = false;
+  let foreignNoteAt = -Infinity;
+  let pendingSteering = []; // steering commands waiting for the conversation language and a ready session
+  let agenda = []; // topics and visuals Paxi turns to after the current exchange, in order
+  let agendaReminded = false; // one reminder per answer of the person
+  const visualUpdates = new Map(); // visual ID -> pending debounced update
+  let ending = false; // the app or backend asked Paxi to end the call
+  let endTimer;
+  let conversationLanguage = null;
+  let sentFragments = []; // everything posted, to rebuild the conversation after a server restart
+  let serverLost = false;
+  let confirmation = null; // the open confirmation question (VOICE-08)
 
   const emit = (callback, value) => {
     try {
@@ -122,6 +154,7 @@ export function createPaxiVoice({
     for (const [sessionId, entries] of Map.groupBy(batch, (entry) => entry.sessionId)) {
       try {
         await postJson(`/api/conversations/${sessionId}/transcript`, { fragments: entries.map((entry) => entry.fragment) });
+        sentFragments.push(...entries);
       } catch (error) {
         // Keep the fragments for the next attempt instead of dropping them.
         pendingFragments = entries.concat(pendingFragments);
@@ -167,8 +200,10 @@ export function createPaxiVoice({
 
   function endPlayback(event) {
     if (!playbackId) return;
+    const ended = playbackId;
     emit(onAvatarEvent, { type: "playback", event, playbackId });
     playbackId = null;
+    confirmationPlaybackEnded(event, ended);
   }
 
   function checkLevels() {
@@ -207,10 +242,14 @@ export function createPaxiVoice({
       console.error("set_language failed", error);
       result = { ok: false };
     }
-    if (result.ok) languageChosen = true;
+    if (result.ok) {
+      languageChosen = true;
+      conversationLanguage = result.language;
+    }
     if (!result.ok || !result.switch_voice || switching) {
       // This voice already fits (or the switch failed): carry on in this session.
       returnToolResult(session, item.call_id, { ok: result.ok, language: result.language });
+      flushSteering();
       return;
     }
     switchVoice(session, item.call_id, result.voice);
@@ -242,7 +281,9 @@ export function createPaxiVoice({
     }
     if (!result.ok || languageChosen) return;
     languageChosen = true;
+    conversationLanguage = result.language;
     if (result.switch_voice && !switching) switchVoice(session, null, result.voice);
+    else flushSteering();
   }
 
   // --- Voice switch -------------------------------------------------------------------
@@ -250,6 +291,7 @@ export function createPaxiVoice({
   // Hands the conversation to a new session with the native voice. The old session
   // is muted right away so the person never hears the wrong voice in the new language.
   async function switchVoice(previous, callId, voice) {
+    cancelConfirmation("new_question");
     switching = true;
     previous.audio.muted = true;
     if (previous.monitor) stopMonitor(previous.monitor);
@@ -368,10 +410,194 @@ export function createPaxiVoice({
     return accepted;
   }
 
+  // --- Languages and visuals -----------------------------------------------------------------
+
+  // The person's words were transcribed partly in another script: most likely noise or echo.
+  // Paxi hears the same, so a quiet note keeps it in its four languages.
+  function foreignScriptHeard(session) {
+    const now = performance.now();
+    if (session !== current || !session.ready || now - foreignNoteAt < FOREIGN_NOTE_GAP_MS) return;
+    foreignNoteAt = now;
+    send(session, {
+      type: "session.thinking.append",
+      delegation_id: null,
+      content: languageChosen
+        ? "The transcript just picked up words in another language or script. That was noise or echo, not the person: do not react to it and never switch to that language. Stay in the conversation language; if you missed something, briefly ask the person to repeat it."
+        : "The transcript just picked up words in another language or script. That was noise or echo, not the person. You only speak German, French, Italian and English: wait for the person to answer in one of them.",
+    });
+  }
+
+  // --- Steering: topics, visuals, priorities and ending from the app or backend -------------
+
+  // Notes wait until the language is chosen and the voice switch is done, so they reach the
+  // session the person hears. Agenda items (a topic, a new or changed visual) are then brought
+  // up one by one after the current exchange: see remindOfAgenda.
+  function flushSteering() {
+    if (!pendingSteering.length || !languageChosen || switching || !current?.ready || (intro && !intro.endedAt)) return;
+    for (const command of pendingSteering) {
+      send(current, { type: "session.thinking.append", delegation_id: null, content: command.note });
+      if (command.type === "agenda") agenda = [...agenda.filter((item) => item.id !== command.id), command];
+      if (command.type === "drop") agenda = agenda.filter((item) => item.id !== command.id);
+    }
+    pendingSteering = [];
+  }
+
+  function applyCommand(command) {
+    if (!command || !running) return;
+    if (command.type === "end") return endOnRequest(command);
+    if (command.type === "stop_speaking") return this_.stopSpeaking();
+    if (!command.note) return;
+    // A newer command for the same topic or visual replaces one that is still waiting.
+    if (command.id) pendingSteering = pendingSteering.filter((item) => item.id !== command.id);
+    pendingSteering.push(command);
+    flushSteering();
+  }
+
+  // The person answers: that ends the current exchange, so Paxi's reply turns to the next
+  // agenda item. Sent while they are still talking, so it arrives before Paxi answers.
+  function remindOfAgenda() {
+    if (agendaReminded || confirmation || !agenda.length || !current?.ready) return;
+    agendaReminded = true;
+    send(current, { type: "session.thinking.append", delegation_id: null, content: agenda.shift().reminder });
+  }
+
+  // The app or backend ends the call: Paxi says a short goodbye first unless told otherwise.
+  function endOnRequest(command) {
+    if (!running || ending) return;
+    ending = true;
+    agenda = [];
+    pendingSteering = [];
+    cancelConfirmation("cancelled_by_customer");
+    if (!command.goodbye || !current?.ready) {
+      this_.stop();
+      return;
+    }
+    if (silenced) {
+      silenced = false;
+      current.audio.muted = false;
+    }
+    send(current, { type: "session.commentary.append", delegation_id: null, content: command.note });
+    endTimer = setTimeout(() => this_.stop(), END_FALLBACK_MS);
+  }
+
+  async function sendSteer(command) {
+    const result = await postJson(`/api/conversations/${current.id}/steer`, command);
+    applyCommand(result.command);
+    return result;
+  }
+
+  // --- Confirmation questions (VOICE-08) -----------------------------------------------------
+
+  // The customer app created a confirmation (POST /api/cases/:id/customer-confirmations). Paxi
+  // says exactly its question; the app hears back when it was really played to the end
+  // ("presented"), what the person answered ("answer"), or that it was cancelled. The app
+  // makes the backend calls: only it holds the customer session.
+  function askConfirmation({ confirmationId, questionText, questionReplyId }) {
+    cancelConfirmation("new_question");
+    const report = (event) => emit(onConfirmation, { confirmationId, questionReplyId, ...event });
+    if (!current?.ready || switching || ending) return report({ event: "cancelled", reason: "new_question", detail: "not_connected" });
+    // Commentary is limited to 500 tokens; longer questions belong on the screen.
+    if (questionText.length > 1500) return report({ event: "cancelled", reason: "new_question", detail: "too_long" });
+    confirmation = { confirmationId, questionText, questionReplyId, report, state: "waiting", said: "", playbackId: null, answer: "", timer: null, quietSince: null, tries: 0 };
+    const open = confirmation;
+    open.timer = setTimeout(() => cancelConfirmation("new_question", "not_played"), QUESTION_TIMEOUT_MS);
+    agendaReminded = true; // no agenda item may take over this turn
+    // Paxi ignores the request while it is still talking (it then waits for an answer to its own
+    // question), so the question goes out once Paxi has been quiet briefly, and once more if
+    // Paxi does not start it.
+    open.poll = setInterval(() => {
+      if (confirmation !== open) return clearInterval(open.poll);
+      if (open.state !== "waiting") return;
+      const now = performance.now();
+      if (playbackId || !current?.ready || now - lastUserAt < QUESTION_QUIET_MS) {
+        open.quietSince = null;
+        return;
+      }
+      open.quietSince ??= now;
+      if (now - open.quietSince < QUESTION_QUIET_MS || (open.sentAt && now - open.sentAt < QUESTION_RETRY_MS)) return;
+      if (open.tries >= 2) return;
+      open.tries += 1;
+      open.sentAt = now;
+      send(current, {
+        type: "session.commentary.append",
+        delegation_id: null,
+        content: `Ask the person this confirmation question now. Read it word for word, exactly as written and in this language, with nothing before or after it. Then stop and wait for their answer:\n"${questionText}"`,
+      });
+    }, 100);
+  }
+
+  function cancelConfirmation(reason, detail) {
+    if (!confirmation) return;
+    const { report, timer, poll } = confirmation;
+    clearTimeout(timer);
+    clearInterval(poll);
+    confirmation = null;
+    report({ event: "cancelled", reason, ...(detail ? { detail } : {}) });
+  }
+
+  const coverage = (said, question) => {
+    const heard = new Set(wordsOf(said));
+    const words = wordsOf(question);
+    return words.length ? words.filter((word) => heard.has(word)).length / words.length : 0;
+  };
+
+  // Paxi's words while the question is open: they belong to the question turn.
+  function confirmationAgentFragment(fragment) {
+    if (!confirmation) return;
+    if (confirmation.state === "awaiting_answer") {
+      // Paxi moves on before the person answered: the question no longer applies.
+      if (!confirmation.answer && isSpeech(fragment.text)) cancelConfirmation("new_question", "paxi_continued");
+      return;
+    }
+    // Paxi is still finishing what it said before the question was sent.
+    if (confirmation.state === "waiting" && !confirmation.sentAt) return;
+    clearInterval(confirmation.poll);
+    confirmation.state = "playing";
+    confirmation.said += fragment.text;
+    confirmation.playbackId = upcomingPlaybackId();
+    fragment.reply_id = confirmation.questionReplyId;
+  }
+
+  // Playback of a segment ended. Only a complete, uninterrupted question counts as presented.
+  function confirmationPlaybackEnded(event, id) {
+    if (confirmation?.state !== "playing" || id !== confirmation.playbackId) return;
+    if (event !== "ended") return cancelConfirmation("cancelled_by_customer", "interrupted");
+    if (coverage(confirmation.said, confirmation.questionText) < QUESTION_COVERAGE) return; // a pause mid-question
+    // The transcript can run ahead of the audio: wait briefly whether another segment follows.
+    confirmation.state = "settling";
+    const open = confirmation;
+    setTimeout(() => {
+      if (confirmation !== open || open.state !== "settling") return;
+      if (playbackId) {
+        open.state = "playing";
+        open.playbackId = playbackId;
+        return;
+      }
+      clearTimeout(open.timer);
+      open.state = "awaiting_answer";
+      open.report({ event: "presented", playback: { playbackId: id, event: "ended" }, spokenText: open.said.trim() });
+    }, SILENCE_MS);
+  }
+
+  // The person's words while the question is open: an interruption, or the answer.
+  function confirmationUserFragment(text) {
+    if (!confirmation) return;
+    // Still waiting to ask: the person answers Paxi's previous question; ask afterwards.
+    if (confirmation.state === "waiting" && !confirmation.sentAt) return;
+    if (confirmation.state !== "awaiting_answer") return cancelConfirmation("cancelled_by_customer", "interrupted");
+    confirmation.answer += text;
+    clearTimeout(confirmation.timer);
+    confirmation.timer = setTimeout(() => {
+      const { report, answer } = confirmation;
+      confirmation = null;
+      report({ event: "answer", text: answer.trim(), locale: conversationLanguage ?? "de", transcriptStatus: "final" });
+    }, ANSWER_PAUSE_MS);
+  }
+
   // --- Taking the initiative ---------------------------------------------------------------
 
   function checkIdle() {
-    if (!running || switching || closingForInactivity || !current?.ready || (intro && !intro.endedAt)) return;
+    if (!running || switching || closingForInactivity || ending || confirmation || !current?.ready || (intro && !intro.endedAt)) return;
     const now = performance.now();
     if (playbackId) lastActivity = now;
     const say = (content) => send(current, { type: "session.commentary.append", delegation_id: null, content });
@@ -393,6 +619,10 @@ export function createPaxiVoice({
     if (inactiveWarnedAt || now - lastActivity < IDLE_MS || nudges >= MAX_NUDGES) return;
     nudges += 1;
     lastActivity = now;
+    if (languageChosen && agenda.length) {
+      say(agenda.shift().nudge);
+      return;
+    }
     say(
       !languageChosen
         ? "Nobody has answered yet. Warmly ask again, very briefly in German, French, Italian and English, which language they would like, and say they can just start speaking."
@@ -415,11 +645,17 @@ export function createPaxiVoice({
         }
       },
       onNote: (note) => {
-        if (current?.ready) send(current, { type: "session.thinking.append", delegation_id: null, content: note });
+        if (current?.ready && !ending) send(current, { type: "session.thinking.append", delegation_id: null, content: note });
       },
       onStop: () => {
         poller?.stop();
         if (running && !finishing) this_.stop();
+      },
+      onCommands: (commands) => commands.forEach(applyCommand),
+      onLost: () => {
+        if (serverLost || !running) return;
+        serverLost = true;
+        emit(onServerLost, { conversationId, linked: Boolean(caseLink) });
       },
     });
   }
@@ -449,7 +685,7 @@ export function createPaxiVoice({
       if (!running) return;
       if (!isGoodbye(said)) {
         // The person kept talking after a farewell: the conversation goes on.
-        if (closeAfterGoodbye) {
+        if (closeAfterGoodbye && !ending) {
           clearTimeout(closeAfterGoodbye);
           closeAfterGoodbye = null;
           closingForInactivity = false;
@@ -502,6 +738,8 @@ export function createPaxiVoice({
           retire(session.previous);
           switching = false;
         }
+        if (muted) send(session, { type: "session.input_audio.mute" });
+        flushSteering();
         status("connected", session.voice);
         break;
       case "session.input_transcript.delta":
@@ -515,7 +753,11 @@ export function createPaxiVoice({
         // A muted, retiring session may still talk; nobody hears it, so its words are not
         // logged. The person's words are kept: they keep talking while the voice switches.
         if (speaker === "agent" && (session.retired || session.audio.muted)) break;
-        const fragment = { speaker, text: event.delta, start_ms: event.start_ms, end_ms: event.end_ms };
+        // Words in another script are noise the transcription misread; they never choose a language.
+        const text = speaker === "user" ? withoutForeignScript(event.delta) : event.delta;
+        if (text !== event.delta) foreignScriptHeard(session);
+        if (!text.trim()) break;
+        const fragment = { speaker, text, start_ms: event.start_ms, end_ms: event.end_ms };
         const accepted = speaker === "user" ? filterIntroEcho(session, fragment) : [fragment];
         for (const f of accepted) {
           lastActivity = performance.now();
@@ -525,14 +767,24 @@ export function createPaxiVoice({
             if (silenced && current) {
               silenced = false;
               current.audio.muted = false;
+              // The stop instruction only meant that one answer.
+              send(current, { type: "session.thinking.append", delegation_id: null, content: "The person is talking to you again after asking you to stop. Listen and answer what they say now, normally." });
             }
             nudges = 0;
             lastUserAt = performance.now();
             inactiveWarnedAt = null;
             collectFirstWords(session, f.text);
+            if (session === current && languageChosen && !switching) {
+              confirmationUserFragment(f.text);
+              remindOfAgenda();
+            }
             watchUserForGoodbye(f.text);
           }
-          if (speaker === "agent") watchForGoodbye(f.text);
+          if (speaker === "agent") {
+            agendaReminded = false;
+            if (session === current) confirmationAgentFragment(f);
+            watchForGoodbye(f.text);
+          }
           pendingFragments.push({ sessionId: session.id, fragment: f });
           emit(onTranscript, { speaker, text: f.text, startMs: f.start_ms + session.offsetMs, endMs: f.end_ms + session.offsetMs });
         }
@@ -618,7 +870,10 @@ export function createPaxiVoice({
         fallbackGreeting: result.fallbackGreeting,
       });
       conversationId ??= result.conversationId;
-      if (result.language) languageChosen = true;
+      if (result.language) {
+        languageChosen = true;
+        conversationLanguage = result.language;
+      }
       await peer.setRemoteDescription({ type: "answer", sdp: result.transport.sdp });
       return session;
     } catch (error) {
@@ -642,6 +897,10 @@ export function createPaxiVoice({
   }
 
   function cleanup() {
+    cancelConfirmation("cancelled_by_customer", "call_ended");
+    clearTimeout(endTimer);
+    for (const { timer } of visualUpdates.values()) clearTimeout(timer);
+    visualUpdates.clear();
     poller?.stop();
     poller = null;
     clearTimeout(goodbyeTimer);
@@ -688,6 +947,14 @@ export function createPaxiVoice({
       handledCalls = new Set();
       languageChosen = false;
       firstWords = "";
+      pendingSteering = [];
+      agenda = [];
+      agendaReminded = false;
+      ending = false;
+      conversationLanguage = null;
+      sentFragments = [];
+      serverLost = false;
+      foreignNoteAt = -Infinity;
       intro = null;
       nudges = 0;
       lastUserAt = performance.now();
@@ -736,6 +1003,88 @@ export function createPaxiVoice({
       return result;
     },
 
+    /**
+     * Steers the running call from the app. Commands:
+     * - { type: "topic", topic, reason?, fields?, urgency?: "next" | "soon" }: talk about this next
+     * - { type: "visual", id, title, event?: "shown" | "updated" | "hidden", description? | data?, revision?, announce? }
+     * - { type: "priorities", fields }: questionnaire fields that come first
+     * - { type: "end", reason?, goodbye?: true }: say goodbye and end the call
+     * - { type: "stop_speaking" }
+     * Topics and visuals never cut the person off: Paxi finishes the current exchange first.
+     */
+    async steer(command) {
+      if (!current?.id) throw new Error("Start the conversation before steering it.");
+      if (command?.type === "stop_speaking") {
+        this_.stopSpeaking();
+        return { command };
+      }
+      // A chart that changes several times in a row: only its latest version goes to Paxi.
+      if (command?.type === "visual" && command.event === "updated" && command.id) {
+        return new Promise((resolve, reject) => {
+          const waiting = visualUpdates.get(command.id);
+          if (waiting) {
+            clearTimeout(waiting.timer);
+            waiting.resolve({ command: null, superseded: true });
+          }
+          const timer = setTimeout(() => {
+            visualUpdates.delete(command.id);
+            sendSteer(command).then(resolve, reject);
+          }, VISUAL_UPDATE_DEBOUNCE_MS);
+          visualUpdates.set(command.id, { timer, resolve });
+        });
+      }
+      return sendSteer(command);
+    },
+
+    /** A visual appeared ({ id, title, description? | data? }); same as steer({ type: "visual" }). */
+    showVisual(visual) {
+      return this_.steer({ ...visual, type: "visual", event: visual.event ?? "shown" });
+    },
+
+    /** A visual on the screen changed, for example a recalculated chart. */
+    updateVisual(visual) {
+      return this_.steer({ ...visual, type: "visual", event: "updated" });
+    },
+
+    /** A visual is no longer on the screen. */
+    hideVisual(id) {
+      return this_.steer({ type: "visual", id, event: "hidden" });
+    },
+
+    /**
+     * Asks a confirmation question the customer app created (VOICE-08):
+     * { confirmationId, questionText, questionReplyId }. Results arrive via onConfirmation:
+     * "presented" (played completely), "answer" (the person's final answer) or "cancelled".
+     */
+    confirm(question) {
+      if (!question?.confirmationId || typeof question.questionText !== "string" || !question.questionReplyId) {
+        throw new Error("confirmationId, questionText and questionReplyId are required");
+      }
+      askConfirmation(question);
+    },
+
+    /** The app cancels the open confirmation question, for example because it showed a new one. */
+    cancelConfirmation() {
+      cancelConfirmation("cancelled_by_customer", "by_app");
+    },
+
+    /**
+     * After the voice server restarted (onServerLost), hands it the running call again, with a
+     * fresh case link from the customer app if the call was linked ({ link }).
+     */
+    async reattach({ link } = {}) {
+      if (!current?.id || !conversationId) return null;
+      const result = await postJson(`/api/conversations/${current.id}/reattach`, {
+        conversationId,
+        link,
+        language: conversationLanguage,
+        sessions: sessions.filter((s) => s.id).map((s) => ({ sessionId: s.id, offsetMs: s.offsetMs, voice: s.voice })),
+        fragments: sentFragments,
+      });
+      serverLost = false;
+      return result;
+    },
+
     /** Ends the conversation gracefully; the log is completed on the server. */
     stop() {
       if (!current?.ready) {
@@ -751,6 +1100,8 @@ export function createPaxiVoice({
     setMuted(value) {
       muted = Boolean(value);
       microphone?.getAudioTracks().forEach((track) => (track.enabled = !muted));
+      // While muted, GPT-Live also takes no turns from the (silent) microphone.
+      if (current?.ready) send(current, { type: muted ? "session.input_audio.mute" : "session.input_audio.unmute" });
     },
 
     get muted() {
@@ -766,6 +1117,9 @@ export function createPaxiVoice({
       silenced = true;
       current.audio.muted = true;
       endPlayback("cancelled");
+      cancelConfirmation("cancelled_by_customer", "stopped");
+      // Also stops the answer on the server, so Paxi answers what the person says next.
+      if (current.ready) send(current, { type: "session.instructions.append", delegation_id: null, content: STOP_INSTRUCTION });
     },
 
     /** URL of the conversation's JSON log, once the conversation has started. */
