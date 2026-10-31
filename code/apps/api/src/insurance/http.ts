@@ -8,7 +8,7 @@ import { WorkflowError,type Actor } from './types.js';
 import { Operations } from '../logismata/contracts.js';
 import { PAX_PRODUCTS } from './products.js';
 import { lifeOpenApi } from './openapi.js';
-import { catalog,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
+import { catalog,complianceSteps,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
 
 type Request={headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
 type Response={setHeader:(key:string,value:string)=>void;status:(code:number)=>Response;json:(value:unknown)=>void;send:(value:unknown)=>void;type:(value:string)=>Response};
@@ -86,6 +86,8 @@ export class ProtectedLifeController {
   @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}
   @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return localizedCase(this.r.engine.caseFor(req.actor,uuid(id)));}
   @Patch('cases/:caseId/draft') async patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.patchDraft(req.actor,uuid(id),body));}
+  @Get('cases/:caseId/suitability') suitability(@Req() req:Request,@Param('caseId') id:string){return this.r.suitability.view(req.actor,uuid(id));}
+  @Post('cases/:caseId/suitability') checkSuitability(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.suitability.check(req.actor,uuid(id),body);}
   @Post('cases/:caseId/demo-profile') async demoProfile(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.demo.loadPersona(req.actor,uuid(id),body));}
   @Post('cases/:caseId/standard-analyses') standardAnalyses(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.demo.runStandardAnalyses(req.actor,uuid(id),body);}
   @Post('cases/:caseId/confirmations') async confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.confirm(req.actor,uuid(id),body));}
@@ -114,7 +116,7 @@ export class ProtectedLifeController {
   @Post('cases/:caseId/demo-applications/start-review') startReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.startReview(req.actor,uuid(id),body));}
   @Post('cases/:caseId/demo-applications/decisions') decide(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.decide(req.actor,uuid(id),body));}
   @Post('cases/:caseId/demo-policies') policy(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.issuePolicy(req.actor,uuid(id),body));}
-  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){return PortalDtoSchema.parse({...presentJourney(this.r.journey.portal(req.actor,uuid(id)),this.r.engine.caseFor(req.actor,id).locale),schemaVersion:CASE_DTO_VERSION});}
+  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){const locale=this.r.engine.caseFor(req.actor,uuid(id)).locale;return PortalDtoSchema.parse({...presentJourney(this.r.journey.portal(req.actor,id),locale),complianceSteps:complianceSteps(locale),schemaVersion:CASE_DTO_VERSION});}
   @Get('cases/:caseId/summaries') summaries(@Req() req:Request,@Param('caseId') id:string){return this.r.dossier.bundle(req.actor,uuid(id));}
   @Get('cases/:caseId/dossier') dossier(@Req() req:Request,@Param('caseId') id:string,@Query('audience') audience='customer',@Query('format') format='json',@Res({passthrough:true}) res:Response){
     const a=z.enum(['customer','advisor']).parse(audience);const f=z.enum(['json','html']).parse(format);

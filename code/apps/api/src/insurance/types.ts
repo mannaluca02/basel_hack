@@ -1,4 +1,4 @@
-import type { InsuranceCaseState,CustomerConfirmation,ModelExtractionConsent,VoiceSession,StoredVoiceTurn,VoiceMappingIssue,VoiceObservation } from '@pax/contracts';
+import type { InsuranceCaseState,CustomerConfirmation,ModelExtractionConsent,VoiceSession,StoredVoiceTurn,VoiceMappingIssue,VoiceObservation,SuitabilityCheck } from '@pax/contracts';
 export type { SourceDecision,ProductCandidate,Recommendation,ReviewTask,DemoQuote,DemoApplication,DemoPolicy,
   CaseEvent,ScenarioComparison,AgentProposal,LifeRun,RiskNeed } from '@pax/contracts';
 
@@ -8,7 +8,9 @@ export type AuditEvent = {id:string;at:string;actorId:string;action:string;caseI
 export type InsuranceCase = InsuranceCaseState & {
   ownerId:string;voiceSessions:StoredVoiceSession[];confirmationRequests:(CustomerConfirmation & {sessionHash:string})[];modelExtractionConsent:(ModelExtractionConsent & {acceptedBy:string})|null;
   /** Final turns of a separately running voice agent (Paxi), owner-readable only, never in the case DTO. */
-  agentTurns:AgentVoiceTurn[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
+  agentTurns:AgentVoiceTurn[];
+  /** Suitability pre-checks of the customer; read through /suitability, never in the case DTO. */
+  suitabilityChecks:SuitabilityCheck[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
 };
 export type Database = {
   version:1;sessions:Record<string,Actor>;cases:Record<string,InsuranceCase>;audit:AuditEvent[];

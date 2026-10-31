@@ -1,4 +1,5 @@
 import { AgentVoiceTurnsSchema,ExternalVoiceObservationsSchema } from '../voice/service.js';
+import { SuitabilityCheckInputSchema } from '@pax/contracts';
 import { DemoStartSchema,LoadPersonaSchema,StandardAnalysesSchema } from './demo-journey.js';
 import { z } from 'zod';
 import { CreateVoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceSessionSchema,VoiceTranscriptSchema,VoiceTurnInputSchema,VoiceExtractionInputSchema,VoiceExtractionResponseSchema,CloseVoiceSessionSchema,
@@ -39,6 +40,8 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases','List authorized cases',undefined],['post','/api/cases','Create synthetic life-insurance case',CreateInsuranceCaseSchema],
   ['get','/api/cases/{caseId}','Read own case',undefined],['patch','/api/cases/{caseId}/draft','Update unconfirmed draft',DraftPatchSchema],
   ['post','/api/demo/start','Local demo only (PAX_DEMO_START=1): shared customer session with the confirmed, calculated Mueller persona; no access code',DemoStartSchema],
+  ['get','/api/cases/{caseId}/suitability','Read the suitability pre-checks (Pax form 0054/PMPV/03.2026, not binding) and the qualified products',undefined],
+  ['post','/api/cases/{caseId}/suitability','Customer answers the suitability pre-check for one qualified product; fund-linked products cannot be quoted without a suitable result',SuitabilityCheckInputSchema],
   ['post','/api/cases/{caseId}/demo-profile','Load a synthetic Pax persona as unconfirmed draft; confirmation still required',LoadPersonaSchema],
   ['post','/api/cases/{caseId}/standard-analyses','Run the standard family/home/retirement/baseline scenarios of the confirmed profile, then derive the recommendation',StandardAnalysesSchema],
   ['post','/api/cases/{caseId}/confirmations','Confirm profile and calculator transfer',ConfirmProfileSchema],

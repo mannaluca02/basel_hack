@@ -14,6 +14,7 @@ import { ModelExtractionConsents,type ModelExtractionOptions } from './model-ext
 import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
 import { DemoJourney } from './demo-journey.js';
+import { SuitabilityService } from './suitability.js';
 import { ProductDocuments } from './documents.js';
 import { PrototypeInsights } from './telemetry.js';
 import { ScenarioComparisonService } from './comparison.js';
@@ -51,7 +52,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
       }).catch(()=>{});
     },60_000);cleanup.unref();
     const estimates=new DraftEstimateService(engine);
-    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,demo:new DemoJourney(engine,estimates,options.demoStart?{sessions,credentials}:null),
+    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,options.demoStart?{sessions,credentials}:null),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
