@@ -84,6 +84,8 @@ export function createPaxiVoice({
   let firstWords = "";
   let firstWordsTimer;
   let intro = null; // { audio, monitor, words, endedAt, pending: [] } while the recorded intro runs
+  let muted = false; // the person muted their microphone
+  let silenced = false; // the person asked Paxi to stop talking, until they speak again
   let lastActivity = 0;
   let nudges = 0;
   let idleTimer;
@@ -415,6 +417,10 @@ export function createPaxiVoice({
       onNote: (note) => {
         if (current?.ready) send(current, { type: "session.thinking.append", delegation_id: null, content: note });
       },
+      onStop: () => {
+        poller?.stop();
+        if (running && !finishing) this_.stop();
+      },
     });
   }
 
@@ -515,6 +521,11 @@ export function createPaxiVoice({
           lastActivity = performance.now();
           // Breathing or noise tags like "[sniff]" are logged, but do not count as activity.
           if (speaker === "user" && isSpeech(f.text)) {
+            // Paxi may talk again once the person said something after "stop speaking".
+            if (silenced && current) {
+              silenced = false;
+              current.audio.muted = false;
+            }
             nudges = 0;
             lastUserAt = performance.now();
             inactiveWarnedAt = null;
@@ -660,7 +671,7 @@ export function createPaxiVoice({
     running = false;
   }
 
-  return {
+  const this_ = {
     /**
      * Starts a conversation. Call it from a click or tap: browsers require a user action.
      * Pass { resume: conversationId } to continue a conversation that was closed, for
@@ -736,6 +747,27 @@ export function createPaxiVoice({
       closeTimeout = setTimeout(() => finish("disconnected"), FINAL_CLOSE_TIMEOUT_MS);
     },
 
+    /** Mutes the person's microphone; Paxi keeps talking and listening resumes on unmute. */
+    setMuted(value) {
+      muted = Boolean(value);
+      microphone?.getAudioTracks().forEach((track) => (track.enabled = !muted));
+    },
+
+    get muted() {
+      return muted;
+    },
+
+    /**
+     * Stops what Paxi is saying right now: its voice is muted until the person speaks again, so
+     * the rest of that answer is neither heard nor logged (like a muted session in a voice switch).
+     */
+    stopSpeaking() {
+      if (!current) return;
+      silenced = true;
+      current.audio.muted = true;
+      endPlayback("cancelled");
+    },
+
     /** URL of the conversation's JSON log, once the conversation has started. */
     get logUrl() {
       return conversationId ? `${baseUrl}/api/conversations/${conversationId}` : null;
@@ -744,7 +776,23 @@ export function createPaxiVoice({
     get running() {
       return running;
     },
+
+    /** Follows the app's language: switches Paxi to that language's native voice. */
+    async setLanguage(language) {
+      if (!current?.ready || switching) return;
+      let result;
+      try {
+        result = await postJson(`/api/conversations/${current.id}/language`, { language });
+      } catch (error) {
+        console.error("Language from the app failed", error);
+        return;
+      }
+      if (!result.ok) return;
+      languageChosen = true;
+      if (result.switch_voice && !switching) switchVoice(current, null, result.voice);
+    },
   };
+  return this_;
 }
 
 function waitForIceGathering(connection) {

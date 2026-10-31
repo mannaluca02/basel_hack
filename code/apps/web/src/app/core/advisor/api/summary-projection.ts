@@ -2,6 +2,7 @@ import type {
   AdvisorContext,
   InsuranceCaseDto,
   SummaryBundle as CaseSummaries,
+  SuitabilityView,
 } from '@pax/contracts';
 import type { Language } from '../../i18n/language';
 import type {
@@ -14,6 +15,7 @@ import type {
   SummaryFact,
   SummaryGap,
   SummaryPoint,
+  SummaryProduct,
 } from '../contracts';
 import type { InfoItem, RiskItem, TranscriptEntry } from '../ui-models';
 
@@ -68,6 +70,9 @@ const TEXT = {
   assumption: { de: 'Annahme der Berechnung', fr: 'Hypothèse du calcul', it: 'Ipotesi del calcolo', en: 'Calculation assumption' },
 } satisfies Record<string, Text>;
 
+/** Mirror of `QUALIFIED_PRODUCT_IDS` in @pax/contracts: loss risk in the saving process. */
+const UNIT_LINKED = new Set(['pax_fondsstar', 'pax_lifestar', 'pax_payout']);
+
 const PILLAR_KEYS: Readonly<Record<Pillar, '1' | '2' | '3'>> = { pillar1: '1', pillar2: '2', pillar3: '3' };
 
 export function projectSummary(
@@ -76,6 +81,7 @@ export function projectSummary(
   summaries: CaseSummaries | null,
   risks: readonly RiskItem[],
   language: Language,
+  suitability: SuitabilityView | null = null,
 ): SummaryBundle | null {
   const summary = summaries?.customer;
   if (!summary || summary.profileVersion === null || summary.runId === null) return null;
@@ -84,7 +90,6 @@ export function projectSummary(
   const progress = context?.progress.groups ?? [];
   const complete = (...ids: string[]) => ids.every((id) => progress.find((g) => g.id === id)?.complete === true);
   const reviewOpen = context?.progress.reviewOpen ?? summary.reviewTasks.some((task) => task.status === 'open');
-  const confirmed = dto.confirmedVersions.at(-1)?.draft;
 
   const keyFacts: SummaryFact[] = (summary.presentation?.metrics ?? []).slice(0, 6).map((metric) => ({
     factId: metric.id,
@@ -128,6 +133,16 @@ export function projectSummary(
     ...(summary.recommendations.length ? [{ id: 'recommendation', text: t(TEXT.recommendation) }] : []),
   ];
 
+  const recommendation = [...summary.recommendations].reverse().find((r) => r.runId === summary.runId);
+  const products: SummaryProduct[] = (recommendation?.candidates ?? []).map((candidate) => ({
+    candidateId: candidate.id,
+    productId: candidate.productId,
+    name: candidate.productName,
+    ...(candidate.personId ? { personId: candidate.personId } : {}),
+    need: money(candidate.needAmountCents, candidate.needPeriod, candidate.needPeriod === 'once' ? 'capital' : 'net_after_income_tax'),
+    unitLinked: UNIT_LINKED.has(candidate.productId),
+  }));
+
   return {
     schemaVersion: '1.0',
     messageId: `summary_${summary.snapshotId.slice(0, 16)}`,
@@ -150,8 +165,12 @@ export function projectSummary(
       needsCaptured: complete('life_goals'),
       financesCaptured: complete('income', 'budget', 'capital'),
       allPillarsCaptured: complete('pillar_1', 'pillar_2', 'pillar_3'),
-      suitabilityCheckDone: confirmed?.insurance?.investmentKnowledgeConfirmed === true,
+      // A suitable pre-check for the current profile; the binding check stays with a Pax advisor.
+      suitabilityCheckDone: (suitability?.checks ?? []).some(
+        (check) => check.profileVersion === summary.profileVersion && check.result === 'suitable',
+      ),
     },
+    products,
   };
 }
 

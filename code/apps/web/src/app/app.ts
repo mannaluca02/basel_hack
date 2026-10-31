@@ -30,6 +30,13 @@ import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
+import { ConnectionBanner } from './features/connection/connection-banner';
+import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
+import { CallControls } from './features/call-controls/call-controls';
+import { SummaryDialog } from './features/summary/summary-dialog';
+import { VoiceAgentLink } from './core/advisor/api/voice-agent-link';
+import { VoiceActivity } from './core/voice/voice-activity';
+import { LiveVoiceControl } from './features/live-voice/live-voice-control';
 import { ReviewPanel } from './features/review/review-panel';
 
 interface TabLink {
@@ -50,6 +57,11 @@ interface TabLink {
     LanguageSwitcher,
     ConsentScreen,
     AgentDock,
+    ConnectionBanner,
+    HumanAdvisorStatus,
+    CallControls,
+    SummaryDialog,
+    LiveVoiceControl,
     ReviewPanel,
   ],
   selector: 'app-root',
@@ -96,7 +108,19 @@ export class App {
 
   /** Data capture for the ring around the avatar. */
   protected readonly progress = this.store.progress;
-  protected readonly activity = computed(() => this.store.agent().activity);
+  private readonly paxi = inject(VoiceAgentLink);
+  private readonly live = inject(VoiceActivity).live;
+  /** Paxi's activity while it talks here or in its own window, else the advisor's. */
+  protected readonly activity = computed(
+    () =>
+      this.live() ??
+      (this.paxi.state() === 'opened' ? this.paxi.activity() : this.store.agent().activity),
+  );
+
+  /** The live voice needs the case service; the scripted mock has no voice sessions. */
+  protected readonly liveVoice = inject(APP_ENVIRONMENT).dataSource === 'api';
+  /** Link to the Voice Lab, only in the debug configurations. */
+  protected readonly debugVoice = inject(APP_ENVIRONMENT).debugVoice === true;
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll

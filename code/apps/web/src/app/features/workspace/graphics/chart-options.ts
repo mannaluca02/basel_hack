@@ -59,6 +59,8 @@ export interface ChartContext {
 export interface ViewChoice {
   /** Index of the shown scenario of an event-impact chart; out-of-range values are clamped. */
   readonly scenario: number;
+  /** The life event picked on the timeline (FE-15); charts with that year on their axis mark it. */
+  readonly event?: { readonly year: number; readonly label: string };
 }
 
 export type LegendMark = 'bar' | 'hatched' | 'line' | 'dashed' | 'vline' | 'dot' | 'ring';
@@ -94,6 +96,7 @@ export interface TimelineEntry {
   readonly certaintyLabel: string;
   readonly token: CssToken;
   readonly today: boolean;
+  readonly kind: LifeEvent['kind'];
 }
 
 export interface ChartView {
@@ -109,6 +112,44 @@ export interface ChartView {
   readonly table: ChartTable;
   /** e.g. "CHF per year · gross"; `null` for charts without amounts. */
   readonly unit: string | null;
+  /** A backend figure that belongs to the chart but not on an axis, e.g. the 3a tax saving. */
+  readonly annotation: string | null;
+}
+
+/** Colour of the band behind the year of the selected life event. */
+const SELECTED_TOKEN: CssToken = '--border-focusring';
+
+/**
+ * Marks the year of the selected life event as a band on the category axis, when the chart has
+ * that year; a year between two sampled ones is not guessed onto the axis.
+ */
+function withSelectedYear(
+  view: ChartView,
+  years: readonly number[],
+  ctx: ChartContext,
+  choice: ViewChoice,
+): ChartView {
+  const event = choice.event;
+  const option = view.option as (ChartOption & { series: (BarSeriesOption | LineSeriesOption)[] }) | null;
+  if (!event || !option || !years.includes(event.year)) return view;
+  const year = String(event.year);
+  const [first, ...rest] = option.series;
+  const marked = {
+    ...first,
+    markArea: {
+      silent: true,
+      itemStyle: { color: ctx.token(SELECTED_TOKEN), opacity: 0.18 },
+      data: [[{ xAxis: year }, { xAxis: year }]],
+    },
+  } as BarSeriesOption | LineSeriesOption;
+  return {
+    ...view,
+    option: { ...option, series: [marked, ...rest] } as ChartOption,
+    legend: [
+      ...view.legend,
+      { label: ctx.t('graphics.selectedEvent', { label: event.label, year }), token: SELECTED_TOKEN, mark: 'bar' },
+    ],
+  };
 }
 
 // Translation keys, written out in full for the i18n check.
@@ -217,11 +258,11 @@ export function buildChartView(
 ): ChartView {
   switch (chart.type) {
     case 'income_timeline':
-      return incomeTimeline(chart, ctx);
+      return withSelectedYear(incomeTimeline(chart, ctx), chart.years, ctx, choice);
     case 'event_impact':
       return eventImpact(chart, ctx, choice);
     case 'pillar3a_growth':
-      return pillar3aGrowth(chart, ctx);
+      return withSelectedYear(pillar3aGrowth(chart, ctx), chart.years, ctx, choice);
     case 'life_events':
       return lifeEvents(chart, ctx);
   }
@@ -414,6 +455,13 @@ function pillar3aGrowth(chart: Pillar3aGrowthChart, ctx: ChartContext): ChartVie
       })),
     },
     unit: unitLabel(chart.unit, ctx),
+    annotation:
+      chart.taxSaving === null
+        ? null
+        : ctx.t('graphics.taxSaving', {
+            amount: ctx.chf(chart.taxSaving.amount / 100),
+            period: ctx.t(PERIOD_KEYS[chart.taxSaving.period]),
+          }),
   };
 }
 
@@ -432,6 +480,7 @@ function lifeEvents(chart: LifeEventsChart, ctx: ChartContext): ChartView {
       certaintyLabel: ctx.t(CERTAINTY_KEYS[e.certainty]),
       token: CERTAINTY_TOKENS[e.certainty],
       today: e.kind === 'today',
+      kind: e.kind,
     }));
   return {
     ...noExtras,
@@ -460,7 +509,7 @@ function lifeEvents(chart: LifeEventsChart, ctx: ChartContext): ChartView {
 
 // --- shared parts ------------------------------------------------------------------------------
 
-const noExtras = { timeline: null, scenarios: null, scenario: 0 } as const;
+const noExtras = { timeline: null, scenarios: null, scenario: 0, annotation: null } as const;
 
 /** Rappen to francs, for display only. `null` stays unknown; ECharts leaves a gap for it. */
 function francs(rappen: number | null): number | null {

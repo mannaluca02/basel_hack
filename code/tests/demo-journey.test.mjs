@@ -150,3 +150,50 @@ test('a separate voice agent records the call history without touching the case 
     assert.equal((await call('GET',`/api/cases/${c.id}/voice/agent-turns`,reviewer.sessionToken)).status,403);
   }finally{await voiceApp.close();await rm(dir,{recursive:true,force:true});}
 });
+
+test('in the demo start the voice agent proposals are taken over, confirmed and recalculated in one step',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'pax-demo-accept-'));
+  const {app:demoApp}=await createLifeInsuranceApp({dataDirectory:dir,provider:new SyntheticTestProvider(),providerMode:'test',credentials,demoStart:true,voice:{enabled:true}});
+  try{
+    await demoApp.listen(0,'127.0.0.1');const url=await demoApp.getUrl();
+    const start=await fetch(url+'/api/demo/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const cookie=start.headers.get('set-cookie').split(';')[0];const {caseId,csrfToken}=await start.json();
+    const call=async(method,path,body,auth={Cookie:cookie,'X-CSRF-Token':csrfToken})=>{const r=await fetch(url+path,{method,headers:{...auth,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:r.status,body:await r.json()};};
+    const grant=(await call('POST',`/api/cases/${caseId}/agent-access`,{})).body;
+    const agent={Authorization:`Bearer ${grant.sessionToken}`};
+    const context=(await call('GET',`/api/cases/${caseId}/advisor/extractor-context`,undefined,agent)).body;
+    const proposed=await call('POST',`/api/cases/${caseId}/voice/agent-observations`,{messageId:'obs_1',conversationId:'conv_1',
+      expectedCaseRevision:context.caseRevision,expectedProfileVersion:context.profileVersion,basisDraftHash:context.draftHash,
+      turns:[{messageId:'t1',turnId:'t1',text:'Ich verdiene 105000 brutto.'}],
+      observations:[{fieldId:'annual_gross_income_chf',personId:'person_demo_1',sourceMessageId:'t1',quote:'105000',value:105000,precision:'exact',unit:'CHF',period:'year',basis:'gross'}]},agent);
+    assert.equal(proposed.status,201,JSON.stringify(proposed.body));
+    const result=await call('POST',`/api/cases/${caseId}/demo-accept`,{});
+    assert.equal(result.status,201,JSON.stringify(result.body));
+    assert.equal(result.body.accepted.length,1);assert.equal(result.body.profileVersion,2);assert.equal(result.body.runs.length,4);
+    const c=(await call('GET',`/api/cases/${caseId}`)).body;
+    assert.equal(c.confirmedVersions.at(-1).draft.insurance.persons[0].grossAnnualIncomeCents,10500000);
+    assert.ok(c.runs.filter(r=>r.profileVersion===2).length===4);
+    const nothing=await call('POST',`/api/cases/${caseId}/demo-accept`,{});
+    assert.deepEqual([nothing.body.accepted,nothing.body.runs],[[],[]]);
+  }finally{await demoApp.close();await rm(dir,{recursive:true,force:true});}
+});
+
+test('taking over proposals in one step only exists in the demo start',async()=>{
+  const c=(await request('POST','/api/cases',customer.sessionToken,{locale:'de',timeBudgetMinutes:10,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
+  assert.equal((await request('POST',`/api/cases/${c.id}/demo-accept`,customer.sessionToken,{})).status,404);
+});
+
+test('the voice agent reads the rule-based recommendation it may talk about',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'pax-agent-rec-'));
+  const {app:demoApp}=await createLifeInsuranceApp({dataDirectory:dir,provider:new SyntheticTestProvider(),providerMode:'test',credentials,demoStart:true});
+  try{
+    await demoApp.listen(0,'127.0.0.1');const url=await demoApp.getUrl();
+    const start=await fetch(url+'/api/demo/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const cookie=start.headers.get('set-cookie').split(';')[0];const {caseId,csrfToken}=await start.json();
+    const grant=await (await fetch(`${url}/api/cases/${caseId}/agent-access`,{method:'POST',headers:{Cookie:cookie,'X-CSRF-Token':csrfToken,'Content-Type':'application/json'},body:'{}'})).json();
+    const result=await (await fetch(`${url}/api/cases/${caseId}/voice/agent-recommendation`,{headers:{Authorization:`Bearer ${grant.sessionToken}`}})).json();
+    assert.equal(result.recommendation.reviewOpen,true);
+    assert.deepEqual(result.recommendation.candidates.map(c=>c.productName),['Pax Erwerbsunfähigkeitsschutz','Pax Todesfallschutz']);
+    assert.equal(JSON.stringify(result).includes('needAmountCents'),false);
+  }finally{await demoApp.close();await rm(dir,{recursive:true,force:true});}
+});

@@ -127,6 +127,19 @@ export interface SummaryGap {
   readonly relatedRiskId?: string;
 }
 
+/** A product family the analysis points to, only shown once the product gate is open. */
+export interface SummaryProduct {
+  readonly candidateId: string;
+  readonly productId: string;
+  /** Already in the requested locale. */
+  readonly name: string;
+  readonly personId?: string;
+  /** The need behind it, if quantified. */
+  readonly need: Money | null;
+  /** Fund-linked or capitalization: loss risk in the saving process, needs the suitability check. */
+  readonly unitLinked: boolean;
+}
+
 /** Inputs for the product gate (rules 1 and 6); the UI only reads them. */
 export interface ProductGate {
   readonly needsCaptured: boolean;
@@ -152,6 +165,8 @@ export interface SummaryBundle extends MessageHeader {
   readonly openQuestions: readonly SummaryPoint[];
   readonly nextSteps: readonly SummaryPoint[];
   readonly productGate: ProductGate;
+  /** From the current recommendation; empty or missing before there is one. */
+  readonly products?: readonly SummaryProduct[];
 }
 
 // --- I09 ProgressSnapshot: data maturity -> avatar ring and progress views ---------------------
@@ -189,4 +204,4 @@ export type ContextUpdateReason =
   | 'conversation_preference_changed';
 
 /** The runtime's event; `handover` is left out until the UI has a use for it. */
-export type AdvisorContextUpdate = Omit<AdvisorContextUpdated, 'handover'>;
+export type AdvisorContextUpdate = Omit<AdvisorContextUpdated, 'handover'> & Partial<Pick<AdvisorContextUpdated, 'handover'>>;

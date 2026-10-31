@@ -1,4 +1,161 @@
 {
+  "lab": {
+    "setup": {
+      "title": "1. Préparer le dossier du dialogue",
+      "prepare": "Préparer le dossier de démonstration",
+      "signedOut": "Connectez-vous ici et chargez la situation fictive en une étape. La préparation n’ouvre ni microphone ni connexion au fournisseur.",
+      "loading": "Vérification du dossier. Vous pouvez le recharger ici ou poursuivre la préparation.",
+      "empty": "Ce dossier est vide. Préparez-le d’abord, puis choisissez la personne et démarrez le direct.",
+      "incomplete": "Ce dossier existant contient des données mais aucune personne commune aux profils financier et d’assurance. Complétez-le dans la vérification ; la démonstration n’écrase aucune donnée ni historique.",
+      "ready": "Le dossier est prêt. Choisissez la personne, configurez les skills et démarrez le direct avec consentement séparé.",
+      "choosePerson": "Choisissez une personne existante de ce dossier.",
+      "working": "Veuillez patienter – opération en cours …",
+      "running": "Le dialogue est en cours. Utilisez Arrêter immédiatement pour le terminer.",
+      "consent": "2. Acceptez l’avis vocal affiché. Seul le clic sur Démarrer demande le microphone.",
+      "provider": "Le fournisseur vocal est indisponible. Vérifiez la configuration du backend et rechargez le dossier.",
+      "extractionUnavailable": "L’extraction en direct est désactivée ou inaccessible. Démarrez le backend actuel avec PAX_SYNTHETIC_VOICE_ENABLED=1 et OPENAI_API_KEY ; la connexion vocale seule ne recueille pas les données.",
+      "extractionReady": "Extraction en direct active : journal → IA → propositions",
+      "handover": "Un conseil humain a été demandé. Réautorisez explicitement le dialogue numérique ici avant de démarrer une nouvelle conversation.",
+      "liveReady": "3. Prêt : démarrez le dialogue en direct et autorisez le microphone dans le navigateur.",
+      "replayReady": "Prêt : le replay fictif ne nécessite ni microphone ni consentement vocal."
+    },
+    "error": {
+      "microphoneDenied": "L’accès au microphone a été refusé. Autorisez-le dans les paramètres du site du navigateur, puis redémarrez le dialogue en direct.",
+      "microphoneMissing": "Aucun microphone trouvé. Branchez ou sélectionnez un microphone, puis réessayez.",
+      "sessionExpired": "La session ou le dossier a expiré, par exemple après un redémarrage du serveur. Reconnectez-vous ci-dessous et préparez la démonstration.",
+      "recover": "L’opération n’a pas abouti. Consultez la trace API, puis relancez la préparation ou rechargez le dossier."
+    },
+    "avatarNotice": "Avatar : visualisation locale du niveau audio. Ni preuve de transcription finale ni de lecture terminée.",
+    "confirmedGross": "Dernier revenu annuel brut confirmé",
+    "canonicalUnits": "Valeur brute : montants en centimes CHF (100 centimes = 1 CHF)",
+    "title": "Voice Lab",
+    "syntheticOnly": "Données fictives uniquement",
+    "description": "Dialoguez avec Paxi et suivez les vrais échanges API, de la transcription au dossier canonique et à la projection du store.",
+    "apiRequired": "Démarrez avec npm --prefix code/apps/web run start:api. Le laboratoire nécessite le backend de dossiers sur le port 3000.",
+    "demoCode": "Le code public prérempli fonctionne uniquement avec le serveur start:voice-lab. Sinon, utilisez votre code client local.",
+    "baselineNotice": "La situation initiale contient des personnes et montants fictifs. Elle est chargée comme brouillon non confirmé.",
+    "connection": "Dialogue et avatar",
+    "synthetic": "Replay fictif",
+    "live": "Direct · microphone",
+    "speaker": "Personne qui parle (attribution explicite)",
+    "replayNotice": "Conversation rédigée sur les huit champs, vraies écritures backend. Aucun microphone, son ou appel de modèle. L’activité de l’avatar est simulée.",
+    "replay": "Rejouer toute la conversation",
+    "correction": "Correction",
+    "smalltalk": "Conversation / sans résultat",
+    "configured": "configuré (sans test de disponibilité)",
+    "unconfigured": "non configuré",
+    "voiceConsent": "J’utilise uniquement des informations fictives et j’accepte leur transfert audio/conversation à OpenAI pour cette démonstration.",
+    "start": "Démarrer le dialogue en direct",
+    "liveNotice": "Dialogue GPT-Live avec les skills choisis. L’IA analyse le journal de conversation et actualise les données à droite. Le direct exige une extraction active et les deux consentements. Les points ambigus sont clarifiés ; les modifications sont acceptées dans la revue.",
+    "stop": "Arrêter immédiatement",
+    "handover": "Demander un conseiller humain",
+    "resume": "Réautoriser le dialogue numérique",
+    "dialogue": "Conversation",
+    "transcriptNotice": "Direct : fragments transmis comme client-settled au changement de locuteur ou après 1,5 s de silence. Cela ne prouve ni la finalité du fournisseur ni la fin de lecture audio.",
+    "noTurns": "Choisissez vos réglages et démarrez le dialogue en direct.",
+    "canonical": "Dossier canonique → vue",
+    "pending": "Propositions en attente",
+    "confirmationNotice": "Les informations détectées sont des propositions. Leur acceptation modifie le brouillon ; la confirmation du profil complet reste une action séparée dans la revue.",
+    "refresh": "Recharger le dossier",
+    "storeProjection": "Projection presenter/store",
+    "canonicalPayload": "DTO canonique du dossier",
+    "noCase": "Aucun dossier chargé. Connectez-vous.",
+    "trace": "Envoi / réception · trace des échanges",
+    "clearTrace": "Effacer la trace",
+    "traceNotice": "Vraies requêtes/réponses HTTP, événements du canal WebRTC et projections locales explicites. SDP et identifiants masqués. 80 entrées maximum, données volumineuses tronquées. Les paquets audio et données internes des modèles ne sont pas présentés comme observés.",
+    "extraction": "Dernière extraction côté serveur (model-v1 avec accord IA, sinon règles)",
+    "noTrace": "Aucun échange enregistré.",
+    "review": "Vérification · acceptation et confirmation du profil",
+    "settings": {
+      "title": "Réglages de conversation",
+      "source": "Skills de code/voice-agent/skills avec assigned: true. La sélection s’applique au prochain démarrage.",
+      "time": "Temps disponible",
+      "priority": "Sujet prioritaire",
+      "natural": "Suivre naturellement la conversation",
+      "unavailable": "Les réglages du prompt sont indisponibles. Démarrez le backend actuel et rechargez le dossier."
+    },
+    "context": {
+      "title": "Ce que la conversation a permis de recueillir",
+      "logs": "Journal de conversation",
+      "description": "Ce texte suit les informations recueillies par le backend et évolue avec la conversation, y compris les corrections.",
+      "empty": "Aucune information précise n’a encore été recueillie dans la conversation.",
+      "proposed": "Détecté dans la conversation, mais pas encore accepté :",
+      "accepted": "Déjà accepté dans le brouillon :",
+      "unclear": "Votre déclaration « {{quote}} » concernant {{field}} reste ambiguë et doit être précisée.",
+      "open": "Restent à préciser : {{fields}}.",
+      "skipped": "Reporté à plus tard et toujours ouvert : {{fields}}.",
+      "processing": "Le backend analyse la nouvelle déclaration …",
+      "failed": "La dernière déclaration n’a pas pu être analysée. Le contexte recueilli reste visible et la conversation peut continuer.",
+      "source": "Dernière déclaration analysée par le backend",
+      "updated": "Le backend a créé une proposition à partir de cette déclaration. Le dossier actuel est rechargé automatiquement.",
+      "noMatch": "Aucune nouvelle information précise n’en résulte. Le contexte déjà recueilli est conservé.",
+      "needsClarification": "Le backend a détecté une information ambiguë qui nécessite une question complémentaire.",
+      "reviewNeeded": "Cette déclaration n’a pas pu être entièrement saisie comme proposition. Vérifiez la revue ou précisez-la dans la conversation.",
+      "details": "Détails techniques et aperçu des champs",
+      "fact": {
+        "income": "Vous avez indiqué un revenu brut de {{value}} par an.",
+        "employment": "Vous travaillez à un taux de {{value}}.",
+        "civilStatus": "Vous avez indiqué « {{value}} » comme état civil.",
+        "pensionFund": "À la question de savoir si vous avez une caisse de pension, vous avez répondu « {{value}} ».",
+        "pillar3a": "Vous versez {{value}} par an dans le pilier 3a.",
+        "housing": "Vos frais de logement s’élèvent à {{value}} par mois.",
+        "retirement": "Vous souhaitez prendre votre retraite à {{value}} ans.",
+        "risk": "Vous avez décrit votre appétence au risque comme {{value}}."
+      }
+    },
+    "intake": {
+      "title": "Informations de la conversation",
+      "progress": "Saisi",
+      "evaluating": "analyse en cours",
+      "yes": "oui",
+      "no": "non",
+      "done": "Merci, j’ai toutes les informations. Vous pouvez les vérifier dans la revue.",
+      "extractionConsent": "J’accepte qu’un petit extrait fictif de la conversation soit transmis à OpenAI pour l’extraction par IA (accord séparé).",
+      "extractionBlocker": "Confirmez l’accord séparé pour l’IA, sinon le labo reviendrait silencieusement à des phrases rigides.",
+      "status": {
+        "open": "ouvert",
+        "asking": "Paxi demande",
+        "unclear": "peu clair",
+        "proposed": "proposé",
+        "accepted": "accepté",
+        "skipped": "ignoré"
+      },
+      "field": {
+        "annual_gross_income_chf": "Revenu annuel brut",
+        "employment_rate_percent": "Taux d’occupation",
+        "civil_status": "État civil",
+        "has_pension_fund": "Caisse de pension",
+        "pillar_3a_annual_contribution_chf": "Pilier 3a par an",
+        "monthly_housing_cost_chf": "Frais de logement par mois",
+        "desired_retirement_age": "Âge de retraite souhaité",
+        "risk_appetite": "Appétence au risque"
+      },
+      "question": {
+        "annual_gross_income_chf": "Quel est votre revenu annuel brut en CHF ? Précisez bien qu’il est brut et par an.",
+        "employment_rate_percent": "À quel pourcentage travaillez-vous ?",
+        "civil_status": "Quel est votre état civil ?",
+        "has_pension_fund": "Avez-vous une caisse de pension ?",
+        "pillar_3a_annual_contribution_chf": "Combien versez-vous par an dans le pilier 3a ?",
+        "monthly_housing_cost_chf": "À combien s’élèvent vos frais de logement par mois ?",
+        "desired_retirement_age": "À quel âge souhaitez-vous prendre votre retraite ?",
+        "risk_appetite": "Comment décririez-vous votre appétence au risque : faible, moyenne ou élevée ?"
+      },
+      "value": {
+        "civil_status": {
+          "single": "célibataire",
+          "married": "marié",
+          "cohabiting": "concubinage",
+          "registered_partnership": "partenariat enregistré"
+        },
+        "risk_appetite": {
+          "low": "faible",
+          "medium": "moyenne",
+          "high": "élevée"
+        }
+      },
+      "clarify": "Est-ce brut et par an ?"
+    }
+  },
   "app": {
     "name": "Pax Digital Advisor"
   },
@@ -88,7 +245,10 @@
     },
     "neededLine": "Nécessaire : {{amount}}",
     "payout": "Versement à la retraite ({{year}})",
-    "showInInfo": "Afficher dans Info"
+    "showInInfo": "Afficher dans Info",
+    "taxSaving": "Économie d’impôt selon le calculateur : {{amount}} ({{period}})",
+    "selectedEvent": "Sélection : {{label}} ({{year}})",
+    "selectEventHint": "Choisir un événement pour marquer son année dans les autres graphiques"
   },
   "risks": {
     "title": "Risques",
@@ -284,5 +444,73 @@
       "voiceOpened": "Paxi est ouvert dans une fenêtre séparée. Ce que tu racontes apparaît ici comme proposition à vérifier.",
       "voiceFailed": "Impossible de relier Paxi. L'agent vocal est-il lancé ?"
     }
+  },
+  "connection": {
+    "lost": "La connexion au conseiller est interrompue.",
+    "reconnecting": "La connexion est en cours de rétablissement …",
+    "paused": "D’ici là, aucun nouveau chiffre n’arrive ; ceux affichés peuvent être dépassés.",
+    "retry": "Se reconnecter"
+  },
+  "human": {
+    "request": "Parler à un·e conseiller·ère Pax",
+    "requested": "Votre demande de conseil personnel est enregistrée, le conseil numérique est en pause. Vous joignez Pax au",
+    "resume": "Continuer en numérique",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer ou appeler Pax directement.",
+    "prompt": "Plutôt en personne ?"
+  },
+  "summary": {
+    "title": "Résumé",
+    "draft": "Brouillon",
+    "close": "Fermer le résumé",
+    "reviewOpen": "Un·e spécialiste Pax vérifie encore les valeurs ; il s’agit d’un état provisoire.",
+    "keyFacts": "L’essentiel",
+    "goals": "Vos objectifs",
+    "pillars": "Les trois piliers à la retraite",
+    "gaps": "Lacunes principales",
+    "openQuestions": "Questions ouvertes",
+    "nextSteps": "Prochaines étapes",
+    "products": "Solutions possibles",
+    "productsLocked": "Les recommandations apparaissent dès que l’analyse est complète : objectifs, finances et les trois piliers.",
+    "productsDraft": "Provisoire : un·e spécialiste Pax vérifie encore ces propositions.",
+    "noProducts": "Aucun contrat supplémentaire n’est nécessaire pour votre situation actuellement.",
+    "need": "Besoin",
+    "suitabilityRequired": "Vérification du caractère approprié requise",
+    "unknown": "encore inconnu",
+    "empty": "Le résumé apparaît dès que l’on en sait assez sur votre situation.",
+    "pillar": {
+      "pillar1": "1er pilier (AVS)",
+      "pillar2": "2e pilier (caisse de pension)",
+      "pillar3": "3e pilier (privé)"
+    },
+    "period": {
+      "month": "par mois",
+      "year": "par an",
+      "once": "unique"
+    }
+  },
+  "call": {
+    "label": "Conversation",
+    "start": "Démarrer la conversation",
+    "startPaxi": "Parler avec Paxi",
+    "openPaxi": "Compris, ouvrir Paxi",
+    "cancel": "Annuler",
+    "active": "Conversation en cours",
+    "activePaxi": "Paxi est ouvert dans une fenêtre séparée",
+    "mute": "Muet",
+    "unmute": "Son activé",
+    "stopSpeaking": "Interrompre Paxi",
+    "end": "Terminer la conversation"
+  },
+  "voice": {
+    "start": "Conversation en direct avec Paxi",
+    "stop": "Terminer la conversation",
+    "title": "Parler avec Paxi",
+    "begin": "Démarrer la conversation",
+    "cancel": "Annuler",
+    "connected": "Paxi est connecté et écoute",
+    "pending": "Paxi a entendu de nouvelles informations.",
+    "accept": "Reprendre et recalculer",
+    "accepting": "Reprise en cours …",
+    "acceptFailed": "La reprise n’a pas fonctionné. Veuillez réessayer."
   }
 }

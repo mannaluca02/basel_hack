@@ -1,4 +1,161 @@
 {
+  "lab": {
+    "setup": {
+      "title": "1. Prepare the conversation case",
+      "prepare": "Prepare demo case",
+      "signedOut": "Sign in here and load the invented baseline in one step. Preparation opens neither the microphone nor a provider connection.",
+      "loading": "Checking the case. You can reload it here or continue preparation.",
+      "empty": "This case is empty. Prepare it first, then select the speaker and start live.",
+      "incomplete": "This existing case contains data but has no matching person in its financial and insurance profiles. Complete it in Review; demo preparation never overwrites existing details or history.",
+      "ready": "The case is ready. Select the speaker, configure the conversation skills and start live with separate consent.",
+      "choosePerson": "Select an existing person from this case.",
+      "working": "Please wait – the operation is running …",
+      "running": "The conversation is running. Use Stop immediately to end it.",
+      "consent": "2. Accept the displayed voice notice. Only clicking Start requests the microphone.",
+      "provider": "The live provider is unavailable. Check backend configuration and choose Reload case.",
+      "extractionUnavailable": "Live extraction is disabled or unreachable in the backend. Start the current debug backend with PAX_SYNTHETIC_VOICE_ENABLED=1 and OPENAI_API_KEY; a voice connection alone does not capture details.",
+      "extractionReady": "Live extraction active: conversation logs → AI → field proposals",
+      "handover": "Human advice has been requested. Explicitly allow digital dialogue again here before starting another conversation.",
+      "liveReady": "3. Ready: start the live conversation and allow microphone access in your browser.",
+      "replayReady": "Ready: synthetic replay needs neither a microphone nor voice consent."
+    },
+    "error": {
+      "microphoneDenied": "Microphone access was denied. Allow it in your browser’s site settings, then click Start live conversation again.",
+      "microphoneMissing": "No microphone was found. Connect or select a microphone, then start again.",
+      "sessionExpired": "The session or case has expired, for example after a server restart. Sign in below again and prepare the demo.",
+      "recover": "The operation could not finish. Check the API trace, then retry preparation or Reload case."
+    },
+    "avatarNotice": "Avatar: local audio-level visualization. Not evidence of transcript finality or completed playback.",
+    "confirmedGross": "Last confirmed annual gross income",
+    "canonicalUnits": "Raw value: money in CHF cents (100 cents = CHF 1)",
+    "title": "Voice Lab",
+    "syntheticOnly": "Invented data only",
+    "description": "Talk with Paxi and follow real API payloads from transcripts through the canonical case to the visible store projection.",
+    "apiRequired": "Start with npm --prefix code/apps/web run start:api. This lab needs the case backend on port 3000.",
+    "demoCode": "The prefilled public demo code works only with the dedicated start:voice-lab server. Otherwise use your local customer access code.",
+    "baselineNotice": "The baseline contains invented people and amounts. It is loaded as an unconfirmed draft.",
+    "connection": "Dialogue & avatar",
+    "synthetic": "Synthetic replay",
+    "live": "Live · microphone",
+    "speaker": "Speaking person (explicit attribution)",
+    "replayNotice": "Authored conversation across all eight fields, real backend writes. No microphone, speech playback or model call. Avatar activity is simulated.",
+    "replay": "Replay whole conversation",
+    "correction": "Correction",
+    "smalltalk": "Smalltalk / no match",
+    "configured": "configured (not a health check)",
+    "unconfigured": "not configured",
+    "voiceConsent": "I will use invented details only and consent to sending audio/conversation data to OpenAI for this voice demo.",
+    "start": "Start live conversation",
+    "liveNotice": "Continuous GPT-Live dialogue using your selected conversation skills. AI reads the conversation logs and updates captured details on the right. Live requires active extraction and both consents. Unclear statements are clarified; changes are accepted in the review.",
+    "stop": "Stop immediately",
+    "handover": "Request human advisor",
+    "resume": "Allow digital dialogue again",
+    "dialogue": "Conversation",
+    "transcriptNotice": "Live: GPT-Live fragments are submitted as client-settled on a speaker change or after 1.5 s quiet. This is neither provider-finality evidence nor playback confirmation.",
+    "noTurns": "Choose your conversation settings and start the live conversation.",
+    "canonical": "Canonical case → view",
+    "pending": "Pending proposal packages",
+    "confirmationNotice": "Captured details are proposals. Accepting them changes the draft; confirming the whole profile is a separate review action.",
+    "refresh": "Reload case",
+    "storeProjection": "Presenter/store projection",
+    "canonicalPayload": "Canonical case DTO",
+    "noCase": "No case loaded. Please sign in.",
+    "trace": "Send / receive · payload trace",
+    "clearTrace": "Clear trace",
+    "traceNotice": "Actual HTTP requests/responses, WebRTC data-channel events and explicitly local projections. SDP and credentials are redacted. At most 80 entries; large payloads are truncated. Audio packets and internal model payloads are not claimed here.",
+    "extraction": "Latest server-side extraction (model-v1 with AI consent, otherwise rules)",
+    "noTrace": "No payloads recorded yet.",
+    "review": "Review · acceptance and profile confirmation",
+    "settings": {
+      "title": "Conversation settings",
+      "source": "Skills from code/voice-agent/skills with assigned: true. Your selection applies at the next conversation start.",
+      "time": "Available conversation time",
+      "priority": "Preferred conversation topic",
+      "natural": "Follow the conversation naturally",
+      "unavailable": "Voice prompt settings are unavailable. Start the current debug backend and reload the case."
+    },
+    "context": {
+      "title": "What the conversation has captured",
+      "logs": "Conversation logs",
+      "description": "This text follows the details captured by the backend and updates with the conversation, including corrections.",
+      "empty": "No clear details have been captured from the conversation yet.",
+      "proposed": "Recognised from the conversation, but not yet accepted:",
+      "accepted": "Already accepted into the draft:",
+      "unclear": "Your statement “{{quote}}” about {{field}} is still unclear and needs clarification.",
+      "open": "Still open: {{fields}}.",
+      "skipped": "Left for later and still open: {{fields}}.",
+      "processing": "The backend is evaluating the new statement …",
+      "failed": "The latest statement could not be evaluated. The captured context remains visible and the conversation can continue.",
+      "source": "Statement most recently evaluated by the backend",
+      "updated": "The backend created a field proposal from this statement. The current case is reloaded automatically.",
+      "noMatch": "This did not produce a new clear detail. The previously captured context is retained.",
+      "needsClarification": "The backend detected an unclear detail that needs a follow-up question.",
+      "reviewNeeded": "This statement could not be fully captured as a proposal. Check the review or clarify it in conversation.",
+      "details": "Technical details and field overview",
+      "fact": {
+        "income": "You stated a gross income of {{value}} per year.",
+        "employment": "You work at {{value}} of full-time hours.",
+        "civilStatus": "You described your civil status as “{{value}}”.",
+        "pensionFund": "Your answer to whether you have a pension fund was “{{value}}”.",
+        "pillar3a": "You contribute {{value}} to pillar 3a each year.",
+        "housing": "Your housing costs are {{value}} per month.",
+        "retirement": "You would like to retire at age {{value}}.",
+        "risk": "You described your risk appetite as {{value}}."
+      }
+    },
+    "intake": {
+      "title": "Details from the conversation",
+      "progress": "Captured",
+      "evaluating": "evaluating",
+      "yes": "yes",
+      "no": "no",
+      "done": "Thank you, that is everything I need. You can now check it in the review.",
+      "extractionConsent": "I agree that a small, invented conversation excerpt is sent to OpenAI for AI extraction (separate consent).",
+      "extractionBlocker": "Confirm the separate AI consent, otherwise the lab would silently fall back to rigid sentences.",
+      "status": {
+        "open": "open",
+        "asking": "Paxi asks",
+        "unclear": "unclear",
+        "proposed": "proposed",
+        "accepted": "accepted",
+        "skipped": "skipped"
+      },
+      "field": {
+        "annual_gross_income_chf": "Gross annual income",
+        "employment_rate_percent": "Employment rate",
+        "civil_status": "Civil status",
+        "has_pension_fund": "Pension fund",
+        "pillar_3a_annual_contribution_chf": "Pillar 3a per year",
+        "monthly_housing_cost_chf": "Housing cost per month",
+        "desired_retirement_age": "Desired retirement age",
+        "risk_appetite": "Risk appetite"
+      },
+      "question": {
+        "annual_gross_income_chf": "What is your gross annual income in CHF? Please say explicitly that it is gross and per year.",
+        "employment_rate_percent": "What percentage do you work?",
+        "civil_status": "What is your civil status?",
+        "has_pension_fund": "Do you have a pension fund?",
+        "pillar_3a_annual_contribution_chf": "How much do you pay into pillar 3a each year?",
+        "monthly_housing_cost_chf": "What are your housing costs per month?",
+        "desired_retirement_age": "At what age would you like to retire?",
+        "risk_appetite": "How would you describe your risk appetite: low, medium or high?"
+      },
+      "value": {
+        "civil_status": {
+          "single": "single",
+          "married": "married",
+          "cohabiting": "cohabiting",
+          "registered_partnership": "registered partnership"
+        },
+        "risk_appetite": {
+          "low": "low",
+          "medium": "medium",
+          "high": "high"
+        }
+      },
+      "clarify": "Is that gross and per year?"
+    }
+  },
   "app": {
     "name": "Pax Digital Advisor"
   },
@@ -88,7 +245,10 @@
     },
     "neededLine": "Needed: {{amount}}",
     "payout": "Paid out at retirement ({{year}})",
-    "showInInfo": "Show in Info"
+    "showInInfo": "Show in Info",
+    "taxSaving": "Tax saving according to the calculator: {{amount}} ({{period}})",
+    "selectedEvent": "Selected: {{label}} ({{year}})",
+    "selectEventHint": "Pick an event to mark its year in the other charts"
   },
   "risks": {
     "title": "Risks",
@@ -284,5 +444,73 @@
       "voiceOpened": "Paxi is open in its own window. What you tell Paxi shows up here as a proposal to review.",
       "voiceFailed": "Paxi could not be connected. Is the voice agent running?"
     }
+  },
+  "connection": {
+    "lost": "The connection to the advisor is interrupted.",
+    "reconnecting": "Reconnecting …",
+    "paused": "Until then no new figures arrive; the ones shown may be outdated.",
+    "retry": "Reconnect"
+  },
+  "human": {
+    "request": "Talk to a Pax advisor",
+    "requested": "Your request for personal advice is saved and the digital advice is paused. You can reach Pax at",
+    "resume": "Continue digitally",
+    "failed": "That did not work. Please try again or call Pax directly.",
+    "prompt": "Rather talk in person?"
+  },
+  "summary": {
+    "title": "Summary",
+    "draft": "Draft",
+    "close": "Close the summary",
+    "reviewOpen": "A Pax specialist is still reviewing the figures; this is a preliminary state.",
+    "keyFacts": "Key facts",
+    "goals": "Your goals",
+    "pillars": "The three pillars at retirement",
+    "gaps": "Main gaps",
+    "openQuestions": "Open questions",
+    "nextSteps": "Next steps",
+    "products": "Possible solutions",
+    "productsLocked": "Recommendations appear once the analysis is complete: goals, finances and all three pillars.",
+    "productsDraft": "Preliminary: a Pax specialist is still reviewing these proposals.",
+    "noProducts": "No additional contract is needed for your situation right now.",
+    "need": "Need",
+    "suitabilityRequired": "Suitability check required",
+    "unknown": "not known yet",
+    "empty": "The summary appears once enough is known about your situation.",
+    "pillar": {
+      "pillar1": "Pillar 1 (AHV)",
+      "pillar2": "Pillar 2 (pension fund)",
+      "pillar3": "Pillar 3 (private)"
+    },
+    "period": {
+      "month": "per month",
+      "year": "per year",
+      "once": "once"
+    }
+  },
+  "call": {
+    "label": "Call",
+    "start": "Start the call",
+    "startPaxi": "Talk to Paxi",
+    "openPaxi": "Understood, open Paxi",
+    "cancel": "Cancel",
+    "active": "Call running",
+    "activePaxi": "Paxi is open in its own window",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "stopSpeaking": "Interrupt Paxi",
+    "end": "End the call"
+  },
+  "voice": {
+    "start": "Live conversation with Paxi",
+    "stop": "End conversation",
+    "title": "Talk to Paxi",
+    "begin": "Start conversation",
+    "cancel": "Cancel",
+    "connected": "Paxi is connected and listening",
+    "pending": "Paxi heard new details.",
+    "accept": "Accept and recalculate",
+    "accepting": "Accepting …",
+    "acceptFailed": "Accepting did not work. Please try again."
   }
 }

@@ -34,10 +34,14 @@ export const reviewText=(locale:Locale,code:string)=>{
     /PROVIDER|RISK_SCENARIOS|RISK_NEED/.test(code)?'provider':null;
   return key?translated(locale,`review.${key}`,'common.review'):t(locale,'common.review');
 };
+/** What a real contract additionally needs; the demo shows these steps instead of skipping them. */
+export const complianceSteps=(locale:Locale)=>(['identification','aml_check','health_declaration','signature'] as const).map(id=>({
+  id,status:'required_in_real_integration' as const,label:t(locale,`compliance.${id}.label`),explanation:t(locale,`compliance.${id}.explanation`)}));
 export const errorText=(locale:Locale,code:string)=>t(locale,
   code==='VOICE_PROVIDER_DISABLED'?'voice.error.disabled':code==='VOICE_SESSION_NOT_ACTIVE'?'voice.error.inactive':
   code==='VOICE_CONNECTION_NOT_REPLAYABLE'?'voice.error.connectionExpired':['VOICE_ALREADY_ACTIVE','VOICE_START_IN_PROGRESS'].includes(code)?'voice.error.alreadyActive':code==='VOICE_SOURCE_NOT_FOUND'?'voice.error.source':
   code==='MODEL_EXTRACTION_DISABLED'?'extraction.error.disabled':['MODEL_EXTRACTION_CONSENT_REQUIRED','MODEL_EXTRACTION_NOTICE_CHANGED'].includes(code)?'extraction.error.consent':
+  code==='SUITABILITY_CHECK_REQUIRED'?'error.suitabilityRequired':code==='SUITABILITY_ADVISED_AGAINST'?'error.suitabilityAdvisedAgainst':
   code==='HUMAN_HANDOVER_ACTIVE'?'error.handoverActive':code==='DIGITAL_TASK_CANCELLED'?'error.digitalCancelled':
   code==='UNAUTHORIZED'?'error.unauthorized':/FORBIDDEN|CSRF|ORIGIN/.test(code)?'error.forbidden':
   /NOT_FOUND/.test(code)?'error.notFound':/STALE|VERSION_CONFLICT/.test(code)?'error.stale':
@@ -75,7 +79,7 @@ export function presentJourney<T>(data:T,locale:Locale):T&{locale:Locale;display
   return {...walk(data) as T,locale,displayLabel:t(locale,'common.demo'),documentsLanguageNotice:t(locale,'common.documents')};
 }
 export const localizedCase=(c:InsuranceCase):InsuranceCaseDto=>{
-  const {ownerId,idempotency,confirmationRequests,voiceSessions,agentTurns,modelExtractionConsent,...business}=c;
+  const {ownerId,idempotency,confirmationRequests,voiceSessions,agentTurns,suitabilityChecks,modelExtractionConsent,...business}=c;
   return InsuranceCaseDtoSchema.parse({...business,schemaVersion:CASE_DTO_VERSION,toolRuns:c.toolRuns??[],presentation:{locale:c.locale,
     activeRun:c.activeRunId?presentRun(c.runs.find(r=>r.id===c.activeRunId)!,c.locale):null,
     recommendations:c.recommendations.map(r=>presentRecommendation(r,c.locale)),

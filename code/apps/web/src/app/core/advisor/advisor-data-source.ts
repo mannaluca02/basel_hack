@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import type { InsuranceCaseDto } from '@pax/contracts';
 import {
   AdvisorContextUpdate,
   AgentReply,
@@ -30,6 +31,7 @@ export type AdvisorEventType = AdvisorEvent['type'];
 
 /** Full current state of one case, loaded at start and after every reconnect. */
 export interface AdvisorSnapshot {
+  readonly canonical?: InsuranceCaseDto;
   readonly caseId: string;
   readonly contextRevision: number;
   readonly agent: AgentPresentation;

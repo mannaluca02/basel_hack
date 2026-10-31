@@ -13,6 +13,7 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ResultStatus } from '../../../core/advisor/contracts';
 import { ChartResult, EventImpactScenario, ImpactEventKind } from '../../../core/advisor/ui-models';
+import { LifeEventSelection } from '../../../core/layout/life-event-selection';
 import { AppLanguage } from '../../../core/i18n/language';
 import { LocaleFormat } from '../../../core/i18n/locale-format';
 import { ColorScheme } from '../../../core/theme/color-scheme';
@@ -111,6 +112,10 @@ function impactKey(scenario: EventImpactScenario): string {
       }
       @if (view().timeline; as entries) {
         <app-life-timeline [entries]="entries" />
+      }
+
+      @if (view().annotation; as annotation) {
+        <p class="annotation">{{ annotation }}</p>
       }
 
       <ul class="legend" [attr.aria-label]="'graphics.legend' | transloco">
@@ -243,9 +248,15 @@ export class ChartCard {
     );
   });
 
-  protected readonly view = computed(() =>
-    buildChartView(this.chart(), this.context(), { scenario: this.scenario() }),
-  );
+  private readonly selection = inject(LifeEventSelection);
+
+  protected readonly view = computed(() => {
+    const event = this.selection.selected();
+    return buildChartView(this.chart(), this.context(), {
+      scenario: this.scenario(),
+      ...(event ? { event: { year: event.year, label: event.label } } : {}),
+    });
+  });
 
   protected selectScenario(index: number): void {
     const chart = this.chart();
@@ -268,6 +279,18 @@ export class ChartCard {
   }
 
   constructor() {
+    // A retirement picked on the timeline shows the retirement scenario of the event impact.
+    effect(() => {
+      const event = this.selection.selected();
+      if (event?.kind !== 'retirement') return;
+      untracked(() => {
+        const chart = this.chart();
+        if (chart.type !== 'event_impact') return;
+        const scenario = chart.scenarios.find((s) => s.event === 'retirement');
+        if (scenario) this.scenarioKey.set(impactKey(scenario));
+      });
+    });
+
     let lastRevision: number | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
     effect(() => {

@@ -1,4 +1,5 @@
 import { AgentVoiceTurnsSchema,ExternalVoiceObservationsSchema } from '../voice/service.js';
+import { SuitabilityCheckInputSchema } from '@pax/contracts';
 import { DemoStartSchema,LoadPersonaSchema,StandardAnalysesSchema } from './demo-journey.js';
 import { z } from 'zod';
 import { CreateVoiceSessionSchema,VoiceSessionStartResponseSchema,VoiceSessionSchema,VoiceTranscriptSchema,VoiceTurnInputSchema,VoiceExtractionInputSchema,VoiceExtractionResponseSchema,CloseVoiceSessionSchema,
@@ -23,6 +24,7 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/transcript','Read encrypted finalized transcript; scoped agent or owner only',undefined],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/turns','Customer client records a finalized customer/agent turn; never confirms facts',VoiceTurnInputSchema],
   ['post','/api/cases/{caseId}/voice/sessions/{voiceSessionId}/extraction','Scoped agent maps sourced observations into one atomic proposal batch or explicit follow-ups',VoiceExtractionInputSchema],
+  ['get','/api/cases/{caseId}/voice/agent-recommendation','Owner or scoped agent reads the rule-based recommendation of the active run, product names in the case language',undefined],
   ['get','/api/cases/{caseId}/voice/agent-turns','Owner or scoped agent reads the call history recorded by a separate voice agent',undefined],
   ['post','/api/cases/{caseId}/voice/agent-turns','Scoped agent of a separate voice agent records final turns for the call history; changes no fact and no case revision',AgentVoiceTurnsSchema],
   ['post','/api/cases/{caseId}/voice/agent-observations','Scoped agent of a separately running voice agent maps quoted final customer turns into one atomic proposal batch',ExternalVoiceObservationsSchema],
@@ -39,6 +41,9 @@ const endpoints:[string,string,string,z.ZodType|undefined][]=[
   ['get','/api/cases','List authorized cases',undefined],['post','/api/cases','Create synthetic life-insurance case',CreateInsuranceCaseSchema],
   ['get','/api/cases/{caseId}','Read own case',undefined],['patch','/api/cases/{caseId}/draft','Update unconfirmed draft',DraftPatchSchema],
   ['post','/api/demo/start','Local demo only (PAX_DEMO_START=1): shared customer session with the confirmed, calculated Mueller persona; no access code',DemoStartSchema],
+  ['get','/api/cases/{caseId}/suitability','Read the suitability pre-checks (Pax form 0054/PMPV/03.2026, not binding) and the qualified products',undefined],
+  ['post','/api/cases/{caseId}/suitability','Customer answers the suitability pre-check for one qualified product; fund-linked products cannot be quoted without a suitable result',SuitabilityCheckInputSchema],
+  ['post','/api/cases/{caseId}/demo-accept','Demo start only (PAX_DEMO_START=1): accept the open proposal packages, confirm the profile and recalculate the standard scenarios',undefined],
   ['post','/api/cases/{caseId}/demo-profile','Load a synthetic Pax persona as unconfirmed draft; confirmation still required',LoadPersonaSchema],
   ['post','/api/cases/{caseId}/standard-analyses','Run the standard family/home/retirement/baseline scenarios of the confirmed profile, then derive the recommendation',StandardAnalysesSchema],
   ['post','/api/cases/{caseId}/confirmations','Confirm profile and calculator transfer',ConfirmProfileSchema],

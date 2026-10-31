@@ -8,6 +8,8 @@ import { WorkflowError, type Actor, type InsuranceCase, type StoredVoiceSession 
 import { sha256Json } from '../calculation/hash.js';
 import { gatewaysFor, type VoiceOptions, type VoiceGateway } from './providers.js';
 import { mapVoiceObservations, portfolioCatalog } from './portfolio.js';
+import { buildVoicePrompt } from './prompt.js';
+import { productText } from '../insurance/i18n.js';
 /**
  * Observations from a separately running voice agent (Paxi) that holds its own provider session.
  * It quotes the final customer turns it relied on; no audio and no full transcript reach the case.
@@ -26,7 +28,6 @@ export const AgentVoiceTurnsSchema = z.object({
 const MAX_AGENT_TURNS = 500;
 const active = (s: StoredVoiceSession) => s.status === 'active' || s.status === 'starting';
 const now = () => new Date().toISOString();
-const prompt = (locale: string) => `You are Paxi, a friendly voice intake assistant. Speak ${locale}. This is a synthetic-data demonstration only. Ask one short question at a time. Never ask for real names, full birth dates, identifying details or health data. Never invent missing amounts, average a range, infer a risk appetite or calculate pension/tax limits. Ask for clarification. Collect annual gross income explicitly separately from monthly net income. All calculations, proposed changes and confirmations belong to the case backend. Never claim that data is confirmed or a colleague will call. Never confirm a profile, accept a contract or place a call. Stop immediately when the application requests handover. Financial recommendations require backend-approved facts; do not improvise them.`;
 export class VoiceIntegrationService {
     private gateways: Map<string, VoiceGateway>;
     private cache = new Map<string, {
@@ -91,6 +92,7 @@ export class VoiceIntegrationService {
                 return { ...cached.response, replayed: true };
             throw new WorkflowError(previous.status === 'starting' ? 'VOICE_START_IN_PROGRESS' : 'VOICE_CONNECTION_NOT_REPLAYABLE');
         }
+        const prompt = await buildVoicePrompt(b.locale,b.conversationSettings);
         const reserved = await this.engine.edit(actor, id, b.expectedCaseRevision, (c, db) => {
             if (c.locale !== b.locale)
                 throw new WorkflowError('VOICE_LOCALE_MISMATCH', 422);
@@ -113,7 +115,7 @@ export class VoiceIntegrationService {
         this.opening.set(reserved.id,{caseId:id,controller:openingController});
         let created: Awaited<ReturnType<VoiceGateway['open']>> | undefined;
         try {
-            await this.engine.runDigital(actor, id, async (signal) => { created = await gateway.open({ ...(b.sdp === undefined ? {} : { sdp: b.sdp }), locale: b.locale, prompt: prompt(b.locale) }, signal); },openingController.signal);
+            await this.engine.runDigital(actor, id, async (signal) => { created = await gateway.open({ ...(b.sdp === undefined ? {} : { sdp: b.sdp }), locale: b.locale, prompt }, signal); },openingController.signal);
             const session = await this.engine.edit(actor, id, undefined, (c, db) => {
                 const s = this.session(actor, c, reserved.id);
                 if (s.status !== 'starting' || s.handoverRevision !== c.handover.revision || c.caseRevision !== b.expectedCaseRevision || c.locale !== b.locale)
@@ -134,7 +136,7 @@ export class VoiceIntegrationService {
                 return this.dto(s);
             });
             this.handles.set(session.id, { caseId: id, provider: b.provider, providerSessionId: created!.providerSessionId });
-            const response = VoiceSessionStartResponseSchema.parse({ voiceSession: session, connection: created!.connection, prompt: prompt(b.locale), replayed: false });
+            const response = VoiceSessionStartResponseSchema.parse({ voiceSession: session, connection: created!.connection, prompt, replayed: false });
             this.cache.set(session.id, { until: Date.now() + 30000, response });
             await this.sweep();
             return response;
@@ -225,6 +227,20 @@ export class VoiceIntegrationService {
             return { caseId: id, contextRevision: c.contextRevision, recorded: changed, total: c.agentTurns.length };
         });
     }
+    /**
+     * What the voice agent may say about solutions: the current recommendation of the active run,
+     * with product names in the case language. Only the rule-based result, no amounts it would
+     * have to explain on its own; `null` before there is one.
+     */
+    agentRecommendation(actor: Actor, id: string) {
+        if (actor.role === 'reviewer')
+            throw new WorkflowError('FORBIDDEN', 403);
+        const c = this.engine.caseFor(actor, id, true);
+        const rec = [...c.recommendations].reverse().find(r => r.runId === c.activeRunId) ?? null;
+        return { caseId: id, recommendation: rec && { id: rec.id, status: rec.status, reviewOpen: rec.status === 'human_review_required',
+            candidates: rec.candidates.map(x => ({ productId: x.productId, productName: productText(c.locale, x.productId), personId: x.personId,
+                suitabilityCheckRequired: x.rule.reasonCodes.includes('SUITABILITY_CHECK_REQUIRED') })) } };
+    }
     /** The owner's call history from a separate voice agent; never part of the case DTO. */
     agentTurns(actor: Actor, id: string) {
         // Reviewers decide on the analysis, they do not read what the customer said.
@@ -299,8 +315,12 @@ export class VoiceIntegrationService {
                     throw new WorkflowError('VOICE_SOURCE_NOT_FOUND', 422);
             }
             const mapped = mapVoiceObservations(c.draft, b.observations, c.locale), sourceTurn = s.turns.find(t => t.log.messageId === b.observations[0]!.sourceMessageId)!;
+            // Open changes of the replaced batches stay in the new one, so there is one cumulative open batch (acceptBatch needs a matching draft hash).
+            // ponytail: a carried change keeps its original text but its sourceRef now names only the latest turn; per-change sources if audits need them.
+            const carried = (changes: typeof mapped.changes) => { if (!changes.length) return changes; const paths = new Set(changes.map(x => x.path));
+                return [...b.supersedesBatchIds.flatMap(oid => c.proposalBatches.find(p => p.id === oid && p.status === 'proposed')?.changes ?? []).filter(x => !paths.has(x.path)), ...changes]; };
             const batch = mapped.changes.length || mapped.questions.length ? this.extraction.proposeBatchInTransaction(actor, c, db, { messageId: b.messageId, expectedCaseRevision: b.expectedCaseRevision, expectedProfileVersion: b.expectedProfileVersion, basisDraftHash: b.basisDraftHash,
-                source: { messageId: b.messageId, turnId: sourceTurn.log.turnId, sourceRef: `voice:${sessionId}:${b.messageId}` }, changes: mapped.changes,
+                source: { messageId: b.messageId, turnId: sourceTurn.log.turnId, sourceRef: `voice:${sessionId}:${b.messageId}` }, changes: carried(mapped.changes),
                 ambiguities: mapped.questions.map(q => { const turn = s.turns.find(t => t.log.messageId === q.sourceMessageId)!; const { sourceMessageId, ...a } = q; return { ...a, source: { messageId: b.messageId, turnId: turn.log.turnId, sourceRef: `voice:${sessionId}:${q.sourceMessageId}` } }; }),
                 supersedesBatchIds: b.supersedesBatchIds, supersedesProposalIds: b.supersedesProposalIds, resolvesAmbiguityIds: b.resolvesAmbiguityIds }) : null;
             const entry = { requestHash, proposalId: batch?.id ?? null, issues: mapped.issues, mappingVersion: 'voice-portfolio-v1', transcriptRevision: b.transcriptRevision, observations: b.observations.filter(o => o.fieldId !== 'full_name' && o.fieldId !== 'smoker') };

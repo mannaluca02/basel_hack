@@ -45,6 +45,8 @@ In the customer app (`npm run start:api` in `code/apps/web`), "Mit Paxi sprechen
 
 After every answer extraction, the bridge sends the captured details the backend maps directly (income, birth date, Pensum, pension fund, 3a, housing cost, civil status, retirement age, risk appetite) to `POST /api/cases/:id/voice/agent-observations`. Each one quotes the customer turn it comes from; a value not said in these digits goes as `approximate`, and the backend asks it back. The result is one **unconfirmed** package on the app's review stand: the person accepts it and confirms the profile there. A newer answer replaces a still open package; accepted answers are not proposed again. The bridge also sends every turn (both speakers, once it pauses) to `POST /api/cases/:id/voice/agent-turns`, so the app's Chat tab shows the call history. Both backend routes only work with `PAX_SYNTHETIC_VOICE_ENABLED=1`.
 
+The app's call controls steer this window with `postMessage` (`{ type: "pax.call", action }`, actions `end`, `mute`, `unmute`, `stop_speaking`). Only the window that opened Paxi is listened to. `stop_speaking` mutes Paxi until the person speaks again; it does not cancel the model response on the server.
+
 Without a link, Paxi runs as before and keeps everything in its own log.
 
 ## Architecture and data flow

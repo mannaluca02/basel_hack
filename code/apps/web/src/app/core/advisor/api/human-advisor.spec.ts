@@ -6,6 +6,7 @@ import { provideI18nTesting } from '../../i18n/i18n-testing';
 import { provideAdvisorDataSource } from '../provide-advisor-data-source';
 import { CUSTOMER_SESSION_KEY } from './customer-api';
 import { HumanAdvisor } from './human-advisor';
+import { VoiceAgentLink } from './voice-agent-link';
 
 const CASE_ID = 'case_api';
 const view = (wantsHumanAdvisor: boolean) => ({
@@ -62,5 +63,21 @@ describe('HumanAdvisor', () => {
 
     expect(advisor.failed()).toBe(true);
     expect(advisor.requested()).toBe(true);
+  });
+
+  it('ends a running Paxi call as soon as a human advisor is asked for', async () => {
+    const { advisor, http } = setup();
+    const link = TestBed.inject(VoiceAgentLink);
+    vi.spyOn(link, 'windowOpen', 'get').mockReturnValue(true);
+    const control = vi.spyOn(link, 'control').mockImplementation(() => undefined);
+
+    const requested = advisor.request();
+    await Promise.resolve();
+    http.expectOne(`/api/cases/${CASE_ID}`).flush({ id: CASE_ID, caseRevision: 4 });
+    await new Promise((resolve) => setTimeout(resolve));
+    http.expectOne(`/api/cases/${CASE_ID}/handover`).flush(view(true));
+    await requested;
+
+    expect(control).toHaveBeenCalledWith('end');
   });
 });

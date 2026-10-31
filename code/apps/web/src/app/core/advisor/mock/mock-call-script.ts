@@ -752,6 +752,26 @@ function summary(
             allPillarsCaptured: true,
             suitabilityCheckDone: false,
           },
+          products: complete
+            ? [
+                {
+                  candidateId: 'candidate_disability',
+                  productId: 'pax_disability',
+                  name: t({ de: 'Pax Erwerbsunfähigkeitsversicherung', en: 'Pax disability insurance' }),
+                  personId: CUSTOMER,
+                  need: DISABILITY_GAP,
+                  unitLinked: false,
+                },
+                {
+                  candidateId: 'candidate_fondsstar',
+                  productId: 'pax_fondsstar',
+                  name: t({ de: 'Pax FondsStar', en: 'Pax FondsStar' }),
+                  personId: CUSTOMER,
+                  need: RETIREMENT_GAP,
+                  unitLinked: true,
+                },
+              ]
+            : [],
         },
       };
     },
