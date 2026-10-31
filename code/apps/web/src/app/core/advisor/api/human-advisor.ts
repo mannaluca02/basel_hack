@@ -4,6 +4,7 @@ import type { HumanHandoverView } from '@pax/contracts';
 import { filter } from 'rxjs';
 import { AdvisorDataSource } from '../advisor-data-source';
 import { CustomerApi } from './customer-api';
+import { VoiceAgentLink } from './voice-agent-link';
 
 /**
  * The always reachable way to a human advisor (FE-10, rule 5). A request is stored in the case;
@@ -17,6 +18,7 @@ export class HumanAdvisor {
   private readonly viewState = signal<HumanHandoverView | null>(null);
   private readonly busyState = signal(false);
   private readonly failedState = signal(false);
+  private readonly paxi = inject(VoiceAgentLink);
 
   readonly view = this.viewState.asReadonly();
   readonly busy = this.busyState.asReadonly();
@@ -59,6 +61,8 @@ export class HumanAdvisor {
     this.failedState.set(false);
     try {
       this.viewState.set(await this.api.handover(caseId, action));
+      // A human takes over: the voice call ends right away, not only at Paxi's next poll.
+      if (action === 'request' && this.paxi.windowOpen) this.paxi.control('end');
     } catch {
       this.failedState.set(true);
       await this.load();

@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { effect, inject, untracked } from '@angular/core';
 import type { AdvisorContextUpdated, InsuranceCaseDto } from '@pax/contracts';
 import { BehaviorSubject, EMPTY, Observable, Subject, filter, from, map } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../config/app-environment';
@@ -41,6 +41,28 @@ export class ApiDataSource extends AdvisorDataSource {
 
   readonly events: Observable<AdvisorEvent> = this.eventStream.asObservable();
   readonly connection: Observable<ConnectionState> = this.connectionState.asObservable();
+
+  constructor() {
+    super();
+    // In the demo start nothing else tells the case service the language (no review stand), so
+    // its texts would stay in the language the case was created in.
+    if (!this.demoStart) return;
+    let first = true;
+    effect(() => {
+      const language = this.language.language();
+      untracked(() => {
+        const caseId = this.api.session()?.caseId;
+        if (first || !caseId) {
+          first = false;
+          return;
+        }
+        this.api
+          .setLocale(caseId, language)
+          .then(() => this.push(caseId))
+          .catch((error: unknown) => console.error('ApiDataSource: changing the case language failed', error));
+      });
+    });
+  }
 
   snapshot(): Observable<AdvisorSnapshot> {
     const session = this.api.session();
