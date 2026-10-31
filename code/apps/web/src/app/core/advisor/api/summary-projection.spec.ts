@@ -1,4 +1,9 @@
-import type { AdvisorContext, InsuranceCaseDto, SummaryBundle as CaseSummaries } from '@pax/contracts';
+import type {
+  AdvisorContext,
+  InsuranceCaseDto,
+  SummaryBundle as CaseSummaries,
+  SuitabilityView,
+} from '@pax/contracts';
 import { describe, expect, it } from 'vitest';
 import { projectCase } from './case-projection';
 import mueller from './mueller-case.testing.json';
@@ -45,6 +50,15 @@ describe('projectSummary', () => {
       allPillarsCaptured: true,
       suitabilityCheckDone: false,
     });
+  });
+
+  it('opens the suitability part of the gate only with a suitable check for this profile', () => {
+    const view = (result: string, profileVersion = 1) =>
+      ({ checks: [{ result, profileVersion }] }) as unknown as SuitabilityView;
+    const gate = (v: SuitabilityView) => projectSummary(dto, context, summaries, risks, 'de', v)!.productGate;
+    expect(gate(view('suitable')).suitabilityCheckDone).toBe(true);
+    expect(gate(view('advised_against')).suitabilityCheckDone).toBe(false);
+    expect(gate(view('suitable', 2)).suitabilityCheckDone).toBe(false);
   });
 
   it('has no summary before the backend has an analysed snapshot', () => {

@@ -117,11 +117,12 @@ export class ApiDataSource extends AdvisorDataSource {
 
   private async project(caseId: string): Promise<{ contextRevision: number; projection: Projection }> {
     // Only the case is required; the rest may not exist yet (no analysis, no voice agent).
-    const [dto, context, summaries, turns] = await Promise.all([
+    const [dto, context, summaries, turns, suitability] = await Promise.all([
       this.api.loadCase(caseId),
       this.api.loadContext(caseId).catch(() => null),
       this.api.loadSummaries(caseId).catch(() => null),
       this.api.loadAgentTurns(caseId).catch(() => []),
+      this.api.loadSuitability(caseId).catch(() => null),
     ]);
     const language = this.language.language();
     const at = new Date().toISOString();
@@ -132,7 +133,7 @@ export class ApiDataSource extends AdvisorDataSource {
         ...projection,
         transcript: projectTranscript(turns),
         info: projectInfo(dto, summaries, language),
-        summary: projectSummary(dto, context, summaries, projection.risks, language),
+        summary: projectSummary(dto, context, summaries, projection.risks, language, suitability),
       },
     };
   }

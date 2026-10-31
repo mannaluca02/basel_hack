@@ -331,6 +331,6 @@ Die Frontend-Modelle aus `code/apps/web/src/app/core/advisor/{contracts,ui-model
 
 Revision und Zeit eines Diagramms stammen aus seinem Lauf bzw. seiner Schätzung. Ein erneutes Laden unveränderter Daten ist damit ein Duplikat und markiert nichts als neu, auch wenn Paxi während eines Gesprächs laufend Kontext-Events auslöst.
 
-Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`).
+Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`), `GET|POST /cases/:id/suitability` und `complianceSteps` im Portal ([Angemessenheit und Compliance](suitability-and-compliance.md)).
 
 Noch ohne Quelle: freie Erklärungen und Antworten des Advisors (`AgentReply`, Info-Karten während des Gesprächs) und Live-Zwischenstände des Transkripts.

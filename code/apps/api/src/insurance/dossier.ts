@@ -3,7 +3,7 @@ import { LifeInsuranceEngine } from './engine.js';
 import { DemoJourneyService } from './journey.js';
 import type { Actor } from './types.js';
 import { WorkflowError } from './types.js';
-import { t,presentRun,presentRecommendation,presentJourney,moneyText,statusText,catalog,type Locale } from './i18n.js';
+import { t,presentRun,presentRecommendation,presentJourney,complianceSteps,moneyText,statusText,catalog,type Locale } from './i18n.js';
 import { CASE_DTO_VERSION,PortalDtoSchema,SummaryBundleSchema } from '@pax/contracts';
 
 const escape=(text:unknown)=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
@@ -20,7 +20,7 @@ export class DossierService {
       recommendations:c.recommendations.filter(r=>r.runId===run?.id),comparisons:c.comparisons.filter(x=>x.profileVersion===profile?.version),portal,coverageInForce:false,demo:true};
     const snapshotId=sha256Json(common);
     const presentation=run?presentRun(run,c.locale):null;
-    const localizedPortal=PortalDtoSchema.parse({...presentJourney(portal,c.locale),schemaVersion:CASE_DTO_VERSION});
+    const localizedPortal=PortalDtoSchema.parse({...presentJourney(portal,c.locale),complianceSteps:complianceSteps(c.locale),schemaVersion:CASE_DTO_VERSION});
     const localized={...common,schemaVersion:CASE_DTO_VERSION,locale:c.locale,assumptions:presentation?.assumptions??[],presentation,
       recommendations:common.recommendations.map(r=>presentRecommendation(r,c.locale)),reviewTasks:localizedPortal.reviewTasks,portal:localizedPortal};
     return SummaryBundleSchema.parse({schemaVersion:CASE_DTO_VERSION,snapshotId,customer:{snapshotId,...localized},advisor:{snapshotId,...localized,

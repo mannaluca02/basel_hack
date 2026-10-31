@@ -2,6 +2,7 @@ import {z} from 'zod';
 import {Id,AnalysisResultSchema,CaseSnapshotSchema,StatusSchema} from './financial.js';
 import {GoalSchema,LocaleSchema} from './insurance.js';
 import {LifeAnalysisSchema,ProviderResultSchema} from './life-analysis.js';
+import {ComplianceStepSchema} from './suitability.js';
 import {CASE_DTO_VERSION,DemoQuoteSchema,DemoApplicationSchema,DemoPolicySchema,ReviewTaskSchema,
   RecommendationPresentationSchema,RunPresentationSchema,ScenarioComparisonSchema,SourceDecisionSchema} from './insurance-case.js';
 
@@ -11,6 +12,8 @@ export const PortalDtoSchema=z.object({schemaVersion:z.literal(CASE_DTO_VERSION)
   quotes:z.array(DemoQuoteSchema.extend({stale:z.boolean(),displayLabel:text}).strict()),
   applications:z.array(DemoApplicationSchema.extend({stale:z.boolean(),displayLabel:text,statusLabel:text}).strict()),
   policies:z.array(DemoPolicySchema.extend({adviceContextChanged:z.boolean(),displayLabel:text}).strict()),
+  /** Identification, AML, health declaration and signature: required for a real contract, not performed in this demo. */
+  complianceSteps:z.array(ComplianceStepSchema).length(4),
   realInsuranceCoverage:z.literal(false),paxContractIntegrationAvailable:z.literal(false),locale:LocaleSchema,displayLabel:text,documentsLanguageNotice:text}).strict();
 export const CustomerSummarySchema=z.object({schemaVersion:z.literal(CASE_DTO_VERSION),snapshotId:hash,caseId:Id,profileVersion:version.nullable(),runId:Id.nullable(),calculationInputHash:hash.nullable(),
   draftPending:z.boolean(),goals:z.array(GoalSchema),financial:CaseSnapshotSchema.nullable(),metrics:AnalysisResultSchema.shape.metrics,

@@ -8,6 +8,7 @@ import {
   ExtractorContextSchema,ProposalBatchInputSchema,ProposalBatchSchema,ProposalAcceptanceSchema,AmbiguityResolutionSchema,
   InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,LifeAnalysisResponseSchema,
   VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,GraphExplanationRequestSchema,SummaryBundleSchema,PortalDtoSchema,
+  SuitabilityCheckInputSchema,SuitabilityViewSchema,
 } from '@pax/contracts';
 
 const documents={
@@ -28,6 +29,7 @@ const documents={
   'voice-log-v1':VoiceLogSchema,'agent-reply-v1':AgentReplySchema,'voice-playback-v1':VoicePlaybackEventSchema,
   'graph-explanation-v1':GraphExplanationRequestSchema,
   'summary-bundle-v1':SummaryBundleSchema,'portal-v1':PortalDtoSchema,
+  'suitability-check-input-v1':SuitabilityCheckInputSchema,'suitability-view-v1':SuitabilityViewSchema,
 };
 const directory=new URL('../packages/contracts/schemas/',import.meta.url);
 const check=process.argv.includes('--check');if(!check)await mkdir(directory,{recursive:true});

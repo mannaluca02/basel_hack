@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "expectedCaseRevision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "productId": {
+      "type": "string",
+      "enum": [
+        "pax_fondsstar",
+        "pax_lifestar",
+        "pax_payout"
+      ]
+    },
+    "personId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "answers": {
+      "type": "object",
+      "properties": {
+        "annualPremiumCents": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "singleInvestmentCents": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "netIncome": {
+          "type": "string",
+          "enum": [
+            "under_75k",
+            "75k_150k",
+            "150k_250k",
+            "over_250k"
+          ]
+        },
+        "netWorth": {
+          "type": "string",
+          "enum": [
+            "under_10k",
+            "10k_50k",
+            "50k_150k",
+            "150k_300k",
+            "over_300k"
+          ]
+        },
+        "annualSavingCapacity": {
+          "type": "string",
+          "enum": [
+            "under_1k",
+            "1k_3k",
+            "3k_7k",
+            "over_7k"
+          ]
+        },
+        "singleInvestmentCapacity": {
+          "type": "string",
+          "enum": [
+            "under_10k",
+            "10k_50k",
+            "50k_150k",
+            "150k_300k",
+            "over_300k"
+          ]
+        },
+        "investmentGoal": {
+          "type": "string",
+          "enum": [
+            "low_risk",
+            "moderate_risk",
+            "high_risk"
+          ]
+        },
+        "horizon": {
+          "type": "string",
+          "enum": [
+            "under_10_years",
+            "10_to_15_years",
+            "over_15_years"
+          ]
+        },
+        "securitiesExperience": {
+          "type": "string",
+          "enum": [
+            "none",
+            "knowledge_only",
+            "experience",
+            "extensive"
+          ]
+        },
+        "lossReaction": {
+          "type": "string",
+          "enum": [
+            "sell_all",
+            "sell_part",
+            "hold",
+            "buy_more"
+          ]
+        },
+        "guaranteedPercent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "selectedStrategy": {
+          "type": "string",
+          "enum": [
+            "conservative",
+            "balanced",
+            "dynamic"
+          ]
+        }
+      },
+      "required": [
+        "annualPremiumCents",
+        "singleInvestmentCents",
+        "netIncome",
+        "netWorth",
+        "annualSavingCapacity",
+        "singleInvestmentCapacity",
+        "investmentGoal",
+        "horizon",
+        "securitiesExperience",
+        "lossReaction",
+        "guaranteedPercent",
+        "selectedStrategy"
+      ],
+      "additionalProperties": false
+    },
+    "answersConfirmedByCustomer": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "expectedCaseRevision",
+    "productId",
+    "personId",
+    "answers",
+    "answersConfirmedByCustomer"
+  ],
+  "additionalProperties": false,
+  "title": "suitability-check-input-v1",
+  "description": "Pax synthetic-data PoC contract v1. Runtime Zod/domain reference checks and authorization remain authoritative; JSON Schema alone does not grant permission."
+}
