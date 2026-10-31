@@ -43,7 +43,7 @@ import { connectOpenAIRealtime } from "./openai-realtime-adapter.js";
 const $ = (id) => document.getElementById(id);
 let connection = "idle", call = null, lastReply = null;
 
-const avatar = createPaxAvatar($("avatar"));
+const avatar = createPaxAvatar($("avatar"), { emotionHoldMs: 5000 });
 setInterval(() => {
   const { level } = avatar.state;
   $("meter").style.width = (level * 100).toFixed(0) + "%";

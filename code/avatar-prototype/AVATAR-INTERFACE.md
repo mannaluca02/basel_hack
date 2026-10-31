@@ -9,12 +9,14 @@ The voice layer gives the avatar **the audio it plays** and a stream of **`Avata
 ```js
 import { createPaxAvatar } from "./pax-avatar.js";
 
-const avatar = createPaxAvatar(hostElement);
+const avatar = createPaxAvatar(hostElement, { emotionHoldMs: 5000 });
 avatar.attachAudio(remoteStream);   // MediaStream or <audio> element that the user hears
 avatar.handle(event);               // every AvatarEvent, in the order they happen
 ```
 
 Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Live: [`openai-realtime-adapter.js`](openai-realtime-adapter.js).
+
+`emotionHoldMs` is configurable per instance (default `5000`; `0` disables the hold). It must be a finite non-negative number. The first emotion applies immediately; later requests keep only the latest candidate until the current hold expires. Repeated answers for the same emotion do not restart the hold. The live demo sets this option in [`realtime.html`](realtime.html).
 
 `attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
 
@@ -22,8 +24,8 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Li
 
 | Event | Send when | Current GPT-Live adapter source |
 |---|---|---|
-| `{ type: "activity", state: "listening" }` | The user starts speaking | Local microphone energy rises |
-| `{ type: "activity", state: "thinking" }` | The user finished; the reply is being prepared | 600 ms local microphone silence |
+| `{ type: "activity", state: "listening" }` | The user starts speaking | Microphone energy stays above threshold for 150 ms |
+| `{ type: "activity", state: "thinking" }` | The user finished; the reply is being prepared | 1.2 s local microphone silence |
 | `{ type: "activity", state: "idle" }` | Nothing is happening (call ended) | on close |
 | `{ type: "emotion", emotion, playbackId }` | Whenever a tone is known, ideally before `playback started`; send every answer, the avatar queues and stabilises | `decision.event` → `decision.completed` choice; local `playbackId` |
 | `{ type: "playback", event: "started", playbackId }` | Audio is **actually audible**, not just requested | Remote-stream energy rises (audibility caveat below) |
@@ -60,8 +62,8 @@ avatar.handle({ type: "emotion", emotion: "empathetic", playbackId });
 - **No twitching on false barge-ins.** While a playback is running, `listening`/`thinking` do not change the face. Only `playback cancelled` interrupts the reply visually.
 - **Late events are ignored.** Events for the last 50 finished `playbackId`s (including ended/cancelled/error) are dropped (`handle()` returns `false`); `reset()` clears that history.
 - **Early emotions wait for the reply.** An `emotion` that arrives while the user speaks or the advisor thinks (e.g. from the input transcript trigger) is queued and shown when playback starts. Otherwise it is shown right away.
-- **No flicker from classifiers.** While the advisor has the turn, `neutral` never replaces a stronger emotion, and other changes apply at most every 4 s (`EMOTION_HOLD_MS`; the latest one wins). Send every answer; the avatar filters.
-- **Relax after the reply.** The emotion is held ~1.5 s after playback ends, then the face relaxes to neutral. A new user turn starts from neutral.
+- **Minimum emotion hold.** All reply emotions, including `neutral`, use the same `emotionHoldMs` interval, including during listening/thinking and playback. The latest candidate wins at expiry; candidates tied to finished playback are discarded. Activity faces and cancellation remain immediate; explicit `reset()` and design-only `show()` bypass the hold.
+- **Relax after the reply.** Return to neutral after both the minimum emotion hold and ~1.5 s after playback end have elapsed. A new user turn clears old candidates and returns to neutral if the hold has elapsed; listening/thinking can still show immediately.
 - **Calm expression motion.** Each expression has a subtle tilt, breath, nod or sway; warm expressions lift once on entry and recovery briefly resets. Audio only adds tiny eye emphasis when explaining; it never drives body motion. Reduced-motion preferences suppress decorative motion and blinking while preserving all eye shapes and decorations.
 
 
@@ -126,7 +128,7 @@ For application-controlled timing, call **`POST /v1/decisions`** from the backen
 
 ### 2. Where activity and playback come from
 
-**Keep local energy for the demo**, with a headset. The adapter samples microphone/remote-stream RMS every 50 ms, uses threshold `0.015`, and ends a segment after 600 ms silence. Microphone onset/end emits listening/thinking; remote onset/end emits playback started/ended. Cleanup cancels active playback and emits idle. Silence is an estimate, not a turn boundary or a reliable server interruption signal.
+**Keep local energy for the demo**, with a headset. The adapter samples microphone/remote-stream RMS every 50 ms, uses threshold `0.015`, and requires 150 ms of sustained microphone energy before emitting listening. Thinking follows 1.2 s of microphone silence, so brief noise and ordinary speech pauses do not flip activity. These are `INPUT_ONSET_MS` / `INPUT_SILENCE_MS` in the adapter, separate from the renderer’s 5 s reply-emotion hold. Remote audio still emits playback started immediately and ended after 600 ms silence. Cleanup cancels active playback and emits idle. Silence is an estimate, not a turn boundary or a reliable server interruption signal.
 
 The documented Live events offer transcript deltas with approximate `start_ms`/`end_ms`, lifecycle events (`session.started`/`session.closed`), and audio data. They do **not** offer Realtime's speech-start/stop or output-buffer boundary events. Primary WebSocket `session.output_audio.delta` has no timing fields or output-audio-done event; WebRTC audio arrives on the media track. Transcript gaps cannot establish silence. These events can support caption/activity heuristics, not replace actual playback tracking. [Speech/transcripts](https://developers.openai.com/api/docs/guides/live-conversations#manage-speech-and-transcripts).
 
