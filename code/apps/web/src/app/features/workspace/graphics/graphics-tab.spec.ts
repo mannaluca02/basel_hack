@@ -185,4 +185,20 @@ describe('GraphicsTab', () => {
     await emit(chart({ revision: 2 }));
     expect(live()).toBe('Grafik aktualisiert: Lebensereignisse');
   });
+
+  it('announces the same chart updated twice in a row twice', async () => {
+    const region = () => root.querySelector('[aria-live]')?.textContent;
+    await start([chart()]);
+
+    await emit(chart({ revision: 2 }));
+    const first = region();
+    await emit(chart({ revision: 3 }));
+    const second = region();
+    await emit(chart({ revision: 4 }));
+
+    // The text has to change for a screen reader to speak; what it reads stays the same.
+    expect(second).not.toBe(first);
+    expect(region()).not.toBe(second);
+    expect(live()).toBe('Grafik aktualisiert: Lebensereignisse');
+  });
 });

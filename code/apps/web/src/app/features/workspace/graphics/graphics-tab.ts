@@ -224,7 +224,11 @@ export class GraphicsTab {
         this.transloco.translate('graphics.announce.updated', { title: title(chart) }),
       ),
     ];
-    if (messages.length > 0) this.announcement.set(messages.join(' '));
+    if (messages.length === 0) return;
+    // A live region only speaks when its text changes. The same message twice in a row (one chart
+    // updated twice) toggles a silent trailing no-break space, so it is read again.
+    const message = messages.join(' ');
+    this.announcement.update((last) => (last === message ? `${message} ` : message));
   }
 
   private cardElement(chartId: string | undefined): HTMLElement | undefined {
