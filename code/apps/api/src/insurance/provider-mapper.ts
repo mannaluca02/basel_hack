@@ -4,11 +4,12 @@ import type { Operation } from '../logismata/contracts.js';
 import type { NormalizedProviderResult } from '../logismata/normalize.js';
 import type { RiskNeed } from './types.js';
 import { WorkflowError } from './types.js';
+import { languageNumber,type Locale } from './i18n.js';
 
 const relationship={single:1,married:2,cohabiting:3,registered_partnership:4,unknown:0};
 const chf=(cents:number)=>cents/100;
 export type ProviderJob={operation:Operation;request:unknown;personId?:string};
-export function buildProviderJobs(draft:InsuranceDraft,financial:CaseSnapshot,scenario:LifeScenario,providerYear=Number(financial.valuationDate.slice(0,4))):ProviderJob[] {
+export function buildProviderJobs(draft:InsuranceDraft,financial:CaseSnapshot,scenario:LifeScenario,providerYear=Number(financial.valuationDate.slice(0,4)),locale:Locale='de'):ProviderJob[] {
   const missing=intakeQuestions(draft);if(missing.length)throw new WorkflowError('NEEDS_INPUT',422,missing);
   const intake=draft.insurance!;const original=draft.financial!;
   if(Number(financial.valuationDate.slice(0,4))!==providerYear)throw new WorkflowError('LIVE_VALUATION_YEAR_UNSUPPORTED',422,['financial.valuationDate']);
@@ -42,7 +43,7 @@ export function buildProviderJobs(draft:InsuranceDraft,financial:CaseSnapshot,sc
       NeedInPcRetirement:false,NeedRetirement:chf(intake.retirementNeedAnnualCents!),LiveSpan:intake.retirementHorizonAge!}}];
   const gross=persons.reduce((sum,p)=>sum+p.risk.GrossIncome,0);
   jobs.push({operation:'budgetProposal',request:{BudgetMonthly:false,IncomeType:1,Income:gross,Relationship:common.Relationship,
-    NumberOfChildren:intake.children.filter(c=>c.kind==='shared'||c.kind==='sole_custody').length,UseEffectiveTax:false,Language:1}});
+    NumberOfChildren:intake.children.filter(c=>c.kind==='shared'||c.kind==='sole_custody').length,UseEffectiveTax:false,Language:languageNumber[locale]}});
   if(intake.taxLocationId!==null) {
     jobs.push({operation:'location',request:{TaxLocationID:intake.taxLocationId}});
     for(const p of persons)jobs.push({operation:'income',personId:p.personId,request:{TaxLocationID:intake.taxLocationId,

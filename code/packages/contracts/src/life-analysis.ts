@@ -6,10 +6,11 @@ const amount=z.number().int().safe().nonnegative();
 const optionalAmount=amount.nullable();
 export const ProviderResultSchema=z.object({
   operation:z.enum(['saving3aLimits','ageLimits','riskBase','risk','retirementBase','retirement','income','budgetProposal',
-    'saving','consumption','searchLocation','location','incomeFortuneTax','saving3a','capitalTax','purchaseP2']),
+    'saving','consumption','searchLocation','location','incomeFortuneTax','saving3a','capitalTax','purchaseP2',
+    'taxBaseInfo','searchLocationGeo','estateGainFields','estateGainTax','inheritanceAll','inheritanceGroup','inheritanceBeneficiary','corporateEntityTax']),
   status:StatusSchema,
   metrics:z.array(z.object({id:z.string().max(160),value:z.number().int().safe().nullable(),currency:z.literal('CHF'),unit:z.literal('cent'),
-    period:z.enum(['month','year','once']),status:StatusSchema,scenario:z.number().int().min(1).max(8).optional()}).strict()).max(200),
+    period:z.enum(['month','year','once']),status:StatusSchema,scenario:z.number().int().min(1).max(8).optional()}).strict()).max(1000),
   issues:z.array(IssueSchema).max(100),metadata:z.record(z.string(),z.json()),
   provenance:z.object({mode:z.enum(['live','replay']),operationId:Id,inputHash:z.string().regex(/^[a-f0-9]{64}$/),capturedAt:z.string().max(50),sourceRef:z.string().max(250)}).strict(),
 }).strict();

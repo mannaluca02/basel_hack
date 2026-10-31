@@ -29,13 +29,13 @@ Das sind geprüfte PoC-Schutzmaßnahmen. Rechtskonformität im Produktivbetrieb,
 
 ## Rechen-APIs und tatsächliche Prüfung
 
-16 Operationen sind mit strikten Requests und normalisierten Antworten implementiert und live ausgeführt: `saving3aLimits`, `ageLimits`, `riskBase`, `risk`, `retirementBase`, `retirement`, `income`, `budgetProposal`, `saving`, `consumption`, `searchLocation`, `location`, `incomeFortuneTax`, `saving3a`, `capitalTax`, `purchaseP2`.
+24 Operationen sind mit strikten Requests und normalisierten Antworten implementiert und live ausgeführt: `saving3aLimits`, `ageLimits`, `riskBase`, `risk`, `retirementBase`, `retirement`, `income`, `budgetProposal`, `saving`, `consumption`, `searchLocation`, `location`, `incomeFortuneTax`, `saving3a`, `capitalTax`, `purchaseP2`, `taxBaseInfo`, `searchLocationGeo`, `estateGainFields`, `estateGainTax`, `inheritanceAll`, `inheritanceGroup`, `inheritanceBeneficiary`, `corporateEntityTax`.
 
 Der Live-Client verwendet einen festen Host/Pfad, keine Redirects, maximal zwei parallele Requests, begrenzte Queue, fünf Sekunden Timeout je Versuch und höchstens einen Retry bei vorübergehenden Fehlern. Authentisierungsfehler werden nicht wiederholt, Payloads/Tokens nicht in Fehlermeldungen gespiegelt. Es gibt keinen stillen Replay-Fallback. Der Replay-Provider benötigt einen exakt identischen vollständigen Request-Hash.
 
-**Automatische Suite:** 100 Tests, 0 Fehler. Sie umfasst die bisherigen Fach-/Adaptertests und neue Lebensversicherungs-, Persistenz-, Review-, Vertrags-, Rollen-, HTTP-, CSRF-, Dokument-, SSE-, OpenAPI-, Vergleichs- und NPS-Negativfälle. Provider in normalen Tests sind synthetisch injiziert; reale Requests sind dem ausdrücklichen Live-Test vorbehalten.
+**Automatische Suite:** 111 Tests, 0 Fehler. Sie umfasst die bisherigen Fach-/Adaptertests und neue Lebensversicherungs-, Persistenz-, Review-, Vertrags-, Rollen-, HTTP-, CSRF-, Dokument-, SSE-, OpenAPI-, Vergleichs- und NPS-Negativfälle. Provider in normalen Tests sind synthetisch injiziert; reale Requests sind dem ausdrücklichen Live-Test vorbehalten.
 
-**Echter Live-Durchstich:** 16 Operationen erfolgreich; Baseline, Familie, Eigenheim, Pensionierung ohne Providerfehler, drei Vergleiche. Empfehlung, separate Test-Reviewer-Rolle, Demo-Konfiguration mit archivierten Dokumentnachweisen, Antrag, idempotente Einreichung, Demo-Annahme, Demo-Police, identische Summary-Snapshots und Portal nach Server-Neustart durchlaufen. Alle verwendeten Angaben waren erfunden. Temporäre Testdaten wurden anschließend gelöscht. Zugangsdaten wurden weder kopiert noch ausgegeben.
+**Echter Live-Durchstich:** 24 Operationen erfolgreich; Baseline, Familie, Eigenheim, Pensionierung ohne Providerfehler, drei Vergleiche. Empfehlung, separate Test-Reviewer-Rolle, Demo-Konfiguration mit archivierten Dokumentnachweisen, Antrag, idempotente Einreichung, Demo-Annahme, Demo-Police, identische Summary-Snapshots und Portal nach Server-Neustart durchlaufen. Alle verwendeten Angaben waren erfunden. Temporäre Testdaten wurden anschließend gelöscht. Zugangsdaten wurden weder kopiert noch ausgegeben.
 
 Die Risikoantworten mit Code `0` bleiben `requires_review`; die Testrolle legitimiert keine fachlich ungeklärte Providersemantik. Keine Gleichsetzung mit vlot-/Studienfallwerten ohne identische Annahmen. Geburtsmonat, PK-Folgen, Kapitalfreigabe, Steuern, Begünstigung und Produkttauglichkeit bleiben ausdrücklich fachlich prüfpflichtig.
 
@@ -50,3 +50,12 @@ Es wurden keine echten Pax-Tarifierungs-, Underwriting-, Identitäts-/AML-, Sign
 Die Produktfamilien sind anhand der offiziellen [Pax-Produktübersicht](https://www.pax.ch/de/private-vorsorge) und der vorhandenen archivierten Broschüren/Bedingungen nachvollziehbar hinterlegt. Dokumente tragen SHA-256 und Archivstand, jedoch keine unbelegte Aktualitätsfreigabe. Aktuelle fachliche Eignung und konkrete Tarife sind mit Pax zu bestätigen. Für die Transparenzanforderungen ist die [EDÖB-Information zur Informationspflicht](https://www.edoeb.admin.ch/de/informationspflicht) eine relevante Primärquelle; der Demo-Hinweis ersetzt keine rechtliche Freigabe.
 
 Der bestehende vollständige Quellenkatalog-Build scheitert weiterhin an den im Commit `6bf72c6` bewusst entfernten 16 Videodateien. Diese Änderung wird respektiert; Videos werden nicht wiederhergestellt. Quellen-/Medieninventare bleiben historisch. Die vorliegende Implementierung und ihre Tests benötigen die vorhandenen API-Spezifikationen/-Beispiele und Produkt-PDFs, keine Videodateien. Neue Dokumentlinks werden separat geprüft.
+
+
+## Nachtrag: 24 Operationen und DE/FR/IT/EN
+
+Die acht zuvor ausgelassenen Sponsor-Operationen sind als geschützte isolierte Zusatzrechner ergänzt. Sie verwenden validierte Anfragen, klare Rappen-/CHF-Grenzen und getrennte Begünstigtenalternativen. Keine dieser Abfragen mutiert automatisch Profil, Lebensversicherungsbedarf oder aktiven Lauf.
+
+Die vorher nur teilweise vorhandene Mehrsprachigkeit wurde vervollständigt: 191 lokale Texte für DE/FR/IT/EN, öffentliche Katalog-/Datenschutzprojektion, übersetzte Rückfragen, Empfehlungen, Bedingungen/Alternativen, Status-/Grafik-/Fortschrittsbeschriftungen, Fehlermeldungen und beide lesbaren Dossier-Exporte. Sprachwechsel verändert technische Kontextrevisionen, aber keine finanzielle Version und keinen bestehenden Rechenhash. Die normale Budget-Abfrage verwendet jetzt die passende Sprache statt fest Deutsch.
+
+Die vollständige Suite umfasst 111 erfolgreiche Tests. Der echte Durchstich führt alle 24 Operationen und vier Sprach-/Exportprüfungen mit erfundenen Daten aus. Sprachprüfungen bleiben Backend-/API-Prüfungen; die Darstellung und Audioausgabe durch die anderen vier Teammitglieder sowie rechtsgültige Originaldokumente in passenden Sprachen werden gesondert integriert und abgenommen.

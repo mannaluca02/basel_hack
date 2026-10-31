@@ -2,7 +2,7 @@
   "dataClassification": "synthetic",
   "providerMode": "live",
   "automatedReviewer": "test-only role simulation; no real Pax expert approval",
-  "capturedAt": "2026-10-31T01:44:39.690Z",
+  "capturedAt": "2026-10-31T02:06:05.214Z",
   "stages": [
     "profile_confirmed",
     "recommendation_explained",
@@ -22,11 +22,11 @@
       "providerFailures": [],
       "providerStatuses": [
         {
-          "operation": "ageLimits",
+          "operation": "saving3aLimits",
           "status": "valid"
         },
         {
-          "operation": "saving3aLimits",
+          "operation": "ageLimits",
           "status": "valid"
         },
         {
@@ -54,12 +54,12 @@
           "status": "valid"
         },
         {
-          "operation": "location",
-          "status": "valid"
-        },
-        {
           "operation": "income",
           "status": "estimated"
+        },
+        {
+          "operation": "location",
+          "status": "valid"
         },
         {
           "operation": "income",
@@ -82,11 +82,11 @@
       "providerFailures": [],
       "providerStatuses": [
         {
-          "operation": "ageLimits",
+          "operation": "saving3aLimits",
           "status": "valid"
         },
         {
-          "operation": "saving3aLimits",
+          "operation": "ageLimits",
           "status": "valid"
         },
         {
@@ -142,11 +142,11 @@
       "providerFailures": [],
       "providerStatuses": [
         {
-          "operation": "saving3aLimits",
+          "operation": "ageLimits",
           "status": "valid"
         },
         {
-          "operation": "ageLimits",
+          "operation": "saving3aLimits",
           "status": "valid"
         },
         {
@@ -174,12 +174,12 @@
           "status": "valid"
         },
         {
-          "operation": "income",
-          "status": "estimated"
-        },
-        {
           "operation": "location",
           "status": "valid"
+        },
+        {
+          "operation": "income",
+          "status": "estimated"
         },
         {
           "operation": "income",
@@ -198,11 +198,11 @@
       "providerFailures": [],
       "providerStatuses": [
         {
-          "operation": "saving3aLimits",
+          "operation": "ageLimits",
           "status": "valid"
         },
         {
-          "operation": "ageLimits",
+          "operation": "saving3aLimits",
           "status": "valid"
         },
         {
@@ -222,12 +222,12 @@
           "status": "requires_review"
         },
         {
-          "operation": "retirement",
-          "status": "valid"
-        },
-        {
           "operation": "budgetProposal",
           "status": "estimated"
+        },
+        {
+          "operation": "retirement",
+          "status": "valid"
         },
         {
           "operation": "income",
@@ -275,8 +275,14 @@
     "budgetProposal",
     "capitalTax",
     "consumption",
+    "corporateEntityTax",
+    "estateGainFields",
+    "estateGainTax",
     "income",
     "incomeFortuneTax",
+    "inheritanceAll",
+    "inheritanceBeneficiary",
+    "inheritanceGroup",
     "location",
     "purchaseP2",
     "retirement",
@@ -286,10 +292,35 @@
     "saving",
     "saving3a",
     "saving3aLimits",
-    "searchLocation"
+    "searchLocation",
+    "searchLocationGeo",
+    "taxBaseInfo"
+  ],
+  "localeChecks": [
+    {
+      "locale": "de",
+      "financialInputHashUnchanged": true,
+      "dossierLanguageVerified": true
+    },
+    {
+      "locale": "fr",
+      "financialInputHashUnchanged": true,
+      "dossierLanguageVerified": true
+    },
+    {
+      "locale": "it",
+      "financialInputHashUnchanged": true,
+      "dossierLanguageVerified": true
+    },
+    {
+      "locale": "en",
+      "financialInputHashUnchanged": true,
+      "dossierLanguageVerified": true
+    }
   ],
   "coverageInForce": false,
   "estimateErrors": [],
   "estimateBlocked": [],
+  "localePersistedAfterRestart": true,
   "status": "passed"
 }

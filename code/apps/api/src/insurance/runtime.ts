@@ -10,6 +10,7 @@ import { DraftEstimateService } from './estimates.js';
 import { ProductDocuments } from './documents.js';
 import { PrototypeInsights } from './telemetry.js';
 import { ScenarioComparisonService } from './comparison.js';
+import { AdditionalCalculatorTools } from './tools.js';
 import { LiveLogismataProvider,ReplayProvider,type CalculationProvider } from '../logismata/client.js';
 
 export const LIFE_RUNTIME=Symbol('LIFE_RUNTIME');
@@ -38,7 +39,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
       }).catch(()=>{});
     },60_000);cleanup.unref();
     return {store,sessions,engine,documents,journey,dossier,advisory:new AdvisoryTools(engine),estimates:new DraftEstimateService(engine),
-      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);await store.close();}}};
+      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
 export type LifeRuntime=Awaited<ReturnType<typeof createLifeRuntime>>;

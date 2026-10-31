@@ -14,6 +14,19 @@ const confession=z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.
 const taxCommon={IncomeType:z.number().int().min(1).max(3),Income:chf,TaxLocationID:z.number().int().positive(),Relationship:z.number().int().min(1).max(4),
   Confession1:confession,Confession2:confession.optional(),NumberOfChildren:z.number().int().min(0).max(30),BirthYear:year};
 export const RequestSchemas={
+  taxBaseInfo:z.object({}).strict(),
+  searchLocationGeo:z.object({Latitude:z.number().finite().min(-90).max(90),Longitude:z.number().finite().min(-180).max(180),RadiusKm:z.number().positive().max(10000),Language:z.number().int().min(1).max(4).optional()}).strict(),
+  estateGainFields:z.object({TaxLocationID:z.number().int().positive()}).strict(),
+  estateGainTax:z.object({TaxLocationID:z.number().int().positive(),Relationship:common.Relationship,Confession1:confession,Confession2:confession.optional(),
+    ConfessionPart1:z.number().int().min(0).max(100).optional(),TaxableGain:z.number().finite().min(-1e10).max(1e10).optional(),
+    OwnerYears:z.number().int().min(0).max(300).optional(),OwnerMonths:z.number().int().min(0).max(11).optional(),
+    Revenues:chf.optional(),FirstCosts:chf.optional(),BuildingInvest:chf.optional(),HasBuilding:z.boolean().optional(),SelfInhabited:z.boolean().optional(),SelfInhabYears:z.number().int().min(0).max(300).optional(),HasDiscount:z.boolean().optional()}).strict(),
+  inheritanceAll:z.object({TaxLocationID:z.number().int().positive(),Amount:chf}).strict(),
+  inheritanceGroup:z.object({TaxLocationID:z.number().int().positive(),Amount:chf,Group:z.union([z.literal(100),z.literal(200),z.literal(300),z.literal(400),z.literal(500),z.literal(600),z.literal(700),z.literal(800)])}).strict(),
+  inheritanceBeneficiary:z.object({TaxLocationID:z.number().int().positive(),Amount:chf,Beneficiary:z.number().int().refine(n=>[101,201,202,203,301,302,303,304,305,306,307,308,401,402,403,501,502,503,504,601,602,701,702,703,704,705,706,707,801,802,803,804,805,806,807,808,809,810,811].includes(n))}).strict(),
+  corporateEntityTax:z.object({TaxLocationID:z.number().int().positive(),ProfitBeforeTaxes:z.boolean(),
+    TaxableProfitConf:chf,TaxableProfitCanton:chf,TaxableCapital:chf,ShareCapital:chf,NetProfitParticipationConf:chf,
+    NetProfitParticipationCanton:chf,InnovationsDeduction:chf,NotionalInterestDeduction:chf,TotalAssets:chf,TotalBeneficiaryParticipation:chf}).strict(),
   incomeFortuneTax:z.object({...taxCommon,Fortune:chf.optional()}).strict(),
   saving3a:z.object({...taxCommon,Sex:z.union([z.literal(1),z.literal(2)]),Duration:z.number().int().min(1).max(100),
     InitialInvestment:chf,YearlyInvestment:chf,InterestRate:z.number().min(-50).max(20)}).strict(),
@@ -43,6 +56,14 @@ export const RequestSchemas={
 };
 export type Operation=keyof typeof RequestSchemas;
 export const Operations:Record<Operation,{id:string;archive:string}>={
+  taxBaseInfo:{id:'APICalc_getTaxBaseInfo',archive:'steuerstand'},
+  searchLocationGeo:{id:'APICalc_searchLocationGeo',archive:'standort-suche-geo'},
+  estateGainFields:{id:'APICalc_getAdditionalEstateGainFields',archive:'grundstueckgewinn-zusatzfelder'},
+  estateGainTax:{id:'APICalc_calculateEstateGainTax',archive:'grundstueckgewinnsteuer'},
+  inheritanceAll:{id:'APICalc_calculateAllInheritanceDonationTaxes',archive:'erbschaftssteuer-uebersicht'},
+  inheritanceGroup:{id:'APICalc_calculateGroupInheritanceDonationTaxes',archive:'erbschaftssteuer-gruppe'},
+  inheritanceBeneficiary:{id:'APICalc_calculateBeneficiaryInheritanceDonationTax',archive:'erbschaftssteuer-beguenstigter'},
+  corporateEntityTax:{id:'APICalc_calculateCorporateEntityTax',archive:'unternehmenssteuer'},
   incomeFortuneTax:{id:'APICalc_calculateIncomeFortuneTax',archive:'einkommens-vermoegenssteuer'},
   saving3a:{id:'APICalc_calculateSaving3a',archive:'saeule-3a'},
   capitalTax:{id:'APICalc_calculateCapitalTax',archive:'kapitalleistungssteuer'},

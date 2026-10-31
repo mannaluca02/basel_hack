@@ -24,8 +24,8 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 
 | Befehl | Wirkung |
 |---|---|
-| `npm test` | Vollständiger Build und 100 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
-| `npm run test:live` | Echte 16 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
+| `npm test` | Vollständiger Build und 111 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
+| `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
 | `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
 | `npm run demo` | Frühere Offline-Fachdemo ohne HTTP-Server |
@@ -63,7 +63,7 @@ Die vollständigen Routen und Eingabeschemas stehen in `/api/openapi.json`. Zod-
 | `packages/contracts/src/life-analysis.ts` | Validierter kompletter Rechenlauf, Risiko- und Zeitachsen-Ausgaben |
 | `packages/domain/src/` | Reine Budget-/Kapital-/Säulen-/Szenario-/Lebensversicherungsfunktionen |
 | `apps/api/src/calculation/` | Weiterverwendbarer NestJS-Rechenkern, Hash-/Versionsschutz |
-| `apps/api/src/logismata/` | Allowlist, 16 Request-/Response-Mapper, Live und exakter Replay |
+| `apps/api/src/logismata/` | Allowlist, 24 Request-/Response-Mapper, Live und exakter Replay |
 | `apps/api/src/insurance/engine.ts` | Gemeinsamer Fall, bestätigte Versionen, Analyse, Bedarf, Review, Fortschritt, Gesprächskontext |
 | `insurance/store.ts`, `auth.ts`, `http.ts` | Verschlüsselung, Besitzer/Rollen, Sitzungen, CSRF, Grenzen, geschützte HTTP-/SSE-Schnittstellen |
 | `insurance/products.ts`, `journey.ts`, `documents.ts` | Erklärbare Produktauswahl, Dokumentnachweise, gespeicherte Demo-State-Machine |
@@ -86,11 +86,11 @@ Earnie kann `createLifeRuntime()` bzw. `createLifeInsuranceApp()` verwenden oder
 
 Geburtsmonate, konkrete Frühpensionierungskürzungen, Teilrenten, PK-Reglemente, Bezüger-/Begünstigtenrecht und Bezugs-/Steuerberechtigung benötigen Fachprüfung; keine Simulation stellt eine garantierte Rentenzusage dar. Die lokale Zeitachse ist ausdrücklich eine zusätzliche Liquiditätsillustration mit dem eingegebenen Zusatzsparen: bestehende private Prämien werden dort nicht nochmals pauschal als Vermögenszuwachs angesetzt. Bereits laufendes Sparen geht in die gesonderte Provider-Pensionierungsprojektion ein. Gebundene Bestände werden lokal zum eingegebenen nominalen Betrag freigegeben; unbekannte künftige Leistungen, Kosten oder Renditen aus bestehenden Verträgen werden nicht erfunden. Beide Modelle werden nicht addiert und ihre Abstimmung ist ein eigener Review-Grund. Beträge aus vlot und dem Musterfall werden nicht ohne identische Voraussetzungen mit diesen Läufen gleichgesetzt.
 
-## 16 echte Rechenoperationen
+## 24 echte Rechenoperationen
 
 `saving3aLimits`, `ageLimits`, `riskBase`, `risk`, `retirementBase`, `retirement`, `income`, `budgetProposal`, `saving`, `consumption`, `searchLocation`, `location`, `incomeFortuneTax`, `saving3a`, `capitalTax`, `purchaseP2`.
 
-Die sechs optionalen Schätzpfade werden über `/calculator-estimates` ausdrücklich vor Bestätigung aufgerufen; fehlende Steuer-/Konfessions-/Ortsangaben werden nachgefragt. Schätzungen verändern das Profil nicht. Die übrigen acht archivierten Provideroperationen betreffen etwa Gesellschafts-/Erbschafts-/Grundstückgewinnsteuern, Geosuche und Zusatzmetadaten; sie sind keine implementierten Lebensversicherungsfunktionen und werden nicht als angebunden behauptet.
+Die sechs optionalen Schätzpfade werden über `/calculator-estimates` ausdrücklich vor Bestätigung aufgerufen; fehlende Steuer-/Konfessions-/Ortsangaben werden nachgefragt. Schätzungen verändern das Profil nicht. Die zusätzlichen acht Operationen sind ebenfalls implementiert und live geprüft: `taxBaseInfo`, `searchLocationGeo`, `estateGainFields`, `estateGainTax`, `inheritanceAll`, `inheritanceGroup`, `inheritanceBeneficiary`, `corporateEntityTax`. Sie werden ausdrücklich über die geschützte Zusatzrechner-Schnittstelle aufgerufen und verändern weder bestätigte Profile noch aktive Finanzläufe automatisch. Unternehmens-/Grundstückgewinn-/Erbschaftssteuern werden nicht ungefragt in jede Lebensversicherungsberatung eingerechnet.
 
 Der Providerzugang ist auf den dokumentierten Host und Operationspfade begrenzt. Maximal zwei gleichzeitige Requests, begrenzte Warteschlange, fünf Sekunden je Versuch, höchstens ein Retry bei vorübergehenden Fehlern, keine Redirects, keine Wiederholung bei 401/403. Fehler geben keine Token oder Provider-Payloads preis. Live-Fehler wechseln niemals still zu Replay; Replay trifft ausschließlich bei vollständigem identischem Operations-/Request-Hash.
 
@@ -127,3 +127,31 @@ Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundenda
 Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
 
 Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Es gibt keine externen Analytics-/Modellaufrufe.
+
+
+## Vollständige Tool-Abdeckung und vier Sprachen
+
+Alle 24 Operationen der bereitgestellten APICalc-Spezifikation sind nun im Server-Allowlist-Adapter verfügbar und im erweiterten Live-Test ausgeführt. Die bisherigen 16 bleiben im bestehenden Beratungs-/Schätzweg; die zusätzlichen acht sind gezielte Zusatzwerkzeuge.
+
+`GET /api/cases/:id/calculator-tools` liefert Operationen, monetäre Eingabefelder und den isolierten fachlichen Geltungsbereich. `POST` auf denselben Pfad braucht `expectedCaseRevision`, `noticeVersion`, `allowSyntheticCalculatorTransfer:true`, `requestUnits:"CHF_CENTS"`, `operation` und `request`. Die Eigenschaftsnamen in `request` folgen der bereitgestellten API, **sämtliche monetären Werte sind ganze CHF-Rappen**. Der Server konvertiert erst an der Providergrenze. Nicht monetäre Felder wie Steuerort-ID, Jahre, Gruppen-/Begünstigtencodes oder Koordinaten werden nicht skaliert. Beispiel für eine isolierte Erbschafts-/Schenkungssteuerübersicht:
+
+```json
+{
+  "expectedCaseRevision": 2,
+  "noticeVersion": "lifemap-synthetic-v1",
+  "allowSyntheticCalculatorTransfer": true,
+  "requestUnits": "CHF_CENTS",
+  "operation": "inheritanceAll",
+  "request": { "TaxLocationID": 400100000, "Amount": 10000000 }
+}
+```
+
+Das Beispiel entspricht CHF 100’000. Ergebnisse behalten Begünstigtenalternativen getrennt; sie werden nicht summiert oder ungeprüft auf Lebensversicherungsauszahlungen angewendet. Fehlende Zustimmung, falsche Einheiten, Rappenbruchteile, unbekannte Operationen und fremde Fälle werden vor dem Provideraufruf abgewiesen. Geokoordinaten stammen ausschliesslich aus der ausdrücklich übergebenen synthetischen Anfrage; kein Geräte-/Browser-GPS wird abgefragt. Ausführungen sind verschlüsselt am Fall als `toolRuns` gespeichert.
+
+Die zentrale lokale Textsammlung enthält 191 vollständige Schlüssel in **DE/FR/IT/EN**. `GET /api/translations?locale=fr` liefert das passende Angular-/Agent-Wörterbuch; alternativ wird `Accept-Language` berücksichtigt. `/privacy` liefert zusätzlich einen lokalisierten `display`-Abschnitt. Fehler haben stabile technische `code`-Werte und eine übersetzte `message`; dafür `X-Locale` oder `Accept-Language` mitsenden.
+
+`PATCH /api/cases/:id/preferences` mit `{ "locale":"fr" }` wechselt die Sprache jederzeit. Profilversion, Rechenlauf, finanzielle Eingabehashes und Kandidatenidentitäten bleiben unverändert; die Kontextrevision steigt und SSE meldet die Änderung. Regelmässige Budgetanfragen und Orts-/Geosuche verwenden die passende Provider-Sprachnummer.
+
+Kundenlesbare Rückfragen, Produktbeschreibungen, Empfehlungsbegründungen/-bedingungen, Alternativen, Risiko-/Status-/Perioden-/Fortschrittsbeschriftungen, Disclaimer, Datenschutzanzeige und beide Dossier-Sichten werden lokalisiert. Rechenantworten ergänzen `presentation`; der gemeinsame Fall bietet dieselbe aktuelle Projektion unter `presentation`. Der HTML-Export nutzt die Fall-Locale, Schweizer Zahlenformate und lesbare Abschnitte anstelle technischer JSON-Blöcke. Technische IDs, Original-Provenienz und kanonische Rechendaten bleiben unverändert. **Luca soll die Präsentationsfelder und den Katalog rendern; Earnie/Dario verwenden die aktuelle `locale` vor jeder Antwort.** Angular-Oberfläche, generierter Dialog und reale Sprachausgabe müssen von den jeweiligen Teammitgliedern angebunden werden.
+
+Archivierte Vertrags-PDFs bleiben gekennzeichnete deutschsprachige Originale. Sie werden nicht maschinell als rechtsverbindliche französische, italienische oder englische Dokumente ausgegeben; dafür sind aktuelle von Pax freigegebene Sprachfassungen erforderlich. Dies wird auch im Übersetzungskatalog und im Dossier erklärt.

@@ -17,7 +17,30 @@ export function normalizeResponse(operation:Operation,request:unknown,envelope:u
     metrics.push({id,...money(value===null?null:cents(value),period),status,...(scenario?{scenario}:{})});
   const problem=(code:string,path:string,message:string)=>issues.push({code,path,message});
   let status:Status='valid';
-  if(operation==='saving3aLimits') {
+  if(operation==='taxBaseInfo') {
+    const data=z.object({TaxBaseVersion:z.string().min(1).max(100),TaxBaseDate:z.string().min(1).max(100)}).parse(raw);
+    metadata.taxBaseVersion=data.TaxBaseVersion;metadata.taxBaseDate=data.TaxBaseDate;
+  } else if(operation==='estateGainFields') {
+    const keys=['Confession','Revenues','FirstCost','BuildingInvest','HasBuilding','SelfInhabitated','SelfInhabYears','HasDiscount'];
+    const data=z.record(z.string(),z.unknown()).parse(raw);
+    metadata.additionalFields=Object.fromEntries(keys.map(k=>[k,z.boolean().parse(data[k])]));
+  } else if(['inheritanceAll','inheritanceGroup','inheritanceBeneficiary'].includes(operation)) {
+    const row=z.object({Group:z.number().int(),Beneficiary:z.number().int(),InheritanceTaxes:z.number().finite().nonnegative(),
+      InheritanceExemption:z.number().finite().nonnegative(),InheritanceDeduction:z.number().finite().nonnegative(),
+      DonationTaxes:z.number().finite().nonnegative(),DonationExemption:z.number().finite().nonnegative(),DonationDeduction:z.number().finite().nonnegative()});
+    const rows=operation==='inheritanceBeneficiary'?[row.parse(raw)]:z.array(row).min(1).max(100).parse(raw);
+    if(new Set(rows.map(r=>r.Beneficiary)).size!==rows.length||rows.some(r=>operation==='inheritanceGroup'&&r.Group!==req.Group||operation==='inheritanceBeneficiary'&&r.Beneficiary!==req.Beneficiary))throw new Error('Unexpected beneficiary');
+    status='requires_review';metadata.beneficiaries=rows.map(r=>({group:r.Group,beneficiary:r.Beneficiary}));
+    for(const r of rows)for(const key of ['InheritanceTaxes','InheritanceExemption','InheritanceDeduction','DonationTaxes','DonationExemption','DonationDeduction'] as const)
+      add(`beneficiary_${r.Beneficiary}_${key}`,r[key],'once',status);
+    problem('INHERITANCE_TAX_REVIEW','inheritance','Tax eligibility and treatment of insurance proceeds need separate confirmation; beneficiary alternatives are not additive.');
+  } else if(operation==='estateGainTax'||operation==='corporateEntityTax') {
+    const fields=operation==='estateGainTax'?['FederalTax','StateTax','CommunityTax','ChurchTax','TotalTaxes']:
+      ['ProfitSimpleTaxState','ProfitSimpleTaxCommunity','ProfitCommunityTax','ProfitChurchTax','ProfitStateTax','ProfitFederalTax','TotalProfitTaxes','CapitalSimpleTaxState','CapitalSimpleTaxCommunity','CapitalCommunityTax','CapitalChurchTax','CapitalStateTax','TotalCapitalTaxes','MinimalTaxesCanton','TotalTaxes'];
+    const data=z.record(z.string(),z.unknown()).parse(raw);status='requires_review';
+    for(const key of fields)add(key,z.number().finite().nonnegative().max(1e10).parse(data[key]),operation==='estateGainTax'?'once':'year',status);
+    problem('ADDITIONAL_TAX_REVIEW',operation,'An isolated tax estimate does not establish tax liability or change insurance needs.');
+  } else if(operation==='saving3aLimits') {
     const data=LimitsResponse.parse(raw);
     add('max3aWithP2',data.Max3aSaving,'year','valid');add('max3aWithoutP2',data.Max3aSavingWithoutP2,'year','valid');
     metadata.eligibilityNotEstablished=true;
@@ -128,9 +151,9 @@ export function normalizeResponse(operation:Operation,request:unknown,envelope:u
     const data=z.object({Withdrawal:z.number().finite().nonnegative(),EndCapital:z.number().finite().nonnegative(),DurationYears:z.number().int().nonnegative(),DurationMonths:z.number().int().nonnegative()}).parse(raw);
     status='estimated';add('withdrawal',data.Withdrawal,req.WithdrawalMonthly===true?'month':'year',status);add('endCapital',data.EndCapital,'once',status);
     metadata.durationMonths=data.DurationYears*12+data.DurationMonths;metadata.guaranteed=false;
-  } else if(operation==='searchLocation'||operation==='location') {
+  } else if(operation==='searchLocation'||operation==='searchLocationGeo'||operation==='location') {
     const location=z.object({LocationID:z.number().int().positive(),ZipCode:z.union([z.string(),z.number()]),City:z.string(),Canton:z.string(),Location:z.string().optional()});
-    const locations=operation==='searchLocation'?z.array(location).max(200).parse(raw):[location.parse(raw)];
+    const locations=operation!=='location'?z.array(location).max(200).parse(raw):[location.parse(raw)];
     metadata.locations=locations;
   } else {
     const data=BaseResponse.parse(raw);status='estimated';

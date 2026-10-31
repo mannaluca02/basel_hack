@@ -30,7 +30,7 @@ async function confirmedCase() {
 }
 test('public processing notice precedes data capture and reports live capabilities without credentials',async()=>{
   const p=await request('GET','/api/privacy');assert.equal(p.body.externalAiTransfer,false);assert.equal(p.body.dataMode,'synthetic_only');
-  const status=await request('GET','/api/status');assert.equal(status.body.realCoverageCanBeActivated,false);assert.equal(status.body.operations.length,16);
+  const status=await request('GET','/api/status');assert.equal(status.body.realCoverageCanBeActivated,false);assert.equal(status.body.operations.length,24);
   assert.ok(!JSON.stringify(status.body).includes('accessCode'));
 });
 test('case routes require authentication and do not accept a customer role override',async()=>{

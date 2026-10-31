@@ -1,14 +1,16 @@
 import 'reflect-metadata';
-import { mkdtemp,rm,readFile,writeFile } from 'node:fs/promises';
+import { mkdtemp,rm,readFile,writeFile,mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createLifeInsuranceApp } from '../apps/api/dist/insurance/app.js';
+import { AdditionalOperations,AdditionalMoneyFields } from '../apps/api/dist/insurance/tools.js';
+import { Operations } from '../apps/api/dist/logismata/contracts.js';
 
 const token=process.env.LOGISMATA_BEARER_TOKEN;
 if(!token)throw new Error('LOGISMATA_BEARER_TOKEN is required; real customer data is not used.');
 const directory=await mkdtemp(join(tmpdir(),'pax-life-live-journey-'));
 const report={dataClassification:'synthetic',providerMode:'live',automatedReviewer:'test-only role simulation; no real Pax expert approval',
-  capturedAt:new Date().toISOString(),stages:[],scenarioRuns:[],comparisons:[],operations:[],coverageInForce:false};
+  capturedAt:new Date().toISOString(),stages:[],scenarioRuns:[],comparisons:[],operations:[],localeChecks:[],coverageInForce:false};
 let app,runtime,base;
 async function call(method,path,session,body) {
   const r=await fetch(base+path,{method,headers:{...(session?{Authorization:`Bearer ${session}`} : {}),...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});
@@ -36,6 +38,14 @@ try {
     purchaseP2:{investmentCents:500000,years:5,conversionBps:600}});
   report.estimateErrors=estimates.errors;report.estimateBlocked=estimates.blocked;
   report.operations.push(...estimates.results.filter(r=>r.provenance.mode==='live').map(r=>r.operation));
+  for(const operation of AdditionalOperations){
+    const example=JSON.parse(await readFile(new URL(`../../documentation/baselhack/references/api/examples/${Operations[operation].archive}.json`,import.meta.url),'utf8'));
+    const request=structuredClone(example.request);delete request.Language;
+    for(const name of AdditionalMoneyFields[operation])if(typeof request[name]==='number')request[name]=Math.round(request[name]*100);
+    c=await call('GET',path,customer.sessionToken);
+    const extra=await call('POST',`${path}/calculator-tools`,customer.sessionToken,{operation,request,requestUnits:'CHF_CENTS',expectedCaseRevision:c.caseRevision,noticeVersion:'lifemap-synthetic-v1',allowSyntheticCalculatorTransfer:true});
+    if(extra.result.provenance.mode!=='live')throw new Error('Additional tool did not use live provider');report.operations.push(operation);
+  }
   const retirement={kind:'retirement',goalId:'goal_retirement',startMonth:'2047-01',endMonth:'2055-12',incomeBasis:'net_after_income_tax',
     monthlyNeedCents:500000,monthlySavingCents:50000,annualReturnBps:0,savingLiquidity:'retirement_restricted',savingsReleaseMonth:'2050-01',
     releaseAssumptions:[{assetId:'pillar3_account',availableMonth:'2050-01'}],assumptionsConfirmed:true,priceBasis:'nominal',
@@ -60,6 +70,18 @@ try {
   await call('POST',`${path}/active-analysis`,customer.sessionToken,{runId:baseline.id});
   const rec=await call('POST',`${path}/recommendations`,customer.sessionToken,{});
   if(!rec.candidates.length)throw new Error('No candidate for the explicit synthetic needs');
+  for(const locale of ['de','fr','it','en']){
+    await call('PATCH',`${path}/preferences`,customer.sessionToken,{locale});
+    const context=await call('GET',`${path}/advisor/context`,customer.sessionToken);
+    const translated=await call('GET',`/api/translations?locale=${locale}`,null);
+    const translatedRec=await call('POST',`${path}/recommendations`,customer.sessionToken,{});
+    const html=await fetch(`${base}${path}/dossier?format=html&audience=customer`,{headers:{Authorization:`Bearer ${customer.sessionToken}`}});
+    const htmlText=await html.text();
+    if(context.locale!==locale||context.calculationInputHash!==baseline.inputHash||translated.locale!==locale||translatedRec.locale!==locale||!htmlText.includes(`<html lang="${locale}">`))throw new Error(`Locale ${locale} lost context or translation`);
+    if(process.env.LIFEMAP_DEMO_EXPORT_DIR){await mkdir(process.env.LIFEMAP_DEMO_EXPORT_DIR,{recursive:true});await writeFile(join(process.env.LIFEMAP_DEMO_EXPORT_DIR,`dossier-${locale}.html`),htmlText,{mode:0o600});}
+    report.localeChecks.push({locale,financialInputHashUnchanged:true,dossierLanguageVerified:true});
+  }
+  await call('PATCH',`${path}/preferences`,customer.sessionToken,{locale:'de'});
   c=await call('GET',path,customer.sessionToken);const task=c.reviewTasks.filter(t=>t.runId===baseline.id).at(-1);
   await call('POST',`${path}/review-decisions`,reviewer.sessionToken,{runId:baseline.id,decision:'approved_for_demo',acknowledgedReasonCodes:task.reasons,
     criteria:['data_sources_checked','need_and_units_checked','beneficiaries_checked','personal_affordability_checked','demo_only_understood']});
@@ -81,12 +103,15 @@ try {
   const bundle=await call('GET',`${path}/summaries`,customer.sessionToken);
   if(bundle.customer.snapshotId!==bundle.advisor.snapshotId)throw new Error('Summary snapshots differ');
   report.stages.push('demo_quote','demo_application','idempotent_submission','demo_acceptance','demo_policy','matching_summary_snapshots');
+  await call('PATCH',`${path}/preferences`,customer.sessionToken,{locale:'fr'});
   await app.close();app=null;
   ({app,runtime}=await createLifeInsuranceApp({dataDirectory:directory,providerMode:'live',token}));await app.listen(0,'127.0.0.1');base=await app.getUrl();
   const portal=await call('GET',`${path}/portal`,customer.sessionToken);
   if(portal.policies.length!==1||portal.policies[0].id!==policy.id)throw new Error('Persisted policy could not be resumed');
+  if(portal.locale!=='fr'||!portal.displayLabel.includes('AUCUNE COUVERTURE'))throw new Error('Portal locale did not survive restart');
+  report.localePersistedAfterRestart=true;
   report.stages.push('portal_after_restart');report.operations=[...new Set(report.operations)].sort();
-  report.status=report.estimateErrors.length||report.estimateBlocked.length?'partial':'passed';
+  report.status=report.estimateErrors.length||report.estimateBlocked.length||report.operations.length!==24?'partial':'passed';
   console.log(JSON.stringify(report,null,2));
   if(process.env.LIFEMAP_LIVE_REPORT)await writeFile(process.env.LIFEMAP_LIVE_REPORT,JSON.stringify(report,null,2)+'\n',{mode:0o600});
   if(report.status!=='passed')process.exitCode=1;

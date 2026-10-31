@@ -8,6 +8,7 @@ import { WorkflowError,type Actor } from './types.js';
 import { Operations } from '../logismata/contracts.js';
 import { PAX_PRODUCTS } from './products.js';
 import { lifeOpenApi } from './openapi.js';
+import { catalog,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
 
 type Request={headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
 type Response={setHeader:(key:string,value:string)=>void;status:(code:number)=>Response;json:(value:unknown)=>void;send:(value:unknown)=>void;type:(value:string)=>Response};
@@ -38,10 +39,13 @@ export class LifeSessionGuard implements CanActivate {
 export class SafeLifeErrorFilter implements ExceptionFilter {
   catch(error:unknown,host:ArgumentsHost) {
     const res=host.switchToHttp().getResponse<Response>();
-    if(error instanceof WorkflowError){res.status(error.status).json({code:error.code,fields:error.fields});return;}
-    if(error instanceof z.ZodError){res.status(400).json({code:'INVALID_INPUT',fields:error.issues.slice(0,20).map(i=>i.path.map(String).join('.'))});return;}
+    const req=host.switchToHttp().getRequest<Request>();const locale=localeOf(req.headers['x-locale']??req.headers['accept-language']);
+    res.setHeader('Content-Language',locale);
+    if(error instanceof WorkflowError){res.status(error.status).json({code:error.code,fields:error.fields,locale,message:errorText(locale,error.code)});return;}
+    if(error instanceof z.ZodError){res.status(400).json({code:'INVALID_INPUT',fields:error.issues.slice(0,20).map(i=>i.path.map(String).join('.')),locale,message:errorText(locale,'INVALID_INPUT')});return;}
     const status=error instanceof HttpException?error.getStatus():500;
-    res.status(status).json({code:status===413?'PAYLOAD_TOO_LARGE':status===404?'NOT_FOUND':status===400?'INVALID_INPUT':'INTERNAL_ERROR'});
+    const code=status===413?'PAYLOAD_TOO_LARGE':status===404?'NOT_FOUND':status===400?'INVALID_INPUT':'INTERNAL_ERROR';
+    res.status(status).json({code,locale,message:errorText(locale,code)});
   }
 }
 
@@ -49,8 +53,10 @@ export class SafeLifeErrorFilter implements ExceptionFilter {
 export class PublicLifeController {
   constructor(@Inject(LIFE_RUNTIME) private readonly r:LifeRuntime){}
   @Get('status') status(){return {service:'pax-life-insurance-backend',modelVersion:'0.2.0',providerMode:this.r.providerMode,
-    dataMode:'synthetic-only',paxContractApiAvailable:false,realCoverageCanBeActivated:false,operations:Object.keys(Operations)};}
-  @Get('privacy') privacy(){return PRIVACY_NOTICE;}
+    dataMode:'synthetic-only',paxContractApiAvailable:false,realCoverageCanBeActivated:false,supportedLocales:['de','fr','it','en'],translationCatalog:'/api/translations',operations:Object.keys(Operations)};}
+  @Get('privacy') privacy(@Query('locale') selected:unknown,@Req() req:Request){const locale=selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected);
+    return {...PRIVACY_NOTICE,locale,display:{title:t(locale,'privacy.title'),purpose:t(locale,'privacy.purpose'),recipients:t(locale,'privacy.recipients'),storage:t(locale,'privacy.storage'),release:t(locale,'privacy.release')}};}
+  @Get('translations') translations(@Query('locale') selected:unknown,@Req() req:Request){return catalog(selected===undefined?localeOf(req.headers['accept-language']):z.enum(['de','fr','it','en']).parse(selected));}
   @Get('openapi.json') openapi(){return lifeOpenApi();}
   @Post('sessions') async login(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
     if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
@@ -62,12 +68,13 @@ export class PublicLifeController {
 @Controller('api') @UseGuards(LifeSessionGuard)
 export class ProtectedLifeController {
   constructor(@Inject(LIFE_RUNTIME) private readonly r:LifeRuntime){}
+  private async displayJourney(req:Request,id:string,result:unknown){return presentJourney(await result,this.r.engine.caseFor(req.actor,id).locale);}
   @Delete('sessions/current') async logout(@Req() req:Request,@Res({passthrough:true}) res:Response){
     await this.r.sessions.revoke(req.actor);res.setHeader('Set-Cookie','pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0');return {revoked:true};
   }
   @Get('cases') list(@Req() req:Request){return this.r.engine.list(req.actor);}
   @Post('cases') create(@Req() req:Request,@Body() body:unknown){return this.r.engine.createCase(req.actor,body);}
-  @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.caseFor(req.actor,uuid(id));}
+  @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return localizedCase(this.r.engine.caseFor(req.actor,uuid(id)));}
   @Patch('cases/:caseId/draft') patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.patchDraft(req.actor,uuid(id),body);}
   @Post('cases/:caseId/confirmations') confirm(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.confirm(req.actor,uuid(id),body);}
   @Get('cases/:caseId/questions') questions(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.questions(req.actor,uuid(id));}
@@ -82,16 +89,18 @@ export class ProtectedLifeController {
     return {locations:result.metadata.locations,provenance:result.provenance};
   }
   @Post('cases/:caseId/calculator-estimates') estimate(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.estimates.calculate(req.actor,uuid(id),body);}
+  @Get('cases/:caseId/calculator-tools') tools(@Req() req:Request,@Param('caseId') id:string){return this.r.tools.list(req.actor,uuid(id));}
+  @Post('cases/:caseId/calculator-tools') tool(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.tools.execute(req.actor,uuid(id),body);}
   @Post('cases/:caseId/recommendations') recommend(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.engine.recommendation(req.actor,uuid(id));}
   @Post('cases/:caseId/reviews') requestReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.engine.requestReview(req.actor,uuid(id));}
   @Post('cases/:caseId/review-decisions') review(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.reviewDecision(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-quotes') quote(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.quote(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-applications') application(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.application(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-applications/submit') submit(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.submit(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-applications/start-review') startReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.startReview(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-applications/decisions') decide(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.decide(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/demo-policies') policy(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.journey.issuePolicy(req.actor,uuid(id),body);}
-  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){return this.r.journey.portal(req.actor,uuid(id));}
+  @Post('cases/:caseId/demo-quotes') quote(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.quote(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-applications') application(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.application(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-applications/submit') submit(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.submit(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-applications/start-review') startReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.startReview(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-applications/decisions') decide(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.decide(req.actor,uuid(id),body));}
+  @Post('cases/:caseId/demo-policies') policy(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.displayJourney(req,id,this.r.journey.issuePolicy(req.actor,uuid(id),body));}
+  @Get('cases/:caseId/portal') portal(@Req() req:Request,@Param('caseId') id:string){return presentJourney(this.r.journey.portal(req.actor,uuid(id)),this.r.engine.caseFor(req.actor,id).locale);}
   @Get('cases/:caseId/summaries') summaries(@Req() req:Request,@Param('caseId') id:string){return this.r.dossier.bundle(req.actor,uuid(id));}
   @Get('cases/:caseId/dossier') dossier(@Req() req:Request,@Param('caseId') id:string,@Query('audience') audience='customer',@Query('format') format='json',@Res({passthrough:true}) res:Response){
     const a=z.enum(['customer','advisor']).parse(audience);const f=z.enum(['json','html']).parse(format);
@@ -103,7 +112,8 @@ export class ProtectedLifeController {
     res.type('application/pdf');res.setHeader('Content-Disposition',`attachment; filename="${document.filename}"`);res.setHeader('X-Document-SHA256',document.sha256);res.send(document.bytes);
   }
   @Get('cases/:caseId/products') products(@Req() req:Request,@Param('caseId') id:string){
-    this.r.engine.caseFor(req.actor,uuid(id));return {kind:'educational_catalog_not_personal_recommendations',products:PAX_PRODUCTS};
+    const locale=this.r.engine.caseFor(req.actor,uuid(id)).locale;return {kind:'educational_catalog_not_personal_recommendations',locale,
+      products:PAX_PRODUCTS.map(p=>({...p,name:productText(locale,p.id),summary:catalog(locale).messages[`summary.${p.id}`]??t(locale,'common.condition')}))};
   }
   @Post('cases/:caseId/agent-access') agent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});this.r.engine.caseFor(req.actor,uuid(id));return this.r.sessions.agentToken(req.actor,id);}
   @Get('cases/:caseId/advisor/context') context(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.advisorContext(req.actor,uuid(id));}

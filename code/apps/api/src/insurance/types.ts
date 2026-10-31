@@ -42,6 +42,7 @@ export type ScenarioComparison={id:string;scope:'valuation_snapshot_local_metric
   metrics:{id:string;personId?:string;currency:'CHF';unit:'cent';period:'month'|'year'|'once';baselineValue:number|null;variantValue:number|null;delta:number|null;status:string}[]};
 export type AgentProposal = {id:string;path:string;value:unknown;expectedProfileVersion:number|null;basisDraftHash:string;status:'proposed'|'accepted';messageId:string};
 export type InsuranceCase = {
+  toolRuns?:{id:string;createdAt:string;operation:string;requestUnits:string;request:Record<string,unknown>;result:unknown;scope:string;profileMutated:boolean;financialInputHashChanged:boolean;inputHash:string;locale:string}[];
   id:string;ownerId:string;createdAt:string;updatedAt:string;expiresAt:string;locale:'de'|'fr'|'it'|'en';timeBudgetMinutes:number;
   caseRevision:number;contextRevision:number;draft:InsuranceDraft;draftDirty:boolean;
   confirmedVersions:{version:number;draft:InsuranceDraft;confirmedAt:string;confirmedBy:string;noticeVersion:string;calculatorTransferAllowed:true}[];

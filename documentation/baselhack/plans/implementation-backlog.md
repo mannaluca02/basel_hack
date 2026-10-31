@@ -543,7 +543,7 @@ P0 · implementiert, gemeinsame Abnahme offen · 3 Personenstunden · M1
 - [ ] Risiko-Code 0 bis zur Klärung reviewpflichtig; HTTP 200 ist nicht alleinige Freigabe.
 - [ ] Begrenzte Fehlerpfade und Replay nur bei passendem vollständigem Input-Hash.
 
-**Implementierungsstand (31.10.2026):** 16 echte Logismata-Operationen mit validierten Requests, Normalisierung und begrenztem Client implementiert; vollständiger synthetischer Live-Test bestanden. Risiko-Code 0 bleibt fachlich offen und requires_review. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+**Implementierungsstand (31.10.2026):** 24 echte Logismata-Operationen mit validierten Requests, Normalisierung und begrenztem Client implementiert; vollständiger synthetischer Live-Test bestanden. Risiko-Code 0 bleibt fachlich offen und requires_review. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
 
 
 ### LOG-03 – Budget und Kapitalzuordnung ohne Doppelzählung
@@ -648,7 +648,7 @@ P0 · implementiert, gemeinsame Abnahme offen · 2.5 Personenstunden · M5
 - [ ] Kleine Risikolücken, Schätzungen und Entwurfsstatus bleiben erklärbar.
 - [ ] Fachliche Vorbehalte sind in Grafik, Empfehlung und Export gleich.
 
-**Implementierungsstand (31.10.2026):** 100 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
+**Implementierungsstand (31.10.2026):** 111 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen. Siehe [Requirements und Prüfnachweis](../reports/life-insurance-requirements.md).
 
 
 ## Earnie – KI-Backend
@@ -826,3 +826,6 @@ Die alten 36 Tickets werden nicht als erledigt markiert. Ihre Aufgaben sind in d
 ## Dynamische Gesprächsaktualisierung
 
 I10 konkretisiert die bestehenden Fall-/Voice-Integrationspakete: Earnie baut ContextBuilder und Update-Kanal, Dario aktualisiert vor Turns und bricht veraltete Ausgabe ab, Valentin liefert gültige Runreferenzen, Luca gleicht Grafik/Chat ab, Lukas übernimmt den Abbruch. [Schnittstellen Abschnitt 9](interface-contracts.md#9-gemeinsame-json-und-dynamischer-gesprächskontext-für-dario) beschreibt HTTP/SSE als Vorschlag. Die Schätzungen bleiben vorläufig und werden vor Umsetzung gegen die tatsächliche Restzeit geprüft. Die 55 geplanten Abnahmefälle enthalten Reconnect, laufende Fachänderung und Tempowechsel.
+
+
+**Ergänzter Prüfumfang:** Alle 24 Sponsor-Operationen und 191 vollständige DE/FR/IT/EN-Anzeigetexte sind im Backend implementiert. Sprachwechsel ohne finanzielle Invalidierung, beide Dossier-Sprachen und die acht gezielten Zusatzrechner sind automatisch und live geprüft. Siehe [Requirements](../reports/life-insurance-requirements.md).

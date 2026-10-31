@@ -779,7 +779,7 @@
         "I03",
         "I04"
       ],
-      "implementation_note": "16 echte Logismata-Operationen mit validierten Requests, Normalisierung und begrenztem Client implementiert; vollständiger synthetischer Live-Test bestanden. Risiko-Code 0 bleibt fachlich offen und requires_review.",
+      "implementation_note": "Alle 24 Sponsor-Operationen implementiert und live geprüft; acht Zusatzrechner separat autorisiert. Originale Fachprüfpflichten bleiben erhalten.",
       "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
@@ -923,7 +923,7 @@
         "I08",
         "I10"
       ],
-      "implementation_note": "100 automatisierte Tests und vollständiger echter Rechen-/Demo-Journey-Test bestanden; Requirements, Provenienz und fachliche Vorbehalte dokumentiert. Gemeinsame Darstellung und Pax-Fachabnahme sowie Produktionsfreigaben bleiben gesondert offen.",
+      "implementation_note": "111 Tests und echter 24-Operationen-/Vier-Sprachen-Durchstich bestanden; Finanzwerte bleiben beim Sprachwechsel unverändert. Team-/Pax-Fachabnahme bleibt getrennt offen.",
       "implementation_report": "documentation/baselhack/reports/life-insurance-requirements.md"
     },
     {
@@ -1203,10 +1203,17 @@
   "implementation_report_path": "documentation/baselhack/reports/logic-backend-implementation.md",
   "logic_backend_verification": {
     "date": "2026-10-31",
-    "automated_tests_passed": 100,
-    "live_operations_verified": 16,
+    "automated_tests_passed": 111,
+    "live_operations_verified": 24,
     "data_classification": "synthetic",
     "real_coverage_enabled": false,
-    "report": "documentation/baselhack/reports/life-insurance-requirements.md"
+    "report": "documentation/baselhack/reports/life-insurance-requirements.md",
+    "supported_locales": [
+      "de",
+      "fr",
+      "it",
+      "en"
+    ],
+    "translation_keys": 191
   }
 }

@@ -11,6 +11,7 @@ import { buildProviderJobs,deriveRiskNeeds } from './provider-mapper.js';
 import { recommendLifeSolutions } from './products.js';
 import { selectedGraphFacts } from './graph.js';
 import { pillarPicture } from './pillars.js';
+import { questionText,presentRecommendation,presentRun,progressText,metricText,statusText } from './i18n.js';
 import { EncryptedCaseStore } from './store.js';
 import { SessionService } from './auth.js';
 import { WorkflowError,type Actor,type InsuranceCase,type Database,type LifeRun,type CaseEvent } from './types.js';
@@ -18,16 +19,7 @@ import { WorkflowError,type Actor,type InsuranceCase,type Database,type LifeRun,
 export const LIFE_MODEL_VERSION='lifemap-life-insurance-0.2.0';
 const now=()=>new Date().toISOString();
 const currentVersion=(c:InsuranceCase)=>c.confirmedVersions.at(-1);
-const text={de:'Bitte ergänzen oder bestätigen Sie diese Angabe.',fr:'Veuillez compléter ou confirmer cette information.',
-  it:'Completi o confermi questa informazione.',en:'Please provide or confirm this information.'};
-const questionLabels:Record<string,Record<'de'|'fr'|'it'|'en',string>>={
-  goals:{de:'Was möchten Sie für Familie, Eigenheim oder Pensionierung erreichen?',fr:'Quels sont vos objectifs pour la famille, le logement ou la retraite ?',it:'Quali sono i suoi obiettivi per famiglia, casa o pensione?',en:'What would you like to achieve for family, home ownership or retirement?'},
-  financial:{de:'Wie sehen Einkommen, Ausgaben, Vermögen und bisherige Vorsorge aus?',fr:'Quels sont vos revenus, dépenses, avoirs et prévoyance existante ?',it:'Quali sono reddito, spese, patrimonio e previdenza esistente?',en:'What are your income, expenses, assets and existing pension arrangements?'},
-  providerSex:{de:'Welcher ausdrücklich bestätigte Geschlechtsparameter darf für den Rechner verwendet werden?',fr:'Quel paramètre de sexe confirmé peut être utilisé pour le calcul ?',it:'Quale parametro di sesso confermato può essere usato nel calcolo?',en:'Which explicitly confirmed sex parameter may the calculator use?'},
-  deathNeedAnnualCents:{de:'Welchen jährlichen Betrag brauchen Ihre Hinterbliebenen nach einem Todesfall?',fr:'De quel montant annuel vos proches auraient-ils besoin après un décès ?',it:'Di quale importo annuo avrebbero bisogno i superstiti dopo un decesso?',en:'What annual amount would your survivors need after a death?'},
-  disabilityNeedAnnualCents:{de:'Welches jährliche Einkommen benötigen Sie bei Erwerbsunfähigkeit?',fr:'De quel revenu annuel auriez-vous besoin en cas d’incapacité de gain ?',it:'Di quale reddito annuo avrebbe bisogno in caso di incapacità di guadagno?',en:'What annual income would you need if unable to work?'},
-  personalAffordableAnnualPremiumCents:{de:'Welchen Jahresbetrag können Sie persönlich zusätzlich tragen?',fr:'Quel montant annuel supplémentaire pouvez-vous personnellement financer ?',it:'Quale importo annuo aggiuntivo può sostenere personalmente?',en:'What additional annual amount can you personally afford?'},
-};
+
 
 export class LifeInsuranceEngine {
   constructor(readonly store:EncryptedCaseStore,readonly sessions:SessionService,readonly provider:CalculationProvider,
@@ -107,7 +99,7 @@ export class LifeInsuranceEngine {
     const c=this.caseFor(actor,id,true);const fields=intakeQuestions(c.draft);
     return {profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
       mandatoryFields:fields,questions:fields.slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
-        text:(questionLabels[path]?.[c.locale]??questionLabels[path.split('.').at(-1)!]?.[c.locale]??text[c.locale])})),
+        text:questionText(c.locale,path)})),
       pace:c.timeBudgetMinutes<=10?'compact':'detailed'};
   }
   async confirm(actor:Actor,id:string,input:unknown) {
@@ -155,7 +147,7 @@ export class LifeInsuranceEngine {
     const draft=started.version.draft;const financial=draft.financial!;
     const providerResults:NormalizedProviderResult[]=[];const failures:{operation:string;code:string}[]=[];
     try {
-      const jobs=buildProviderJobs(draft,scenarioFinancial,body.scenario,this.providerMode==='live'?new Date().getUTCFullYear():Number(financial.valuationDate.slice(0,4)));
+      const jobs=buildProviderJobs(draft,scenarioFinancial,body.scenario,this.providerMode==='live'?new Date().getUTCFullYear():Number(financial.valuationDate.slice(0,4)),initial.locale);
       for(const slice of Array.from({length:Math.ceil(jobs.length/2)},(_,i)=>jobs.slice(i*2,i*2+2))) {
         await Promise.all(slice.map(async job=>{
           try {const result=await this.provider.execute(job.operation,job.request,signal);
@@ -202,16 +194,16 @@ export class LifeInsuranceEngine {
         c.reviewTasks.push({id:randomUUID(),runId:run.id,profileVersion:run.profileVersion,reasons:run.reviewReasons,status:'open',decision:null});
         this.touch(c,'analysis_ready');
       }
-      this.audit(db,actor,c,'analysis_finished',run.status);return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,run};
+      this.audit(db,actor,c,'analysis_finished',run.status);return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,run,presentation:presentRun(run,c.locale)};
     });
   }
   async recommendation(actor:Actor,id:string) {
     this.role(actor,'customer');return this.edit(actor,id,undefined,(c,db)=>{
       const run=this.activeRun(c);if(run.status!=='current')throw new WorkflowError('ANALYSIS_NOT_READY',422);
       if(run.providerResults.some(r=>['needs_input','provider_error','unsupported','stale'].includes(r.status)))throw new WorkflowError('ANALYSIS_NOT_READY',422);
-      const previous=c.recommendations.find(r=>r.runId===run.id);if(previous)return previous;
+      const previous=c.recommendations.find(r=>r.runId===run.id);if(previous)return presentRecommendation(previous,c.locale);
       const rec=recommendLifeSolutions(currentVersion(c)!.draft,run,this.approved(c,run));c.recommendations.push(rec);
-      this.touch(c,'recommendation_available');this.audit(db,actor,c,'recommendation_created');return rec;
+      this.touch(c,'recommendation_available');this.audit(db,actor,c,'recommendation_created');return presentRecommendation(rec,c.locale);
     });
   }
   async reviewDecision(actor:Actor,id:string,input:unknown) {
@@ -249,8 +241,10 @@ export class LifeInsuranceEngine {
     });
   }
   async preferences(actor:Actor,id:string,input:unknown) {
-    this.role(actor,'customer');const body=z.object({timeBudgetMinutes:z.number().int().min(3).max(120)}).strict().parse(input);
-    return this.edit(actor,id,undefined,(c,db)=>{c.timeBudgetMinutes=body.timeBudgetMinutes;this.touch(c,'conversation_preference_changed');this.audit(db,actor,c,'tempo_changed');return {caseRevision:c.caseRevision,contextRevision:c.contextRevision};});
+    this.role(actor,'customer');const body=z.object({timeBudgetMinutes:z.number().int().min(3).max(120).optional(),locale:z.enum(['de','fr','it','en']).optional()}).strict()
+      .refine(b=>b.locale!==undefined||b.timeBudgetMinutes!==undefined).parse(input);
+    return this.edit(actor,id,undefined,(c,db)=>{if(body.timeBudgetMinutes!==undefined)c.timeBudgetMinutes=body.timeBudgetMinutes;if(body.locale)c.locale=body.locale;
+      this.touch(c,'conversation_preference_changed');this.audit(db,actor,c,'preferences_changed');return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,locale:c.locale};});
   }
   async selectAnalysis(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=z.object({runId:z.string().uuid()}).strict().parse(input);
@@ -294,10 +288,10 @@ export class LifeInsuranceEngine {
         (!!selected&&(['valid','estimated'].includes(selected.metric.status)||approved))&&
         (c.graphContext.graphId!=='risk_coverage'||approved),
       calculationStatus:run?.status??(c.latestAnalysisRequestId&&!c.draftDirty?'running':'needs_input'),
-      approvedFacts:facts,nextQuestion:questions.questions[0]??null,missingFields:questions.mandatoryFields,
+      approvedFacts:facts.map(f=>({...f,label:metricText(c.locale,f.metricId),statusLabel:statusText(c.locale,f.status)})),nextQuestion:questions.questions[0]??null,missingFields:questions.mandatoryFields,
       scenarioComparisons:run?c.comparisons.filter(x=>x.variantRunId===run.id).slice(-1):[],
       reviewStatus:approved?'approved_for_demo':run?'open':'not_started',maySpeakAmounts:facts.length>0,
-      progress:this.progress(c),
+      progress:{...this.progress(c),groups:progressText(c.locale,this.progress(c).groups)},
       allowedActions:actor.role==='advisor'?['read_context','propose_patch']:['update_draft','confirm_profile','calculate','request_human'],
       policy:{noRawHealthData:true,noProviderTokens:true,noExternalAiTransferAuthorized:true,productFirstSelling:false}};
   }
