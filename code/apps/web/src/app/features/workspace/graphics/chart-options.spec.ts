@@ -204,6 +204,28 @@ describe('buildChartView', () => {
     });
   });
 
+  describe('selected life event', () => {
+    const event = { year: 2030, label: 'Eigenheim' };
+
+    it('marks its year as a band in the charts that have it on their axis', () => {
+      const view = buildChartView(incomeChart(), ctx, { scenario: 0, event });
+      expect(optionOf(view).series[0]!.markArea?.data).toEqual([[{ xAxis: '2030' }, { xAxis: '2030' }]]);
+      expect(view.legend.at(-1)).toEqual({
+        label: 'graphics.selectedEvent{"label":"Eigenheim","year":"2030"}',
+        token: '--border-focusring',
+        mark: 'bar',
+      });
+    });
+
+    it('guesses no position for a year the chart did not sample', () => {
+      const view = buildChartView(incomeChart(), ctx, { scenario: 0, event: { ...event, year: 2031 } });
+      expect(optionOf(view).series[0]!.markArea).toBeUndefined();
+      expect(view.legend.map((item) => item.label)).not.toContain(
+        'graphics.selectedEvent{"label":"Eigenheim","year":"2031"}',
+      );
+    });
+  });
+
   describe('pillar 3a growth', () => {
     it('draws with contributions solid and without dashed', () => {
       const view = buildChartView(pillar3aChart(), ctx);
@@ -220,6 +242,15 @@ describe('buildChartView', () => {
         token: '--text-muted',
         mark: 'vline',
       });
+    });
+
+    it('states the tax saving next to the chart when the backend sends one', () => {
+      const taxSaving = { currency: 'CHF', unit: 'cent', period: 'year', basis: 'net_after_income_tax', amount: 172_800 } as const;
+      expect(buildChartView(pillar3aChart({ taxSaving }), ctx).annotation).toBe(
+        'graphics.taxSaving{"amount":"CHF 1728","period":"graphics.unit.year"}',
+      );
+      expect(buildChartView(pillar3aChart(), ctx).annotation).toBeNull();
+      expect(buildChartView(incomeChart(), ctx).annotation).toBeNull();
     });
 
     it('leaves the marker out without a payout year, or when that year is not sampled', () => {

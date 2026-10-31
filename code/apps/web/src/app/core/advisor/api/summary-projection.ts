@@ -15,6 +15,7 @@ import type {
   SummaryFact,
   SummaryGap,
   SummaryPoint,
+  SummaryProduct,
 } from '../contracts';
 import type { InfoItem, RiskItem, TranscriptEntry } from '../ui-models';
 
@@ -68,6 +69,9 @@ const TEXT = {
   },
   assumption: { de: 'Annahme der Berechnung', fr: 'Hypothèse du calcul', it: 'Ipotesi del calcolo', en: 'Calculation assumption' },
 } satisfies Record<string, Text>;
+
+/** Mirror of `QUALIFIED_PRODUCT_IDS` in @pax/contracts: loss risk in the saving process. */
+const UNIT_LINKED = new Set(['pax_fondsstar', 'pax_lifestar', 'pax_payout']);
 
 const PILLAR_KEYS: Readonly<Record<Pillar, '1' | '2' | '3'>> = { pillar1: '1', pillar2: '2', pillar3: '3' };
 
@@ -129,6 +133,16 @@ export function projectSummary(
     ...(summary.recommendations.length ? [{ id: 'recommendation', text: t(TEXT.recommendation) }] : []),
   ];
 
+  const recommendation = [...summary.recommendations].reverse().find((r) => r.runId === summary.runId);
+  const products: SummaryProduct[] = (recommendation?.candidates ?? []).map((candidate) => ({
+    candidateId: candidate.id,
+    productId: candidate.productId,
+    name: candidate.productName,
+    ...(candidate.personId ? { personId: candidate.personId } : {}),
+    need: money(candidate.needAmountCents, candidate.needPeriod, candidate.needPeriod === 'once' ? 'capital' : 'net_after_income_tax'),
+    unitLinked: UNIT_LINKED.has(candidate.productId),
+  }));
+
   return {
     schemaVersion: '1.0',
     messageId: `summary_${summary.snapshotId.slice(0, 16)}`,
@@ -156,6 +170,7 @@ export function projectSummary(
         (check) => check.profileVersion === summary.profileVersion && check.result === 'suitable',
       ),
     },
+    products,
   };
 }
 

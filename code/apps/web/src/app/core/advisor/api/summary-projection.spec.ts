@@ -52,6 +52,14 @@ describe('projectSummary', () => {
     });
   });
 
+  it('lists the products of the current recommendation and marks unit-linked ones', () => {
+    expect(summary.products!.map((p) => [p.productId, p.unitLinked])).toEqual([
+      ['pax_disability', false],
+      ['pax_term_life', false],
+    ]);
+    expect(summary.products![0]!.need).toMatchObject({ amount: 2_200_000, period: 'year' });
+  });
+
   it('opens the suitability part of the gate only with a suitable check for this profile', () => {
     const view = (result: string, profileVersion = 1) =>
       ({ checks: [{ result, profileVersion }] }) as unknown as SuitabilityView;

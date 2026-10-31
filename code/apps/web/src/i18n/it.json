@@ -245,7 +245,10 @@
     },
     "neededLine": "Necessario: {{amount}}",
     "payout": "Versamento al pensionamento ({{year}})",
-    "showInInfo": "Mostra in Info"
+    "showInInfo": "Mostra in Info",
+    "taxSaving": "Risparmio fiscale secondo il calcolatore: {{amount}} ({{period}})",
+    "selectedEvent": "Selezionato: {{label}} ({{year}})",
+    "selectEventHint": "Scegliere un evento per evidenziarne l’anno negli altri grafici"
   },
   "risks": {
     "title": "Rischi",
@@ -441,6 +444,62 @@
       "voiceOpened": "Paxi è aperto in una finestra separata. Quello che racconti appare qui come proposta da verificare.",
       "voiceFailed": "Impossibile collegare Paxi. L'agente vocale è avviato?"
     }
+  },
+  "connection": {
+    "lost": "La connessione al consulente è interrotta.",
+    "reconnecting": "La connessione viene ristabilita …",
+    "paused": "Fino ad allora non arrivano nuovi dati; quelli mostrati possono essere superati.",
+    "retry": "Riconnetti"
+  },
+  "human": {
+    "request": "Parlare con un consulente Pax",
+    "requested": "La sua richiesta di consulenza personale è registrata, la consulenza digitale è in pausa. Può contattare Pax al",
+    "resume": "Continuare in digitale",
+    "failed": "Non ha funzionato. Riprovi o chiami Pax direttamente.",
+    "prompt": "Preferisce di persona?"
+  },
+  "summary": {
+    "title": "Riepilogo",
+    "draft": "Bozza",
+    "close": "Chiudere il riepilogo",
+    "reviewOpen": "Uno specialista Pax sta ancora verificando i valori; è uno stato provvisorio.",
+    "keyFacts": "L’essenziale",
+    "goals": "I suoi obiettivi",
+    "pillars": "I tre pilastri in vecchiaia",
+    "gaps": "Lacune principali",
+    "openQuestions": "Domande aperte",
+    "nextSteps": "Prossimi passi",
+    "products": "Soluzioni possibili",
+    "productsLocked": "Le raccomandazioni appaiono non appena l’analisi è completa: obiettivi, finanze e tutti e tre i pilastri.",
+    "productsDraft": "Provvisorio: uno specialista Pax sta ancora verificando queste proposte.",
+    "noProducts": "Per la sua situazione al momento non serve alcun contratto aggiuntivo.",
+    "need": "Fabbisogno",
+    "suitabilityRequired": "Verifica dell’adeguatezza necessaria",
+    "unknown": "ancora sconosciuto",
+    "empty": "Il riepilogo appare non appena si sa abbastanza sulla sua situazione.",
+    "pillar": {
+      "pillar1": "1° pilastro (AVS)",
+      "pillar2": "2° pilastro (cassa pensione)",
+      "pillar3": "3° pilastro (privato)"
+    },
+    "period": {
+      "month": "al mese",
+      "year": "all’anno",
+      "once": "una tantum"
+    }
+  },
+  "call": {
+    "label": "Conversazione",
+    "start": "Avviare la conversazione",
+    "startPaxi": "Parla con Paxi",
+    "openPaxi": "Capito, apri Paxi",
+    "cancel": "Annulla",
+    "active": "Conversazione in corso",
+    "activePaxi": "Paxi è aperto in una finestra separata",
+    "mute": "Muto",
+    "unmute": "Audio attivo",
+    "stopSpeaking": "Interrompere Paxi",
+    "end": "Terminare la conversazione"
   },
   "voice": {
     "start": "Conversazione dal vivo con Paxi",

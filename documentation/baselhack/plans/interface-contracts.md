@@ -325,7 +325,7 @@ Die Frontend-Modelle aus `code/apps/web/src/app/core/advisor/{contracts,ui-model
 | `Pillar3aGrowthChart` | neueste `saving3a`-Schätzung (`estimates`) aus den Standardanalysen | Heute bis zur ersten Pensionierung; `taxSaving` = `YearlyTaxSavings` |
 | `RiskItem` | Baseline-Lauf `riskNeeds`, Ruhestands-Zeitreihe | Grössere Lücke aus Krankheit/Unfall je Person und Ereignis; Schwere = Lücke/Bedarf (≥ 25 % hoch) |
 | `ProgressSnapshot` | `GET /advisor/context` → `progress` | Gruppen zusammengefasst; „Szenarien“ erledigt, sobald gerechnet |
-| `SummaryBundle` | `GET /summaries` (Kunden-Sicht) + Kontext + Risiken | Snapshot-/Lauf-Bindung, Kennzahlen, Ziele, drei Säulen, offene Lücken; Entwurf solange Prüfung offen; Produkt-Gate mit `suitabilityCheckDone` aus `investmentKnowledgeConfirmed` |
+| `SummaryBundle` | `GET /summaries` (Kunden-Sicht) + Kontext + Risiken | Snapshot-/Lauf-Bindung, Kennzahlen, Ziele, drei Säulen, offene Lücken; Entwurf solange Prüfung offen; Produkt-Gate mit `suitabilityCheckDone`; `products` aus den Kandidaten der aktuellen Empfehlung, `unitLinked` für FondsStar, LifeStar und Auszahlungsplan (Frontend-Ergänzung zu I08) |
 | `InfoItem` | `GET /summaries` → `assumptions` | Lokalisierte Annahmen des aktuellen Laufs, Kategorie `assumption` |
 | `TranscriptEntry` | `GET /voice/agent-turns` (von Paxis Fall-Brücke aufgezeichnet) | Nur abgeschlossene Beiträge, `status: final` |
 
@@ -334,3 +334,5 @@ Revision und Zeit eines Diagramms stammen aus seinem Lauf bzw. seiner Schätzung
 Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`), `GET|POST /cases/:id/suitability` und `complianceSteps` im Portal ([Angemessenheit und Compliance](suitability-and-compliance.md)).
 
 Noch ohne Quelle: freie Erklärungen und Antworten des Advisors (`AgentReply`, Info-Karten während des Gesprächs) und Live-Zwischenstände des Transkripts.
+
+Die Ansichten dazu: Zusammenfassung als Dialog am Avatar (FE-19), Weg zur Beratungsperson über `HumanAdvisor` in der Tab-Leiste und in der Zusammenfassung (FE-10), Gesprächssteuerung über `VoiceCall`, das Paxi im eigenen Fenster per `postMessage` steuert (FE-10), Hinweis bei Verbindungsverlust (FE-20).

@@ -30,6 +30,10 @@ import { LanguageSwitcher } from './core/i18n/language-switcher';
 import { ViewScroller } from './core/layout/view-scroller';
 import { AgentDock } from './features/agent-dock/agent-dock';
 import { ConsentScreen } from './features/consent/consent-screen';
+import { ConnectionBanner } from './features/connection/connection-banner';
+import { HumanAdvisorStatus } from './features/human-advisor/human-advisor-status';
+import { CallControls } from './features/call-controls/call-controls';
+import { SummaryDialog } from './features/summary/summary-dialog';
 import { VoiceAgentLink } from './core/advisor/api/voice-agent-link';
 import { VoiceActivity } from './core/voice/voice-activity';
 import { LiveVoiceControl } from './features/live-voice/live-voice-control';
@@ -53,6 +57,10 @@ interface TabLink {
     LanguageSwitcher,
     ConsentScreen,
     AgentDock,
+    ConnectionBanner,
+    HumanAdvisorStatus,
+    CallControls,
+    SummaryDialog,
     LiveVoiceControl,
     ReviewPanel,
   ],
