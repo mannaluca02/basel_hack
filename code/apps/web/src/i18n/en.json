@@ -200,6 +200,18 @@
       "allFields": "All details",
       "assumptions": "Assumptions",
       "notice": "Data processing notice"
+    },
+    "demo": {
+      "emptyHint": "The case is still empty. Talk to Paxi or load the Pax persona.",
+      "loadPersona": "Load the Müller family (Pax persona, synthetic)",
+      "calculate": "Calculate scenarios",
+      "calculating": "Family, home, retirement and baseline are being calculated with the Pax calculator …",
+      "voiceStart": "Talk to Paxi",
+      "voiceAgree": "Understood, open Paxi",
+      "voiceDisabled": "Note: voice processing is switched off in the backend, so Paxi cannot propose changes to the case.",
+      "voiceLinking": "Connecting Paxi to your case …",
+      "voiceOpened": "Paxi is open in its own window. What you tell Paxi shows up here as a proposal to review.",
+      "voiceFailed": "Paxi could not be connected. Is the voice agent running?"
     }
   }
 }

@@ -118,11 +118,20 @@ describe('ApiDataSource', () => {
     const { source, http } = setup();
 
     const snapshot = firstValueFrom(source.snapshot());
+    http.expectOne(`/api/cases/${CASE_ID}`).flush({
+      id: CASE_ID,
+      contextRevision: 12,
+      draft: { financial: null, insurance: null, goals: [], reviewFlags: [] },
+      confirmedVersions: [],
+      runs: [],
+      activeRunId: null,
+      proposalBatches: [],
+    });
     http
-      .expectOne(`/api/cases/${CASE_ID}`)
-      .flush({ id: CASE_ID, contextRevision: 12, draft: {}, proposalBatches: [] });
+      .expectOne(`/api/cases/${CASE_ID}/advisor/context`)
+      .flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
 
-    expect(await snapshot).toMatchObject({ caseId: CASE_ID, contextRevision: 12 });
+    expect(await snapshot).toMatchObject({ caseId: CASE_ID, contextRevision: 12, charts: [] });
   });
 });
 

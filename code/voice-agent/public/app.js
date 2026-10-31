@@ -21,6 +21,8 @@ let resumable = null;
 const tierTitles = { core: "Kernangaben", extended: "Wenn es passt", planning: "Für die Berechnung" };
 // Fields another part of the app wants first. In the demo: tap a field, or ?priorities=id,id.
 const priorities = new Set(new URLSearchParams(location.search).get("priorities")?.split(",").filter(Boolean) ?? []);
+// Set when the customer app opened Paxi for a case: what Paxi hears is proposed to that case.
+const caseLink = new URLSearchParams(location.search).get("link") ?? undefined;
 
 function renderAnswers() {
   $("answers").replaceChildren(
@@ -113,7 +115,7 @@ const callbacks = {
   },
 };
 
-const paxi = createPaxiVoice(callbacks);
+const paxi = createPaxiVoice({ ...callbacks, caseLink });
 
 $("avatar").addEventListener("click", () => {
   if (paxi.running) return;

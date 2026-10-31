@@ -200,6 +200,18 @@
       "allFields": "Tutte le informazioni",
       "assumptions": "Ipotesi",
       "notice": "Nota sul trattamento dei dati"
+    },
+    "demo": {
+      "emptyHint": "Il caso è ancora vuoto. Parla con Paxi o carica la persona Pax.",
+      "loadPersona": "Carica la famiglia Müller (persona Pax, fittizia)",
+      "calculate": "Calcola gli scenari",
+      "calculating": "Famiglia, casa, pensionamento e situazione attuale vengono calcolati con il calcolatore Pax …",
+      "voiceStart": "Parla con Paxi",
+      "voiceAgree": "Capito, apri Paxi",
+      "voiceDisabled": "Nota: l'elaborazione vocale è disattivata nel backend. Paxi non può quindi proporre modifiche.",
+      "voiceLinking": "Paxi viene collegato al tuo caso …",
+      "voiceOpened": "Paxi è aperto in una finestra separata. Quello che racconti appare qui come proposta da verificare.",
+      "voiceFailed": "Impossibile collegare Paxi. L'agente vocale è avviato?"
     }
   }
 }

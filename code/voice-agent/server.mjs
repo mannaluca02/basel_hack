@@ -14,6 +14,7 @@ import {
   validateAnswer,
 } from "./conversation-log.mjs";
 import { extractAnswers } from "./answer-extractor.mjs";
+import { createCaseBridge } from "./case-bridge.mjs";
 import { extractContext } from "./conversation-context.mjs";
 import { detectLanguage } from "./language-detect.mjs";
 import { customVoices } from "./paxi-voice.mjs";
@@ -26,7 +27,8 @@ try {
   // No .env at the repo root; rely on the process environment.
 }
 
-const port = Number(process.env.PORT ?? 3000);
+// 3100, so it runs next to the case backend on 3000.
+const port = Number(process.env.PORT ?? 3100);
 const origin = `http://localhost:${port}`;
 const liveModel = process.env.LIVE_MODEL ?? "gpt-live-1";
 const backendModel = process.env.LIVE_BACKEND_MODEL ?? "gpt-6-luna";
@@ -54,6 +56,10 @@ const languages = {
   en: { name: "English", voiceKey: "gleam" },
 };
 const logDirectory = resolve(here, "data/conversations");
+// Valentin's case backend; Paxi proposes what it heard there once the app linked a case.
+const bridge = createCaseBridge({ apiUrl: process.env.PAX_API_URL ?? "http://127.0.0.1:3000" });
+// The customer app that may hand a case to Paxi (see /api/case-link).
+const appOrigins = new Set((process.env.PAX_APP_ORIGINS ?? "http://localhost:4200,http://127.0.0.1:4200").split(",").map((o) => o.trim()));
 const questionnaire = JSON.parse(await readFile(resolve(here, "questionnaire.json"), "utf8"));
 // Paxi collects core, extended and planning fields; colleague and suitability fields are
 // left to a Pax colleague.
@@ -254,6 +260,33 @@ async function persist(log) {
 
 app.get("/api/questionnaire", (_request, response) => response.json(questionnaire));
 
+// The customer app hands over a case-scoped agent grant after the person read the voice notice.
+// Only the app's own origin may do this; the grant stays in this process and is never logged.
+function fromApp(request, response, next) {
+  const requestOrigin = request.headers.origin;
+  if (!appOrigins.has(requestOrigin)) {
+    response.status(403).json({ error: "Unexpected request origin" });
+    return;
+  }
+  response.setHeader("Access-Control-Allow-Origin", requestOrigin);
+  response.setHeader("Vary", "Origin");
+  response.setHeader("Access-Control-Allow-Methods", "POST");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept-Language");
+  if (request.method === "OPTIONS") {
+    response.status(204).end();
+    return;
+  }
+  next();
+}
+app.options("/api/case-link", fromApp);
+app.post("/api/case-link", fromApp, (request, response) => {
+  try {
+    response.status(201).json(bridge.register(request.body));
+  } catch (error) {
+    response.status(400).json({ error: error.message });
+  }
+});
+
 // Local-only demo. Add authentication before exposing session creation to other users.
 // With continueFrom, the new session continues that conversation in a native voice.
 app.post("/api/session", sameOrigin, async (request, response) => {
@@ -330,6 +363,12 @@ app.post("/api/session", sameOrigin, async (request, response) => {
     const sessionId = result.session.id;
     const log = earlierLog ?? createLog({ conversationId: sessionId, questionnaire, model: liveModel });
     conversations.set(log.conversationId, log);
+    // Only the case reference is logged; the grant stays in the bridge.
+    const caseLink = !earlierLog && request.body.link ? bridge.linkFor(request.body.link) : null;
+    if (caseLink) {
+      log.caseLink = caseLink;
+      log.events.push({ type: "case_linked", at: new Date().toISOString(), caseId: caseLink.caseId });
+    }
     if (!earlierLog && priorities.length) setPriorities(log, priorities, "start");
     if (resumed) {
       log.status = "active";
@@ -454,6 +493,7 @@ async function runExtraction(log) {
     }
   }
   if (changed) await persist(log);
+  if (changed && log.caseLink) bridge.answersChanged(log.caseLink.linkId, log);
 }
 
 // The browser polls this to update the UI and to give Paxi a quiet note of what is missing.

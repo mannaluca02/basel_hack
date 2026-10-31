@@ -1,0 +1,385 @@
+{
+ "id": "mueller",
+ "label": "Familie Müller (Pax-Persona)",
+ "source": "documentation/challenge_material/personas.pdf, Seite 2",
+ "stated": [
+  "Jane Müller 01.06.1986, Mr. May Müller 16.09.1984, verheiratet",
+  "Vermögen CHF 20'000",
+  "Einkommen CHF 100'000 (im PDF ohne Brutto/Netto; hier als Brutto behandelt)",
+  "Mr. Müller 100 %, Ms. Müller arbeitet nicht, Baby 5 Monate"
+ ],
+ "assumptionsNote": "Alle Werte mit sourceRef 'assumption:mueller:*' sind erfundene Ergänzungen fuer die Demo, keine Pax-Angaben.",
+ "draft": {
+  "financial": {
+   "schemaVersion": "1.0",
+   "caseId": "case_persona_mueller",
+   "caseRevision": 1,
+   "profileVersion": 1,
+   "dataClassification": "synthetic",
+   "valuationDate": "2026-10-31",
+   "priceBasis": "nominal",
+   "persons": [
+    {
+     "id": "person_demo_1",
+     "birthYear": 1984,
+     "employmentRateBps": 10000,
+     "income": {
+      "value": 8000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:net-income-from-100k"
+     },
+     "incomeBasis": "net_after_income_tax"
+    },
+    {
+     "id": "person_demo_2",
+     "birthYear": 1986,
+     "employmentRateBps": 0,
+     "income": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "persona:pax-mueller:not-working"
+     },
+     "incomeBasis": "net_after_income_tax"
+    }
+   ],
+   "expenses": [
+    {
+     "id": "housing",
+     "category": "housing",
+     "amount": {
+      "value": 220000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:rent"
+     }
+    },
+    {
+     "id": "living",
+     "category": "living",
+     "amount": {
+      "value": 280000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:living-with-baby"
+     }
+    },
+    {
+     "id": "tax",
+     "category": "tax",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:tax-already-in-net"
+     }
+    },
+    {
+     "id": "provision",
+     "category": "provision",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:no-private-provision-yet"
+     }
+    },
+    {
+     "id": "debt",
+     "category": "debt",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:no-debt"
+     }
+    },
+    {
+     "id": "reserve",
+     "category": "reserve",
+     "amount": {
+      "value": 30000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "month",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:reserve-saving"
+     }
+    }
+   ],
+   "safetyBuffer": {
+    "value": 30000,
+    "currency": "CHF",
+    "unit": "cent",
+    "period": "month",
+    "origin": "synthetic",
+    "confirmation": "proposed",
+    "review": "unreviewed",
+    "sourceRef": "assumption:mueller:buffer"
+   },
+   "assetsConfirmed": true,
+   "assets": [
+    {
+     "id": "cash",
+     "amount": {
+      "value": 2000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "once",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "persona:pax-mueller:assets-20000"
+     },
+     "liquidity": "free",
+     "availableFrom": "2026-10-31",
+     "pillar": "none",
+     "allocations": [
+      {
+       "goalId": "existing_emergency_reserve",
+       "amountCents": 1000000
+      }
+     ]
+    }
+   ],
+   "provisions": [
+    {
+     "id": "p1_person1",
+     "personId": "person_demo_1",
+     "pillar": "1",
+     "event": "retirement",
+     "amount": {
+      "value": 2820000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "estimate",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:pillar1-estimate"
+     }
+    },
+    {
+     "id": "p2_person1",
+     "personId": "person_demo_1",
+     "pillar": "2",
+     "event": "retirement",
+     "amount": {
+      "value": 3000000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:pillar2-certificate-missing"
+     }
+    },
+    {
+     "id": "p3_person1",
+     "personId": "person_demo_1",
+     "pillar": "3",
+     "event": "retirement",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:no-3a"
+     }
+    },
+    {
+     "id": "p1_person2",
+     "personId": "person_demo_2",
+     "pillar": "1",
+     "event": "retirement",
+     "amount": {
+      "value": 1800000,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "estimate",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:pillar1-estimate-care-credits"
+     }
+    },
+    {
+     "id": "p2_person2",
+     "personId": "person_demo_2",
+     "pillar": "2",
+     "event": "retirement",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "persona:pax-mueller:not-working"
+     }
+    },
+    {
+     "id": "p3_person2",
+     "personId": "person_demo_2",
+     "pillar": "3",
+     "event": "retirement",
+     "amount": {
+      "value": 0,
+      "currency": "CHF",
+      "unit": "cent",
+      "period": "year",
+      "origin": "synthetic",
+      "confirmation": "proposed",
+      "review": "unreviewed",
+      "sourceRef": "assumption:mueller:no-3a"
+     }
+    }
+   ]
+  },
+  "insurance": {
+   "relationship": "married",
+   "relationshipSinceYear": 2018,
+   "sharedChildren": 1,
+   "taxLocationId": 400100000,
+   "persons": [
+    {
+     "personId": "person_demo_1",
+     "providerSex": 1,
+     "grossAnnualIncomeCents": 10000000,
+     "withPillar2": true,
+     "pillar2Risk": {
+      "disabilityAnnualCents": 3000000,
+      "disabilityChildAnnualCents": 600000,
+      "survivorAnnualCents": 1800000,
+      "orphanAnnualCents": 600000
+     },
+     "retirementPensionAnnualCents": 3000000,
+     "currentPillar2CapitalCents": 8000000,
+     "desiredWorkStopAge": 65,
+     "disabilityNeedAnnualCents": 8000000,
+     "deathNeedAnnualCents": 6500000,
+     "protectionTermMonths": 240,
+     "existingDeathCapitalCents": 0,
+     "deathOneOffCostsCents": 1500000,
+     "debtPayoffCents": 0,
+     "debtTreatment": "included_in_income_need",
+     "deathNeedExcludesRepaidDebtService": false,
+     "personalAffordableAnnualPremiumCents": 300000
+    },
+    {
+     "personId": "person_demo_2",
+     "providerSex": 2,
+     "grossAnnualIncomeCents": 0,
+     "withPillar2": false,
+     "pillar2Risk": {
+      "disabilityAnnualCents": 0,
+      "disabilityChildAnnualCents": 0,
+      "survivorAnnualCents": 0,
+      "orphanAnnualCents": 0
+     },
+     "retirementPensionAnnualCents": 0,
+     "currentPillar2CapitalCents": 0,
+     "desiredWorkStopAge": 64,
+     "disabilityNeedAnnualCents": 3000000,
+     "deathNeedAnnualCents": 2400000,
+     "protectionTermMonths": 240,
+     "existingDeathCapitalCents": 0,
+     "deathOneOffCostsCents": 1000000,
+     "debtPayoffCents": 0,
+     "debtTreatment": "included_in_income_need",
+     "deathNeedExcludesRepaidDebtService": false,
+     "personalAffordableAnnualPremiumCents": 100000
+    }
+   ],
+   "children": [
+    {
+     "id": "child_1",
+     "birthYear": 2026,
+     "kind": "shared",
+     "parentPersonIds": [
+      "person_demo_1",
+      "person_demo_2"
+     ],
+     "supportUntilMonth": "2051-05",
+     "goalId": null
+    }
+   ],
+   "debts": [],
+   "debtsConfirmed": true,
+   "existingPrivateRiskBenefitsConfirmed": true,
+   "confession1": 4,
+   "confession2": 4,
+   "taxableFortuneCents": 2000000,
+   "retirementNeedAnnualCents": 7200000,
+   "annualReturnBps": 0,
+   "retirementHorizonAge": 88,
+   "annualSavingCents": 300000,
+   "investmentKnowledgeConfirmed": false,
+   "annualSavingIsAdditional": true,
+   "existingAnnualRetirementSavingCents": 0,
+   "existingAnnualPillar3aContributionCents": 0,
+   "riskAppetite": "low",
+   "riskCapitalStrategy": "use_free_assets_first"
+  },
+  "goals": [
+   {
+    "id": "goal_family",
+    "kind": "family",
+    "targetMonth": "2026-05",
+    "priority": 1,
+    "targetCapitalCents": null
+   },
+   {
+    "id": "goal_home",
+    "kind": "home",
+    "targetMonth": "2031-01",
+    "priority": 3,
+    "targetCapitalCents": 80000000
+   },
+   {
+    "id": "goal_retirement",
+    "kind": "retirement",
+    "targetMonth": "2049-10",
+    "priority": 2,
+    "targetCapitalCents": null
+   }
+  ],
+  "reviewFlags": []
+ }
+}

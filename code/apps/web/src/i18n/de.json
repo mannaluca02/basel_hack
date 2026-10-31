@@ -200,6 +200,18 @@
       "allFields": "Alle Angaben",
       "assumptions": "Annahmen",
       "notice": "Verarbeitungshinweis"
+    },
+    "demo": {
+      "emptyHint": "Der Fall ist noch leer. Erzähle Paxi von dir oder lade die Pax-Persona.",
+      "loadPersona": "Familie Müller laden (Pax-Persona, erfunden)",
+      "calculate": "Szenarien berechnen",
+      "calculating": "Familie, Eigenheim, Pensionierung und Ausgangslage werden mit dem Pax-Rechner berechnet …",
+      "voiceStart": "Mit Paxi sprechen",
+      "voiceAgree": "Verstanden, Paxi öffnen",
+      "voiceDisabled": "Hinweis: Im Backend ist die Sprachverarbeitung ausgeschaltet. Paxi kann dann keine Vorschläge in den Fall schreiben.",
+      "voiceLinking": "Paxi wird mit deinem Fall verbunden …",
+      "voiceOpened": "Paxi ist in einem eigenen Fenster offen. Was du erzählst, erscheint hier als Vorschlag zum Prüfen.",
+      "voiceFailed": "Paxi konnte nicht verbunden werden. Läuft der Voice-Agent?"
     }
   }
 }
