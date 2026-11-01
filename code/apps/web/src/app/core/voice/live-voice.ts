@@ -42,9 +42,9 @@ interface LiveTurnResult {
 interface CaseAsk {
   key: string;
   text: string;
+  /** What the answer must give, for Paxi (not shown). */
+  about?: string;
 }
-/** Customer turns without an answer after which Paxi moves on to the next profile question. */
-const MAX_ASK_ATTEMPTS = 2;
 interface DialogueLine {
   id: number;
   speaker: 'customer' | 'agent';
@@ -120,11 +120,20 @@ export class LiveVoice {
   /** Live build: what the profile still needs after the intake fields; null until loaded. */
   readonly caseAsks = signal<readonly CaseAsk[] | null>(null);
   private readonly askAttempts = signal<Readonly<Record<string, number>>>({});
-  /** Live build: the profile question Paxi asks next, once the intake fields are through. */
+  /**
+   * Live build: the profile question Paxi asks next, once the intake fields are through. One left
+   * unanswered goes to the back of the queue, never away: every question comes round again until
+   * the profile is complete, and none can block the others.
+   */
   readonly caseAsk = computed(() => {
     if (!this.liveStart || nextIntakeField(this.rows()) !== null) return null;
-    return this.caseAsks()?.find((ask) => (this.askAttempts()[ask.key] ?? 0) < MAX_ASK_ATTEMPTS) ?? null;
+    const asks = this.caseAsks() ?? [],
+      attempts = this.askAttempts();
+    return asks.reduce<CaseAsk | null>((best, ask) =>
+      !best || (attempts[ask.key] ?? 0) < (attempts[best.key] ?? 0) ? ask : best, null);
   });
+  /** The dialogue line count when the current profile question became current. */
+  private askSince = { key: '', line: 0 };
   /** The remote voice, for the avatar's local audio visual. */
   readonly audio = signal<MediaStream | null>(null);
   /** Activity events for the avatar renderer. */
@@ -493,7 +502,10 @@ export class LiveVoice {
   ): Promise<void> {
     if (!personId) this.setupMessages.push(messageId);
     const asked = nextIntakeField(this.rows()),
-      askedCase = this.caseAsk()?.key;
+      // Only a question Paxi had the chance to ask counts: an agent line since it became current.
+      askedCase = this.dialogue().some((line) => line.speaker === 'agent' && line.id > this.askSince.line)
+        ? this.caseAsk()?.key
+        : undefined;
     this.evaluating.set(true);
     this.extractionFailed.set(false);
     const post = () =>
@@ -616,7 +628,10 @@ export class LiveVoice {
     if (!this.liveStart || !context.done) return context;
     if (this.caseAsks() === null) return { ...context, done: false };
     const ask = this.caseAsk();
-    return { ...context, done: !ask, nextQuestion: ask?.text ?? null };
+    if ((ask?.key ?? '') !== this.askSince.key) this.askSince = { key: ask?.key ?? '', line: this.sequence };
+    // A skipped intake field may come back as a profile question (the backend still needs it).
+    const neverAskAgain = rows.filter((r) => r.status === 'proposed' || r.status === 'accepted').map((r) => r.fieldId);
+    return { ...context, neverAskAgain, done: !ask, nextQuestion: ask?.text ?? null, ...(ask?.about ? { nextQuestionMeans: ask.about } : {}) };
   }
 
   private extracted(result: LiveTurnResult): void {

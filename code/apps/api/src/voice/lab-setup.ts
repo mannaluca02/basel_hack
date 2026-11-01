@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DraftSchema, EMPTY_INSURANCE, type InsuranceDraft } from '@pax/contracts';
-import { callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
+import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
 import { WorkflowError } from '../insurance/types.js';
 
 /** The one person a live case without test data starts with, once the conversation knows her. */
@@ -26,7 +26,7 @@ const INSTRUCTIONS = 'Read the whole conversation and submit what the USER said 
  * prompt never asks for a full birth date).
  */
 export async function setupFacts(transport: ResponsesTransport, turns: { role: 'user' | 'assistant'; text: string }[], signal: AbortSignal, today = new Date()): Promise<SetupFacts> {
-  const request: ResponsesRequest = { model: 'gpt-5.6-terra', store: false, reasoning: { effort: 'low' }, instructions: INSTRUCTIONS,
+  const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, reasoning: { effort: 'low' }, instructions: INSTRUCTIONS,
     input: [{ role: 'user', content: JSON.stringify({ conversation: turns.slice(-24) }) }],
     tools: [{ type: 'function', name: 'submit_setup_facts', description: 'Submit the user\'s age and employment rate.', parameters: z.toJSONSchema(Arguments), strict: true }],
     tool_choice: 'auto', parallel_tool_calls: false, max_output_tokens: 600 };

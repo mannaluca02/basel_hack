@@ -39,16 +39,53 @@ test('every open question has a localized text; the partner\'s own fields name t
   assert.doesNotMatch(askText(two,'insurance.persons.person_1.grossAnnualIncomeCents','de'),/Partner/);
 });
 
-test('the intake fields of the person speaking stay with the intake extraction',()=>{
-  const keys=answerTargets(frame(),'person_1').map(t=>t.key);
+test('every open field is a target, the intake fields too: one the intake extraction missed is still taken',()=>{
+  const targets=answerTargets(frame());
+  const keys=targets.map(t=>t.key);
   for(const key of ['insurance.relationship','insurance.persons.person_1.grossAnnualIncomeCents','insurance.persons.person_1.withPillar2',
-    'insurance.persons.person_1.desiredWorkStopAge','insurance.existingAnnualPillar3aContributionCents','financial.expenses.housing'])assert.ok(!keys.includes(key),key);
-  assert.ok(keys.includes('insurance.persons.person_1.retirementPensionAnnualCents'));
-  assert.ok(keys.includes('financial.persons.person_1.income'));
+    'insurance.persons.person_1.desiredWorkStopAge','insurance.existingAnnualPillar3aContributionCents','financial.expenses.housing',
+    'insurance.persons.person_1.retirementPensionAnnualCents','financial.persons.person_1.income'])assert.ok(keys.includes(key),key);
+  assert.ok(targets.every(t=>!t.correction),'nothing answered yet, nothing to correct');
+  assert.match(targets.find(t=>t.key==='financial.persons.person_1.income').description,/never this field/,'a gross income never lands as net');
+});
+
+test('the real conversation: 80000 a year confirmed as brutto, 3a 500 a month, a later correction',()=>{
+  const d=frame();
+  const said=['Ja, ungefähr achtzigtausend pro Jahr','Ja','Ja, ich zahle fünfhundert pro Monat in die Säule drei A ein'];
+  const got=validAnswers(answerTargets(d),{answers:[
+    {id:'insurance.persons.person_1.grossAnnualIncomeCents',value:'80000',period:'year',quote:'achtzigtausend pro Jahr'},
+    {id:'insurance.existingAnnualPillar3aContributionCents',value:'500',period:'month',quote:'fünfhundert pro Monat'},
+  ]},said);
+  assert.deepEqual(got.map(a=>[a.key,a.value,a.period]),[['insurance.persons.person_1.grossAnnualIncomeCents',8000000,'year'],
+    ['insurance.existingAnnualPillar3aContributionCents',50000,'month']]);
+
+  // No children, answered: "plane noch drei Kinder ein" changes it, but only when said now.
+  const answered=pendingView(d,[{path:'insurance.sharedChildren',value:0}],CASE);
+  const target=answerTargets(answered).find(t=>t.key==='insurance.sharedChildren');
+  assert.equal(target.correction,true);
+  assert.match(target.description,/Already answered \(0\)/);
+  const correction={answers:[{id:'insurance.sharedChildren',value:'3',period:null,quote:'plane noch drei Kinder ein'}]};
+  assert.deepEqual(validAnswers(answerTargets(answered),correction,['Äh, keine','und plane noch drei Kinder ein']).map(a=>a.value),[3]);
+  assert.deepEqual(validAnswers(answerTargets(answered),correction,['und plane noch drei Kinder ein','Ja']),[],'said earlier: no change now');
+});
+
+test('a value the profile already holds is no change; the 3a per month becomes a year',async()=>{
+  const d=pendingView(frame(),[{path:'insurance.sharedChildren',value:0}],CASE);
+  assert.deepEqual(await answerChanges(d,[answer('insurance.sharedChildren',0)],'voice:test'),[]);
+  const changes=await answerChanges(d,[answer('insurance.existingAnnualPillar3aContributionCents',50000,'month'),answer('insurance.sharedChildren',3)],'voice:test');
+  assert.deepEqual(changes.map(c=>[c.path,c.value]),[['insurance.existingAnnualPillar3aContributionCents',600000],['insurance.sharedChildren',3]]);
+  assert.ok(openKeys(pendingView(d,changes,CASE)).includes('insurance.children'),'three children: their birth years are asked next');
+});
+
+test('each open question tells Paxi what the answer must give',()=>{
+  const asks=openAsks(frame(),'de');
+  assert.ok(asks.every(a=>a.about&&a.about.length>10),JSON.stringify(asks.filter(a=>!a.about).map(a=>a.key)));
+  const married=openAsks(pendingView(frame(),[{path:'insurance.relationship',value:'married'}],CASE),'de');
+  assert.match(married.find(a=>a.key==='financial.partner').about,/age of the partner.*employment rate of the partner/);
 });
 
 test('model output is untrusted: unknown fields, unsaid quotes and values off their unit are dropped',()=>{
-  const targets=answerTargets(frame(),'person_1');
+  const targets=answerTargets(frame());
   const said=['Wir sparen 2.500 Franken im Monat, Ziel Pension und Familie. Steuern 12000.'];
   const got=validAnswers(targets,{answers:[
     {id:'financial.persons.person_1.income',value:'2.500',period:'month',quote:'2.500 Franken im Monat'},
@@ -122,7 +159,8 @@ function fakeModel(intakeFirstTurn,values) {
     let args;
     if(name==='submit_setup_facts')args={age:{value:'34',quote:'Antwort'},employment_rate_percent:{value:'80',quote:'Antwort'}};
     else if(name==='submit_intake_observations')args={observations:intakeTurns++===0?intakeFirstTurn:[]};
-    else args={answers:input.fields.flatMap(field=>{
+    // A customer who never corrects anything: answered fields are left alone.
+    else args={answers:input.fields.filter(field=>!/Already answered/.test(field.description)).flatMap(field=>{
       const known=Object.entries(values).find(([pattern])=>new RegExp(`^${pattern}$`).test(field.id));
       return known?[{id:field.id,value:known[1][0],period:known[1][1]??null,quote:'Antwort'}]:[];
     })};
@@ -152,6 +190,21 @@ const values={
 };
 
 test('only asking: the conversation fills the whole profile, then the acceptance confirms and calculates',async t=>{
+  const {c,model}=await converse(t,intake,values);
+  assert.ok(model.requests.every(r=>r.model==='gpt-6-luna'&&r.service_tier==='fast'&&r.reasoning.effort==='low'),'GPT-6 Luna, fast tier');
+  assert.equal(c.draft.insurance.persons[0].grossAnnualIncomeCents,9500000,'the intake value stays: answering the same field again changes nothing');
+});
+
+test('the intake extraction misses everything: the open questions still take every field, the charts still come',async t=>{
+  const {c}=await converse(t,[],{...values,'insurance\\.relationship':['married'],'insurance\\.existingAnnualPillar3aContributionCents':['500','month'],
+    'financial\\.expenses\\.housing':['2200','month']});
+  assert.equal(c.draft.insurance.persons[0].grossAnnualIncomeCents,7000000);
+  assert.equal(c.draft.insurance.existingAnnualPillar3aContributionCents,600000,'500 a month is 6000 a year');
+  assert.equal(c.draft.financial.expenses.find(e=>e.id==='housing').amount.value,220000);
+});
+
+/** A whole live conversation over HTTP until the profile is confirmed and calculated. */
+async function converse(t,intake,values) {
   const model=fakeModel(intake,values);
   const f=await demoApp(t,{demoStart:true,voice:{enabled:true,gateways:[new FakeVoiceGateway()]},modelExtraction:{enabled:true,transport:model.transport}});
   const started=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
@@ -201,7 +254,6 @@ test('only asking: the conversation fills the whole profile, then the acceptance
   assert.equal(c.draft.financial.expenses.find(e=>e.category==='debt').amount.value,0);
   // Answers are proposals of the customer's own words, never estimates.
   for(const person of c.draft.financial.persons)assert.equal(person.income.origin,'user');
-  const answers=model.requests.filter(r=>r.tools[0].name==='submit_answers');
-  assert.ok(answers.length>0);
-  assert.ok(answers.every(r=>!JSON.stringify(JSON.parse(r.input[0].content).fields).includes('person_1.grossAnnualIncomeCents')),'intake fields are not asked twice');
-});
+  assert.ok(model.requests.some(r=>r.tools[0].name==='submit_answers'));
+  return {c,model};
+}

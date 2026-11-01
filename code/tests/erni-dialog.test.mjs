@@ -56,7 +56,7 @@ test('final voice uses the same turn and transport receives only the authored pr
  assert.equal(notice.status,200);assert.equal(notice.body.provider,'OpenAI');assert.match(notice.body.content,/erfundene/);assert.match(notice.body.purpose,/Extraktion/);
  const result=await f.turn(f.input('voice'));assert.equal(result.status,201);assert.deepEqual(result.body.batch.changes,[change]);
  const request=f.requests[0],projection=JSON.parse(request.input[0].content);
- assert.equal(request.model,'gpt-5.6-terra');assert.equal(request.store,false);assert.equal(request.parallel_tool_calls,false);
+ assert.equal(request.model,'gpt-6-luna');assert.equal(request.service_tier,'fast');assert.equal(request.store,false);assert.equal(request.parallel_tool_calls,false);
  assert.deepEqual(request.tools.map(tool=>tool.name),['submit_intake_proposals']);assert.equal(request.tools[0].strict,true);
  assert.equal(request.tools[0].parameters.additionalProperties,false);
  for(const key of ['changes','ambiguities']){
