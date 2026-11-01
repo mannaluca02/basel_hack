@@ -384,7 +384,7 @@ describe('App review stand', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource },
+          useValue: { apiBaseUrl: '/api', dataSource },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),
@@ -422,7 +422,7 @@ describe('App voice per configuration', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', ...environment },
+          useValue: { apiBaseUrl: '/api', ...environment },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),
@@ -712,7 +712,7 @@ describe('App before consent, with the live voice', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart: true },
+          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),
@@ -751,7 +751,7 @@ describe('App during the scripted mock call', () => {
         provideAdvisorDataSource(),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
+          useValue: { apiBaseUrl: '/api', dataSource: 'mock' },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),

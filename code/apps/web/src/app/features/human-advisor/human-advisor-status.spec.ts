@@ -12,7 +12,7 @@ describe('HumanAdvisorStatus', () => {
         provideHttpClient(),
         provideI18nTesting(),
         provideAdvisorDataSource(),
-        { provide: APP_ENVIRONMENT, useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'mock' } },
       ],
     });
     const fixture = TestBed.createComponent(HumanAdvisorStatus);

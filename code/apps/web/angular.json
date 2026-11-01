@@ -166,7 +166,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.live-production.ts"
+                  "with": "src/environments/environment.live.ts"
                 }
               ],
               "outputPath": {
@@ -180,9 +180,6 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "web:build:production"
-            },
             "development": {
               "buildTarget": "web:build:development"
             },

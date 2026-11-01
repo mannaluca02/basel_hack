@@ -31,7 +31,7 @@ function setup(
       provideAdvisorDataSource(),
       {
         provide: APP_ENVIRONMENT,
-        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart, liveStart },
+        useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart, liveStart },
       },
     ],
   });

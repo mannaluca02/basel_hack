@@ -51,7 +51,7 @@ describe('ReviewPanel', () => {
         { provide: AdvisorDataSource, useValue: source },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', ...environment },
+          useValue: { apiBaseUrl: '/api', dataSource: 'api', ...environment },
         },
       ],
     });

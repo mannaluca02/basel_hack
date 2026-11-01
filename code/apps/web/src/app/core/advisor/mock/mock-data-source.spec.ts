@@ -44,7 +44,7 @@ function setup() {
       provideAdvisorDataSource(),
       {
         provide: APP_ENVIRONMENT,
-        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
+        useValue: { apiBaseUrl: '/api', dataSource: 'mock' },
       },
     ],
   });

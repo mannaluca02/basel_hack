@@ -5,7 +5,6 @@ import { AppEnvironment } from './environment.model';
  * raw payloads) against the normal backend. Same app, same case service, only more to see.
  */
 export const environment: AppEnvironment = {
-  production: false,
   apiBaseUrl: '/api',
   dataSource: 'api',
   demoStart: true,

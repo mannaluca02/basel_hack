@@ -5,7 +5,6 @@ import { AppEnvironment } from './environment.model';
  * (`npm --prefix code run start:voice-lab`, port 3030, temporary synthetic cases).
  */
 export const environment: AppEnvironment = {
-  production: false,
   apiBaseUrl: '/api',
   dataSource: 'api',
   debugVoice: true,

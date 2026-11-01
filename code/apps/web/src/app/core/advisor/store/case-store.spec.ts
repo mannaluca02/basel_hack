@@ -214,7 +214,7 @@ describe('CaseStore with the scripted mock call', () => {
         provideAdvisorDataSource(),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
+          useValue: { apiBaseUrl: '/api', dataSource: 'mock' },
         },
       ],
     });

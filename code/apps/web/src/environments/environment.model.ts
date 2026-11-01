@@ -6,7 +6,6 @@ export type DataSourceMode = 'mock' | 'api';
  * Everything here ends up in the public bundle: never put tokens or other secrets in it.
  */
 export interface AppEnvironment {
-  readonly production: boolean;
   /** Base URL of the advisor backend. Relative so the app talks to its own origin. */
   readonly apiBaseUrl: string;
   readonly dataSource: DataSourceMode;
