@@ -1,5 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import { sseEvents } from './helpers/sse.mjs';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -87,9 +88,9 @@ test('HTTP/SSE broadcasts immediate stop to the scoped agent, survives reconnect
  assert.equal((await call('GET',`/api/cases/${c.id}/handover`,agent.sessionToken)).body.handover.wantsHumanAdvisor,true);
  const blocked=await call('POST',`/api/cases/${c.id}/locations`,customer.sessionToken,{search:'Basel',allowSyntheticCalculatorTransfer:true});assert.equal(blocked.status,409);assert.equal(blocked.body.code,'HUMAN_HANDOVER_ACTIVE');
  controller.abort();await reader.cancel().catch(()=>{});
- const reconnectAbort=new AbortController(),reconnect=await fetch(base+`/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${agent.sessionToken}`},signal:reconnectAbort.signal});const initial=await reconnect.body.getReader().read();assert.ok(decoder.decode(initial.value).includes('"stopDigitalConversation":true'));reconnectAbort.abort();
+ const reconnectAbort=new AbortController(),reconnect=await fetch(base+`/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${agent.sessionToken}`},signal:reconnectAbort.signal});const initial=await sseEvents(reconnect).next();assert.ok(initial.includes('"stopDigitalConversation":true'));reconnectAbort.abort();
  const resumed=await call('POST',`/api/cases/${c.id}/handover`,customer.sessionToken,{action:'resume',messageId:'http_resume',expectedCaseRevision:switched.body.caseRevision,source:'ui'});assert.equal(resumed.status,201);
- const resumedAbort=new AbortController(),resumedStream=await fetch(base+`/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${agent.sessionToken}`},signal:resumedAbort.signal});const resumedChunk=decoder.decode((await resumedStream.body.getReader().read()).value);assert.ok(resumedChunk.includes('\"stopDigitalConversation\":false'));assert.ok(resumedChunk.includes('\"interruptPolicy\":\"immediate\"'));resumedAbort.abort();
+ const resumedAbort=new AbortController(),resumedStream=await fetch(base+`/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${agent.sessionToken}`},signal:resumedAbort.signal});const resumedChunk=await sseEvents(resumedStream).next();assert.ok(resumedChunk.includes('\"stopDigitalConversation\":false'));assert.ok(resumedChunk.includes('\"interruptPolicy\":\"immediate\"'));resumedAbort.abort();
  assert.equal((await call('DELETE',`/api/cases/${c.id}`,customer.sessionToken)).status,200);
 });
 test('cancelling a calculation outside handover clears its running marker without changing the confirmed profile',async t=>{

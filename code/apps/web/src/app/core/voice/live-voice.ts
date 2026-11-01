@@ -22,6 +22,7 @@ import {
 } from './intake-plan';
 import { INTAKE_TEXT } from './intake-text';
 import { LabTrace } from './lab-trace';
+import type { ReplyEmotion } from './emotions';
 import { PaxiCaseVoice } from './paxi-case-voice';
 import { VoiceActivity } from './voice-activity';
 import { VoiceLabApi } from './voice-lab-api';
@@ -52,7 +53,9 @@ interface PromptSkill {
   name: string;
   description: string;
 }
-type VoiceAvatarEvent = { type: 'activity'; state: 'idle' | 'listening' | 'thinking' };
+type VoiceAvatarEvent =
+  | { type: 'activity'; state: 'idle' | 'listening' | 'thinking' }
+  | { type: 'emotion'; emotion: ReplyEmotion };
 
 /**
  * Earnie's live voice over the case backend, shared by the app and the Voice Lab (debug): GPT-Live
@@ -73,6 +76,7 @@ export class LiveVoice {
   private readonly language = inject(AppLanguage);
   private readonly transloco = inject(TranslocoService);
   private readonly ring = inject(VoiceActivity);
+  private emotionSeq = 0;
   private readonly avatarEvents = new Subject<VoiceAvatarEvent>();
   private sessionId: string | null = null;
   private sequence = 0;
@@ -106,13 +110,15 @@ export class LiveVoice {
   readonly audio = signal<MediaStream | null>(null);
   /** Activity events for the avatar renderer. */
   readonly events = this.avatarEvents.asObservable();
-  private readonly voiceActivity = signal<VoiceAvatarEvent['state']>('idle');
+  private readonly voiceActivity = signal<'idle' | 'listening' | 'thinking'>('idle');
 
   readonly rows = computed(() => {
     const c = this.store.canonical();
     return c ? intakeRows(c, this.personId(), this.intake()) : [];
   });
   readonly active = computed(() => this.state() === 'connecting' || this.state() === 'connected');
+  /** A customer session exists (signed in, or the demo start's session). */
+  readonly signedIn = computed(() => !!this.customer.session());
   readonly caseReady = computed(
     () =>
       this.apiMode &&
@@ -204,7 +210,9 @@ export class LiveVoice {
       });
     },
     onEvent: (event) => {
-      this.voiceActivity.set(event.state);
+      if (event.type === 'activity') this.voiceActivity.set(event.state);
+      // Paxi in the shell shows the emotion; a repeated one counts again (new sequence number).
+      else this.ring.emotion.set({ emotion: event.emotion, seq: ++this.emotionSeq });
       this.avatarEvents.next(event);
     },
     onTrace: (direction, payload) => this.trace.add(direction, 'GPT-Live data channel', payload),
@@ -255,6 +263,9 @@ export class LiveVoice {
     effect(() => {
       const said = [...this.dialogue()].reverse().find((line) => line.speaker === 'agent');
       this.ring.caption.set(this.active() && said ? said.text : null);
+    });
+    effect(() => {
+      if (!this.active()) this.ring.emotion.set(null);
     });
     this.store.digitalStops.pipe(takeUntilDestroyed()).subscribe((command) => {
       if (command.reason === 'session-ended') {

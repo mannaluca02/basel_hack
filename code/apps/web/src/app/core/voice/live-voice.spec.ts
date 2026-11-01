@@ -113,4 +113,20 @@ describe('LiveVoice', () => {
     expect(live.validPerson()).toBe(false);
     expect(live.available()).toBe(false);
   });
+
+  it('hands Paxi\'s reply emotions to the shell during a call and clears them after it', () => {
+    loadCase();
+    live.state.set('connected');
+    TestBed.tick();
+    const transport = (live as unknown as { voice: { options: { onEvent(event: unknown): void } } }).voice.options;
+    transport.onEvent({ type: 'emotion', emotion: 'curious' });
+    transport.onEvent({ type: 'emotion', emotion: 'curious' });
+    expect(ring.emotion()?.emotion).toBe('curious');
+    expect(ring.emotion()?.seq).toBe(2);
+
+    live.stop();
+    TestBed.tick();
+    expect(ring.emotion()).toBeNull();
+  });
 });
+

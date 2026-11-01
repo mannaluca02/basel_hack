@@ -111,6 +111,8 @@ These decisions are independent: emotion source, activity/playback source, sessi
 
 ### 1. Where emotions come from
 
+**In the web app's live voice** (backend voice sessions, `apps/web/src/app/core/voice/live-voice.ts`) the same two triggers are sent by the backend when it opens the GPT-Live session (`apps/api/src/voice/emotions.ts`, `OpenAiLiveGateway`); a project without Decisions gets the voice without them. `PaxiCaseVoice` reads the `decision.event` results with the ordering rules below and Paxi in the shell shows them (`VoiceActivity.emotion` → `PaxiAvatar`).
+
 **A. Transcript-triggered Decisions (current; recommended for the standalone voice demo).** Configure `session.triggers` at session creation alongside `session.delegation`; `transport` is a sibling of `session` in the WebRTC request. Each entry uses `type`, `event_type`, and `decisions.questions`; a choice question uses `type`, `name`, `instructions`, and `choices` with `value` and optional `description`. This is the current input trigger structure (shortened choices):
 
 ```js

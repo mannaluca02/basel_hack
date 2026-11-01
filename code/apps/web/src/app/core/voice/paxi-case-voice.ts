@@ -1,4 +1,5 @@
 import type { VoiceSessionStartResponse } from '@pax/contracts';
+import { isReplyEmotion, type ReplyEmotion } from './emotions';
 
 export interface VoiceBrowser {
   microphone():Promise<MediaStream>;
@@ -13,7 +14,7 @@ export interface PaxiCaseVoiceOptions {
   onStatus(state:'idle'|'connecting'|'connected'|'error',detail?:string):void;
   onTurn(speaker:'customer'|'agent',text:string,segmentation:'client-settled'):void;
   onAudio(stream:MediaStream|null):void;
-  onEvent(event:{type:'activity';state:'idle'|'listening'|'thinking'}):void;
+  onEvent(event:{type:'activity';state:'idle'|'listening'|'thinking'}|{type:'emotion';emotion:ReplyEmotion}):void;
   onTrace(direction:'send'|'receive'|'local',payload:unknown):void;
 }
 const browserDefaults:VoiceBrowser={
@@ -37,6 +38,8 @@ export class PaxiCaseVoice {
   private timers:ReturnType<typeof setTimeout>[]=[];
   private fragments=new Map<'customer'|'agent',{text:string;timer:ReturnType<typeof setTimeout>}>();
   private seen=new Set<string>();
+  /** Per transcript direction: the order of its fragments and the newest one whose emotion was shown. */
+  private emotionSources=freshEmotionSources();
   private lastContext='';
 
   constructor(private readonly options:PaxiCaseVoiceOptions,private readonly browser:VoiceBrowser=browserDefaults) {}
@@ -86,7 +89,7 @@ export class PaxiCaseVoice {
   stop():void {
     const sid=this.sessionId;this.sessionId=null;this.running=false;++this.generation;
     this.timers.forEach(clearTimeout);this.timers=[];
-    this.fragments.forEach(fragment=>clearTimeout(fragment.timer));this.fragments.clear();this.seen.clear();this.lastContext='';
+    this.fragments.forEach(fragment=>clearTimeout(fragment.timer));this.fragments.clear();this.seen.clear();this.lastContext='';this.emotionSources=freshEmotionSources();
     this.microphone?.getTracks().forEach(track=>track.stop());this.microphone=null;
     this.remote?.getTracks().forEach(track=>track.stop());this.remote=null;
     this.audio?.pause();if(this.audio)this.audio.srcObject=null;this.audio=null;
@@ -117,7 +120,10 @@ export class PaxiCaseVoice {
       this.send({type:'session.commentary.append',delegation_id:null,content:`Introduce yourself briefly as Paxi. This is a synthetic-data demo. ${this.options.opening()} Do not claim to have accepted or confirmed any profile.`});
     } else if(type==='session.closed')this.stop();
     else if(type==='error')this.fail('VOICE_PROVIDER_ERROR');
+    else if(type==='decision.event')this.emotion(event);
     else if((type==='session.input_transcript.delta'||type==='session.output_transcript.delta')&&typeof event['delta']==='string') {
+      const direction=this.emotionSources[type];
+      if(typeof event['event_id']==='string'&&!direction.events.has(event['event_id']))direction.events.set(event['event_id'],++direction.index);
       const speaker=type==='session.input_transcript.delta'?'customer':'agent';
       // Persist the preceding speaker before their answer/reply, even when it arrives within
       // the quiet window. Otherwise a quick reply can merge two separate agent questions.
@@ -130,6 +136,26 @@ export class PaxiCaseVoice {
       // the renderer's local audio visual; late captions must not pin it in a thinking pose.
       if(speaker==='customer')this.options.onEvent({type:'activity',state:'listening'});
     }
+  }
+
+  /**
+   * The backend's GPT-Live session classifies every transcript fragment (Decisions triggers, see
+   * avatar-prototype/AVATAR-INTERFACE.md). Results can come late or out of order: per direction
+   * only a newer fragment than the last shown one counts; failed or unknown answers change nothing.
+   */
+  private emotion(envelope:Record<string,unknown>):void {
+    const result=envelope['event'] as {type?:string;decision?:{answers?:{type?:string;name?:string;choice?:unknown}[]}}|undefined;
+    if(envelope['delegation_id']!=null||result?.type!=='decision.completed')return;
+    const sourceType=envelope['source_event_type'];
+    if(sourceType!=='session.input_transcript.delta'&&sourceType!=='session.output_transcript.delta')return;
+    const direction=this.emotionSources[sourceType];
+    const index=direction.events.get(String(envelope['source_event_id']));
+    if(index===undefined||index<=direction.applied)return;
+    const name=sourceType==='session.input_transcript.delta'?'reply_emotion':'emotion';
+    const answer=result.decision?.answers?.find(a=>a?.type==='choice'&&a.name===name);
+    if(!answer||!isReplyEmotion(answer.choice))return;
+    direction.applied=index;
+    this.options.onEvent({type:'emotion',emotion:answer.choice});
   }
 
   private settle(speaker:'customer'|'agent'):void {
@@ -155,4 +181,9 @@ export class PaxiCaseVoice {
       const timer=setTimeout(done,2000);peer.addEventListener('icegatheringstatechange',change);
     });
   }
+}
+
+type TranscriptType='session.input_transcript.delta'|'session.output_transcript.delta';
+function freshEmotionSources():Record<TranscriptType,{index:number;applied:number;events:Map<string,number>}> {
+  return {'session.input_transcript.delta':{index:0,applied:0,events:new Map()},'session.output_transcript.delta':{index:0,applied:0,events:new Map()}};
 }

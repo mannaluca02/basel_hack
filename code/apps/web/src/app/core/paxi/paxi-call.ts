@@ -1,7 +1,7 @@
 import { Injector, effect, untracked } from '@angular/core';
 import type { LiveVoice } from '../voice/live-voice';
 
-/** How long "I agree" waits for the case before it leaves the start to the microphone button. */
+/** How long the signed-in case may take to become ready before the microphone button takes over. */
 const START_TIMEOUT_MS = 60_000;
 
 /**
@@ -9,14 +9,19 @@ const START_TIMEOUT_MS = 60_000;
  * banner names the voice transfer and the AI extraction, so agreeing there gives both voice
  * consents; `LiveVoice.start()` still records the extraction consent on the case first.
  *
- * Stops waiting after a minute, when a call already runs, or when a human handover blocks the
- * voice. `done` follows when the wait or the start is over. The microphone button stays for every
- * later start.
+ * Without a session (the api configuration, where the customer signs in on the review panel
+ * after agreeing) it waits for the sign-in as long as it takes. From the sign-in on the case has a
+ * minute to become ready; a sign-out pauses that minute. It stops waiting when a call already runs
+ * or a human handover blocks the voice. `done` follows when the wait or the start is over. The
+ * microphone button stays for every later start.
  */
 export function startPaxiWhenReady(live: LiveVoice, injector: Injector, done: () => void): void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const watch = effect(
     () => {
       if (live.active() || live.handoverActive()) return giveUp();
+      if (!live.signedIn()) return pause();
+      timer ??= setTimeout(giveUp, START_TIMEOUT_MS);
       if (!live.available() || !live.validPerson() || live.busy()) return;
       untracked(() => {
         stop();
@@ -28,10 +33,14 @@ export function startPaxiWhenReady(live: LiveVoice, injector: Injector, done: ()
     },
     { injector },
   );
-  const timer = setTimeout(giveUp, START_TIMEOUT_MS);
+
+  function pause(): void {
+    clearTimeout(timer);
+    timer = undefined;
+  }
 
   function stop(): void {
-    clearTimeout(timer);
+    pause();
     watch.destroy();
   }
 

@@ -14,6 +14,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { AgentActivity } from '../../core/advisor/ui-models';
+import { VoiceActivity } from '../../core/voice/voice-activity';
 import { connectAvatarAudio, type PaxAvatar } from '../../core/voice/voice-avatar';
 
 export interface PaxAvatarModule {
@@ -121,6 +122,15 @@ export class PaxiAvatar {
     inject(DestroyRef).onDestroy(() => {
       destroyed = true;
       this.avatar()?.destroy();
+    });
+
+    // Reply emotions of the live call (GPT-Live emotion triggers); the renderer holds each a while.
+    const voice = inject(VoiceActivity);
+    effect(() => {
+      const avatar = this.avatar();
+      const emotion = voice.emotion();
+      if (!avatar || !emotion) return;
+      untracked(() => this.zone.runOutsideAngular(() => avatar.handle({ type: 'emotion', emotion: emotion.emotion })));
     });
 
     effect(() => {

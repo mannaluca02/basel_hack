@@ -234,3 +234,45 @@ describe('PaxiCaseVoice connection events', () => {
     }
   });
 });
+
+describe('PaxiCaseVoice reply emotions', () => {
+  const decision = (sourceType: string, sourceId: string, name: string, choice: unknown, extra: Record<string, unknown> = {}) => ({
+    type: 'decision.event', delegation_id: null, trigger_id: 'trigger', source_event_type: sourceType, source_event_id: sourceId,
+    event: { type: 'decision.completed', decision: { answers: [{ type: 'choice', name, choice }] } }, ...extra,
+  });
+  async function connected() {
+    vi.useFakeTimers();
+    const f = connectedBrowser(), cb = callbacks();
+    await new PaxiCaseVoice(cb, f.browser).start();
+    f.emit({ type: 'session.started' });
+    const emotions = () => cb.onEvent.mock.calls.map(([event]) => event).filter((event) => event.type === 'emotion').map((event) => event.emotion);
+    return { f, emotions };
+  }
+  afterEach(() => vi.useRealTimers());
+
+  it('shows the emotion GPT-Live chose for the customer\'s words and for Paxi\'s own', async () => {
+    const { f, emotions } = await connected();
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_1', delta: 'Mein Vater ist gestorben.' });
+    f.emit(decision('session.input_transcript.delta', 'in_1', 'reply_emotion', 'empathetic'));
+    f.emit({ type: 'session.output_transcript.delta', event_id: 'out_1', delta: 'Das tut mir leid.' });
+    f.emit(decision('session.output_transcript.delta', 'out_1', 'emotion', 'acknowledging'));
+    expect(emotions()).toEqual(['empathetic', 'acknowledging']);
+  });
+
+  it('ignores late results for older fragments, unknown fragments and invalid or failed answers', async () => {
+    const { f, emotions } = await connected();
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_1', delta: 'Hallo' });
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_2', delta: ' zusammen' });
+    f.emit(decision('session.input_transcript.delta', 'in_2', 'reply_emotion', 'pleased'));
+    f.emit(decision('session.input_transcript.delta', 'in_1', 'reply_emotion', 'shocked'));
+    f.emit(decision('session.input_transcript.delta', 'in_unknown', 'reply_emotion', 'curious'));
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_3', delta: '!' });
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'furious'));
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'emotion', 'curious'));
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'curious', { delegation_id: 'delegation' }));
+    f.emit({ ...decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'curious'), event: { type: 'decision.failed' } });
+    f.emit(decision('session.other', 'in_3', 'reply_emotion', 'curious'));
+    expect(emotions()).toEqual(['pleased']);
+  });
+});
+
