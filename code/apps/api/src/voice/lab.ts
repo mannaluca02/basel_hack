@@ -11,6 +11,7 @@ import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, modelObservations, scriptObservation } 
 import { setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
 import { answerChanges, answerObservations, answerTargets, openAsks, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
 import { languageNumber } from '../insurance/i18n.js';
+import { at } from '../insurance/draft-proposals.js';
 import type { ResponsesTransport } from '../erni-dialog/responses.js';
 type JsonValue = Parameters<typeof JSON.stringify>[0];
 const MODEL_ERRORS=['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'];
@@ -134,9 +135,18 @@ export class VoiceLabController {
       }
       // Dry run per observation: an unclear value is turn data (not a CaseAmbiguity, a batch without changes could not be replaced).
       const clarifications:{fieldId:string;quote:string;value:string|null;code:'AMBIGUOUS_VALUE'}[]=[],exact:VoiceObservation[]=[];
+      // A case the conversation set up (live start): the intake extraction only fills what is still
+      // empty. It sees eight fields only, so it took "20000 more saving" for the 3a; corrections of
+      // answered fields go through answerObservations, which knows every field and needs the latest
+      // sentence. With a persona (demo, Voice Lab) the intake extraction stays the correction path.
+      const liveSetup=ctx.proposalBatches.some(batch=>batch.messageId.startsWith('setup_'));
+      const view=adapter==='model-v1'&&liveSetup?pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id):null;
+      // 'unknown' is the placeholder of relationship and risk appetite, not an answer.
+      const known=(path:string)=>{const value=at(view,path);return value!==null&&value!==undefined&&value!=='unknown';};
       for(const o of observations) {
         try {
           const dry=mapVoiceObservations(ctx.draft,[o],ctx.locale);
+          if(view&&dry.changes.length&&dry.changes.every(change=>known(change.path)))continue;
           if(dry.issues.some(issue=>issue.code==='AMBIGUOUS_VALUE'))clarifications.push({fieldId:o.fieldId,quote:o.quote,value:o.value===null?null:String(o.value),code:'AMBIGUOUS_VALUE'});
           else if(dry.changes.length)exact.push(o);
         } catch(error) {if(!(error instanceof WorkflowError))throw error;}
