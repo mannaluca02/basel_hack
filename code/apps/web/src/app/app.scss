@@ -5,9 +5,11 @@
   --tab-size: 3rem;
   --icon-size: 1.5rem;
   // Paxi's two spots, read by the stage and by the Dynamic View that makes room for him.
+  // Phones: 15 % larger than on wider screens. The lower bound stays, so in landscape (small dvh)
+  // the caption below Paxi still fits.
   --paxi-top: 1.5rem;
-  --paxi-centre: clamp(8rem, 28dvh, 14rem);
-  --paxi-corner: 5.175rem;
+  --paxi-centre: clamp(8rem, 32dvh, 16.1rem);
+  --paxi-corner: 5.95rem;
   --paxi-gap: 0.75rem;
 
   display: grid;
@@ -31,6 +33,7 @@
   :host {
     --tab-size: 3.25rem;
     --icon-size: 1.75rem;
+    --paxi-centre: clamp(8rem, 28dvh, 14rem);
     --paxi-corner: 6.9rem;
     --paxi-gap: 1.25rem;
   }
