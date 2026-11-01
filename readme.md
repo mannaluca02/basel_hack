@@ -68,7 +68,7 @@ flowchart TB
 
   Human["Human advisor"]
 
-  UI -->|"REST: consent, accept, confirm"| API
+  UI -->|"REST: consent, suitability, Abschluss"| API
   API -.->|"SSE: charts, risks, progress"| UI
   LiveVoice -->|"call setup, final turns"| Voice
   LiveVoice <==>|"audio over WebRTC"| GPTLive
@@ -76,8 +76,8 @@ flowchart TB
   Voice -->|"open session<br/>key stays on server"| GPTLive
   Voice --> AI
   AI <-->|"excerpt → proposals"| Responses
-  AI -->|"proposal batches"| Case
-  API -->|"accepted values"| Case
+  AI -->|"heard values, applied automatically"| Case
+  API --> Case
   Case -->|"confirmed profile"| Calc
   Calc <-->|"requests → results"| Logismata
   Case --> Rules
