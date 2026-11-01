@@ -25,6 +25,7 @@ import { AppLanguage } from './core/i18n/language';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
 import { provideFakePaxAvatar } from './features/paxi/paxi-testing';
 import { stubChartCanvas } from './features/workspace/graphics/graphics-testing';
+import { polyfillDialog } from './core/layout/dialog-testing';
 
 describe('App', () => {
   let source: FakeDataSource;
@@ -505,13 +506,7 @@ describe('App before consent', () => {
   beforeEach(async () => {
     localStorage.clear();
     sessionStorage.clear();
-    // jsdom has no modal dialogs; "Details" only needs the open state.
-    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
-      this.open = true;
-    };
-    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
-      this.open = false;
-    };
+    polyfillDialog();
     source = new FakeDataSource();
     await TestBed.configureTestingModule({
       imports: [App],

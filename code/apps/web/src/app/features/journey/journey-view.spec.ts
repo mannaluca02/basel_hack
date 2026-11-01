@@ -13,6 +13,7 @@ import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { Consent } from '../../core/consent/consent';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
 import { JourneyView } from './journey-view';
+import { polyfillDialog } from '../../core/layout/dialog-testing';
 
 const CASE = 'case_journey';
 const RUN = 'run_1';
@@ -95,14 +96,7 @@ function portal(state: State) {
 
 describe('JourneyView', () => {
   beforeAll(() => {
-    // jsdom has no modal dialogs; the browser behaviour (focus trap, Esc) is native.
-    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
-      this.open = true;
-    };
-    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
-      this.open = false;
-      this.dispatchEvent(new Event('close'));
-    };
+    polyfillDialog();
   });
 
   let fixture: ComponentFixture<JourneyView>;
