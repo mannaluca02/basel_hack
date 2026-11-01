@@ -127,11 +127,6 @@ function signature(risk: RiskItem): string {
       margin-top: 1.5rem;
     }
 
-    h2 {
-      margin: 0 0 0.75rem;
-      font-size: 1rem;
-    }
-
     .list {
       margin: 0;
       padding: 0;

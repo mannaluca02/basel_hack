@@ -87,27 +87,9 @@ import { JourneyApi } from '../../core/advisor/api/journey-api';
       border-bottom: var(--stroke-border) solid var(--border-soft);
     }
 
+    // Size and weight from the global heading scale; the margin pushes the buttons right.
     h2 {
       margin: 0 auto 0 0;
-      font-size: 1.125rem;
-      font-weight: var(--font-weight-bold);
-    }
-
-    .action {
-      min-height: 2.75rem;
-      padding: 0.5rem 1rem;
-      border: var(--stroke-s) solid var(--border-default);
-      border-radius: var(--radius-full);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
     }
 
     .close {
@@ -131,13 +113,13 @@ import { JourneyApi } from '../../core/advisor/api/journey-api';
       color: var(--text-error);
     }
 
-    // The dossier brings its own print styles; a white page in both themes, like paper.
+    // The dossier brings its own styles: the app's colours in the system theme, light on paper.
     .frame {
       flex: 1;
       width: 100%;
       border: 0;
       border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-      background: var(--bg-paper);
+      background: var(--bg-default);
     }
 
     .frame--hidden {

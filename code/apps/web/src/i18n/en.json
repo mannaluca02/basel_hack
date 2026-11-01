@@ -532,6 +532,7 @@
     "intro": "From the recommendation through quote and application to the policy in the customer portal. Everything is a demo with invented data: no contract, no insurance cover.",
     "steps": {
       "label": "Progress",
+      "position": "Step {{number}}:",
       "recommendation": "Recommendation",
       "quote": "Quote",
       "application": "Application",
@@ -664,7 +665,11 @@
     "dossierTitle": "Advice dossier",
     "dossierClose": "Close the advice dossier",
     "print": "Print",
-    "dossierFailed": "The advice dossier could not be loaded."
+    "dossierFailed": "The advice dossier could not be loaded.",
+    "chosen": {
+      "title": "Your recommendation",
+      "intro": "You chose these solutions from the needs analysis. All figures and reasons are in the advice dossier."
+    }
   },
   "insights": {
     "title": "Product management insights",

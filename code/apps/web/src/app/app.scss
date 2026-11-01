@@ -76,17 +76,6 @@
   text-overflow: ellipsis;
 }
 
-// Always visible: the whole app runs on synthetic data only.
-.demo {
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-full);
-  color: var(--text-inverse);
-  background: var(--bg-brand-purple);
-  font-size: 0.75rem;
-  // Pax Brand: no uppercase.
-  font-weight: var(--font-weight-bold);
-}
-
 // Its column stays when the switcher is hidden, so the header keeps its layout.
 .language {
   grid-column: 4;

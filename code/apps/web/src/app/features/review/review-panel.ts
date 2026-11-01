@@ -351,14 +351,8 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
       border-radius: var(--radius-sm);
     }
 
-    h2 {
-      margin: 0 0 0.75rem;
-      font-size: 1.125rem;
-    }
-
     h3 {
       margin: 1rem 0 0.25rem;
-      font-size: 1rem;
     }
 
     dl {
@@ -465,29 +459,6 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
         border-radius: var(--radius-sm);
         font: inherit;
       }
-    }
-
-    .action {
-      min-height: 2.75rem;
-      padding: 0.5rem 1rem;
-      border: var(--stroke-s) solid var(--border-default);
-      border-radius: var(--radius-full);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-
-      &:disabled {
-        color: var(--text-muted);
-        cursor: not-allowed;
-      }
-    }
-
-    .action--primary {
-      border-color: transparent;
-      color: var(--text-on-brand);
-      background: var(--bg-brand);
     }
   `,
 })

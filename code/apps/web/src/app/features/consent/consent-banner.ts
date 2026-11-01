@@ -143,25 +143,6 @@ let nextId = 0;
       margin-top: 1rem;
     }
 
-    .action {
-      min-height: 2.75rem;
-      padding: 0.625rem 1.25rem;
-      border: var(--stroke-border) solid var(--border-default);
-      border-radius: var(--radius-full);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-      // Pax Brand: Medium for buttons.
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-    }
-
-    .action--primary {
-      border-color: var(--bg-brand);
-      color: var(--text-on-brand);
-      background: var(--bg-brand);
-    }
-
     // The host lets clicks through to the intro; the dialog in the top layer still inherits that,
     // so without this it could neither scroll nor close by pointer.
     .details {

@@ -10,7 +10,15 @@
         [class.stage--current]="i === stageIndex()"
         [attr.aria-current]="i === stageIndex() ? 'step' : null"
       >
-        <span class="marker" aria-hidden="true">{{ i + 1 }}</span>
+        <span class="marker" aria-hidden="true">
+          @if (i < stageIndex()) {
+            <svg class="check" viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          } @else if (i === stageIndex()) {
+            <span class="dot"></span>
+          } @else {
+            {{ i + 1 }}
+          }
+        </span>
         <span class="name">{{ stage.label | transloco }}</span>
         @if (i < stageIndex()) {
           <span class="visually-hidden">{{ 'journey.stepState.done' | transloco }}</span>
@@ -18,13 +26,41 @@
       </li>
     }
   </ol>
+  <p class="stage-now" aria-hidden="true">
+    <strong>{{ 'journey.steps.position' | transloco: { number: stageIndex() + 1 } }}</strong>
+    {{ stages[stageIndex()].label | transloco }}
+  </p>
 
   @if (error(); as message) {
     <p class="error" role="alert">{{ 'journey.error' | transloco }} {{ message }}</p>
   }
 
   @if (!loading()) {
-    <div class="panel" aria-live="polite">
+    @if (chosen().length) {
+      <section class="recommended card" aria-labelledby="journey-chosen">
+        <h2 id="journey-chosen">{{ 'journey.chosen.title' | transloco }}</h2>
+        <p class="note">{{ 'journey.chosen.intro' | transloco }}</p>
+        <ul class="chosen">
+          @for (item of chosen(); track item.id) {
+            <li>
+              <span class="product">
+                {{ item.productName }}
+                @if (personNumber(item.personId); as number) {
+                  <span class="person">· {{ 'review.person' | transloco: { number } }}</span>
+                }
+              </span>
+              <span class="amount">{{ 'journey.need' | transloco }}: {{ need($any(item)) }}</span>
+              @if (why(item); as reason) {
+                <span class="why">{{ reason }}</span>
+              }
+            </li>
+          }
+        </ul>
+        <ng-container *ngTemplateOutlet="dossier" />
+      </section>
+    }
+
+    <div class="panel card" aria-live="polite">
       @switch (step()) {
         @case ('locked') {
           <p>{{ 'journey.locked' | transloco }}</p>
@@ -42,7 +78,7 @@
             <ul class="candidates">
               @for (candidate of rec.candidates; track candidate.id) {
                 <li class="candidate">
-                  <label class="pick">
+                  <label class="pick choice">
                     <input
                       type="checkbox"
                       [checked]="selected().has(candidate.id)"
@@ -120,7 +156,7 @@
             @if (recommendation()?.documentsLanguageNotice; as notice) {
               <p class="note">{{ notice }}</p>
             }
-            <label class="confirm">
+            <label class="confirm choice">
               <input
                 type="checkbox"
                 [checked]="documentsRead()"
@@ -168,7 +204,7 @@
       }
     </div>
 
-    <section class="portal" aria-labelledby="journey-portal">
+    <section class="portal card" aria-labelledby="journey-portal">
       <h2 id="journey-portal">{{ 'journey.portal' | transloco }}</h2>
       @for (policy of portal()?.policies ?? []; track policy.id) {
         <article class="policy">
@@ -192,19 +228,9 @@
       } @empty {
         <p class="note">{{ 'journey.noPolicy' | transloco }}</p>
       }
-      @if (caseId()) {
-        <p>
-          <button
-            #dossierButton
-            type="button"
-            class="action"
-            data-action="dossier"
-            (click)="openDossier(dossierButton)"
-          >
-            {{ 'journey.dossier' | transloco }}
-          </button>
-        </p>
-        <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
+      <!-- Until the customer chose, the dossier lives here; afterwards with the recommendation. -->
+      @if (!chosen().length) {
+        <ng-container *ngTemplateOutlet="dossier" />
       }
     </section>
   }
@@ -222,6 +248,23 @@
       {{ (busy() ? 'journey.working' : 'journey.simulateReview') | transloco }}
     </button>
     <p class="note">{{ 'journey.simulatedNote' | transloco }}</p>
+  }
+</ng-template>
+
+<ng-template #dossier>
+  @if (caseId()) {
+    <p>
+      <button
+        #dossierButton
+        type="button"
+        class="action"
+        data-action="dossier"
+        (click)="openDossier(dossierButton)"
+      >
+        {{ 'journey.dossier' | transloco }}
+      </button>
+    </p>
+    <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
   }
 </ng-template>
 

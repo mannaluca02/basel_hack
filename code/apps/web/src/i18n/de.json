@@ -532,6 +532,7 @@
     "intro": "Von der Empfehlung über Offerte und Antrag bis zur Police im Kundenportal. Alles ist eine Demo mit erfundenen Daten: kein Vertrag, kein Versicherungsschutz.",
     "steps": {
       "label": "Fortschritt",
+      "position": "Schritt {{number}}:",
       "recommendation": "Empfehlung",
       "quote": "Offerte",
       "application": "Antrag",
@@ -664,7 +665,11 @@
     "dossierTitle": "Beratungsdossier",
     "dossierClose": "Beratungsdossier schliessen",
     "print": "Drucken",
-    "dossierFailed": "Das Beratungsdossier konnte nicht geladen werden."
+    "dossierFailed": "Das Beratungsdossier konnte nicht geladen werden.",
+    "chosen": {
+      "title": "Deine Empfehlung",
+      "intro": "Diese Lösungen hast du aus der Bedarfsanalyse gewählt. Alle Zahlen und Gründe stehen im Beratungsdossier."
+    }
   },
   "insights": {
     "title": "Produktmanagement-Einblicke",

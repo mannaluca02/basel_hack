@@ -532,6 +532,7 @@
     "intro": "De la recommandation à la police dans le portail client, en passant par l’offre et la proposition. Tout est une démo avec des données fictives : aucun contrat, aucune couverture d’assurance.",
     "steps": {
       "label": "Progression",
+      "position": "Étape {{number}} :",
       "recommendation": "Recommandation",
       "quote": "Offre",
       "application": "Proposition",
@@ -664,7 +665,11 @@
     "dossierTitle": "Dossier de conseil",
     "dossierClose": "Fermer le dossier de conseil",
     "print": "Imprimer",
-    "dossierFailed": "Le dossier de conseil n’a pas pu être chargé."
+    "dossierFailed": "Le dossier de conseil n’a pas pu être chargé.",
+    "chosen": {
+      "title": "Ta recommandation",
+      "intro": "Tu as choisi ces solutions à partir de l’analyse des besoins. Tous les chiffres et les raisons figurent dans le dossier de conseil."
+    }
   },
   "insights": {
     "title": "Aperçus pour la gestion des produits",
