@@ -127,7 +127,8 @@ function budgetKeys(draft: InsuranceDraft): string[] {
  * Conversation order. First the questions whose answer decides others: relationship and partner,
  * children, pension fund, debts, private insurance. Each "no" there fills its follow-ups by itself
  * (consequences): no pension fund, no pension fund benefits to ask; no debts, nothing to repay.
- * Then income and pension, budget, retirement, protection; the year of the partnership last.
+ * Then income, the needs (each draws its chart line at once), pension, budget, retirement,
+ * protection; the year of the partnership last.
  */
 function rank(key: string, firstPerson: string | undefined): number {
   const partner = /^(insurance|financial)\.persons\.([^.]+)\./.exec(key)?.[2] !== firstPerson ? 0.5 : 0;
@@ -135,11 +136,13 @@ function rank(key: string, firstPerson: string | undefined): number {
     [/^insurance\.relationship$/, 0], [/^financial\.partner$/, 1], [/^insurance\.sharedChildren$/, 2], [/^insurance\.children(\.|$)/, 3],
     [/\.withPillar2$/, 4], [/^insurance\.debtsConfirmed$/, 5], [/^insurance\.existingPrivateRiskBenefitsConfirmed$/, 6], [/^goals$/, 7],
     [/\.(providerSex|grossAnnualIncomeCents)$/, 8], [/^financial\.persons\.[^.]+\.income$/, 9], [/\.desiredWorkStopAge$/, 10],
+    // The needs early: each draws its chart line at once (retirement in the income chart, disability and death in the impact chart).
+    [/^insurance\.retirementNeedAnnualCents$/, 10.2], [/\.(disabilityNeedAnnualCents|deathNeedAnnualCents)$/, 10.4],
     [/\.(retirementPensionAnnualCents|pillar2Risk\.\w+)$/, 11],
     [/^financial\.(expenses|expenses_add)\./, 12], [/^financial\.safetyBuffer$/, 13], [/^financial\.assets$/, 14],
     [/^insurance\.debts\./, 15], [/^insurance\.existingAnnual/, 16],
-    [/^insurance\.(retirementNeedAnnualCents|retirementHorizonAge|annualReturnBps|annualSavingCents|taxLocationId)$/, 17],
-    [/\.(disabilityNeedAnnualCents|deathNeedAnnualCents|protectionTermMonths|existingDeathCapitalCents|deathOneOffCostsCents)$/, 18],
+    [/^insurance\.(retirementHorizonAge|annualReturnBps|annualSavingCents|taxLocationId)$/, 17],
+    [/\.(protectionTermMonths|existingDeathCapitalCents|deathOneOffCostsCents)$/, 18],
     [/\.(debtPayoffCents|debtTreatment|deathNeedExcludesRepaidDebtService)$/, 19], [/\.personalAffordableAnnualPremiumCents$/, 20],
     [/^insurance\.riskCapitalStrategy$/, 21], [/^insurance\.relationshipSinceYear$/, 22],
   ];

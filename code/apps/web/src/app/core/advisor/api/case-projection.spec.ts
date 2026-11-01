@@ -116,7 +116,12 @@ describe('projectCase', () => {
       AT,
     );
     expect(empty.risks).toEqual([]);
-    expect(empty.charts.map((c) => c.chartId)).toEqual([CHART_LIFE_EVENTS]);
+    // Without a calculation the income and impact charts are provisional, from the draft.
+    expect(empty.charts.map((c) => [c.chartId, c.status])).toEqual([
+      [CHART_LIFE_EVENTS, 'needs_input'],
+      [CHART_INCOME, 'provisional'],
+      [CHART_IMPACT, 'provisional'],
+    ]);
     expect(projectCase({ ...dto, estimates: [] }, context, 'de', AT).charts.map((c) => c.chartId)).not.toContain(CHART_PILLAR3A);
   });
 });
@@ -198,5 +203,55 @@ describe('incomeMilestones', () => {
 
   it('has nothing to pick without periods', () => {
     expect(incomeMilestones([])).toEqual([]);
+  });
+});
+
+describe('projectCase while the live conversation fills the profile', () => {
+  // One person, as the live start sets her up; the conversation adds value after value.
+  const base = dto.draft;
+  const person = { ...base.financial!.persons[0]!, birthYear: 1992,
+    income: { ...base.financial!.persons[0]!.income, value: null }, incomeBasis: 'gross' as const };
+  const insured = { ...base.insurance!.persons[0]!, personId: person.id, desiredWorkStopAge: null, retirementPensionAnnualCents: null,
+    withPillar2: null, grossAnnualIncomeCents: null, disabilityNeedAnnualCents: null, deathNeedAnnualCents: null,
+    pillar2Risk: { disabilityAnnualCents: null, disabilityChildAnnualCents: null, survivorAnnualCents: null, orphanAnnualCents: null } };
+  const live = (change: { person?: object; insured?: object; insurance?: object } = {}, updatedAt = '2026-11-01T10:00:00.000Z') =>
+    projectCase({ ...dto, confirmedVersions: [], runs: [], activeRunId: null, estimates: [], updatedAt,
+      draft: { ...base, financial: { ...base.financial!, persons: [{ ...person, ...change.person }] },
+        insurance: { ...base.insurance!, retirementNeedAnnualCents: null, ...change.insurance, persons: [{ ...insured, ...change.insured }] } } } as InsuranceCaseDto,
+    null, 'de', AT);
+  const income = (projection: ReturnType<typeof projectCase>) => projection.charts.find((c) => c.chartId === CHART_INCOME) as IncomeTimelineChart | undefined;
+  const impact = (projection: ReturnType<typeof projectCase>) => projection.charts.find((c) => c.chartId === CHART_IMPACT) as EventImpactChart | undefined;
+
+  it('draws no income chart before a retirement age is known', () => {
+    expect(income(live())).toBeUndefined();
+    expect(impact(live())).toBeUndefined();
+  });
+
+  it('draws the income provisionally as soon as the retirement age is known, and grows with every answer', () => {
+    const early = income(live({ insured: { desiredWorkStopAge: 65, grossAnnualIncomeCents: 9500000 } }))!;
+    expect(early.status).toBe('provisional');
+    expect(early.unit.basis).toBe('gross');
+    const at = (chart: IncomeTimelineChart, year: number, key: 'employment' | 'pillar1' | 'pillar2' | 'pillar3') => chart.series[key].values[chart.years.indexOf(year)];
+    expect(at(early, 2030, 'employment')).toBe(9500000);
+    expect([at(early, 2030, 'pillar1'), at(early, 2030, 'pillar2')]).toEqual([0, 0]);
+    // After the retirement in 2057: no income, AHV only from the calculation (open), PK not yet said.
+    expect([at(early, 2058, 'employment'), at(early, 2058, 'pillar1'), at(early, 2058, 'pillar2')]).toEqual([0, null, null]);
+    expect(early.milestones.map((m) => m.kind)).toEqual(['today', 'last_working', 'first_pension', 'pension_plus_10', 'end']);
+
+    const later = income(live({ person: { income: { ...person.income, value: 600000, period: 'month' }, incomeBasis: 'net_after_income_tax' },
+      insured: { desiredWorkStopAge: 65, retirementPensionAnnualCents: 3000000 }, insurance: { retirementNeedAnnualCents: 6000000 } }, '2026-11-01T10:05:00.000Z'))!;
+    expect(later.unit.basis).toBe('net_after_income_tax');
+    expect(at(later, 2030, 'employment')).toBe(7200000);
+    expect(at(later, 2058, 'pillar2')).toBe(3000000);
+    expect(later.target.values[later.years.indexOf(2058)]).toBe(6000000);
+    expect(later.revision).toBeGreaterThan(early.revision);
+  });
+
+  it('shows disability and death with the stated need and the pension fund statement; the AHV and the gap stay open', () => {
+    const chart = impact(live({ insured: { disabilityNeedAnnualCents: 7000000, withPillar2: true,
+      pillar2Risk: { ...insured.pillar2Risk, disabilityAnnualCents: 2400000 } } }))!;
+    expect(chart.status).toBe('provisional');
+    expect(chart.scenarios).toEqual([expect.objectContaining({ event: 'disability', needed: 7000000, gap: null,
+      incomeAfter: { employment: null, pillar1: null, pillar2: 2400000, pillar3: null } })]);
   });
 });

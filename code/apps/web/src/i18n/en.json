@@ -187,7 +187,8 @@
       "requires_review": "Under review",
       "needs_input": "Information missing",
       "provider_error": "Calculation failed",
-      "stale": "Out of date"
+      "stale": "Out of date",
+      "provisional": "Provisional"
     },
     "unit": {
       "month": "CHF per month",

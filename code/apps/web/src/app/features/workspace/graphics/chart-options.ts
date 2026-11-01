@@ -179,6 +179,7 @@ export const STATUS_KEYS: Readonly<Record<ResultStatus, string>> = {
   needs_input: 'graphics.status.needs_input',
   provider_error: 'graphics.status.provider_error',
   stale: 'graphics.status.stale',
+  provisional: 'graphics.status.provisional',
 };
 
 const PERIOD_KEYS: Readonly<Record<MoneyPeriod, string>> = {

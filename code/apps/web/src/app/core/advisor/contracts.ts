@@ -30,9 +30,13 @@ export interface VersionRefs {
 export type Pillar = 'pillar1' | 'pillar2' | 'pillar3';
 export const PILLARS: readonly Pillar[] = ['pillar1', 'pillar2', 'pillar3'];
 
-/** I04 status per area; everything except `valid` must stay visibly distinguishable. */
+/**
+ * I04 status per area; everything except `valid` must stay visibly distinguishable. `provisional`:
+ * drawn live from what the conversation has given so far, before the profile is complete and
+ * calculated (unknown parts stay empty, nothing is filled in).
+ */
 export type ResultStatus =
-  'valid' | 'estimated' | 'requires_review' | 'needs_input' | 'provider_error' | 'stale';
+  'valid' | 'estimated' | 'requires_review' | 'needs_input' | 'provider_error' | 'stale' | 'provisional';
 
 export type MoneyPeriod = 'month' | 'year' | 'once';
 export type MoneyBasis = 'gross' | 'net_before_income_tax' | 'net_after_income_tax' | 'capital';

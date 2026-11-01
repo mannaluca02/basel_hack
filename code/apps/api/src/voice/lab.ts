@@ -15,6 +15,10 @@ import { at } from '../insurance/draft-proposals.js';
 import type { ResponsesTransport } from '../erni-dialog/responses.js';
 type JsonValue = Parameters<typeof JSON.stringify>[0];
 const MODEL_ERRORS=['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'];
+/** The open-question key of an intake field of the person speaking (lab-questions.ts). */
+const intakeKey=(fieldId:string,personId:string)=>({annual_gross_income_chf:`insurance.persons.${personId}.grossAnnualIncomeCents`,civil_status:'insurance.relationship',
+  has_pension_fund:`insurance.persons.${personId}.withPillar2`,pillar_3a_annual_contribution_chf:'insurance.existingAnnualPillar3aContributionCents',
+  monthly_housing_cost_chf:'financial.expenses.housing',desired_retirement_age:`insurance.persons.${personId}.desiredWorkStopAge`} as Record<string,string>)[fieldId]??fieldId;
 /** Open batches the next proposal replaces (and carries): proposed, with changes, without a clarification. */
 const replaceable=<T extends {status:string;changes:unknown[];ambiguityIds?:string[]|undefined}>(batches:T[])=>
   batches.filter(batch=>batch.status==='proposed'&&batch.changes.length>0&&!batch.ambiguityIds?.length);
@@ -179,7 +183,11 @@ export class VoiceLabController {
         result={proposalBatch:null,issues:[{code,action:'screen_or_human_review'}],confirmationStillRequired:true};
       }
       const answered=answers.length?await this.proposeAnswers(agent,id,c.id,b.messageId,source,answers,this.lookup(c.locale)):null;
-      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications,result,
+      // What the open questions took from this sentence is no longer unclear ("ungefähr tausend
+      // Franken" for the housing, saved per month): otherwise Paxi asks for it again.
+      const taken=new Set(answered?.proposalBatch?answered.answered:[]);
+      const stillUnclear=clarifications.filter(item=>!taken.has(intakeKey(item.fieldId,personId)));
+      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications:stillUnclear,result,
         ...(answered?{answers:answered}:{})}};
     } finally {await this.r.sessions.revoke(agent);}
   }
