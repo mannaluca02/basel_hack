@@ -1,14 +1,14 @@
 import { createHash,randomBytes,randomUUID,timingSafeEqual } from 'node:crypto';
 import { WorkflowError,type Actor } from './types.js';
 import type { Database } from './types.js';
-import { EncryptedCaseStore,type BootstrapCredentials } from './store.js';
+import type { CaseStore,BootstrapCredentials } from './store.js';
 import { SessionResponseSchema,AgentAccessResponseSchema } from '@pax/contracts';
 
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 const same=(a:string,b:string)=>timingSafeEqual(Buffer.from(hash(a)),Buffer.from(hash(b)));
 export class SessionService {
   private attempts=new Map<string,{count:number;until:number}>();
-  constructor(private readonly store:EncryptedCaseStore,private readonly codes:BootstrapCredentials,private readonly now=()=>new Date()){
+  constructor(private readonly store:CaseStore,private readonly codes:BootstrapCredentials,private readonly now=()=>new Date()){
     if(codes.customerAccessCode.length<32||codes.reviewerAccessCode.length<32||same(codes.customerAccessCode,codes.reviewerAccessCode))
       throw new WorkflowError('ACCESS_CODE_ROLES_INVALID',500);
   }

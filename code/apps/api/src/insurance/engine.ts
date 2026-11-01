@@ -14,7 +14,7 @@ import { ambiguityDialogue,pendingAcceptanceIds,waitingForAnswer } from './ambig
 import { selectedGraphFacts } from './graph.js';
 import { pillarPicture } from './pillars.js';
 import { questionText,presentRecommendation,presentRun,progressText,metricText,statusText } from './i18n.js';
-import { EncryptedCaseStore } from './store.js';
+import type { CaseStore } from './store.js';
 import { SessionService } from './auth.js';
 import { WorkflowError,type Actor,type InsuranceCase,type Database,type LifeRun,type CaseEvent } from './types.js';
 
@@ -41,7 +41,7 @@ export class LifeInsuranceEngine {
     this.role(actor,'customer');this.assertDigitalActive(this.caseFor(actor,id));const task=this.digitalTasks.begin(id,external);
     try{task.signal.throwIfAborted();const result=await work(task.signal);task.signal.throwIfAborted();return result;}catch(error){if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');throw error;}finally{task.finish();}
   }
-  constructor(readonly store:EncryptedCaseStore,readonly sessions:SessionService,readonly provider:CalculationProvider,
+  constructor(readonly store:CaseStore,readonly sessions:SessionService,readonly provider:CalculationProvider,
     readonly providerMode:'live'|'replay'|'test',private readonly calculation=new CalculationService()){}
   private authorize(actor:Actor,c:InsuranceCase,allowAdvisor=false) {
     this.sessions.assertActive(actor);

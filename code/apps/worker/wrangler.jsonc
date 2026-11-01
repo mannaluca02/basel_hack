@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "lifemap-nest-do-spike",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "build": {
+    "command": "npm run build --prefix ../.."
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "LIFE",
+        "class_name": "LifeInsuranceObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "LifeInsuranceObject"
+      ]
+    }
+  ],
+  "alias": {
+    "class-validator": "./src/optional-nest.cjs",
+    "class-transformer": "./src/optional-nest.cjs",
+    "@nestjs/microservices": "./src/optional-nest.cjs",
+    "@nestjs/websockets/socket-module.js": "./src/optional-nest.cjs",
+    "@nestjs/microservices/microservices-module.js": "./src/optional-nest.cjs"
+  }
+}

@@ -5,6 +5,8 @@ import { WorkflowError } from './types.js';
 
 export class ProductDocuments {
   private constructor(private readonly manifest:Map<string,{id:string;sha256:string;file:URL;filename:string}>){}
+  /** Empty catalog for hosts that inject assets separately. */
+  static empty(){return new ProductDocuments(new Map());}
   static async load(root=new URL('../../../../../documentation/baselhack/references/products/',import.meta.url)) {
     const manifest=new Map<string,{id:string;sha256:string;file:URL;filename:string}>();
     for(const [id,path] of Object.entries(DOCUMENTS)) {

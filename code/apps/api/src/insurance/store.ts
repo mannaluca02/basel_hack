@@ -80,3 +80,6 @@ export class EncryptedCaseStore {
   async close(){await this.queue;this.closed=true;const p=join(this.directory,'store.lock');
     try{if(JSON.parse(await readFile(p,'utf8')).id===this.lockId)await unlink(p);}catch{/* already released */}}
 }
+
+/** Structural injection seam; the Node implementation remains the default. */
+export type CaseStore=Pick<EncryptedCaseStore,'directory'|'snapshot'|'view'|'transaction'|'credentials'|'close'>;

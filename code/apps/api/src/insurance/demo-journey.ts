@@ -89,7 +89,8 @@ export class DemoJourney {
   constructor(private readonly engine:LifeInsuranceEngine,private readonly estimates:DraftEstimateService,
     private readonly extraction:ExtractionWorkflow,
     private readonly demoStart:{sessions:SessionService;credentials:BootstrapCredentials}|null=null,
-    private readonly journey:DemoJourneyService|null=null){}
+    private readonly journey:DemoJourneyService|null=null,
+    private readonly loadPersonaDraft:typeof personaDraft=personaDraft){}
 
   get startEnabled(){return this.demoStart!==null;}
 
@@ -243,7 +244,7 @@ export class DemoJourney {
   async loadPersona(actor:Actor,caseId:string,input:unknown) {
     const body=LoadPersonaSchema.parse(input);
     if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
-    const draft=await personaDraft(body.persona);
+    const draft=await this.loadPersonaDraft(body.persona);
     return this.engine.patchDraft(actor,caseId,{...draft,expectedCaseRevision:body.expectedCaseRevision});
   }
 
