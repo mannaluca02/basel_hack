@@ -371,7 +371,7 @@ test('both models get only the latest exchange, not the whole log',async()=>{
   // The partner's age and rate may come one exchange after the other.
   const married=answerTargets(pendingView(frame(),[{path:'insurance.relationship',value:'married'}],CASE));
   seen.length=0;
-  await answerObservations(transport,[...log,P('Wie alt ist deine Partnerin, und wie viel arbeitet sie?'),K('Sie ist 33'),P('Und das Pensum?'),K('60 Prozent')],married,new AbortController().signal);
+  await answerObservations(transport,[...log,P('Wie alt ist deine Partnerin, und wie viel arbeitet sie?'),K('Sie ist 33'),P('Und das Pensum?'),K('60 Prozent')],married,new AbortController().signal,'financial.partner');
   assert.ok(seen[0].some(t=>t.text==='Sie ist 33'));
   assert.ok(!seen[0].some(t=>t.text==='22'),'never the whole log');
 });
@@ -508,4 +508,57 @@ test('live: what the open questions took from a sentence is no longer unclear, s
   const housing=await say('Ungefähr tausend Franken',{personId:'person_1'});
   assert.deepEqual(housing.clarifications,[],'taken, so not unclear');
   assert.equal((await current()).draft.financial.expenses.find(e=>e.id==='housing').amount.value,100000);
+});
+
+test('amounts as people say them: separators, currency, ".–", k, Tausend, Mio, Millionen',async()=>{
+  const {amount,periodIn}=await import('../apps/api/dist/voice/lab-questions.js');
+  for(const [said,cents] of [['95000',9500000],["95'000",9500000],['95.000',9500000],['95,000',9500000],['95k',9500000],['95 K',9500000],
+    ['1,5 Mio',150000000],['1.5 Millionen',150000000],['2 Mio.',200000000],['3 Tsd',300000],['3 Tausend',300000],["CHF 2'200.–",220000],['2200.-',220000],['Fr. 1200.50',120050]])
+    assert.equal(amount(said),cents,said);
+  for(const said of ['viel','1.2.3','',' k'])assert.equal(amount(said),null,said);
+  assert.equal(periodIn('sechstausend im Monat'),'month');assert.equal(periodIn('monatlich 500'),'month');
+  assert.equal(periodIn('jährlich 7000'),'year');assert.equal(periodIn('7000 pro Jahr'),'year');assert.equal(periodIn('fünftausend'),null);
+});
+
+test('one sentence, many values: relationship, partner with income, children, a mortgage with its amounts',async()=>{
+  const d=frame(),targets=answerTargets(d),keys=targets.map(t=>t.key);
+  // Fields that become fields only through this sentence are offered already.
+  for(const key of ['partner.age','partner.gross_income_chf','partner.sex','insurance.children','insurance.children.ages','debts.mortgage.balance','debts.mortgage.annual_service'])
+    assert.ok(keys.includes(key),key);
+  const said='Ich bin verheiratet, mein Mann ist 33, arbeitet 60 Prozent und verdient brutto 70000 im Jahr. Wir haben zwei Kinder, 2018 und 2021, und eine Hypothek von 500000 mit 12000 Zins im Jahr.';
+  const answer=(id,value,quote,period=null)=>({id,value,quote,period});
+  const got=validAnswers(targets,{answers:[answer('insurance.relationship','married','verheiratet'),answer('partner.age','33',said),answer('partner.employment_rate_percent','60',said),
+    answer('partner.gross_income_chf','70000','verdient brutto 70000 im Jahr'),answer('partner.sex','male','mein Mann'),answer('insurance.sharedChildren','2','zwei Kinder'),
+    answer('insurance.children','2018,2021','2018 und 2021'),answer('insurance.debtsConfirmed','mortgage','eine Hypothek'),answer('debts.mortgage.balance','500000','Hypothek von 500000'),
+    answer('debts.mortgage.annual_service','12000','12000 Zins im Jahr')]},[said]);
+  assert.equal(got.length,10,'every value counts, also two from one quote ("33" and "60 Prozent")');
+  const after=pendingView(d,await answerChanges(d,got,'voice:test'),CASE);
+  assert.equal(after.insurance.relationship,'married');
+  assert.equal(after.financial.persons.length,2);
+  const partner=after.insurance.persons.find(p=>p.personId==='person_2');
+  assert.deepEqual([partner.grossAnnualIncomeCents,partner.providerSex],[7000000,1]);
+  assert.equal(after.financial.persons[1].employmentRateBps,6000);
+  assert.deepEqual(after.insurance.children.map(c=>c.birthYear),[2018,2021]);
+  assert.equal(after.insurance.sharedChildren,2);
+  assert.deepEqual(after.insurance.debts.map(x=>[x.kind,x.balanceCents,x.annualServiceCents]),[['mortgage',50000000,1200000]]);
+  assert.equal(after.financial.expenses.find(e=>e.category==='debt').amount.value,1200000,'the debt line follows');
+  assert.ok(!openKeys(after).some(k=>/partner|sharedChildren|^insurance\.children$|debtsConfirmed|debts\./.test(k)),JSON.stringify(openKeys(after)));
+});
+
+test('children by their ages become birth years; the count follows from them when not said',async()=>{
+  const d=frame(),year=Number(d.financial.valuationDate.slice(0,4));
+  const got=validAnswers(answerTargets(d),{answers:[{id:'insurance.children.ages',value:'5, 8',period:null,quote:'fünf und acht Jahre alt'}]},['Die Kinder sind fünf und acht Jahre alt']);
+  const after=pendingView(d,await answerChanges(d,got,'voice:test'),CASE);
+  assert.deepEqual(after.insurance.children.map(c=>c.birthYear),[year-5,year-8]);
+  assert.equal(after.insurance.sharedChildren,2);
+});
+
+test('a percentage is no amount, but an amount beside one counts; the period comes from the words when the model gave none',()=>{
+  const targets=answerTargets(frame());
+  const said=['Ich arbeite 60 Prozent und verdiene 95000 im Jahr'];
+  const gross=id=>({answers:[{id:'insurance.persons.person_1.grossAnnualIncomeCents',value:id,period:null,quote:'Ich arbeite 60 Prozent und verdiene 95000 im Jahr'}]});
+  assert.deepEqual(validAnswers(targets,gross('95000'),said).map(a=>a.value),[9500000]);
+  assert.deepEqual(validAnswers(targets,gross('60'),said),[]);
+  const net=validAnswers(targets,{answers:[{id:'financial.persons.person_1.income',value:'6000',period:null,quote:'netto 6000 im Monat'}]},['Mir bleiben netto 6000 im Monat']);
+  assert.deepEqual(net.map(a=>[a.value,a.period]),[[600000,'month']]);
 });
