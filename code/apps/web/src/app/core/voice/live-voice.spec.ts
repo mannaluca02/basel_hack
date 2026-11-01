@@ -171,7 +171,7 @@ describe('LiveVoice in the live build', () => {
     // A running call: the transport reports a settled customer turn.
     (live as unknown as { sessionId: string }).sessionId = 'session_1';
     const transport = (live as unknown as { voice: { options: { onTurn(speaker: string, text: string, how: string): void } } }).voice.options;
-    return { live, http: TestBed.inject(HttpTestingController), say: (text: string) => transport.onTurn('customer', text, 'client-settled') };
+    return { live, source, http: TestBed.inject(HttpTestingController), say: (text: string) => transport.onTurn('customer', text, 'client-settled') };
   }
   const settle = () => new Promise((resolve) => setTimeout(resolve));
 
@@ -219,6 +219,24 @@ describe('LiveVoice in the live build', () => {
     expect(steer(live)).toMatchObject({ done: false, nextQuestion: 'Was möchten Sie erreichen?' });
     live.caseAsks.set([]);
     expect(steer(live).done).toBe(true);
+  });
+
+  it('once nothing is open, hands Paxi the calculated result to explain itself, not to a colleague', () => {
+    const { live, source } = setup(true);
+    const presentation = {
+      ...reviewCase().presentation,
+      recommendations: [{ candidates: [{ productName: 'Pax 3a', explanation: 'Vorsorgelücke' }] }],
+      activeRun: { metrics: [{ label: 'Rentenlücke', formatted: 'CHF 1’200', periodLabel: 'pro Monat', valueCents: 120000 }, { label: 'Leer', formatted: '–', periodLabel: '', valueCents: null }] },
+    } as unknown as ReturnType<typeof reviewCase>['presentation'];
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase({ presentation }) });
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
+    intakeThrough(live);
+    live.caseAsks.set([]);
+    expect(steer(live)).toMatchObject({ done: true, analysis: { products: [{ product: 'Pax 3a', why: 'Vorsorgelücke' }], keyFigures: ['Rentenlücke: CHF 1’200 (pro Monat)'] } });
+    // While a question is open there is nothing to explain yet.
+    live.caseAsks.set([{ key: 'goals', text: 'Ziele?' }]);
+    expect(steer(live)).not.toHaveProperty('analysis');
   });
 
   it('keeps the intake steering outside the live build', () => {

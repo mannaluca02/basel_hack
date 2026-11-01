@@ -148,14 +148,14 @@ ${topicList("core")}
 Also part of the picture; find these out too, whenever they fit:
 ${topicList("extended")}
 
-Once the above is known, and only if the person has time, the details the calculation needs. Ask them compactly, in plain words, and say once why (so a colleague of yours can calculate what fits them). Rough numbers are fine; if they do not know, move on, a colleague will complete them:
+Once the above is known, and only if the person has time, the details the calculation needs. Ask them compactly, in plain words, and say once why (so the calculation shows what fits them). Rough numbers are fine; if they do not know, move on and come back to it later:
 ${topicList("planning")}
 
 ${
     priorities.length
       ? `Right now the app especially needs: ${labelsOf(priorities).join(", ")}. Steer the conversation there early, in a natural way.\n\n`
       : ""
-  }Only wrap up when the app's note says that everything is complete or handed to a colleague. If the person wants to stop before that, tell them in one sentence that only a few quick questions are left and ask them right away. If they still want to go, say that a colleague of yours will complete the rest with them.`;
+  }Only wrap up when the app's note says that everything is complete; never hand over to a colleague. If the person wants to stop before that, tell them in one sentence that only a few quick questions are left and ask them right away. If they still want to go, say that they can continue any time.`;
 }
 
 // GPT-Live adds OpenAI's recommended policies (backchannel, interruption, delegation).

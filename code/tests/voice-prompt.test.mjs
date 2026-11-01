@@ -28,3 +28,11 @@ test('conversation selections reach the prompt and unavailable skills/topics are
   await assert.rejects(buildVoicePrompt('de',{skillIds:['../not-a-skill.md']}),e=>e.code==='VOICE_SKILL_NOT_AVAILABLE');
   await assert.rejects(buildVoicePrompt('de',{priorities:['full_name']}),e=>e.code==='VOICE_TOPIC_NOT_AVAILABLE');
 });
+
+test('Paxi does everything itself: the prompt never hands the person over to a colleague',async()=>{
+  const prompt=await buildVoicePrompt('de');
+  for(const handover of [/(?<!say that )a colleague (of yours )?(at Pax )?(will|then)/i,/Kollege von mir schaut/,/handed to a colleague/i,/open points go to/i,/checked by a colleague/i])
+    assert.doesNotMatch(prompt,handover);
+  assert.match(prompt,/never hand over/i);
+  assert.match(prompt,/walk the person through the analysis/);
+});

@@ -631,7 +631,19 @@ export class LiveVoice {
     if ((ask?.key ?? '') !== this.askSince.key) this.askSince = { key: ask?.key ?? '', line: this.sequence };
     // A skipped intake field may come back as a profile question (the backend still needs it).
     const neverAskAgain = rows.filter((r) => r.status === 'proposed' || r.status === 'accepted').map((r) => r.fieldId);
-    return { ...context, neverAskAgain, done: !ask, nextQuestion: ask?.text ?? null, ...(ask?.about ? { nextQuestionMeans: ask.about } : {}) };
+    const analysis = ask ? null : this.analysis();
+    return { ...context, neverAskAgain, done: !ask, nextQuestion: ask?.text ?? null, ...(ask?.about ? { nextQuestionMeans: ask.about } : {}),
+      ...(analysis ? { analysis } : {}) };
+  }
+
+  /** The calculated result, for Paxi to explain itself: the recommended products and key figures. */
+  private analysis() {
+    const presentation = this.store.canonical()?.presentation;
+    const products = (presentation?.recommendations.at(-1)?.candidates ?? []).slice(0, 3)
+      .map((c) => ({ product: c.productName, why: c.explanation }));
+    const keyFigures = (presentation?.activeRun?.metrics ?? []).filter((m) => m.valueCents !== null).slice(0, 8)
+      .map((m) => `${m.label}: ${m.formatted} (${m.periodLabel})`);
+    return products.length || keyFigures.length ? { products, keyFigures } : null;
   }
 
   private extracted(result: LiveTurnResult): void {
