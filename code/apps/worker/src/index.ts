@@ -20,38 +20,50 @@ export class LifeInsuranceObject extends DurableObject<Env> {
   private runtime?: LifeRuntime;
   private store?: Awaited<ReturnType<typeof durableStore>>;
 
+  /** Shared by concurrent requests; a failed boot is cleaned up and retried by the next request or alarm. */
+  private ready() {
+    return this.boot??=this.start().catch(error=>{this.boot=undefined;throw error;});
+  }
+
   private async start() {
     const started=Date.now();
-    const store=this.store=await durableStore(this.ctx.storage,this.env);
-    const credentials=await store.credentials();
-    const options=workerOptions(this.env as unknown as WorkerConfig);
-    configureVoicePrompt({...prompt,loader:{skillsPrompt:skills=>skills.map(skill=>prompt.sections[skill.file as keyof typeof prompt.sections]).join('\n\n')}});
-    const documents=await ProductDocuments.fromAssets(manifest,this.env.ASSETS);
-    // Defer credential validation until calculation so status/demo remain usable without local secrets.
-    let provider:LiveLogismataProvider|undefined;
-    const {app,runtime}=await createLifeInsuranceApp({
-      ...options,personaDraft:async(_id,today)=>normalizePersonaDraft(persona,today),
-      store,internalTimers:false,credentials,documents,
-      provider:{execute(...args:Parameters<LiveLogismataProvider['execute']>){return (provider??=new LiveLogismataProvider({token:options.token??''})).execute(...args);}},
-    });
-    this.runtime=runtime;
-    await runtime.sweepRetention();await runtime.sweepVoice();
-    await app.listen(0);
-    const address=app.getHttpServer().address();
-    if(!address||typeof address==='string')throw new Error('Expected Node HTTP routing port');
-    this.port=address.port;
-    console.log(JSON.stringify({spike:'nest-do-boot',milliseconds:Date.now()-started}));
+    let parts:Awaited<ReturnType<typeof createLifeInsuranceApp>>|undefined;
+    try {
+      const store=this.store=await durableStore(this.ctx.storage,this.env);
+      const credentials=await store.credentials();
+      const options=workerOptions(this.env as unknown as WorkerConfig);
+      configureVoicePrompt({...prompt,loader:{skillsPrompt:skills=>skills.map(skill=>prompt.sections[skill.file as keyof typeof prompt.sections]).join('\n\n')}});
+      const documents=await ProductDocuments.fromAssets(manifest,this.env.ASSETS);
+      // Defer credential validation until calculation so status/demo remain usable without local secrets.
+      let provider:LiveLogismataProvider|undefined;
+      parts=await createLifeInsuranceApp({
+        ...options,personaDraft:async(_id,today)=>normalizePersonaDraft(persona,today),
+        store,internalTimers:false,credentials,documents,
+        provider:{execute(...args:Parameters<LiveLogismataProvider['execute']>){return (provider??=new LiveLogismataProvider({token:options.token??''})).execute(...args);}},
+      });
+      const {app,runtime}=parts;this.runtime=runtime;
+      await runtime.sweepRetention();await runtime.sweepVoice();
+      await app.listen(0);
+      const address=app.getHttpServer().address();
+      if(!address||typeof address==='string')throw new Error('Expected Node HTTP routing port');
+      this.port=address.port;
+      console.log(JSON.stringify({event:'nest-do-boot',milliseconds:Date.now()-started}));
+    } catch(error) {
+      // Leave nothing half-started behind, so the next request or alarm boots from scratch.
+      await parts?.app.close().catch(()=>{});await parts?.runtime.close().catch(()=>{});
+      this.runtime=this.store=this.port=undefined;throw error;
+    }
   }
 
   async alarm() {
-    await (this.boot??=this.start());
+    await this.ready();
     await this.runtime!.sweepVoice();await this.runtime!.sweepRetention();
     // Transactions also arm alarms, including writes from background engine work.
     await this.store!.arm();
   }
 
   async fetch(request: Request) {
-    await (this.boot??=this.start());
+    await this.ready();
     const headers=new Headers(request.headers);
     headers.set('x-forwarded-proto',new URL(request.url).protocol.slice(0,-1));
     headers.set('host',new URL(request.url).host);
