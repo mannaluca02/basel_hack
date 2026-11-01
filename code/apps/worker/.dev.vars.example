@@ -1,4 +1,9 @@
+# Run npm run setup:local -w @pax/worker to generate a local key.
+LIFEMAP_STORE_KEY=REPLACE_WITH_BASE64_ENCODED_32_BYTE_KEY
 LOGISMATA_BEARER_TOKEN=replace-me
 OPENAI_API_KEY=replace-me
 ELEVENLABS_API_KEY=replace-me
 ELEVENLABS_AGENT_ID=replace-me
+# Optional: otherwise generated once and persisted in local DO storage.
+# PAX_CUSTOMER_ACCESS_CODE=REPLACE_WITH_CUSTOMER_ACCESS_CODE
+# PAX_REVIEWER_ACCESS_CODE=REPLACE_WITH_REVIEWER_ACCESS_CODE

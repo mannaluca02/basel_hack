@@ -24,6 +24,7 @@ import { LiveLogismataProvider,ReplayProvider,type CalculationProvider } from '.
 export const LIFE_RUNTIME=Symbol('LIFE_RUNTIME');
 export type RuntimeOptions={personaDraft?:typeof personaDraft;store?:CaseStore;dataDirectory?:string;provider?:CalculationProvider;providerMode?:'live'|'replay'|'test';
   voice?:VoiceOptions;modelExtraction?:ModelExtractionOptions;token?:string;credentials?:BootstrapCredentials;documents?:ProductDocuments;
+  internalTimers?:boolean;
   /** Opens POST /api/demo/start: a ready demo case without access code. Local demos only. */
   demoStart?:boolean};
 const AUDIT_RETENTION_MS=86400_000;
@@ -57,15 +58,29 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
     const journey=new DemoJourneyService(engine,documents),dossier=new DossierService(engine,journey),extraction=new ExtractionWorkflow(engine);
     const confirmations=new CustomerConfirmations(engine,extraction),modelExtraction=new ModelExtractionConsents(engine,options.modelExtraction);
     const voice=new VoiceIntegrationService(engine,extraction,options.voice);await voice.initialize();
-    const voiceCleanup=setInterval(()=>{void voice.sweep().catch(()=>{});},5000);voiceCleanup.unref();
     let closed=false;
-    const cleanup=setInterval(()=>{
+    const sweepRetention=async()=>{
       if(closed)return;const now=new Date();
-      if(store.view(db=>hasExpired(db,now)))void store.transaction(db=>sweepExpired(db,now)).catch(()=>{});
-    },60_000);cleanup.unref();
+      if(store.view(db=>hasExpired(db,now)))await store.transaction(db=>sweepExpired(db,now));
+    };
+    const sweepVoice=()=>voice.sweep();
+    const voiceCleanup=options.internalTimers===false?undefined:setInterval(()=>{void sweepVoice().catch(()=>{});},5000);voiceCleanup?.unref();
+    const cleanup=options.internalTimers===false?undefined:setInterval(()=>{void sweepRetention().catch(()=>{});},60_000);cleanup?.unref();
     const estimates=new DraftEstimateService(engine);
-    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
+    return {sweepRetention,sweepVoice,store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
 export type LifeRuntime=Awaited<ReturnType<typeof createLifeRuntime>>;
+
+/** No periodic wakeups after the last expiring record is removed. */
+export function nextCleanupAt(db:Database,now=Date.now()):number|null {
+  const deadlines=[
+    ...Object.values(db.cases).map(c=>Date.parse(c.expiresAt)),
+    ...Object.values(db.sessions).map(s=>Date.parse(s.expiresAt)),
+    ...db.audit.map(a=>Date.parse(a.at)+AUDIT_RETENTION_MS),
+  ];
+  if(Object.values(db.cases).some(c=>c.voiceSessions.some(s=>s.status==='active'||s.status==='starting')))deadlines.push(now+5000);
+  let next=Infinity;for(const deadline of deadlines)if(Number.isFinite(deadline))next=Math.min(next,deadline);
+  return next===Infinity?null:Math.max(now+1,next);
+}
