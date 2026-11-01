@@ -1,6 +1,6 @@
 # Pax LifeMap – Workflow und Schnittstellen aus dem Workshop
 
-Stand: 31.10.2026 · Entwurf 1.1. Grundlage sind `IMG_7233.HEIC`, die bestätigten Bereiche aus `IMG_7232.HEIC` und der [aktualisierte Detailplan](implementation-plan.md). Die Rollen sind bestätigt; die folgenden Typnamen, Felder, Fehlercodes und Transportvorschläge konkretisieren die Skizze und beschreiben die teamübergreifende Zielarchitektur. Die Backend-Anteile I02–I04/I07–I10 sind inzwischen implementiert; die [Requirements-Matrix](../reports/life-insurance-requirements.md) ordnet nachweisbaren Code und offene Team-Integration zu.
+Stand: 31.10.2026 · Entwurf 1.1. Grundlage sind `IMG_7233.HEIC`, die bestätigten Bereiche aus `IMG_7232.HEIC` und der aktualisierte Detailplan. Die Rollen sind bestätigt; die folgenden Typnamen, Felder, Fehlercodes und Transportvorschläge konkretisieren die Skizze und beschreiben die teamübergreifende Zielarchitektur. Die Backend-Anteile I02–I04/I07–I10 sind inzwischen implementiert; die [Requirements-Matrix](../reports/life-insurance-requirements.md) ordnet nachweisbaren Code und offene Team-Integration zu.
 
 ## 1. Der sichtbare Workflow
 
@@ -191,7 +191,7 @@ Diese Verträge sind unabhängig davon nutzbar, ob die erste Umsetzung ein gemei
 
 Für den ersten Test baut jeder Owner eine kleine zu seinem Vertrag passende Fixture. Die Kette besteht aus einer neuen Eingabe, einer bestätigten Änderung, einer neuen Berechnung, einer UI-Ausgabe und genau einer zur aktiven Auswahl gehörenden Sprachausgabe. Ein zweiter Turn und ein bewusst verspätetes Ergebnis prüfen Abbruch/Versionsschutz. Der Avatar muss auch ohne Video korrekt reagieren.
 
-Die [maschinenlesbare Vertragsübersicht](../catalog/interface-contracts.json) enthält Produzent/Empfänger, Pflichtfelder, Semantik und synthetische Beispiele. Sie ist eine Planungsbeschreibung und kein bereits implementiertes oder vollständiges Runtime-JSON-Schema. Die gemeinsamen Fachschemas bleiben die Quelle für tatsächliche Validierung.
+Die maschinenlesbare Vertragsübersicht enthält Produzent/Empfänger, Pflichtfelder, Semantik und synthetische Beispiele. Sie ist eine Planungsbeschreibung und kein bereits implementiertes oder vollständiges Runtime-JSON-Schema. Die gemeinsamen Fachschemas bleiben die Quelle für tatsächliche Validierung.
 
 ## 9. Gemeinsame JSON und dynamischer Gesprächskontext für Dario
 
@@ -309,7 +309,7 @@ Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jede
 
 ## 11. Verbindlicher Shared-Vertrag v1 und Team-Anbindung
 
-Der vollständige `InsuranceCaseDto` sowie `AdvisorContext`, Kontext-SSE, `SummaryBundle` und `PortalDto` werden aus `@pax/contracts` importiert. Eingaben und Ausgaben sind Zod-validiert; Code und generierte OpenAPI-/JSON-Schemas verwenden dieselben Definitionen. [Team-API-Leitfaden](team-api-guide.md) und [Persistenz-/DB-Entscheid](persistence-and-api.md) sind für den aktuellen ausführbaren Anschluss massgeblich. Die historischen Abschnitte oben zeigen die Herleitung aus dem Workshop.
+Der vollständige `InsuranceCaseDto` sowie `AdvisorContext`, Kontext-SSE, `SummaryBundle` und `PortalDto` werden aus `@pax/contracts` importiert. Eingaben und Ausgaben sind Zod-validiert; Code und generierte OpenAPI-/JSON-Schemas verwenden dieselben Definitionen. [Team-API-Leitfaden](team-api-guide.md) und [Persistenz-/DB-Entscheid](../../architecture.md#datenhaltung) sind für den aktuellen ausführbaren Anschluss massgeblich. Die historischen Abschnitte oben zeigen die Herleitung aus dem Workshop.
 
 Neu bereitgestellt sind ausserdem die Team-Nachrichtenschemas `VoiceLogSchema`, `AgentReplySchema`, `VoicePlaybackEventSchema` und `GraphExplanationRequestSchema`. Der entsprechende Transport bzw. STT/LLM/TTS/Avatar wird dadurch nicht als implementiert behauptet. Der aktuelle kanonische Locale-Wert ist `de|fr|it|en`; regionale Speech-Codes werden im Anbieter-Adapter abgebildet. Finanzielle Antwortreferenzen und Kundenbestätigung bleiben Pflicht.
 
@@ -331,7 +331,7 @@ Die Frontend-Modelle aus `code/apps/web/src/app/core/advisor/{contracts,ui-model
 
 Revision und Zeit eines Diagramms stammen aus seinem Lauf bzw. seiner Schätzung. Ein erneutes Laden unveränderter Daten ist damit ein Duplikat und markiert nichts als neu, auch wenn Paxi während eines Gesprächs laufend Kontext-Events auslöst.
 
-Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`), `GET|POST /cases/:id/suitability` und `complianceSteps` im Portal ([Angemessenheit und Compliance](suitability-and-compliance.md)).
+Weitere Routen für die Anbindung: `POST /cases/:id/voice/agent-observations` (Paxis Angaben als unbestätigtes Paket), `GET|POST /cases/:id/voice/agent-turns` (Gesprächsverlauf, ändert keine Fallrevision), `GET|POST /cases/:id/handover` (im Frontend als `HumanAdvisor`-Dienst), `POST /cases/:id/standard-analyses`, `POST /demo/start` (nur mit `PAX_DEMO_START=1`), `GET|POST /cases/:id/suitability` und `complianceSteps` im Portal ([Angemessenheit und Compliance](../../compliance.md)).
 
 Noch ohne Quelle: freie Erklärungen und Antworten des Advisors (`AgentReply`, Info-Karten während des Gesprächs) und Live-Zwischenstände des Transkripts.
 
