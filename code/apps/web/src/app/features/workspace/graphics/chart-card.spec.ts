@@ -89,7 +89,7 @@ describe('ChartCard', () => {
     expect(headers[0]).toBe('Jahr');
     expect(headers).toContain('2. Säule (Pensionskasse)');
     const lastRow = [...region.querySelectorAll('tbody tr')].at(-1) as HTMLElement;
-    expect(lastRow.querySelector('th[scope="row"]')?.textContent).toBe('2060');
+    expect(lastRow.querySelector('th[scope="row"]')?.textContent).toBe('2060 · Pension');
     expect(lastRow.textContent).toContain('unbekannt');
   });
 

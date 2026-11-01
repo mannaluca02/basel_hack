@@ -1,7 +1,14 @@
 import type { AdvisorContext, InsuranceCaseDto } from '@pax/contracts';
 import { describe, expect, it } from 'vitest';
 import type { EventImpactChart, IncomeTimelineChart, LifeEventsChart, Pillar3aGrowthChart } from '../ui-models';
-import { CHART_IMPACT, CHART_INCOME, CHART_LIFE_EVENTS, CHART_PILLAR3A, projectCase } from './case-projection';
+import {
+  CHART_IMPACT,
+  CHART_INCOME,
+  CHART_LIFE_EVENTS,
+  CHART_PILLAR3A,
+  incomeMilestones,
+  projectCase,
+} from './case-projection';
 // Backend output for the Mueller persona after the standard analyses (synthetic calculator),
 // trimmed to the baseline and retirement runs, one month per year and the 3a estimate.
 import mueller from './mueller-case.testing.json';
@@ -54,6 +61,19 @@ describe('projectCase', () => {
     expect(income.runId).toBe(dto.runs.find((r) => r.timeline)!.id);
   });
 
+  it('picks the bars from the phases: today, last full working year, first full pension year, end', () => {
+    const income = chart<IncomeTimelineChart>(CHART_INCOME);
+    // 2049 is mixed (one partner retired), and 2060 lies past the end of the timeline.
+    expect(income.milestones).toEqual([
+      { year: 2026, kind: 'today' },
+      { year: 2048, kind: 'last_working' },
+      { year: 2050, kind: 'first_pension' },
+      { year: 2059, kind: 'end' },
+    ]);
+    // Every year stays in the chart for the table and the audit trail.
+    expect(income.years).toHaveLength(34);
+  });
+
   it('takes need, benefits and gap per person and event from the baseline run', () => {
     const impact = chart<EventImpactChart>(CHART_IMPACT);
     const disability = impact.scenarios.find(
@@ -98,5 +118,85 @@ describe('projectCase', () => {
     expect(empty.risks).toEqual([]);
     expect(empty.charts.map((c) => c.chartId)).toEqual([CHART_LIFE_EVENTS]);
     expect(projectCase({ ...dto, estimates: [] }, context, 'de', AT).charts.map((c) => c.chartId)).not.toContain(CHART_PILLAR3A);
+  });
+});
+
+describe('incomeMilestones', () => {
+  type Phase = 'working' | 'bridge' | 'pension';
+  /** One period per month from `from` to `to`; `phases(month)` gives each person's phase. */
+  const periods = (from: string, to: string, phases: (month: string) => Phase[]) => {
+    const out: { month: string; persons: { phase: Phase }[] }[] = [];
+    let [year, month] = from.split('-').map(Number) as [number, number];
+    for (;;) {
+      const key = `${year}-${String(month).padStart(2, '0')}`;
+      out.push({ month: key, persons: phases(key).map((phase) => ({ phase })) });
+      if (key === to) return out;
+      [year, month] = month === 12 ? [year + 1, 1] : [year, month + 1];
+    }
+  };
+  const single = (pensionFrom: string, workUntil = pensionFrom) => (month: string): Phase[] => [
+    month < workUntil ? 'working' : month < pensionFrom ? 'bridge' : 'pension',
+  ];
+
+  it('shows five bars for a long timeline and skips the mixed year of the retirement', () => {
+    expect(incomeMilestones(periods('2026-11', '2070-12', single('2051-07')))).toEqual([
+      { year: 2026, kind: 'today' },
+      { year: 2050, kind: 'last_working' },
+      { year: 2052, kind: 'first_pension' },
+      { year: 2062, kind: 'pension_plus_10' },
+      { year: 2070, kind: 'end' },
+    ]);
+  });
+
+  it('keeps a year once when today is also the last working year', () => {
+    expect(incomeMilestones(periods('2026-10', '2045-12', single('2027-01')))).toEqual([
+      { year: 2026, kind: 'today' },
+      { year: 2027, kind: 'first_pension' },
+      { year: 2037, kind: 'pension_plus_10' },
+      { year: 2045, kind: 'end' },
+    ]);
+  });
+
+  it('shows no working bar when the retirement falls into the current year', () => {
+    expect(incomeMilestones(periods('2026-03', '2040-12', single('2026-09'))).map((m) => m.kind)).toEqual([
+      'today',
+      'first_pension',
+      'pension_plus_10',
+      'end',
+    ]);
+  });
+
+  it('never counts the bridge between work and pension as a pension year', () => {
+    const early = incomeMilestones(periods('2026-01', '2075-12', single('2052-01', '2050-01')));
+    expect(early.find((m) => m.kind === 'last_working')?.year).toBe(2049);
+    expect(early.find((m) => m.kind === 'first_pension')?.year).toBe(2052);
+  });
+
+  it('waits until both partners draw a pension', () => {
+    const couple = (month: string): Phase[] => [
+      month < '2049-01' ? 'working' : 'pension',
+      month < '2050-04' ? 'working' : 'pension',
+    ];
+    const bars = incomeMilestones(periods('2026-10', '2070-12', couple));
+    expect(bars.find((m) => m.kind === 'last_working')?.year).toBe(2048);
+    expect(bars.find((m) => m.kind === 'first_pension')?.year).toBe(2051);
+  });
+
+  it('leaves the pension bars out when the timeline ends before a full pension year', () => {
+    expect(incomeMilestones(periods('2026-10', '2040-06', single('2040-03')))).toEqual([
+      { year: 2026, kind: 'today' },
+      { year: 2039, kind: 'last_working' },
+      { year: 2040, kind: 'end' },
+    ]);
+  });
+
+  it('draws ten years after the pension only before the end of the timeline', () => {
+    const bars = incomeMilestones(periods('2026-01', '2061-12', single('2051-01')));
+    expect(bars.map((m) => m.kind)).toEqual(['today', 'last_working', 'first_pension', 'end']);
+    expect(bars.at(-1)?.year).toBe(2061);
+  });
+
+  it('has nothing to pick without periods', () => {
+    expect(incomeMilestones([])).toEqual([]);
   });
 });

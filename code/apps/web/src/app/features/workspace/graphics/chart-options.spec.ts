@@ -5,8 +5,8 @@ import {
   incomeChart,
   pillar3aChart,
 } from '../../../core/advisor/store/case-testing';
-import { EventImpactScenario } from '../../../core/advisor/ui-models';
-import { ChartContext, ChartOption, ChartView, buildChartView } from './chart-options';
+import { EventImpactScenario, MoneySeries } from '../../../core/advisor/ui-models';
+import { ChartContext, ChartOption, ChartView, buildChartView, wrapWords } from './chart-options';
 
 /** Keys, parameters and tokens pass through, so the assertions read what the builder chose. */
 const ctx: ChartContext = {
@@ -18,6 +18,8 @@ const ctx: ChartContext = {
 };
 
 type Series = BarSeriesOption | LineSeriesOption;
+
+const valid = (values: readonly (number | null)[]): MoneySeries => ({ values, status: 'valid' });
 
 function optionOf(view: ChartView): ChartOption & { series: Series[] } {
   if (!view.option) throw new Error('expected an ECharts option');
@@ -74,7 +76,7 @@ describe('buildChartView', () => {
     it('shows unknown as text in the table and a real zero as CHF 0', () => {
       const [first, last] = tableOf(view).rows;
       const pillar2 = tableOf(view).columns.indexOf('graphics.series.pillar2') - 1;
-      expect(first.header).toBe('2030');
+      expect(first.header).toBe('2030 · graphics.milestone.today');
       expect(first.cells[pillar2]).toBe('CHF 0');
       expect(last.cells[pillar2]).toBe('graphics.unknown');
     });
@@ -107,6 +109,71 @@ describe('buildChartView', () => {
 
     it('names the unit with period and basis', () => {
       expect(view.unit).toBe('graphics.unit.year · graphics.basis.gross');
+    });
+
+    describe('reduced to its milestones (FE-31)', () => {
+      // 41 years, one bar per milestone; amounts are the year itself, so a bar shows its source.
+      const years = Array.from({ length: 41 }, (_, i) => 2026 + i);
+      const amounts = years.map((year) => year * 100);
+      const long = incomeChart({
+        years,
+        series: {
+          employment: valid(amounts),
+          pillar1: valid(amounts),
+          pillar2: valid(amounts),
+          pillar3: valid(amounts),
+          gap: valid(amounts),
+        },
+        target: valid(amounts),
+        milestones: [
+          { year: 2026, kind: 'today' },
+          { year: 2050, kind: 'last_working' },
+          { year: 2052, kind: 'first_pension' },
+          { year: 2062, kind: 'pension_plus_10' },
+          { year: 2066, kind: 'end' },
+        ],
+      });
+      const reduced = buildChartView(long, ctx);
+      const axis = () => (optionOf(reduced).xAxis as { data: string[]; axisLabel: object });
+
+      it('draws at most five bars, named by meaning and year, each one readable', () => {
+        expect(axis().data).toEqual([
+          'graphics.milestone.today\n2026',
+          'graphics.milestone.last_working\n2050',
+          'graphics.milestone.first_pension\n2052',
+          'graphics.milestone.pension_plus_10\n2062',
+          'graphics.milestone.end\n2066',
+        ]);
+        expect(axis().axisLabel).toMatchObject({ interval: 0, hideOverlap: false });
+      });
+
+      it('wraps long labels at spaces, so five fit side by side on a phone', () => {
+        expect(wrapWords('Before retiring')).toBe('Before\nretiring');
+        expect(wrapWords('End of plan')).toBe('End of\nplan');
+        expect(wrapWords('+10 Jahre')).toBe('+10\nJahre');
+        expect(wrapWords('Aujourd’hui')).toBe('Aujourd’hui');
+      });
+
+      it('only picks backend values, every part and the target at the same years', () => {
+        const picked = [2026, 2050, 2052, 2062, 2066];
+        for (const id of ['employment', 'pillar1', 'pillar2', 'pillar3', 'gap', 'target']) {
+          expect(byId(reduced, id)?.data).toEqual(picked);
+        }
+      });
+
+      it('keeps every year in the table and names the milestone rows', () => {
+        const rows = tableOf(reduced).rows;
+        expect(rows).toHaveLength(41);
+        expect(rows[0]!.header).toBe('2026 · graphics.milestone.today');
+        expect(rows[1]!.header).toBe('2027');
+        expect(rows[26]!.header).toBe('2052 · graphics.milestone.first_pension');
+      });
+
+      it('falls back to the first and the last year without milestones, never to every year', () => {
+        const bare = buildChartView({ ...long, milestones: [] }, ctx);
+        expect((optionOf(bare).xAxis as { data: string[] }).data).toEqual(['2026', '2066']);
+        expect(byId(bare, 'pillar2')?.data).toEqual([2026, 2066]);
+      });
     });
 
     it('keeps series ids across revisions, so an update merges into the drawn chart', () => {
@@ -152,11 +219,10 @@ describe('buildChartView', () => {
       expect((optionOf(view).yAxis as { max?: unknown }).max).toBeUndefined();
     });
 
-    it('names both columns, while long year axes may thin out their labels', () => {
+    it('names both columns', () => {
       const labelsOf = (view: ChartView) =>
         (optionOf(view).xAxis as { axisLabel: { interval?: number } }).axisLabel;
       expect(labelsOf(buildChartView(impactChart(), ctx)).interval).toBe(0);
-      expect(labelsOf(buildChartView(incomeChart(), ctx)).interval).toBeUndefined();
     });
 
     it('switches to the chosen scenario and clamps a choice that no longer exists', () => {
@@ -209,7 +275,8 @@ describe('buildChartView', () => {
 
     it('marks its year as a band in the charts that have it on their axis', () => {
       const view = buildChartView(incomeChart(), ctx, { scenario: 0, event });
-      expect(optionOf(view).series[0]!.markArea?.data).toEqual([[{ xAxis: '2030' }, { xAxis: '2030' }]]);
+      const bar = 'graphics.milestone.today\n2030';
+      expect(optionOf(view).series[0]!.markArea?.data).toEqual([[{ xAxis: bar }, { xAxis: bar }]]);
       expect(view.legend.at(-1)).toEqual({
         label: 'graphics.selectedEvent{"label":"Eigenheim","year":"2030"}',
         token: '--border-focusring',
@@ -223,6 +290,31 @@ describe('buildChartView', () => {
       expect(view.legend.map((item) => item.label)).not.toContain(
         'graphics.selectedEvent{"label":"Eigenheim","year":"2031"}',
       );
+    });
+
+    it('marks no bar for a year the income chart has but does not draw', () => {
+      const chart = incomeChart({
+        years: [2030, 2045, 2060],
+        series: {
+          employment: valid([1, 2, 3]),
+          pillar1: valid([1, 2, 3]),
+          pillar2: valid([1, 2, 3]),
+          pillar3: valid([1, 2, 3]),
+          gap: valid([1, 2, 3]),
+        },
+        target: valid([1, 2, 3]),
+      });
+      const view = buildChartView(chart, ctx, { scenario: 0, event: { ...event, year: 2045 } });
+      expect(optionOf(view).series[0]!.markArea).toBeUndefined();
+    });
+
+    it('keeps plain years as categories in the 3a chart', () => {
+      const view = buildChartView(pillar3aChart(), ctx, {
+        scenario: 0,
+        event: { ...event, year: pillar3aChart().years[0]! },
+      });
+      const year = String(pillar3aChart().years[0]);
+      expect(optionOf(view).series[0]!.markArea?.data).toEqual([[{ xAxis: year }, { xAxis: year }]]);
     });
   });
 

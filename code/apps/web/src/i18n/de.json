@@ -200,6 +200,13 @@
       "net_after_income_tax": "netto nach Einkommenssteuer",
       "capital": "Kapital"
     },
+    "milestone": {
+      "today": "Heute",
+      "last_working": "Vor Pension",
+      "first_pension": "Pension",
+      "pension_plus_10": "+10 Jahre",
+      "end": "Ende Planung"
+    },
     "series": {
       "employment": "Erwerbseinkommen",
       "pillar1": "1. Säule (AHV/IV)",
