@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {DraftSchema} from '../packages/contracts/dist/index.js';
 import {answerChanges,answerTargets,askText,consequences,openAsks,openKeys,pendingView,validAnswers} from '../apps/api/dist/voice/lab-questions.js';
 import {setupDraft} from '../apps/api/dist/voice/lab-setup.js';
+import {latestExchange} from '../apps/api/dist/voice/exchange.js';
+import {modelObservations} from '../apps/api/dist/voice/lab-intake.js';
+import {answerObservations} from '../apps/api/dist/voice/lab-questions.js';
 import {FakeVoiceGateway} from './helpers/voice-fixture.mjs';
 import {demoApp} from './helpers/demo-http.mjs';
 
@@ -51,13 +54,12 @@ test('every open field is a target, the intake fields too: one the intake extrac
 
 test('the real conversation: 80000 a year confirmed as brutto, 3a 500 a month, a later correction',()=>{
   const d=frame();
-  const said=['Ja, ungefähr achtzigtausend pro Jahr','Ja','Ja, ich zahle fünfhundert pro Monat in die Säule drei A ein'];
-  const got=validAnswers(answerTargets(d),{answers:[
-    {id:'insurance.persons.person_1.grossAnnualIncomeCents',value:'80000',period:'year',quote:'achtzigtausend pro Jahr'},
-    {id:'insurance.existingAnnualPillar3aContributionCents',value:'500',period:'month',quote:'fünfhundert pro Monat'},
-  ]},said);
-  assert.deepEqual(got.map(a=>[a.key,a.value,a.period]),[['insurance.persons.person_1.grossAnnualIncomeCents',8000000,'year'],
-    ['insurance.existingAnnualPillar3aContributionCents',50000,'month']]);
+  const gross=validAnswers(answerTargets(d),{answers:[{id:'insurance.persons.person_1.grossAnnualIncomeCents',value:'80000',period:'year',quote:'achtzigtausend pro Jahr'}]},
+    ['Ja, ungefähr achtzigtausend pro Jahr','Ja']);
+  assert.deepEqual(gross.map(a=>[a.key,a.value,a.period]),[['insurance.persons.person_1.grossAnnualIncomeCents',8000000,'year']]);
+  const pillar3a=validAnswers(answerTargets(d),{answers:[{id:'insurance.existingAnnualPillar3aContributionCents',value:'500',period:'month',quote:'fünfhundert pro Monat'}]},
+    ['Ja','Ja, ich zahle fünfhundert pro Monat in die Säule drei A ein']);
+  assert.deepEqual(pillar3a.map(a=>[a.key,a.value,a.period]),[['insurance.existingAnnualPillar3aContributionCents',50000,'month']]);
 
   // No children, answered: "plane noch drei Kinder ein" changes it, but only when said now.
   const answered=pendingView(d,[{path:'insurance.sharedChildren',value:0}],CASE);
@@ -237,7 +239,7 @@ async function converse(t,intake,values) {
   let accepted,turns=0;
   for(;turns<8;turns++) {
     const turn=await say('person_1');
-    assert.ok(turn.answers,'the open questions are read every turn');
+    assert.ok(turn.answers,`the open questions are read every turn (turn ${turns}): ${JSON.stringify(await asks())}`);
     accepted=await accept();
     if(accepted.profileVersion!==null)break;
   }
@@ -257,3 +259,109 @@ async function converse(t,intake,values) {
   assert.ok(model.requests.some(r=>r.tools[0].name==='submit_answers'));
   return {c,model};
 }
+
+test('an answered amount is known before any confirmation: the net income is not asked again',()=>{
+  const d=pendingView(frame(),[{path:'financial.persons.0.income.value',value:1000000,personId:'person_1'},{path:'financial.persons.0.income.period',value:'month',personId:'person_1'},
+    {path:'financial.persons.0.incomeBasis',value:'net_after_income_tax',personId:'person_1'}],CASE);
+  assert.equal(d.financial.persons[0].income.confirmation,'proposed');
+  assert.ok(!openKeys(d).includes('financial.persons.person_1.income'));
+});
+
+test('answers come from the latest sentence: older sentences belonged to earlier questions',()=>{
+  const targets=answerTargets(frame());
+  const answer=(id,value,quote,period=null)=>({answers:[{id,value,period,quote}]});
+  // "67" was the retirement age two answers ago, "Niedrig" the risk appetite: no planning horizon.
+  assert.deepEqual(validAnswers(targets,answer('insurance.retirementHorizonAge','67','67'),['67','Niedrig','Familie, eigenes Haus und finanziell abgesichert']),[]);
+  // "Sagen wir 1.000" was the housing cost: no safety buffer from a later sentence.
+  assert.deepEqual(validAnswers(targets,answer('financial.safetyBuffer','1000','Sagen wir 1.000','month'),['Sagen wir 1.000','Ja, pro Monat','67']),[]);
+  // A short confirmation completes the sentence before it.
+  assert.deepEqual(validAnswers(targets,answer('insurance.persons.person_1.grossAnnualIncomeCents','80000','ungefähr 80.000','year'),
+    ['Brutto im Jahr ungefähr 80.000, mein Zivilstand ist ledig','Ja, brutto pro Jahr']).map(a=>a.value),[8000000]);
+  // The partner's age and rate may come one after the other.
+  const married=answerTargets(pendingView(frame(),[{path:'insurance.relationship',value:'married'}],CASE));
+  assert.equal(validAnswers(married,{answers:[{id:'partner.age',value:'33',period:null,quote:'sie ist 33'},{id:'partner.employment_rate_percent',value:'60',period:null,quote:'60 Prozent'}]},
+    ['sie ist 33','und arbeitet 60 Prozent']).length,2);
+});
+
+test('a percentage is never an amount: "60 Prozent", "zehn Prozent der Schuld"',()=>{
+  const d=pendingView(frame(),[{path:'insurance.debtsConfirmed',value:true},{path:'insurance.debts_add',value:{id:'debt_consumer',ownerPersonIds:['person_1'],balanceCents:150000000,annualServiceCents:null,kind:'consumer'}}],CASE);
+  const targets=answerTargets(d);
+  assert.deepEqual(validAnswers(targets,{answers:[{id:'insurance.persons.person_1.grossAnnualIncomeCents',value:'60',period:null,quote:'ich arbeite 60 Prozent'}]},['ich arbeite 60 Prozent']),[]);
+  assert.deepEqual(validAnswers(targets,{answers:[{id:'insurance.debts.debt_consumer.annualServiceCents',value:'10',period:null,quote:'Zehn Prozent'}]},['Zehn Prozent']),[]);
+});
+
+test('Paxi learns what a question accepts: a realistic return, a planning horizon, a number of years',()=>{
+  const about=Object.fromEntries(openAsks(frame(),'de').map(a=>[a.key,a.about]));
+  assert.match(about['insurance.annualReturnBps'],/between -5 and 20/);
+  assert.match(about['insurance.retirementHorizonAge'],/never the age to stop working/);
+  assert.deepEqual(validAnswers(answerTargets(frame()),{answers:[{id:'insurance.annualReturnBps',value:'50',period:null,quote:'50 Prozent'}]},['50 Prozent']),[]);
+});
+
+test('live: the intake extraction fills only empty fields; an answered 3a is not overwritten by "20000 more saving"',async t=>{
+  const requests=[];let intakeTurn=0;
+  const transport=async request=>{
+    requests.push(request);
+    const name=request.tools[0].name;
+    let args;
+    if(name==='submit_setup_facts')args={age:{value:'22',quote:'22'},employment_rate_percent:{value:'60',quote:'60 Prozent'}};
+    else if(name==='submit_intake_observations')args={observations:[
+      [{fieldId:'pillar_3a_annual_contribution_chf',quote:'6000 im Jahr',value:'6000',precision:'exact',period:'year',basis:null}],
+      [{fieldId:'pillar_3a_annual_contribution_chf',quote:'zwanzigtausend',value:'20000',precision:'exact',period:'year',basis:null}]][intakeTurn++]??[]};
+    else args={answers:intakeTurn===2?[{id:'insurance.annualSavingCents',value:'20000',period:'year',quote:'zwanzigtausend'}]:[]};
+    return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
+  };
+  const f=await demoApp(t,{demoStart:true,voice:{enabled:true,gateways:[new FakeVoiceGateway()]},modelExtraction:{enabled:true,transport}});
+  const started=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
+  f.customer.csrf=started.body.csrfToken;
+  const path=`/api/cases/${started.body.caseId}`,current=async()=>(await f.customer.call('GET',path)).body;
+  const notice=(await f.customer.call('GET','/api/extraction/privacy?locale=de')).body;
+  let c=await current();
+  await f.customer.call('POST',`${path}/extraction/consent`,{expectedCaseRevision:c.caseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
+  c=await current();
+  const sid=(await f.customer.call('POST',`${path}/voice/sessions`,{messageId:'only_empty',expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',
+    dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=offer'})).body.voiceSession.id;
+  const say=async(text,personId)=>{
+    const latest=await current(),messageId=`turn_${crypto.randomUUID()}`;
+    await f.customer.call('POST',`${path}/voice/sessions/${sid}/turns`,{speaker:'customer',log:{schemaVersion:'1.0',messageId,caseId:latest.id,correlationId:sid,turnId:messageId,
+      source:'voice',locale:'de',text,transcriptStatus:'final',dataClassification:'synthetic'}});
+    const r=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId,...(personId?{personId}:{})});
+    assert.equal(r.status,201,JSON.stringify(r.body));
+    await f.customer.call('POST',`${path}/demo-accept`,{});
+  };
+  await say('Ich bin 22 und arbeite 60 Prozent');
+  await say('In die 3a zahle ich 6000 im Jahr','person_1');
+  assert.equal((await current()).draft.insurance.existingAnnualPillar3aContributionCents,600000);
+  await say('Ähh, zwanzigtausend','person_1');
+  c=await current();
+  assert.equal(c.draft.insurance.existingAnnualPillar3aContributionCents,600000,'the 3a stays');
+  assert.equal(c.draft.insurance.annualSavingCents,2000000,'the additional saving is where it was asked');
+});
+
+const P=text=>({role:'assistant',text}),K=text=>({role:'user',text});
+const log=[P('Wie alt bist du?'),K('22'),P('Mit welchem Alter in Pension?'),K('67'),P('Und deine Risikobereitschaft?'),K('Niedrig'),
+  P('Was möchtest du erreichen?'),K('Ähh,'),K('Familie und ein eigenes Haus')];
+
+test('the recognition reads only the latest exchange: Paxi\'s question and the answer, fragments as one',()=>{
+  assert.deepEqual(latestExchange(log),[P('Was möchtest du erreichen?'),K('Ähh,'),K('Familie und ein eigenes Haus')]);
+  // A bare confirmation takes the exchange it confirms.
+  assert.deepEqual(latestExchange([P('Wie viel verdienst du?'),K('80000 im Jahr'),P('Brutto?'),K('Ja, brutto')]),
+    [P('Wie viel verdienst du?'),K('80000 im Jahr'),P('Brutto?'),K('Ja, brutto')]);
+  assert.deepEqual(latestExchange([P('Wie alt bist du?'),K('22'),P('Pensionsalter?'),K('Mit 67')]),[P('Pensionsalter?'),K('Mit 67')],'a number is an answer of its own');
+  assert.deepEqual(latestExchange(log,2).map(t=>t.text),['Und deine Risikobereitschaft?','Niedrig','Was möchtest du erreichen?','Ähh,','Familie und ein eigenes Haus']);
+  assert.deepEqual(latestExchange([P('Hallo')]),[]);
+});
+
+test('both models get only the latest exchange, not the whole log',async()=>{
+  const seen=[];
+  const transport=async request=>{seen.push(JSON.parse(request.input[0].content).conversation);
+    return {status:'completed',output:[{type:'function_call',name:request.tools[0].name,arguments:request.tools[0].name==='submit_answers'?'{"answers":[]}':'{"observations":[]}'}]};};
+  await modelObservations(transport,log,'m1','person_1',new AbortController().signal);
+  await answerObservations(transport,log,answerTargets(frame()),new AbortController().signal);
+  for(const conversation of seen)assert.deepEqual(conversation.map(t=>t.text),['Was möchtest du erreichen?','Ähh,','Familie und ein eigenes Haus']);
+  // The partner's age and rate may come one exchange after the other.
+  const married=answerTargets(pendingView(frame(),[{path:'insurance.relationship',value:'married'}],CASE));
+  seen.length=0;
+  await answerObservations(transport,[...log,P('Wie alt ist deine Partnerin, und wie viel arbeitet sie?'),K('Sie ist 33'),P('Und das Pensum?'),K('60 Prozent')],married,new AbortController().signal);
+  assert.ok(seen[0].some(t=>t.text==='Sie ist 33'));
+  assert.ok(!seen[0].some(t=>t.text==='22'),'never the whole log');
+});
