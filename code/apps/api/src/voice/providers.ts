@@ -100,6 +100,13 @@ export type VoiceOptions = {
     elevenLabsAgentId?: string;
     liveModel?: string;
     liveVoice?: string;
+    /**
+     * Hosts that restart under a running call (a Cloudflare Durable Object after a deploy or a
+     * move) keep established sessions: the WebRTC call runs between browser and provider, so it
+     * survives the restart. Sessions still starting are interrupted as before. Node keeps the
+     * default (off): there a restart follows an exit and the call is gone.
+     */
+    resumeAfterRestart?: boolean;
 };
 export function gatewaysFor(options: VoiceOptions) {
     if (options.gateways)

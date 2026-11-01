@@ -1,3 +1,4 @@
+import {redactDiagnostic} from '../../api/dist/insurance/http.js';
 import {DurableObject} from 'cloudflare:workers';
 import {handleAsNodeRequest} from 'cloudflare:node';
 import {createLifeInsuranceApp} from '../../api/dist/insurance/app.js';
@@ -17,12 +18,14 @@ interface Env extends StoreSecrets {ASSETS:Fetcher;LIFE: DurableObjectNamespace<
 export class LifeInsuranceObject extends DurableObject<Env> {
   private boot?: Promise<void>;
   private port?: number;
+  /** When this Durable Object instance started, plus a random id: a change on `/api` responses means a restart. */
+  private readonly instance=`${new Date().toISOString()}/${crypto.randomUUID().slice(0,8)}`;
   private runtime?: LifeRuntime;
   private store?: Awaited<ReturnType<typeof durableStore>>;
 
   /** Shared by concurrent requests; a failed boot is cleaned up and retried by the next request or alarm. */
   private ready() {
-    return this.boot??=this.start().catch(error=>{this.boot=undefined;throw error;});
+    return this.boot??=this.start().catch(error=>{console.error(JSON.stringify({event:'do_boot_failed',...failure(error)}));this.boot=undefined;throw error;});
   }
 
   private async start() {
@@ -56,10 +59,12 @@ export class LifeInsuranceObject extends DurableObject<Env> {
   }
 
   async alarm() {
-    await this.ready();
-    await this.runtime!.sweepVoice();await this.runtime!.sweepRetention();
-    // Transactions also arm alarms, including writes from background engine work.
-    await this.store!.arm();
+    try {
+      await this.ready();
+      await this.runtime!.sweepVoice();await this.runtime!.sweepRetention();
+      // Transactions also arm alarms, including writes from background engine work.
+      await this.store!.arm();
+    }catch(error){console.error(JSON.stringify({event:'alarm_failed',...failure(error)}));throw error;}
   }
 
   async fetch(request: Request) {
@@ -67,14 +72,16 @@ export class LifeInsuranceObject extends DurableObject<Env> {
     const headers=new Headers(request.headers);
     headers.set('x-forwarded-proto',new URL(request.url).protocol.slice(0,-1));
     headers.set('host',new URL(request.url).host);
-    return handleAsNodeRequest(this.port!,new Request(request,{headers}));
+    const response=await handleAsNodeRequest(this.port!,new Request(request,{headers}));
+    const marked=new Headers(response.headers);marked.set('X-Pax-Instance',this.instance);
+    return new Response(response.body,{status:response.status,statusText:response.statusText,headers:marked});
   }
 }
 
 export default {
   async fetch(request: Request,env: Env) {
     const path=new URL(request.url).pathname;
-    if(path==='/api'||path.startsWith('/api/'))return env.LIFE.getByName('singleton').fetch(request);
+    if(path==='/api'||path.startsWith('/api/'))return api(request,env,path);
     if(path==='/_products'||path.startsWith('/_products/'))return new Response('Not found',{status:404});
     const response=await env.ASSETS.fetch(request);
     const headers=new Headers(response.headers);
@@ -88,3 +95,22 @@ export default {
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   },
 };
+
+/**
+ * Durable Object console output does not reach `wrangler tail`, so the Worker in front logs API
+ * failures itself: one api_error line from the small JSON error body (code and field names only).
+ */
+async function api(request:Request,env:Env,path:string) {
+  const response=await env.LIFE.getByName('singleton').fetch(request);
+  if(response.status>=400) {
+    const body=await response.clone().json().catch(()=>null) as {code?:unknown;fields?:unknown}|null;
+    const short=path.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,id=>id.slice(0,8));
+    const caseId=short.match(/\/cases\/([^/]+)/)?.[1];
+    (response.status>=500?console.error:console.warn)(JSON.stringify({event:'api_error',method:request.method,path:short,status:response.status,
+      code:typeof body?.code==='string'?body.code:`HTTP_${response.status}`,fields:Array.isArray(body?.fields)?body.fields.filter(f=>typeof f==='string').slice(0,20):[],
+      ...(caseId?{case:caseId}:{})}));
+  }
+  return response;
+}
+
+function failure(error:unknown){return {error:error instanceof Error?error.name:'Error',message:redactDiagnostic(error instanceof Error?error.message:String(error)).slice(0,300)};}

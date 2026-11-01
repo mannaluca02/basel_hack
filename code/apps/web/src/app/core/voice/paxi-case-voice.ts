@@ -1,3 +1,4 @@
+import { diagnosticText, errorCode, httpFailure } from '../http/diagnostics';
 import type { VoiceSessionStartResponse } from '@pax/contracts';
 import { isReplyEmotion, type ReplyEmotion } from './emotions';
 
@@ -63,11 +64,11 @@ export class PaxiCaseVoice {
         void audio.play().catch(()=>{if(active())this.fail('AUDIO_PLAYBACK_BLOCKED');});
       };
       peer.onconnectionstatechange=()=>{
-        if(active()&&['failed','disconnected','closed'].includes(peer.connectionState))this.fail('VOICE_DISCONNECTED');
+        if(active()&&['failed','disconnected','closed'].includes(peer.connectionState)){console.warn('[paxi]',{event:'voice_connection_state',state:peer.connectionState});this.fail('VOICE_DISCONNECTED');}
       };
       const channel=peer.createDataChannel('oai-events');this.channel=channel;
       channel.onmessage=({data})=>{if(active())this.message(data);};
-      channel.onclose=()=>{if(active())this.fail('VOICE_CHANNEL_CLOSED');};
+      channel.onclose=()=>{if(active()){console.warn('[paxi]',{event:'voice_channel_closed'});this.fail('VOICE_CHANNEL_CLOSED');}};
       await peer.setLocalDescription(await peer.createOffer());
       await this.ice(peer);
       if(!active())return;
@@ -81,7 +82,7 @@ export class PaxiCaseVoice {
       await peer.setRemoteDescription({type:'answer',sdp:response.connection.transport.sdp});
       this.timers.push(setTimeout(()=>{if(active()&&channel.readyState!=='open')this.fail('VOICE_CONNECT_TIMEOUT');},20000));
     } catch(error) {
-      if(active())this.fail(error instanceof DOMException?error.name:'VOICE_CONNECT_FAILED');
+      if(active())this.fail(errorCode(error)??(error instanceof DOMException?error.name:'VOICE_CONNECT_FAILED'),httpFailure(error));
     }
   }
 
@@ -119,7 +120,11 @@ export class PaxiCaseVoice {
       this.options.onStatus('connected');this.options.onEvent({type:'activity',state:'listening'});
       this.send({type:'session.commentary.append',delegation_id:null,content:`Introduce yourself briefly as Paxi. This is a synthetic-data demo. ${this.options.opening()} Do not claim to have accepted or confirmed any profile.`});
     } else if(type==='session.closed')this.stop();
-    else if(type==='error')this.fail('VOICE_PROVIDER_ERROR');
+    else if(type==='error'){
+      const source=event['error'] as Record<string,unknown>|undefined;
+      const provider=Object.fromEntries(['type','code','message','param'].filter(key=>typeof source?.[key]==='string').map(key=>[key,diagnosticText(source![key] as string)]));
+      this.fail('VOICE_PROVIDER_ERROR',{provider});
+    }
     else if(type==='decision.event')this.emotion(event);
     else if((type==='session.input_transcript.delta'||type==='session.output_transcript.delta')&&typeof event['delta']==='string') {
       const direction=this.emotionSources[type];
@@ -173,7 +178,7 @@ export class PaxiCaseVoice {
     if(!this.running||this.channel?.readyState!=='open')return;
     this.channel.send(JSON.stringify(payload));this.options.onTrace('send',payload);
   }
-  private fail(code:string):void {this.stop();this.options.onStatus('error',code);}
+  private fail(code:string,details:Record<string,unknown>={}):void {console.warn('[paxi]',{event:'voice_error',code,...details});this.stop();this.options.onStatus('error',code);}
   private async closeRemote(sessionId:string):Promise<void> {
     try {await this.options.close(sessionId);}
     catch {this.options.onTrace('local',{code:'REMOTE_CLOSE_FAILED',localMediaStopped:true});}

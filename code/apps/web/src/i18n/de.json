@@ -511,6 +511,7 @@
     "end": "Gespräch beenden"
   },
   "voice": {
+    "interrupted": "Das Gespräch wurde unterbrochen (Code: {{code}}). Bitte starten Sie es erneut.",
     "start": "Live-Gespräch mit Paxi",
     "stop": "Gespräch beenden",
     "title": "Mit Paxi sprechen",

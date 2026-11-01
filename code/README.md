@@ -192,6 +192,12 @@ Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, K
 
 ## Deploy on Cloudflare
 
+Diagnose (nur lesend): `CLOUDFLARE_ACCOUNT_ID=d4d88ec43765f1f4f61b1f9214b3f721 npm run diagnose -w @pax/worker`.
+Mit `-- --all` werden auch erfolgreiche Requests angezeigt; Ctrl-C beendet den Tail.
+Tail kann unter Last Requests auslassen. Dieselben `api_error`-Zeilen stehen im Cloudflare Dashboard → Workers & Pages → paxi → Observability; dort nach `api_error` suchen und nach `code`/`case` filtern.
+Die Gesprächsfehlermeldung zeigt den Code. In der Browser-Konsole nach `[paxi]` filtern: `api_error` zeigt HTTP-Status und Backend-Code, `voice_error` den Sprachfehler samt ausgewählten Providerdetails; bei `TURN_ROUTING_FAILED` steht der zugrunde liegende HTTP-Fehler unter `http`.
+
+
 Der Worker **`paxi`** liefert Angular mit `live-production` und die Nest-API unter derselben HTTPS-Origin aus: `https://paxi.<subdomain>.workers.dev`. Der Demo-Start ist bewusst ohne Zugangscode offen. Darios separater Voice-Agent wird nicht deployt; Persona und Skills sind für die integrierte Live-Voice gebündelt.
 
 Voraussetzungen: Node 22+, npm, Cloudflare-Konto mit Workers/Durable Objects und workers.dev-Subdomain. Die folgenden Konto- und Deploy-Befehle sind für die spätere Freigabe vorgesehen. Aus `code/` installieren und lokal prüfen:
@@ -242,6 +248,15 @@ npm run tail -w @pax/worker
 ```
 
 Der Build erzeugt Backend, optimiertes Live-Web, Prompts und PDF-Manifest. Provider-Prüfungen melden fehlende Eingaben als übersprungen; das ist kein vollständiger Live-Nachweis. Für einen echten Voice-Setup-Check zusätzlich `VOICE_SDP_FILE` mit einem frischen Browser-SDP-Angebot angeben. Danach auf einem Telefon die öffentliche URL öffnen: Einwilligung erteilen, Mikrofon erlauben, Paxi sprechen hören, eine Berechnung ausführen und Diagramme prüfen. HTTPS von workers.dev ermöglicht den Mikrofonzugriff. Nach Updates alte Tabs schliessen und neu öffnen (Angular Service Worker).
+
+Automatisches Deployment: [`.github/workflows/deploy-cloudflare.yml`](../.github/workflows/deploy-cloudflare.yml) läuft bei jedem Push auf `main` (und manuell über „Run workflow“). Zuerst Backend-Tests, Web-Tests und Worker-Typecheck; nur wenn alle grün sind, folgen `npm run deploy -w @pax/worker` und der automatische Check gegen https://paxi.rushworks.workers.dev. Deployments laufen nacheinander, nie parallel. Einmalig in GitHub unter Settings → Secrets and variables → Actions als Repository-Secrets anlegen:
+
+| Secret | Inhalt |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Vorlage „Edit Cloudflare Workers“, beschränkt auf das Konto rushworks.io |
+| `CLOUDFLARE_ACCOUNT_ID` | Konto-ID von rushworks.io (Dashboard → Workers & Pages, rechte Spalte) |
+
+Die Worker-Secrets (`LIFEMAP_STORE_KEY`, `LOGISMATA_BEARER_TOKEN`, `OPENAI_API_KEY`) bleiben in Cloudflare und überstehen jedes Deployment; die CI sieht sie nie. Manuelle Deployments von einem Rechner brauchen weiterhin `CLOUDFLARE_ACCOUNT_ID` in der Shell, sobald das Login mehrere Konten kennt.
 
 Logs: `tail` mit Ctrl-C beenden; dauerhaft unter Cloudflare Dashboard → Workers & Pages → paxi → Logs/Observability ansehen. [`observability.enabled`](https://developers.cloudflare.com/workers/wrangler/configuration/#observability) ist eingeschaltet. Rollback aus `code/apps/worker`:
 

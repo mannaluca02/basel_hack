@@ -58,6 +58,22 @@ Non-secret defaults live in `wrangler.jsonc`; secrets use `.dev.vars` locally an
 
 Workers logs are enabled via `observability.enabled` ([Cloudflare configuration](https://developers.cloudflare.com/workers/wrangler/configuration/#observability)).
 
+## Diagnose
+
+From `code/`, run:
+
+```sh
+CLOUDFLARE_ACCOUNT_ID=d4d88ec43765f1f4f61b1f9214b3f721 npm run diagnose -w @pax/worker
+# Include successful requests or pass Wrangler filters:
+npm run diagnose -w @pax/worker -- --all --search api_error
+# Parse saved local wrangler-dev console output (or pipe it over stdin):
+npm run diagnose -w @pax/worker -- --stdin < local-worker.log
+```
+
+The command tails read-only; Ctrl-C stops it. It prints API errors, boot/alarm failures, uncaught exceptions and non-ok outcomes. Tail can sample away requests under load. The same structured `api_error` lines are kept in **Cloudflare Dashboard → Workers & Pages → paxi → Observability**; search logs for `api_error`, then filter by `code`, shortened `case` or `session`. Logging is enabled in the Worker and off by default for Node. Console output from inside the Durable Object did not reach `wrangler tail` in production (verified 2026-11-01), so the Worker in front writes the `api_error` line for every `/api` response with status >= 400 from the small JSON error body (code and field names only). The Durable Object's own lines, including 500 details with name, message and first stack frames, may still be visible in Observability.
+
+The live browser message includes the error code. In browser DevTools → Console, filter `[paxi]`: `api_error` has method/path/status/backend code; `voice_error` has the client code and selected provider error details; `TURN_ROUTING_FAILED` also has the underlying HTTP status/code. IDs are shortened and query strings omitted. Logs exclude request bodies, cookies and transcripts; treat exception/provider messages as diagnostic information, not customer data.
+
 ## Accepted demo limitations
 
 One DO serves everyone; this is suitable for a jury, not a horizontally scaled service. The store holds at most 25 cases. At capacity, a new demo start replaces replaceable cases (unreachable first, then oldest), which can end an active visitor's session. `/api/demo/start` is not rate limited. Set provider spending limits before judging. Microphone access requires HTTPS outside localhost; workers.dev provides it. Real provider success and a phone smoke test still need deployed credentials and the public URL.

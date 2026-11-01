@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Body,Controller,Get,Post,Delete,Patch,Param,Query,Req,Res,UseGuards,Inject,Injectable,Module,
   Catch,HttpException,Sse,type CanActivate,type ExecutionContext,type ArgumentsHost,type ExceptionFilter,type DynamicModule,type MessageEvent } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -10,7 +11,7 @@ import { PAX_PRODUCTS } from './products.js';
 import { lifeOpenApi } from './openapi.js';
 import { catalog,complianceSteps,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
 
-type Request={paxHttp?:{publicOrigin?:string;sameOrigin?:boolean};protocol?:string;headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
+type Request={url?:string;paxHttp?:{publicOrigin?:string;sameOrigin?:boolean};protocol?:string;headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
 type Response={setHeader:(key:string,value:string)=>void;status:(code:number)=>Response;json:(value:unknown)=>void;send:(value:unknown)=>void;type:(value:string)=>Response};
 const allowedOrigins=new Set(['http://localhost:4200','http://127.0.0.1:4200','http://localhost:3000','http://127.0.0.1:3000']);
 const requestOrigin=(req:Request)=>`${(req.paxHttp?.sameOrigin?req.headers['x-forwarded-proto']:undefined)??req.protocol??'http'}://${req.headers.host}`;
@@ -40,15 +41,26 @@ export class LifeSessionGuard implements CanActivate {
 }
 @Catch()
 export class SafeLifeErrorFilter implements ExceptionFilter {
+  constructor(private readonly logErrors=false){}
+
   catch(error:unknown,host:ArgumentsHost) {
     const res=host.switchToHttp().getResponse<Response>();
     const req=host.switchToHttp().getRequest<Request>();const locale=localeOf(req.headers['x-locale']??req.headers['accept-language']);
     res.setHeader('Content-Language',locale);
-    if(error instanceof WorkflowError){res.status(error.status).json({code:error.code,fields:error.fields,locale,message:errorText(locale,error.code)});return;}
-    if(error instanceof z.ZodError){res.status(400).json({code:'INVALID_INPUT',fields:error.issues.slice(0,20).map(i=>i.path.map(String).join('.')),locale,message:errorText(locale,'INVALID_INPUT')});return;}
-    const status=error instanceof HttpException?error.getStatus():500;
-    const code=status===413?'PAYLOAD_TOO_LARGE':status===404?'NOT_FOUND':status===400?'INVALID_INPUT':'INTERNAL_ERROR';
-    res.status(status).json({code,locale,message:errorText(locale,code)});
+    const status=error instanceof WorkflowError?error.status:error instanceof z.ZodError?400:error instanceof HttpException?error.getStatus():500;
+    const code=error instanceof WorkflowError?error.code:error instanceof z.ZodError?'INVALID_INPUT':status===413?'PAYLOAD_TOO_LARGE':status===404?'NOT_FOUND':status===400?'INVALID_INPUT':'INTERNAL_ERROR';
+    const fields=error instanceof WorkflowError?error.fields:error instanceof z.ZodError?error.issues.slice(0,20).map(i=>i.path.map(String).join('.')):undefined;
+    if(this.logErrors&&status>=400){
+      const path=(req.url??'').split('?')[0]!.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,id=>id.slice(0,8));
+      const caseId=path.match(/\/cases\/([^/]+)/)?.[1];
+      const session=req.actor?.sessionHash;
+      const bug=status>=500&&!(error instanceof WorkflowError)&&!(error instanceof z.ZodError);
+      const details=bug?{error:error instanceof Error?error.name:'Error',message:redactDiagnostic(error instanceof Error?error.message:String(error)).slice(0,300),
+        stack:error instanceof Error?error.stack?.split('\n').filter(line=>/^\s+at /.test(line)).slice(0,3).map(redactDiagnostic):undefined}:{};
+      (status>=500?console.error:console.warn)(JSON.stringify({event:'api_error',method:req.method,path,status,code,fields:fields??[],
+        ...(caseId?{case:caseId.slice(0,8)}:{}),...(session?{session:createHash('sha256').update(session).digest('hex').slice(0,8)}:{}),...details}));
+    }
+    res.status(status).json({code,...(fields?{fields}:{}),locale,message:errorText(locale,code)});
   }
 }
 
@@ -199,3 +211,6 @@ export class LifeHttpModule {
       {provide:LIFE_RUNTIME,useValue:runtime},{provide:'STORAGE_LIFECYCLE',useValue:{onModuleDestroy:()=>runtime.close()}}]};
   }
 }
+
+/** Keep credentials out of exception messages supplied by libraries. */
+export const redactDiagnostic=(text:string)=>text.replace(/Bearer\s+\S+|(?:sk-|ek_)[A-Za-z0-9_-]+|(?:token|secret|password|authorization|cookie|csrf)[\w-]*["']?\s*[:=]\s*["']?[^\s,;"']+|[A-Za-z0-9_-]{32,}/gi,'[REDACTED]');

@@ -511,6 +511,7 @@
     "end": "End the call"
   },
   "voice": {
+    "interrupted": "The conversation was interrupted (code: {{code}}). Please start it again.",
     "start": "Live conversation with Paxi",
     "stop": "End conversation",
     "title": "Talk to Paxi",

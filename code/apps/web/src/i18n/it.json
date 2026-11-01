@@ -511,6 +511,7 @@
     "end": "Terminare la conversazione"
   },
   "voice": {
+    "interrupted": "La conversazione è stata interrotta (codice: {{code}}). Riavviala.",
     "start": "Conversazione dal vivo con Paxi",
     "stop": "Termina la conversazione",
     "title": "Parla con Paxi",
