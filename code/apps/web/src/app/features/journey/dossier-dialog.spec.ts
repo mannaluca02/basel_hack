@@ -5,16 +5,11 @@ import { CUSTOMER_SESSION_KEY } from '../../core/advisor/api/customer-api';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
 import { DossierDialog } from './dossier-dialog';
+import { polyfillDialog } from '../../core/layout/dialog-testing';
 
 describe('DossierDialog', () => {
   beforeAll(() => {
-    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
-      this.open = true;
-    };
-    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
-      this.open = false;
-      this.dispatchEvent(new Event('close'));
-    };
+    polyfillDialog();
   });
 
   function render() {

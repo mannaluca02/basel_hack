@@ -7,6 +7,7 @@ import { Consent } from '../../core/consent/consent';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
 import { SummarySheet } from '../../core/layout/summary-sheet';
 import { SummaryDialog } from './summary-dialog';
+import { polyfillDialog } from '../../core/layout/dialog-testing';
 
 const money = (amount: number) =>
   ({ currency: 'CHF', unit: 'cent', period: 'year', basis: 'net_after_income_tax', amount }) as const;
@@ -47,14 +48,7 @@ describe('SummaryDialog', () => {
   let source: FakeDataSource;
 
   beforeAll(() => {
-    // jsdom has no modal dialogs; the browser behaviour (focus trap, Esc) is native.
-    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
-      this.open = true;
-    };
-    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
-      this.open = false;
-      this.dispatchEvent(new Event('close'));
-    };
+    polyfillDialog();
   });
 
   function render(summary: SummaryBundle | null) {
