@@ -1,3 +1,4 @@
+import { providerFetch } from '../provider-fetch.js';
 import { z } from 'zod';
 import { VoiceConnectionSchema, type VoiceConnection, type VoiceProvider } from '@pax/contracts';
 import { WorkflowError } from '../insurance/types.js';
@@ -20,10 +21,10 @@ export interface VoiceGateway {
  */
 async function jsonRequest(fetcher: typeof fetch, url: string, init: RequestInit, retry?: (status: number, error: string) => RequestInit | null) {
     try {
-        let r = await fetcher(url, { ...init, redirect: 'error' });
+        let r = await providerFetch(fetcher, url, init);
         if (!r.ok && retry && r.status < 500) {
             const second = retry(r.status, (await r.text()).slice(0, 2000));
-            if (second) r = await fetcher(url, { ...second, redirect: 'error' });
+            if (second) r = await providerFetch(fetcher, url, second);
         }
         if (!r.ok) {
             await r.body?.cancel().catch(() => undefined);
@@ -65,7 +66,7 @@ export class OpenAiLiveGateway implements VoiceGateway {
     }
     async stop(id: string) {
         try {
-            const r = await this.fetcher(`https://api.openai.com/v1/live/sessions/${encodeURIComponent(id)}/hangup`, { method: 'POST', headers: { Authorization: `Bearer ${this.key}` }, redirect: 'error', signal: AbortSignal.timeout(3000) });
+            const r = await providerFetch(this.fetcher, `https://api.openai.com/v1/live/sessions/${encodeURIComponent(id)}/hangup`, { method: 'POST', headers: { Authorization: `Bearer ${this.key}` }, signal: AbortSignal.timeout(3000) });
             if (!r.ok)
                 throw new Error('hangup');
             await r.body?.cancel();

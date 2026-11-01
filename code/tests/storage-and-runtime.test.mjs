@@ -84,7 +84,7 @@ test('the OpenAI transport needs a key, posts the request and turns failures int
   const transport=openAiResponsesTransport('sk-test');
   assert.deepEqual(await transport({model:'m'},new AbortController().signal),{status:'completed',output:[]});
   assert.equal(seen[0].url,'https://api.openai.com/v1/responses');
-  assert.equal(seen[0].init.headers.Authorization,'Bearer sk-test');
+  assert.equal(seen[0].init.headers.get('Authorization'),'Bearer sk-test');
   assert.deepEqual(JSON.parse(seen[0].init.body),{model:'m'});
   globalThis.fetch=async()=>new Response('upstream detail',{status:500});
   await assert.rejects(transport({model:'m'}),e=>e.code==='MODEL_TRANSPORT_FAILED'&&!String(e.message).includes('upstream'));
