@@ -21,11 +21,12 @@ const answer=(key,value,period='once',quote='x')=>({key,value,period,quote});
 
 test('after the setup the open questions follow the conversation order and include the budget',()=>{
   const keys=openKeys(frame());
-  assert.equal(keys[0],'goals');
-  assert.ok(keys.indexOf('insurance.relationship')<keys.indexOf('insurance.persons.person_1.grossAnnualIncomeCents'));
+  // The questions whose "no" settles follow-ups come first: relationship, children, pension fund, debts, private insurance.
+  assert.deepEqual(keys.slice(0,5),['insurance.relationship','insurance.sharedChildren','insurance.persons.person_1.withPillar2',
+    'insurance.debtsConfirmed','insurance.existingPrivateRiskBenefitsConfirmed']);
+  assert.ok(keys.indexOf('insurance.persons.person_1.withPillar2')<keys.indexOf('insurance.persons.person_1.retirementPensionAnnualCents'));
   assert.ok(keys.indexOf('financial.persons.person_1.income')<keys.indexOf('financial.expenses_add.living'));
-  assert.ok(keys.indexOf('financial.assets')<keys.indexOf('insurance.debtsConfirmed'));
-  assert.equal(keys.at(-1),'insurance.riskCapitalStrategy');
+  assert.equal(keys.at(-1),'insurance.relationshipSinceYear');
   for(const key of ['financial.expenses_add.living','financial.expenses_add.tax','financial.expenses_add.provision','financial.expenses_add.reserve',
     'financial.safetyBuffer','financial.assets','financial.expenses.housing'])assert.ok(keys.includes(key),key);
   assert.ok(!keys.includes('financial.expenses_add.debt'),'the debt line follows the debts, it is never asked');
@@ -236,8 +237,8 @@ async function converse(t,intake,values) {
   assert.ok((await say()).result.proposalBatch,'the person');
   await accept();
   const before=await asks();
-  assert.equal(before[0].key,'goals');
-  assert.match(before[0].text,/Familie, Eigenheim oder Pensionierung/);
+  assert.equal(before[0].key,'insurance.relationship','the questions that settle others come first');
+  assert.match(before.find(a=>a.key==='goals').text,/Familie, Eigenheim oder Pensionierung/);
 
   // Each turn answers what is open; partner, children and their details open up turn by turn.
   let accepted,turns=0;
@@ -381,4 +382,91 @@ test('one statement fills one field: the asked one keeps a quote the model also 
   const four=validAnswers(targets,{answers:[{id:'insurance.persons.person_1.pillar2Risk.disabilityAnnualCents',value:'24000',period:'year',quote:'Invalidenrente vierundzwanzigtausend'},
     {id:'insurance.persons.person_1.pillar2Risk.survivorAnnualCents',value:'18000',period:'year',quote:'Partnerrente achtzehntausend'}]},['Invalidenrente vierundzwanzigtausend und Partnerrente achtzehntausend'],'insurance.persons.person_1.pillar2Risk.disabilityAnnualCents');
   assert.equal(four.length,2);
+});
+
+test('the four pension fund risk benefits of a person are one question, and answering it fills all four',()=>{
+  const asks=openAsks(frame(),'de');
+  const risk=asks.filter(a=>a.key.includes('pillar2Risk'));
+  assert.deepEqual(risk.map(a=>a.key),['insurance.persons.person_1.pillar2Risk']);
+  assert.match(risk[0].about,/disability pension.*child.*spouse.*orphan/s);
+  const said=['Invalidenrente vierundzwanzigtausend und Waisenrente viertausendachthundert im Jahr'];
+  const got=validAnswers(answerTargets(frame()),{answers:[
+    {id:'insurance.persons.person_1.pillar2Risk.disabilityAnnualCents',value:'24000',period:'year',quote:'Invalidenrente vierundzwanzigtausend'},
+    {id:'insurance.persons.person_1.pillar2Risk.orphanAnnualCents',value:'4800',period:'year',quote:'Waisenrente viertausendachthundert'}]},said,'insurance.persons.person_1.pillar2Risk');
+  assert.equal(got.length,2);
+});
+
+test('a "no" to the pension fund leaves no pension fund question; no debts leave no debt question',()=>{
+  const d=pendingView(frame(),[{path:'insurance.persons.0.withPillar2',value:false,personId:'person_1'},{path:'insurance.debtsConfirmed',value:true}],CASE);
+  const after=pendingView(d,consequences(d,'voice:test'),CASE);
+  const keys=openKeys(after);
+  assert.ok(!keys.some(k=>/retirementPensionAnnualCents|pillar2Risk|debtPayoffCents|debtTreatment/.test(k)),JSON.stringify(keys));
+});
+
+test('a confirmation confirms the question asked: the sentence before it fills no other field',()=>{
+  const d=pendingView(frame(),[{path:'insurance.relationship',value:'married'},{path:'financial.persons_add',value:{...frame().financial.persons[0],id:'person_2'}},
+    {path:'insurance.persons_add',value:{...frame().insurance.persons[0],personId:'person_2'}},{path:'insurance.persons.0.grossAnnualIncomeCents',value:9500000,personId:'person_1'}],CASE);
+  const said=['Etwa fünfundneunzigtausend.','Ja, brutto im Jahr.'];
+  const partner={answers:[{id:'insurance.persons.person_2.grossAnnualIncomeCents',value:'95000',period:'year',quote:'fünfundneunzigtausend'}]};
+  assert.deepEqual(validAnswers(answerTargets(d),partner,said,'insurance.persons.person_1.grossAnnualIncomeCents'),[]);
+  // Overlapping quotes are one statement: the asked saving keeps it, the 3a gets nothing.
+  const both={answers:[{id:'insurance.existingAnnualPillar3aContributionCents',value:'3000',period:'year',quote:'dreitausend im Jahr'},
+    {id:'insurance.existingAnnualRetirementSavingCents',value:'3000',period:'year',quote:'Bisher sparen wir dreitausend im Jahr für die Pension'}]};
+  assert.deepEqual(validAnswers(answerTargets(frame()),both,['Bisher sparen wir dreitausend im Jahr für die Pension.'],'insurance.existingAnnualRetirementSavingCents').map(a=>a.key),
+    ['insurance.existingAnnualRetirementSavingCents']);
+});
+
+test('a draft path by ids, as the questions name it',async()=>{
+  const {keyOfPath}=await import('../apps/api/dist/voice/lab-questions.js');
+  const d=frame();
+  assert.equal(keyOfPath(d,'insurance.persons.0.grossAnnualIncomeCents'),'insurance.persons.person_1.grossAnnualIncomeCents');
+  assert.equal(keyOfPath(d,'financial.expenses.0.amount.value'),'financial.expenses.housing.amount.value');
+  assert.equal(keyOfPath(d,'insurance.existingAnnualPillar3aContributionCents'),'insurance.existingAnnualPillar3aContributionCents');
+});
+
+test('live: with the question Paxi is on, the intake extraction fills that field only',async t=>{
+  let intakeTurn=0;
+  const transport=async request=>{
+    const name=request.tools[0].name;
+    const args=name==='submit_setup_facts'?{age:{value:'34',quote:'34'},employment_rate_percent:{value:'80',quote:'80 Prozent'}}
+      :name==='submit_intake_observations'?{observations:intakeTurn++===0?[{fieldId:'pillar_3a_annual_contribution_chf',quote:'dreitausend im Jahr',value:'3000',precision:'exact',period:'year',basis:null}]:[]}
+      :{answers:intakeTurn===1?[{id:'insurance.existingAnnualRetirementSavingCents',value:'3000',period:'year',quote:'dreitausend im Jahr'}]:[]};
+    return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
+  };
+  const f=await demoApp(t,{demoStart:true,voice:{enabled:true,gateways:[new FakeVoiceGateway()]},modelExtraction:{enabled:true,transport}});
+  const started=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
+  f.customer.csrf=started.body.csrfToken;
+  const path=`/api/cases/${started.body.caseId}`,current=async()=>(await f.customer.call('GET',path)).body;
+  const notice=(await f.customer.call('GET','/api/extraction/privacy?locale=de')).body;
+  let c=await current();
+  await f.customer.call('POST',`${path}/extraction/consent`,{expectedCaseRevision:c.caseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
+  c=await current();
+  const sid=(await f.customer.call('POST',`${path}/voice/sessions`,{messageId:'asked_only',expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',
+    dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=offer'})).body.voiceSession.id;
+  const say=async(text,extra={})=>{
+    const messageId=`turn_${crypto.randomUUID()}`;
+    await f.customer.call('POST',`${path}/voice/sessions/${sid}/turns`,{speaker:'customer',log:{schemaVersion:'1.0',messageId,caseId:c.id,correlationId:sid,turnId:messageId,
+      source:'voice',locale:'de',text,transcriptStatus:'final',dataClassification:'synthetic'}});
+    const r=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId,...extra});
+    assert.equal(r.status,201,JSON.stringify(r.body));
+    await f.customer.call('POST',`${path}/demo-accept`,{});
+  };
+  await say('Ich bin 34 und arbeite 80 Prozent');
+  await say('Bisher sparen wir dreitausend im Jahr für die Pension.',{personId:'person_1',askedKey:'insurance.existingAnnualRetirementSavingCents'});
+  c=await current();
+  assert.equal(c.draft.insurance.existingAnnualRetirementSavingCents,300000);
+  assert.equal(c.draft.insurance.existingAnnualPillar3aContributionCents,null,'the 3a stays open and is asked');
+});
+
+test('a quote may join verbatim pieces with "…" or a comma, in order; nothing unsaid passes',async()=>{
+  const {spoken}=await import('../apps/api/dist/voice/lab-questions.js');
+  const text='Bei ihm: Invalidenrente achtzehntausend, Kinderrente dreitausendsechshundert, Partnerrente zwölftausend und Waisenrente dreitausendsechshundert im Jahr.';
+  assert.ok(spoken(text,'Invalidenrente achtzehntausend ... im Jahr'));
+  assert.ok(spoken(text,'Invalidenrente achtzehntausend, im Jahr'));
+  assert.ok(spoken(text,'Kinderrente dreitausendsechshundert … im Jahr'));
+  assert.ok(spoken(text,'Waisenrente dreitausendsechshundert im Jahr'));
+  assert.ok(!spoken(text,'Invalidenrente zwanzigtausend'),'unsaid words');
+  assert.ok(!spoken(text,'im Jahr ... Invalidenrente achtzehntausend'),'pieces out of order');
+  assert.ok(!spoken(text,'rente achtzehn'),'only whole words');
+  assert.ok(!spoken(text,' ... '));
 });

@@ -302,6 +302,12 @@ describe('LiveVoice in the live build', () => {
       http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
         mode: 'live', source: { text }, extraction: { adapter: 'model-v1', route: 'x', result: { proposalBatch: null, issues: [] }, answers: { proposalBatch: null, answered: [] } },
       });
+      // Checked and updated after every answer, also one that gave nothing.
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: [], skipped: [], profileVersion: null, runs: [], missing: ['goals'] });
+      await settle();
+      http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: live.caseAsks() });
       await settle();
       steer(live);
     };

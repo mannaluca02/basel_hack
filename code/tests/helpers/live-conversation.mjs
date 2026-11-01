@@ -39,7 +39,8 @@ export const SETUP={say:'Ich bin vierunddreissig und arbeite achtzig Prozent als
 export const SCRIPT=[
   {key:/^goals$/,say:['Ich möchte gut für die Pension vorsorgen und meine Familie absichern.'],
     answers:[['goals','retirement,family','für die Pension vorsorgen und meine Familie absichern']],
-    expect:[['Ziele',d=>d.goals.map(g=>g.kind).sort().join(),'family,retirement']]},
+    // "meine Familie absichern" is family or survivor protection, both fit.
+    expect:[['Ziele: Pension und Familie',d=>d.goals.some(g=>g.kind==='retirement')&&d.goals.some(g=>g.kind==='family'||g.kind==='survivor_protection'),true]]},
   {key:/^insurance\.relationship$/,say:['Ich bin verheiratet.'],answers:[['insurance.relationship','married','verheiratet']],
     expect:[['Zivilstand',d=>d.insurance.relationship,'married']]},
   {key:/^financial\.partner$/,say:['Mein Mann ist dreiunddreissig und arbeitet sechzig Prozent.'],
@@ -63,7 +64,7 @@ export const SCRIPT=[
     expect:[['Pensionskasse',d=>ins(d,'person_1').withPillar2,true]]},
   {key:/^insurance\.persons\.person_1\.retirementPensionAnnualCents$/,say:['Laut Vorsorgeausweis sind es dreissigtausend Franken im Jahr.'],
     answers:[['{key}','30000','dreissigtausend Franken im Jahr','year']],expect:[['PK-Rente',d=>ins(d,'person_1').retirementPensionAnnualCents,3000000]]},
-  {key:/^insurance\.persons\.person_1\.pillar2Risk\./,say:['Invalidenrente vierundzwanzigtausend, Invaliden-Kinderrente viertausendachthundert, Partnerrente achtzehntausend und Waisenrente viertausendachthundert, alles im Jahr.'],
+  {key:/^insurance\.persons\.person_1\.pillar2Risk(\.|$)/,say:['Invalidenrente vierundzwanzigtausend, Invaliden-Kinderrente viertausendachthundert, Partnerrente achtzehntausend und Waisenrente viertausendachthundert, alles im Jahr.'],
     answers:[[`${p1}.pillar2Risk.disabilityAnnualCents`,'24000','Invalidenrente vierundzwanzigtausend','year'],[`${p1}.pillar2Risk.disabilityChildAnnualCents`,'4800','Invaliden-Kinderrente viertausendachthundert','year'],
       [`${p1}.pillar2Risk.survivorAnnualCents`,'18000','Partnerrente achtzehntausend','year'],[`${p1}.pillar2Risk.orphanAnnualCents`,'4800','Waisenrente viertausendachthundert','year']],
     expect:[['PK Invalidenrente',d=>ins(d,'person_1').pillar2Risk.disabilityAnnualCents,2400000],['PK Invaliden-Kinderrente',d=>ins(d,'person_1').pillar2Risk.disabilityChildAnnualCents,480000],
@@ -89,7 +90,7 @@ export const SCRIPT=[
     expect:[['Partner Pensionskasse',d=>ins(d,'person_2')?.withPillar2,true]]},
   {key:/^insurance\.persons\.person_2\.retirementPensionAnnualCents$/,say:['Bei ihm sind es zweiundzwanzigtausend im Jahr.'],answers:[['{key}','22000','zweiundzwanzigtausend im Jahr','year']],
     expect:[['Partner PK-Rente',d=>ins(d,'person_2')?.retirementPensionAnnualCents,2200000]]},
-  {key:/^insurance\.persons\.person_2\.pillar2Risk\./,say:['Bei ihm: Invalidenrente achtzehntausend, Kinderrente dreitausendsechshundert, Partnerrente zwölftausend und Waisenrente dreitausendsechshundert im Jahr.'],
+  {key:/^insurance\.persons\.person_2\.pillar2Risk(\.|$)/,say:['Bei ihm: Invalidenrente achtzehntausend, Kinderrente dreitausendsechshundert, Partnerrente zwölftausend und Waisenrente dreitausendsechshundert im Jahr.'],
     answers:[[`${p2}.pillar2Risk.disabilityAnnualCents`,'18000','Invalidenrente achtzehntausend','year'],[`${p2}.pillar2Risk.disabilityChildAnnualCents`,'3600','Kinderrente dreitausendsechshundert','year'],
       [`${p2}.pillar2Risk.survivorAnnualCents`,'12000','Partnerrente zwölftausend','year'],[`${p2}.pillar2Risk.orphanAnnualCents`,'3600','Waisenrente dreitausendsechshundert','year']],
     expect:[['Partner PK Invalidenrente',d=>ins(d,'person_2')?.pillar2Risk.disabilityAnnualCents,1800000],['Partner PK Partnerrente',d=>ins(d,'person_2')?.pillar2Risk.survivorAnnualCents,1200000]]},

@@ -538,13 +538,15 @@ export class LiveVoice {
       }
       if (epoch !== this.epoch) return;
       this.extracted(result);
-      // Live build: what Paxi heard goes into the case at once (and recalculates once the profile
-      // is complete), so the charts follow the conversation without a button.
-      if (this.liveStart && (result.extraction.result.proposalBatch || result.extraction.answers?.proposalBatch)) {
+      // Live build: after every question and answer, what Paxi heard goes into the case, the case
+      // is checked (complete: confirmed and calculated; a failed calculation is retried) and the
+      // charts and open questions are reloaded, without a button.
+      const proposed = !!(result.extraction.result.proposalBatch || result.extraction.answers?.proposalBatch);
+      if (this.liveStart && (personId || proposed)) {
         await this.acceptLive(epoch);
         // The person now exists: what was said before her (income in the same sentence as the
         // age, say) is extracted again for the intake fields.
-        if (!personId) await this.replaySetupTurns(sid, epoch);
+        if (!personId && proposed) await this.replaySetupTurns(sid, epoch);
         await this.loadAsks(epoch);
       }
       // A profile question still open after its turn counts as one unanswered attempt.

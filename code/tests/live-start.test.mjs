@@ -177,3 +177,18 @@ test('a full store of cases with content still refuses a new one',async t=>{
   assert.equal(r.status,429);
   assert.equal(r.body.code,'CASE_CAPACITY');
 });
+
+test('checked after every answer: a confirmed profile without analyses (the calculator failed) is calculated at the next one',async t=>{
+  const f=await demoApp(t,{voice:{enabled:true,gateways:[new FakeVoiceGateway()]}});
+  const id=f.path.split('/').at(-1);
+  // The persona case is confirmed; drop what the analyses produced, as if the calculator had failed.
+  await f.runtime.store.transaction(db=>{const c=db.cases[id];Object.assign(c,{runs:[],activeRunId:null,latestAnalysisRequestId:null,graphContext:null,reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],comparisons:[],estimates:[],toolRuns:[]});});
+  assert.equal((await f.current()).runs.length,0);
+  const retried=await f.customer.call('POST',`${f.path}/demo-accept`,{});
+  assert.equal(retried.status,201,JSON.stringify(retried.body));
+  assert.ok(retried.body.runs.length>0,'calculated now');
+  // Nothing new: the next check runs nothing again.
+  const again=await f.customer.call('POST',`${f.path}/demo-accept`,{});
+  assert.deepEqual(again.body.runs,[]);
+  assert.equal((await f.current()).runs.length,retried.body.runs.length);
+});
