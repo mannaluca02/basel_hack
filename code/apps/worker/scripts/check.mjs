@@ -19,6 +19,31 @@ function request(path,args=[],status=200) {
   return JSON.parse(raw.slice(0,split));
 }
 try {
+  const page=await fetch(base);
+  assert.equal(page.status,200);
+  const html=await page.text();
+  assert.match(html,/<app-root/);
+  assert.doesNotMatch(html,/<script(?![^>]*\bsrc=)[^>]*>/i,'CSP requires external scripts');
+  assert.match(page.headers.get('content-security-policy'),/frame-ancestors 'none'/);
+  assert.equal(page.headers.get('permissions-policy'),'microphone=(self)');
+  assert.equal(page.headers.get('cache-control'),'no-cache');
+  const deep=await fetch(`${base}/client/deep/route`);
+  assert.equal(deep.status,200);assert.equal(await deep.text(),html);
+  const assets=[...html.matchAll(/(?:src|href)="([^" ]+\.(?:js|css))"/g)].map(match=>match[1]);
+  assert.ok(assets.some(path=>/[-.][A-Z0-9]{8}\.js$/i.test(path)));
+  assert.ok(assets.some(path=>path.endsWith('.css')));
+  for(const path of assets) {
+    const asset=await fetch(new URL(path,base));assert.equal(asset.status,200);
+    assert.ok(!asset.headers.get('content-type')?.includes('text/html'));
+  }
+  for(const path of ['/_products','/_products/missing.pdf',...Object.values(manifest).map(item=>item.path)]) {
+    assert.equal((await fetch(`${base}${path}`)).status,404,path);
+  }
+  const sw=await (await fetch(`${base}/ngsw.json`)).json();
+  assert.equal(sw.dataGroups.length,0);
+  assert.ok(sw.navigationUrls.some(rule=>!rule.positive&&new RegExp(rule.regex).test('/api/cases/id/advisor/events')));
+  assert.ok(Object.keys(sw.hashTable).every(path=>!path.startsWith('/api/')&&!path.startsWith('/_products/')));
+  console.log('SPA: HTML/security headers, deep route, hashed JS/CSS, private PDFs and service-worker exclusions passed');
   assert.equal(request('/api/status').providerMode,'live');
   console.log('GET /api/status: 200, providerMode live');
   const privacy=request('/api/privacy');assert.ok(privacy.purpose);
@@ -58,7 +83,7 @@ try {
   console.log('Repeated start/read: same case ID and context revision');
   const sse=spawnSync('curl',['--silent','--show-error','--no-buffer','--max-time','2','-i','-b',cookies,`${base}/api/cases/${first.caseId}/advisor/events`],{encoding:'utf8'});
   assert.equal(sse.status,28,'SSE must stay open until curl times out');
-  assert.match(sse.stdout,/HTTP\/1\.1 200/);
+  assert.match(sse.stdout,/HTTP\/(?:1\.1|2|3) 200/);
   assert.match(sse.stdout,/Content-Type: text\/event-stream/i);
   assert.match(sse.stdout,/event: advisor.context.updated/);
   const event=JSON.parse(sse.stdout.split('\n').find(line=>line.startsWith('data: ')).slice(6));

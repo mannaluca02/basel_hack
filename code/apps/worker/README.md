@@ -1,3 +1,33 @@
+# Live app on Cloudflare Workers (task D)
+
+From `code/`, `npm run build -w @pax/worker` runs a local Wrangler deploy dry run. Its custom build compiles the backend, runs the web `prebuild` avatar sync and optimized `live-production` Angular build into `apps/worker/assets/`, then regenerates product PDFs into `assets/_products/` and prompt/document manifests into `generated/`. Angular clears the output first; PDFs are copied afterwards. Both generated directories are gitignored. Local `start:live` / `dev:live` keep their development configuration.
+
+All requests run through the Worker: `/api` and `/api/*` go to the existing DO, `/_products` and its descendants return 404, everything else goes to ASSETS with SPA fallback. HTML gets CSP (same-origin scripts, inline styles for Angular; critical-CSS inlining disabled to avoid inline scripts, OpenAI/ElevenLabs voice connections, blob media), microphone permission for self, frame denial, referrer policy and no-cache. Assets get nosniff; service-worker script and manifest get no-cache. No public PDF route exists outside the authenticated API.
+
+Production registers Angular's service worker. Only generated static files are cached; there are no API data groups, and API/PDF paths are explicitly excluded from navigation fallback. Angular checks the manifest on navigation and installs changed hashed assets; an existing open tab keeps its coherent version until all old tabs close and the app is reopened. Reload/reopen after a deployment to use the newly installed version. API/SSE always remain network requests.
+
+Local verification (no login/deploy/account access):
+
+```sh
+cd code
+npm ci --ignore-scripts
+# Copy apps/worker/.dev.vars.example to .dev.vars in the same directory.
+# Replace/remove placeholders; never commit this file.
+npm run build -w @pax/worker
+npm run typecheck -w @pax/worker
+npm run dev -w @pax/worker -- --port 8799
+# In another terminal:
+SPIKE_URL=http://127.0.0.1:8799 npm run check -w @pax/worker
+npm test
+npm --prefix apps/web test -- --watch=false
+```
+
+Required provider secrets: `LOGISMATA_BEARER_TOKEN`, `OPENAI_API_KEY`; optional ElevenLabs: `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`. Without provider secrets, boot/demo work but external calculation/voice success cannot be verified. Non-secret defaults in wrangler.jsonc: `PAX_DEMO_START=1`, `PAX_SYNTHETIC_VOICE_ENABLED=1`, `PAX_SYNTHETIC_EXTRACTION_ENABLED=1`, `LIVE_MODEL=gpt-live-1`, `LIVE_VOICE=juni`, `PAX_PUBLIC_ORIGIN=""` (request origin). Keep same-origin app/API; public phone microphone use requires HTTPS. Additional durable-store configuration belongs to task B and must be reconciled when merging.
+
+Phase 2: account ID **[pending]**, final domain **[pending]**, account secret provisioning and deploy commands **[pending]**. The material below records earlier work and spike limitations, not current static routing.
+
+---
+
 # Worker live boot and assets (task C)
 
 The Worker now uses the shared `liveAppOptions(env)` mapping, real `LiveLogismataProvider`, backend live voice and OpenAI extraction. Persistence, credentials and alarms are described below (durable encrypted DO store). No standalone voice-agent server runs.
@@ -187,3 +217,5 @@ For HTTP/SSE checks, start `npm run dev -w @pax/worker -- --port 8797` separatel
 `tests/durable-store.test.mjs` runs in the root `npm test`: shared envelope authentication, migration defaults, capacity, strict key validation, reopen/credentials, multi-chunk commits/stale deletion, injected mid-transaction failures, queue recovery, clone isolation, closed state, and alarm deadlines/cancellation. The test transpiles only the Worker store with the installed TypeScript compiler and injects transactional fake storage; it does not need Wrangler types or Cloudflare globals at runtime.
 
 Verified locally on Node 24.22.2: root suite 470 tests (469 pass, 1 skip, 0 fail), Worker typecheck and dry-run build pass. Real eviction, production memory/CPU at the 20 MB cap, and enabled voice-provider alarm behavior remain unverified. Whole-database encryption still copies the entire database per write; chunking solves per-value storage limits, not peak memory or throughput.
+
+Task D local verification: backend 461 passed / one skipped; web 487 passed (52 files); Worker typecheck and deploy dry run passed. Extended HTTP checks passed at port 8799 and over tailnet HTTPS, including SPA fallback, JS/CSS, PDF blocking, authenticated PDF hashes, same-origin demo start and SSE. Browser boot reached the consent screen without console errors or failed requests after disabling critical-CSS inlining. Worker bundle: 3773.98 KiB / gzip 773.58 KiB. Generated assets: 6,525,311 bytes (4,994,798 PDF; 1,530,513 web, 62 files). Initial Angular bundle 501.38 kB produces a non-fatal 500 kB budget warning. Real provider success was skipped without secrets. No public deployment or physical-phone microphone test was performed.
