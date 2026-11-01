@@ -1,22 +1,9 @@
-import { AdvisorEvent, emptySnapshot } from '../advisor-data-source';
-import { MOCK_CALL_SCRIPT, MOCK_CASE_ID } from '../mock/mock-call-script';
-import { applyEvent } from '../mock/mock-data-source';
+import { AdvisorEvent } from '../advisor-data-source';
 import { CaseState, applyCaseEvent, applyCaseSnapshot, initialCaseState } from './case-state';
-import { analysis, chart, contextUpdate, event, line, reply, risk, snapshot } from './case-testing';
+import { analysis, chart, contextUpdate, event, line, progress, reply, risk, snapshot } from './case-testing';
 
 function apply(...events: AdvisorEvent[]): CaseState {
   return events.reduce((state, e) => applyCaseEvent(state, e).state, initialCaseState());
-}
-
-function mockEvents(): AdvisorEvent[] {
-  return MOCK_CALL_SCRIPT.map((step, index) =>
-    step.build({
-      language: 'de',
-      locale: 'de-CH',
-      at: '2026-10-31T10:00:00.000Z',
-      messageId: `message_mock_${index + 1}`,
-    }),
-  );
 }
 
 describe('applyCaseEvent: version guard', () => {
@@ -81,13 +68,11 @@ describe('applyCaseEvent: version guard', () => {
     expect(state.data.analysis?.runId).toBe('run_02');
   });
 
-  it('keeps the newer summary and progress', () => {
-    const events = mockEvents();
-    const summaries = events.filter((e) => e.type === 'summary');
-    const progress = events.filter((e) => e.type === 'progress');
-    const state = apply(summaries.at(-1)!, summaries[0], progress.at(-1)!, progress[0]);
-    expect(state.data.summary).toBe(summaries.at(-1)!.payload);
-    expect(state.data.progress).toBe(progress.at(-1)!.payload);
+  it('keeps the newer progress', () => {
+    const newer = progress({ profileVersion: 3 }),
+      older = progress({ profileVersion: 2 });
+    const state = apply(event('progress', newer), event('progress', older));
+    expect(state.data.progress).toBe(newer);
   });
 
   it('drops a reply that answers an older conversation context', () => {
@@ -160,15 +145,6 @@ describe('applyCaseEvent: tab changes', () => {
       { tab: 'chat', id: 'entry_1' },
     ]);
     expect(applyCaseEvent(state, event('reply', reply())).changes).toEqual([]);
-  });
-});
-
-describe('applyCaseEvent: mock call replay', () => {
-  it('accepts every in-order event of the scripted call', () => {
-    const events = mockEvents();
-    const guarded = apply(...events).data;
-    const unguarded = events.reduce(applyEvent, emptySnapshot(MOCK_CASE_ID));
-    expect(guarded).toEqual({ ...unguarded, caseId: '' });
   });
 });
 

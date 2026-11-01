@@ -24,21 +24,10 @@ export interface DemoReviewResult {
   readonly simulated: true;
 }
 
-/** Aggregate funnel signals and NPS for product management; no amounts, no free text. */
-export interface Insights {
-  readonly caseCount: number;
-  readonly currentStageCounts: Readonly<Record<string, number>>;
-  readonly potentialDropoffs: Readonly<Record<string, number>>;
-  readonly dropoffDefinition: string;
-  readonly blockingReasons: Readonly<Record<string, number>>;
-  readonly humanHandover: { readonly requested: number };
-  readonly nps: { readonly responses: number; readonly score: number | null };
-}
-
 /**
  * The backend's journey after the advice: recommendation → (suitability) → demo quote → demo
  * application → submission → Pax review → demo policy in the portal, plus the customer dossier,
- * the product documents and, for the debug configurations, the product insights. Every command carries the case revision and a fresh
+ * the product documents. Every command carries the case revision and a fresh
  * idempotency key; the backend refuses a stale one and the caller reloads.
  */
 @Injectable({ providedIn: 'root' })
@@ -113,10 +102,6 @@ export class JourneyApi {
     });
   }
 
-  /** Demo start only: the reviewer's aggregate, for product management. */
-  insights(): Promise<Insights> {
-    return firstValueFrom(this.http.get<Insights>(`${this.base}/demo/insights`));
-  }
 
   /** The customer's advice dossier as escaped print HTML from the backend. */
   dossierHtml(caseId: string): Promise<string> {

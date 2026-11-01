@@ -116,11 +116,8 @@ export class App {
   /** Paxi shows once the waking "." lands on him. */
   protected readonly revealed = signal(this.consented());
 
-  /**
-   * The review stand needs the real case service; the scripted mock has no packages to decide,
-   * and the demo start comes with an already confirmed case.
-   */
-  protected readonly reviewEnabled = this.env.dataSource === 'api' && !this.env.demoStart;
+  /** The review stand; the demo start comes with an already confirmed case. */
+  protected readonly reviewEnabled = !this.env.demoStart;
 
   /** The tab the router shows; `null` while the URL names no tab (before the first redirect). */
   private readonly activeTab = this.placement.tab;
@@ -150,23 +147,16 @@ export class App {
     this.phase() === 'ready' ? this.placement.spot() : 'centre',
   );
 
-  /** The live voice needs the case service; the scripted mock has no voice sessions. */
-  protected readonly liveVoice = this.env.dataSource === 'api';
-  /**
-   * The call bar drives the scripted call (mock) or Paxi's window (`paxi` configuration); with the
-   * backend otherwise, the live voice's microphone button is the call control.
-   */
-  protected readonly callControls = this.env.dataSource === 'mock' || !!this.env.voiceAgentUrl;
+  /** The call bar drives Paxi's window; otherwise the live voice's microphone button is the call control. */
+  protected readonly callControls = !!this.env.voiceAgentUrl;
   /** "I agree" starts the live voice in the app; not in the `paxi` configuration (own window). */
-  protected readonly autoCall = this.liveVoice && !this.env.voiceAgentUrl;
+  protected readonly autoCall = !this.env.voiceAgentUrl;
   /** "I agree" is about to start the call: no hint meanwhile. */
   private readonly callPending = signal(false);
   /** No call runs and none is about to start (after a reload, or a call ended): say how to start one. */
   protected readonly hint = computed(
     () => this.autoCall && !this.callPending() && this.voice.live() === null,
   );
-  /** Link to the Voice Lab, only in the debug configurations. */
-  protected readonly debugVoice = this.env.debugVoice === true;
 
   constructor() {
     // Tabs stay alive (KeepAliveRouteReuseStrategy), but a detached view loses its scroll

@@ -19,7 +19,7 @@ describe('DossierDialog', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api' } },
       ],
     });
     const fixture = TestBed.createComponent(DossierDialog);

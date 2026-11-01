@@ -32,7 +32,7 @@ Stand: 31.10.2026 · bestätigter Umfang: Valentins gesamter Logik-Backend-Teil.
 | B20 | Mehrsprachigkeit | 191 zentrale Schlüssel DE/FR/IT/EN; wechselbare Locale, Rückfragen, Empfehlungen/Begründungen, Produktbeschreibungen, Status/Disclaimer, Fehler, Datenschutzanzeige und zwei Dossier-Sichten übersetzt | Vier HTTP-Sprachtests und vier Live-Export-/Empfehlungsprüfungen; Finanzhash bleibt stabil. Angular-/Dialog-/Voice-Anschluss bei den zuständigen Teammitgliedern; rechtliche Original-PDFs ausdrücklich als Deutsch gekennzeichnet |
 | B21 | Voice und Avatar | Fallgebundene Kontextabfrage, SSE-Versionen, Vorschläge/Bestätigung, Grafikfakten und Datenaufnahme-Fortschritt | Backend-Anschluss implementiert; STT/TTS, Turn-/Audioabbruch und Avatar-Ring sind Dario/Lukas/Earnies Integration |
 | B22 | Zukunftssimulation | Frei parametrisierbare bestätigte Familien-/Haus-/Ruhestandsvarianten statt statischer Produktführung | Drei Szenariotypen im selben gespeicherten Fall; weitergehende Steuer-/PK-Sonderfälle bleiben sichtbar prüfpflichtig |
-| B23 | NPS und Drop-off-Insights | Ein NPS-Wert je erreichtem Schritt, dedupliziert, ohne Freitext; Reviewer erhält nur Aggregate | Tests für Rolle, Stufe, Duplikat und NPS; Inaktivität ist ausdrücklich nur ein mögliches Abbruchsignal |
+| B23 | NPS und Drop-off-Insights | Nicht umgesetzt: NPS-Umfrage und Insights-Ansicht wurden am 01.11.2026 entfernt | — |
 
 ## LOG-01 bis LOG-07 gegen die Workshop-Abnahme
 
@@ -108,7 +108,7 @@ Die Backend-Anforderungen B13, B14, B21 und B23 sind jetzt auch in der Angular-A
 - **B14 Dokumente und Summary:** Produktdokumente der Offerte als Download (SHA-256-gebunden) mit Lesebestätigung; Beratungsdossier als druckbares HTML.
 - **Eignungsprüfung (Pax-Formular 0054):** Formular für fondsgebundene Produkte vor der Offerte.
 - **B21 Avatar:** Lukas' Renderer im Agent-Dock, gesteuert vom Aktivitätsring und dem Pegel der Live-Voice.
-- **B23 NPS und Abbruch-Insights:** Ansicht `/insights` mit Trichter, möglichen Abbrüchen, NPS und Übergabewünschen (`GET /api/demo/insights`, nur Aggregate), nur in den Debug-Konfigurationen. Die NPS-Umfrage ist nicht Pflicht und weggelassen.
+- **B23 NPS und Abbruch-Insights:** nicht Teil der Abgabe; NPS-Umfrage und Insights-Ansicht sind entfernt.
 
-Nachweis: `code/tests/contract-journey.test.mjs` (HTTP-End-to-End), Angular-Specs unter `features/journey`, und ein Lauf gegen den Live-Rechner bis zur Demo-Police (Dossier, PDF, Insights). Eine Person ohne eigenes Einkommen oder Vermögen erhält für ihre Produkte keine Offerte; die App erklärt das.
+Nachweis: `code/tests/contract-journey.test.mjs` (HTTP-End-to-End), Angular-Specs unter `features/journey`, und ein Lauf gegen den Live-Rechner bis zur Demo-Police (Dossier, PDF). Eine Person ohne eigenes Einkommen oder Vermögen erhält für ihre Produkte keine Offerte; die App erklärt das.
 

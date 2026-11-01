@@ -80,7 +80,7 @@ describe('CustomerReview voice mediation', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'api' },
+          useValue: { apiBaseUrl: '/api' },
         },
       ],
     });

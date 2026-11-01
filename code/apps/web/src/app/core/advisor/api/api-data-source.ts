@@ -18,14 +18,14 @@ type Projection = CaseProjection &
   Pick<AdvisorSnapshot, 'transcript' | 'info' | 'summary'>;
 
 /**
- * The advisor backend behind `dataSource: 'api'`. The backend's only live event says "the case
+ * The advisor backend. The backend's only live event says "the case
  * changed, reload it": this passes it on as a context event, reloads the case and pushes the
  * projected view models as upserts. `CustomerReview` does its own reloading.
  *
  * Besides the case it loads the summaries of the current snapshot (summary sheet, Info tab) and
  * the call history of a linked voice agent and of the app's live voice (Chat tab). Replies stay
  * empty: the backend has no reply route.
- * The same snapshot carries the canonical case for Voice Lab; late former-session reads are ignored.
+ * The same snapshot carries the canonical case; late former-session reads are ignored.
  */
 export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);

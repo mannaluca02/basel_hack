@@ -120,7 +120,7 @@ describe('JourneyView', () => {
         provideRouter([]),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart },
+          useValue: { apiBaseUrl: '/api', demoStart },
         },
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
       ],

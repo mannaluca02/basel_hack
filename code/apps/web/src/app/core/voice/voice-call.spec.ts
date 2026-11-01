@@ -22,7 +22,7 @@ function setup(voiceAgentUrl?: string) {
       { provide: AdvisorDataSource, useValue: source },
       {
         provide: APP_ENVIRONMENT,
-        useValue: { apiBaseUrl: '/api', dataSource: 'api', ...(voiceAgentUrl ? { voiceAgentUrl } : {}) },
+        useValue: { apiBaseUrl: '/api', ...(voiceAgentUrl ? { voiceAgentUrl } : {}) },
       },
     ],
   });

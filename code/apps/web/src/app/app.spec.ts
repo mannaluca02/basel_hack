@@ -6,7 +6,6 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { MOCK_CALL_SCRIPT } from './core/advisor/mock/mock-call-script';
 import { provideAdvisorDataSource } from './core/advisor/provide-advisor-data-source';
 import { CaseStore } from './core/advisor/store/case-store';
 import {
@@ -66,7 +65,7 @@ describe('App', () => {
     expect(root.querySelector('.bar source')?.getAttribute('media')).toBe('(prefers-color-scheme: dark)');
   });
 
-  it('renders one link per workspace tab in the tab bar at the bottom, Graphics first', async () => {
+  it('renders one link per tab in the tab bar at the bottom, Graphics first', async () => {
     const { root } = await renderShell();
     const links = root.querySelectorAll('.tabbar nav a');
 
@@ -75,6 +74,7 @@ describe('App', () => {
       '/risks',
       '/chat',
       '/info',
+      '/journey',
     ]);
   });
 
@@ -356,14 +356,14 @@ describe('App', () => {
     const navLabels = () => Array.from(root.querySelectorAll('nav .label'), (a) => a.textContent);
     const heading = () => root.querySelector('main app-risks-tab h1')?.textContent;
 
-    expect(navLabels()).toEqual(['Grafiken', 'Risiken', 'Chat', 'Info']);
+    expect(navLabels()).toEqual(['Grafiken', 'Risiken', 'Chat', 'Info', 'Abschluss']);
     expect(heading()).toBe('Risiken');
     expect(document.title).toBe('Risiken | Pax Digital Advisor');
 
     await TestBed.inject(AppLanguage).use('fr');
     await fixture.whenStable();
 
-    expect(navLabels()).toEqual(['Graphiques', 'Risques', 'Chat', 'Infos']);
+    expect(navLabels()).toEqual(['Graphiques', 'Risques', 'Chat', 'Infos', 'Contrat']);
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Espace de travail');
     expect(heading()).toBe('Risques');
     expect(document.title).toBe('Risques | Pax Digital Advisor');
@@ -371,7 +371,7 @@ describe('App', () => {
 });
 
 describe('App review stand', () => {
-  async function renderWith(dataSource: 'mock' | 'api') {
+  async function renderWith() {
     localStorage.clear();
     sessionStorage.clear();
     sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
@@ -384,7 +384,7 @@ describe('App review stand', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource },
+          useValue: { apiBaseUrl: '/api' },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),
@@ -396,15 +396,9 @@ describe('App review stand', () => {
   }
 
   it('stays on screen above the tabs against the real backend', async () => {
-    const root = await renderWith('api');
+    const root = await renderWith();
 
     expect(root.querySelector('main app-review-panel + .tab-content > router-outlet')).not.toBeNull();
-  });
-
-  it('is not shown for the scripted demo, which has no case service behind it', async () => {
-    const root = await renderWith('mock');
-
-    expect(root.querySelector('app-review-panel')).toBeNull();
   });
 });
 
@@ -433,14 +427,8 @@ describe('App voice per configuration', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('drives the scripted call from the call bar in the mock', async () => {
-    const root = await renderWith({ dataSource: 'mock' });
-
-    expect(root.querySelector('app-call-controls')).not.toBeNull();
-  });
-
   it('leaves the call to the live voice against the backend, without a call bar', async () => {
-    const root = await renderWith({ dataSource: 'api', demoStart: true });
+    const root = await renderWith({ demoStart: true });
 
     expect(root.querySelector('app-call-controls')).toBeNull();
   });
@@ -449,7 +437,7 @@ describe('App voice per configuration', () => {
     const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
     vi.stubGlobal('navigator', { ...navigator, userAgent: navigator.userAgent, mediaDevices: { getUserMedia } });
     try {
-      await renderWith({ dataSource: 'api', demoStart: true, liveStart: true });
+      await renderWith({ demoStart: true, liveStart: true });
       expect(getUserMedia).toHaveBeenCalledWith({ audio: true });
     } finally {
       vi.unstubAllGlobals();
@@ -460,7 +448,7 @@ describe('App voice per configuration', () => {
     const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
     vi.stubGlobal('navigator', { ...navigator, userAgent: navigator.userAgent, mediaDevices: { getUserMedia } });
     try {
-      await renderWith({ dataSource: 'api', demoStart: true });
+      await renderWith({ demoStart: true });
       expect(getUserMedia).not.toHaveBeenCalled();
     } finally {
       vi.unstubAllGlobals();
@@ -469,7 +457,6 @@ describe('App voice per configuration', () => {
 
   it('shows the call bar for Paxi in its own window in the paxi configuration', async () => {
     const root = await renderWith({
-      dataSource: 'api',
       demoStart: true,
       voiceAgentUrl: 'http://localhost:3100',
     });
@@ -477,26 +464,9 @@ describe('App voice per configuration', () => {
     expect(root.querySelector('app-call-controls')).not.toBeNull();
   });
 
-  it('links the contract journey against the backend, not in the scripted mock', async () => {
-    const api = await renderWith({ dataSource: 'api', demoStart: true });
-    expect(api.querySelector('.tabbar a[href="/journey"]')).not.toBeNull();
-    TestBed.resetTestingModule();
-    const mock = await renderWith({ dataSource: 'mock' });
-    expect(mock.querySelector('.tabbar a[href="/journey"]')).toBeNull();
-  });
-
-  it('links the Voice Lab only in the debug configurations', async () => {
-    const root = await renderWith({ dataSource: 'api', demoStart: true });
-
-    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).toBeNull();
-    expect(root.querySelector('.tabbar a[href="/insights"]')).toBeNull();
-  });
-
-  it('adds the Voice Lab tab to the tab bar with debugVoice', async () => {
-    const root = await renderWith({ dataSource: 'api', demoStart: true, debugVoice: true });
-
-    expect(root.querySelector('.tabbar a[href="/voice-lab"]')).not.toBeNull();
-    expect(root.querySelector('.tabbar a[href="/insights"]')).not.toBeNull();
+  it('links the contract journey', async () => {
+    const root = await renderWith({ demoStart: true });
+    expect(root.querySelector('.tabbar a[href="/journey"]')).not.toBeNull();
   });
 });
 
@@ -513,6 +483,8 @@ describe('App before consent', () => {
       providers: [
         provideRouter(routes),
         { provide: AdvisorDataSource, useValue: source },
+        // The paxi configuration: "I agree" opens no live voice here (Paxi talks in its own window).
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', voiceAgentUrl: 'http://localhost:3100' } },
         provideI18nTesting(),
         provideFakePaxAvatar(),
       ],
@@ -712,7 +684,7 @@ describe('App before consent, with the live voice', () => {
         { provide: AdvisorDataSource, useValue: new FakeDataSource() },
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true },
+          useValue: { apiBaseUrl: '/api', demoStart: true },
         },
         provideI18nTesting(),
         provideFakePaxAvatar(),
@@ -727,88 +699,5 @@ describe('App before consent, with the live voice', () => {
 
     expect(text?.textContent).toContain('Mikrofon und Gespräch gehen an OpenAI');
     expect(text?.textContent).not.toContain('keine echten Daten');
-  });
-});
-
-describe('App during the scripted mock call', () => {
-  beforeAll(async () => {
-    // Lazy tab chunks load on the real clock; the fake one below would run out before they arrive (FE-27).
-    await Promise.all(routes.map((route) => route.loadComponent?.()));
-  });
-
-  beforeEach(async () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    sessionStorage.setItem(CONSENT_STORAGE_KEY, CONSENT_NOTICE_VERSION);
-    // jsdom does not scroll; the Graphics tab scrolls to each new chart.
-    Element.prototype.scrollTo = vi.fn() as Element['scrollTo'];
-    vi.useFakeTimers();
-    TestBed.configureTestingModule({
-      imports: [App],
-      providers: [
-        provideRouter(routes),
-        { provide: RouteReuseStrategy, useClass: KeepAliveRouteReuseStrategy },
-        provideAdvisorDataSource(),
-        {
-          provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'mock' },
-        },
-        provideI18nTesting(),
-        provideFakePaxAvatar(),
-      ],
-    });
-    // The scripted call fills the Graphics tab; ECharts cannot draw in jsdom.
-    stubChartCanvas();
-    await TestBed.compileComponents();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    delete (Element.prototype as Partial<Element>).scrollTo;
-  });
-
-  it('never switches the tab and clears each dot when its tab is shown', async () => {
-    const fixture = TestBed.createComponent(App);
-    const root = fixture.nativeElement as HTMLElement;
-    const router = TestBed.inject(Router);
-    // Angular renders on a timer too, so let the fake clock run in frames until it is stable.
-    const settle = async () => {
-      for (let frame = 0; frame < 50; frame++) {
-        await vi.advanceTimersByTimeAsync(16);
-        if (fixture.isStable()) return;
-      }
-      throw new Error('The app did not settle');
-    };
-    const navigate = async (url: string) => {
-      const done = router.navigateByUrl(url);
-      await settle();
-      await done;
-      await settle();
-    };
-    const marked = () =>
-      Array.from(root.querySelectorAll('.tabbar nav a:has(.dot)'), (a) => a.getAttribute('href'));
-    await navigate('/graphics');
-
-    // The call clock started with the App, which connects right away after consent.
-    const urls = new Set<string>();
-    let played = 0;
-    for (const step of MOCK_CALL_SCRIPT) {
-      await vi.advanceTimersByTimeAsync(step.atMs - played);
-      played = step.atMs;
-      await settle();
-      urls.add(router.url);
-      expect(marked()).not.toContain('/graphics');
-    }
-    await vi.advanceTimersByTimeAsync(1_000);
-    await settle();
-
-    expect([...urls]).toEqual(['/graphics']);
-    expect(marked()).toEqual(['/risks', '/chat', '/info']);
-
-    await navigate('/risks');
-    await navigate('/chat');
-    await navigate('/info');
-    expect(marked()).toEqual([]);
-    expect(TestBed.inject(CaseStore).unread()).toEqual({ graphics: 0, risks: 0, chat: 0, info: 0 });
   });
 });

@@ -14,7 +14,6 @@ import { DraftEstimateService } from './estimates.js';
 import { DemoJourney,type personaDraft } from './demo-journey.js';
 import { SuitabilityService } from './suitability.js';
 import { ProductDocuments } from './documents.js';
-import { PrototypeInsights } from './telemetry.js';
 import { ScenarioComparisonService } from './comparison.js';
 import { AdditionalCalculatorTools } from './tools.js';
 import type { Database } from './types.js';
@@ -67,7 +66,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
     const cleanup=options.internalTimers===false?undefined:setInterval(()=>{void sweepRetention().catch(()=>{});},60_000);cleanup?.unref();
     const estimates=new DraftEstimateService(engine);
     return {sweepRetention,sweepVoice,store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
-      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
+      comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
 export type LifeRuntime=Awaited<ReturnType<typeof createLifeRuntime>>;

@@ -130,9 +130,6 @@ Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundenda
 
 Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
 
-`/demo/insights` liefert im Demo-Start aggregierte Phasen- und Blocker-Signale ohne Finanzbeträge (Debug-Ansicht). Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch.
-
-
 ## Vollständige Tool-Abdeckung und vier Sprachen
 
 Alle 24 Operationen der bereitgestellten APICalc-Spezifikation sind nun im Server-Allowlist-Adapter verfügbar und im erweiterten Live-Test ausgeführt. Die bisherigen 16 bleiben im bestehenden Beratungs-/Schätzweg; die zusätzlichen acht sind gezielte Zusatzwerkzeuge.

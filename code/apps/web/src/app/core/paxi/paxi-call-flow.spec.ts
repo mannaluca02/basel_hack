@@ -57,7 +57,7 @@ describe('Paxi call start after a late sign-in', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api' } },
         { provide: AdvisorDataSource, useClass: ApiDataSource },
       ],
     });

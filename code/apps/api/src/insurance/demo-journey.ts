@@ -138,7 +138,7 @@ export class DemoJourney {
 
   /**
    * Demo start only: the demo reviewer account, for a customer of the demo. Gives the demo the
-   * reviewer's views (simulated specialist review, aggregate insights) without a second sign-in.
+   * reviewer's view (the simulated specialist review) without a second sign-in.
    */
   async reviewer(actor:Actor):Promise<Actor> {
     if(!this.demoStart)throw new WorkflowError('NOT_FOUND',404);

@@ -55,24 +55,7 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.development.ts"
-                }
-              ]
-            },
-            "api": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.api.ts"
-                }
-              ]
+              "sourceMap": true
             },
             "demo": {
               "optimization": false,
@@ -84,38 +67,6 @@
                   "with": "src/environments/environment.demo.ts"
                 }
               ]
-            },
-            "debug": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.debug.ts"
-                },
-                {
-                  "replace": "src/app/debug-routes.ts",
-                  "with": "src/app/debug-routes.voice.ts"
-                }
-              ],
-              "tsConfig": "tsconfig.debug.json"
-            },
-            "debug-lab": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.debug-lab.ts"
-                },
-                {
-                  "replace": "src/app/debug-routes.ts",
-                  "with": "src/app/debug-routes.voice.ts"
-                }
-              ],
-              "tsConfig": "tsconfig.debug.json"
             },
             "paxi": {
               "optimization": false,
@@ -181,23 +132,12 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "development": {
-              "buildTarget": "web:build:development"
-            },
-            "api": {
-              "buildTarget": "web:build:api",
+              "buildTarget": "web:build:development",
               "proxyConfig": "proxy.conf.json"
             },
             "demo": {
               "buildTarget": "web:build:demo",
               "proxyConfig": "proxy.conf.json"
-            },
-            "debug": {
-              "buildTarget": "web:build:debug",
-              "proxyConfig": "proxy.conf.json"
-            },
-            "debug-lab": {
-              "buildTarget": "web:build:debug-lab",
-              "proxyConfig": "proxy.lab.conf.json"
             },
             "paxi": {
               "buildTarget": "web:build:paxi",

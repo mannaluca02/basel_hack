@@ -2,7 +2,6 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { HumanHandoverView } from '@pax/contracts';
 import { filter } from 'rxjs';
-import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { AdvisorDataSource } from '../advisor-data-source';
 import { CustomerApi } from './customer-api';
 import { VoiceAgentLink } from './voice-agent-link';
@@ -14,8 +13,7 @@ const PAX_CONTACT = { organization: 'Pax', displayPhone: '+41 61 277 66 66', pho
  * The always reachable way to a human advisor (FE-10, rule 5). A request is stored in the case;
  * the backend stops voice, AI and graphics work and every channel sees the stop signal. It shows
  * Pax's public contact; nothing dials or books by itself. A button only needs `request()`,
- * `resume()` and `requested()`. Without the case service (mock mode) the request stays in the
- * tab and only shows the contact.
+ * `resume()` and `requested()`.
  */
 @Injectable({ providedIn: 'root' })
 export class HumanAdvisor {
@@ -23,16 +21,12 @@ export class HumanAdvisor {
   private readonly viewState = signal<HumanHandoverView | null>(null);
   private readonly busyState = signal(false);
   private readonly failedState = signal(false);
-  private readonly local = inject(APP_ENVIRONMENT).dataSource !== 'api';
-  private readonly localRequested = signal(false);
   private readonly paxi = inject(VoiceAgentLink);
 
   readonly view = this.viewState.asReadonly();
   readonly busy = this.busyState.asReadonly();
   readonly failed = this.failedState.asReadonly();
-  readonly requested = computed(() =>
-    this.local ? this.localRequested() : this.viewState()?.handover.wantsHumanAdvisor === true,
-  );
+  readonly requested = computed(() => this.viewState()?.handover.wantsHumanAdvisor === true);
   readonly contact = computed(() => this.viewState()?.contact ?? PAX_CONTACT);
 
   constructor() {
@@ -64,10 +58,6 @@ export class HumanAdvisor {
   }
 
   private async command(action: 'request' | 'resume'): Promise<void> {
-    if (this.local) {
-      this.localRequested.set(action === 'request');
-      return;
-    }
     const caseId = this.api.session()?.caseId;
     if (!caseId || this.busyState()) return;
     this.busyState.set(true);

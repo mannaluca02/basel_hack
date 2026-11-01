@@ -103,7 +103,6 @@ export class ProtectedLifeController {
   @Get('cases/:caseId/suitability') suitability(@Req() req:Request,@Param('caseId') id:string){return this.r.suitability.view(req.actor,uuid(id));}
   @Post('cases/:caseId/suitability') checkSuitability(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.suitability.check(req.actor,uuid(id),body);}
   @Post('cases/:caseId/demo-accept') demoAccept(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.demo.acceptPending(req.actor,uuid(id));}
-  @Get('demo/insights') async demoInsights(@Req() req:Request){return this.r.insights.aggregate(await this.r.demo.reviewer(req.actor));}
   @Post('cases/:caseId/demo-review') demoReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.demo.review(req.actor,uuid(id));}
   @Post('cases/:caseId/demo-profile') async demoProfile(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.demo.loadPersona(req.actor,uuid(id),body));}
   @Post('cases/:caseId/standard-analyses') standardAnalyses(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.demo.runStandardAnalyses(req.actor,uuid(id),body);}

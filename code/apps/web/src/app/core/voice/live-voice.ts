@@ -22,7 +22,6 @@ import {
   type TurnExtraction,
 } from './intake-plan';
 import { INTAKE_TEXT } from './intake-text';
-import { LabTrace } from './lab-trace';
 import type { ReplyEmotion } from './emotions';
 import { PaxiCaseVoice } from './paxi-case-voice';
 import { ReportInbox, type ReportCall } from './report-inbox';
@@ -71,7 +70,7 @@ type VoiceAvatarEvent =
   | { type: 'emotion'; emotion: ReplyEmotion };
 
 /**
- * Earnie's live voice over the case backend, shared by the app and the Voice Lab (debug): GPT-Live
+ * Earnie's live voice over the case backend: GPT-Live
  * over WebRTC through `voice/sessions`, every settled turn recorded on the case, every customer
  * turn evaluated by `voice-lab/turns` (model-v1 after the extraction consent). With reports,
  * GPT-Live's background model reads the turn and the turn carries its tool calls; otherwise the
@@ -86,7 +85,6 @@ export class LiveVoice {
   private readonly env = inject(APP_ENVIRONMENT);
   private readonly customer = inject(CustomerApi);
   private readonly store = inject(CaseStore);
-  private readonly trace = inject(LabTrace);
   private readonly api = inject(VoiceLabApi);
   private readonly language = inject(AppLanguage);
   private readonly transloco = inject(TranslocoService);
@@ -102,7 +100,6 @@ export class LiveVoice {
   private reports = false;
   private readonly inbox = new ReportInbox();
 
-  readonly apiMode = this.env.dataSource === 'api';
   /** Live configuration: accepted automatically, no acceptance card. */
   private readonly liveStart = this.env.liveStart === true;
   readonly personId = signal('');
@@ -115,7 +112,6 @@ export class LiveVoice {
   readonly notice = signal('');
   readonly providerAvailable = signal(false);
   readonly extractionNotice = signal<ExtractionNotice | null>(null);
-  readonly promptSkills = signal<readonly PromptSkill[]>([]);
   readonly selectedSkills = signal<readonly string[]>([]);
   readonly promptSettingsReady = signal(false);
   readonly timeBudget = signal(10);
@@ -123,9 +119,6 @@ export class LiveVoice {
   readonly dialogue = signal<readonly DialogueLine[]>([]);
   readonly intake = signal(emptyIntakeMemory);
   readonly evaluating = signal(false);
-  readonly extractionFailed = signal(false);
-  readonly latestExtraction = signal<LiveTurnResult['extraction'] | null>(null);
-  readonly latestSource = signal('');
   /** Live build: what the profile still needs after the intake fields; null until loaded. */
   readonly caseAsks = signal<readonly CaseAsk[] | null>(null);
   private readonly askAttempts = signal<Readonly<Record<string, number>>>({});
@@ -158,7 +151,6 @@ export class LiveVoice {
   readonly signedIn = computed(() => !!this.customer.session());
   readonly caseReady = computed(
     () =>
-      this.apiMode &&
       !!this.customer.session() &&
       this.store.canonical()?.id === this.customer.session()?.caseId,
   );
@@ -249,18 +241,10 @@ export class LiveVoice {
       if (state === 'connected') void this.loadAsks(this.epoch).then(() => this.refreshDelegation(this.epoch));
     },
     onDelegation: (id) => this.inbox.started(id),
-    onReport: (id, calls) => {
-      this.inbox.finished(id, calls);
-      this.trace.add('local', 'GPT-Live background model', { delegation: id, calls: calls.map((call) => call.name) });
-    },
+    onReport: (id, calls) => this.inbox.finished(id, calls),
     onAudio: (stream) => {
       this.audio.set(stream);
       this.ring.audio.set(stream);
-      this.trace.add('local', 'avatar output-energy visualization', {
-        enabled: stream !== null,
-        signal: 'local heuristic',
-        playbackEvidence: false,
-      });
     },
     onEvent: (event) => {
       if (event.type === 'activity') this.voiceActivity.set(event.state);
@@ -268,7 +252,6 @@ export class LiveVoice {
       else this.ring.emotion.set({ emotion: event.emotion, seq: ++this.emotionSeq });
       this.avatarEvents.next(event);
     },
-    onTrace: (direction, payload) => this.trace.add(direction, 'GPT-Live data channel', payload),
     onTurn: (speaker, text, segmentation) => {
       const epoch = this.epoch,
         sid = this.sessionId,
@@ -281,7 +264,6 @@ export class LiveVoice {
           const c = await this.customer.loadCase(this.caseId());
           if (epoch !== this.epoch) return;
           const messageId = `turn_${crypto.randomUUID()}`;
-          this.trace.add('local', 'transcript segmentation', { segmentation, speaker, messageId });
           await this.api.post(`voice/sessions/${sid}/turns`, {
             speaker,
             log: {
@@ -333,7 +315,6 @@ export class LiveVoice {
     this.store.contextUpdates.pipe(takeUntilDestroyed()).subscribe((update) => {
       const session = this.customer.session();
       if (session) this.handoverControl.observe(session, update);
-      this.trace.add('receive', 'SSE advisor.context.updated', update);
     });
     effect(() => {
       const persons = this.persons();
@@ -347,9 +328,6 @@ export class LiveVoice {
       // Clarifications and source quotes belong to the selected speaker, not to the whole case.
       this.personId();
       this.intake.set(emptyIntakeMemory);
-      this.latestExtraction.set(null);
-      this.latestSource.set('');
-      this.extractionFailed.set(false);
     });
     // Fires on projection and on memory changes (rows depends on both); updateContext dedupes by
     // value, so no feedback loop.
@@ -370,10 +348,7 @@ export class LiveVoice {
           this.extractionConsent.set(false);
         }
         this.dialogue.set([]);
-        this.latestExtraction.set(null);
-        this.latestSource.set('');
         this.intake.set(emptyIntakeMemory);
-        this.extractionFailed.set(false);
       }
       previousSession = session;
     });
@@ -386,7 +361,7 @@ export class LiveVoice {
       this.stop();
       this.consent.set(false);
       this.extractionConsent.set(false);
-      if (this.apiMode) void this.loadNotice();
+      void this.loadNotice();
     });
     inject(DestroyRef).onDestroy(() => {
       this.destroyed = true;
@@ -534,7 +509,6 @@ export class LiveVoice {
         ? this.caseAsk()?.key
         : undefined;
     this.evaluating.set(true);
-    this.extractionFailed.set(false);
     const post = () =>
       this.api.post<LiveTurnResult>('voice-lab/turns', {
         mode: 'live',
@@ -564,7 +538,6 @@ export class LiveVoice {
         result = await post();
       }
       if (epoch !== this.epoch) return;
-      this.extracted(result);
       // Live build: after every question and answer, what Paxi heard goes into the case, the case
       // is checked (complete: confirmed and calculated; a failed calculation is retried) and the
       // charts and open questions are reloaded, without a button.
@@ -583,21 +556,15 @@ export class LiveVoice {
         this.askAttempts.update((attempts) => ({ ...attempts, [askedCase]: (attempts[askedCase] ?? 0) + 1 }));
       // A disabled/failing extractor and smalltalk are not answers to a question. In particular,
       // never advance the plan or mark fields skipped on infrastructure errors.
-      if (result.extraction.result.issues?.length) this.extractionFailed.set(true);
-      else if (
-        result.extraction.clarifications?.length ||
-        result.extraction.request?.observations?.length
+      if (
+        !result.extraction.result.issues?.length &&
+        (result.extraction.clarifications?.length || result.extraction.request?.observations?.length)
       )
         this.intake.update((memory) => afterCustomerTurn(memory, asked, result.extraction));
     } catch (error) {
       if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 410))
         throw error;
-      if (epoch !== this.epoch) return;
-      this.trace.add('local', 'voice-lab/turns', {
-        code: 'EXTRACTION_FAILED',
-        conversationContinues: true,
-      });
-      this.extractionFailed.set(true);
+      // The conversation continues; the next turn tries again.
     } finally {
       this.evaluating.set(false);
     }
@@ -629,7 +596,6 @@ export class LiveVoice {
       if (epoch === this.epoch) this.voice.updateDelegation(delegation);
     } catch {
       // The tools stay as they were; the next turn tries again.
-      this.trace.add('local', 'voice-lab/delegation', { code: 'DELEGATION_UNAVAILABLE' });
     }
   }
 
@@ -637,11 +603,9 @@ export class LiveVoice {
   private async acceptLive(epoch: number): Promise<void> {
     if (epoch !== this.epoch) return;
     try {
-      const result = (await this.customer.demoAccept(this.caseId())) as { missing?: string[] };
-      this.trace.add('local', 'demo-accept', result);
+      await this.customer.demoAccept(this.caseId());
     } catch (error) {
       // The conversation goes on; the next proposal tries again.
-      this.trace.add('local', 'demo-accept', { code: 'AUTO_ACCEPT_FAILED' });
       if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 410)) throw error;
     } finally {
       this.store.refresh();
@@ -656,7 +620,6 @@ export class LiveVoice {
       if (epoch === this.epoch) this.caseAsks.set(asks);
     } catch {
       // The last list stays; the next acceptance loads it again.
-      this.trace.add('local', 'voice-lab/questions', { code: 'QUESTIONS_UNAVAILABLE' });
     }
   }
 
@@ -701,17 +664,6 @@ export class LiveVoice {
     return products.length || keyFigures.length ? { products, keyFigures } : null;
   }
 
-  private extracted(result: LiveTurnResult): void {
-    this.extractionFailed.set(false);
-    this.latestExtraction.set(result.extraction);
-    this.latestSource.set(result.source.text);
-    this.trace.add('local', result.extraction.route, {
-      adapter: result.extraction.adapter,
-      request: result.extraction.request,
-      result: result.extraction.result,
-    });
-  }
-
   private append(speaker: DialogueLine['speaker'], text: string): void {
     this.dialogue.update((lines) => [
       ...lines.slice(-39),
@@ -742,7 +694,6 @@ export class LiveVoice {
         skills: PromptSkill[];
         defaultTimeBudgetMinutes: number;
       }>('voice/settings');
-      this.promptSkills.set(settings.skills);
       if (!this.promptSettingsReady()) {
         this.selectedSkills.set(settings.skills.map((skill) => skill.id));
         this.timeBudget.set(settings.defaultTimeBudgetMinutes);

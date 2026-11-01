@@ -4,22 +4,18 @@ Angular 22 mobile-first web app (PWA). Standalone components, signals, strict Ty
 
 Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (Angular 22 engines); the repo `.nvmrc` pins 24 (as CI and `code/package.json` engines).
 
-Live voice runs in the app itself; the Voice Lab is a debug configuration of it, see
-[Live voice and Voice Lab](../../../documentation/baselhack/plans/voice-lab-debugging.md).
+Live voice runs in the app itself, see [Live voice](../../../documentation/live-voice.md).
 
 ```bash
 npm ci
-npm start          # dev server on http://localhost:4200
+npm start          # dev server on http://localhost:4200 against the case service (/api proxied to port 3000), with sign-in and review stand
 npm test           # unit tests (Vitest), add -- --watch=false for a single run
 npm run build      # production build incl. service worker -> dist/web
 npm run check:tokens  # no colour literals outside tokens.css, WCAG AA text contrast in both themes
 npm run check:i18n    # missing/empty/extra keys per language, unknown keys used in src/app
-npm run start:api     # dev server against the real case service, /api proxied to port 3000
-npm run start:demo    # same, but opens on a ready synthetic case: no sign-in, no review stand
-npm run start:debug   # demo start plus the Voice Lab tab (live voice trace)
+npm run start:demo    # opens on a ready synthetic case: no sign-in, no review stand (code: npm run dev:demo)
 npm run start:paxi    # demo start with Dario's Paxi in its own window instead of the live voice (code: npm run dev:paxi)
 npm run start:live    # end to end without test data: a new empty case per start, the voice sets it up (code: npm run dev:live)
-npm run start:debug:lab  # Voice Lab against the isolated lab backend (code: npm run start:voice-lab), port 4300
 ```
 
 It is an npm workspace of `code/` (one lockfile there). The types of `@pax/contracts` come from its build, so run `npm ci && npm run build` in `code/` first.
@@ -38,12 +34,12 @@ It is an npm workspace of `code/` (one lockfile there). The types of `@pax/contr
   - `localeInterceptor` – sends `Accept-Language: <locale>` to `apiBaseUrl` so backend texts come back in the UI language
   - route `title`s are translation keys; specs use `provideI18nTesting()`
 - `src/app/core/config/app-environment.ts` – `APP_ENVIRONMENT` token; inject it instead of importing `environment`
-- `src/environments/` – `apiBaseUrl` and `dataSource` (`mock` | `api`); the development build swaps in `environment.development.ts`
+- `src/environments/` – one file per configuration (`demo`, `paxi`, `live`); `environment.ts` is the plain one with sign-in
 - `src/app/core/advisor/` – the only seam to the advisor backend:
   - `contracts.ts` mirrors the interface contracts I04, I05, I08, I09, I10; `ui-models.ts` holds the UI types without a contract yet (`RiskItem`, `TranscriptEntry`, `InfoItem`, `ChartResult`, agent state)
-  - inject `AdvisorDataSource`: `events` (live upserts), `snapshot()`, `connection`, `connect()` / `disconnect()`. `dataSource: 'mock'` binds `MockDataSource`, which replays a ~3 min synthetic call (`mock/mock-call-script.ts`, DE/EN texts, FR/IT fall back to DE). All amounts are in Rappen and come from the source; the UI never calculates them
+  - inject `AdvisorDataSource`: `events` (live upserts), `snapshot()`, `connection`, `connect()` / `disconnect()`. All amounts are in Rappen and come from the source; the UI never calculates them
   - components read `CaseStore` (`store/case-store.ts`), not the data source: one signal per slice (`charts`, `risks`, `transcript`, `info`, `progress`, `summary`, `agent`, `connection`, …) and `unread()` per tab, reset with `markRead(tab)`. It loads a snapshot on every (re)connect and applies live events on top. The version guard in `store/case-state.ts` drops a late result whose `profileVersion`, `runId`, `scenarioVersionId`, chart `revision` or `contextRevision` is older than the one held for the same item; a known `chartId` updates in place
-- `src/app/core/advisor/api/` and `src/app/features/review/` – the real backend (`dataSource: 'api'`, `npm run start:api`). Backend data uses the types of `@pax/contracts`, only as `import type`, so there is no second contract and nothing extra in the bundle:
+- `src/app/core/advisor/api/` and `src/app/features/review/` – the real backend (`npm start`). Backend data uses the types of `@pax/contracts`, only as `import type`, so there is no second contract and nothing extra in the bundle:
   - `CustomerApi` holds the customer session and the case routes. The session is the backend's HttpOnly cookie; the tab keeps only the CSRF token and the case ID, because every sign-in is a new owner with a new case
   - `ApiDataSource` implements `AdvisorDataSource` over the SSE stream. The only live event says "the case changed"
   - `CustomerReview` reloads the central state after every event, reconnect and mutation. It is also the seam for Dario's voice client, which never holds customer credentials: `open(target, { questionTurnId, questionReplyId })`, `playbackEnded(playbackId)` on the real TTS `ended` only, `answerVoice(voiceLog)` and `cancel('new_question')` before any other question, which resolves to `false` when the question is still open and the conversation must not move on
@@ -58,11 +54,11 @@ The service worker only registers in production builds (`ng build` + a static se
 
 ## Demo start
 
-`npm run dev:demo` in `code/` starts the case backend with `PAX_DEMO_START=1` (live calculator) and this app with `--configuration demo`. On start the app calls `POST /api/demo/start`; the backend signs in a customer itself, loads the Mueller persona, confirms it and calculates the standard scenarios. All visitors share that case while its session lasts, so reloads do not create new cases. The UI is the normal workspace, without sign-in and review stand. `npm run dev:debug` does the same in the debug configuration.
+`npm run dev:demo` in `code/` starts the case backend with `PAX_DEMO_START=1` (live calculator) and this app with `--configuration demo`. On start the app calls `POST /api/demo/start`; the backend signs in a customer itself, loads the Mueller persona, confirms it and calculates the standard scenarios. All visitors share that case while its session lasts, so reloads do not create new cases. The UI is the normal workspace, without sign-in and review stand.
 
 ## Contract journey, documents, NPS
 
-The rail's **Contract** tab (`features/journey`, against the backend only) continues after the advice: recommendation with reasons per product and person → Pax review → quote (no invented premium, product documents to download and acknowledge) → application (the four steps a real contract needs are named, not skipped) → submission → Pax review → demo policy in the customer portal, plus the advice dossier in a dialog (`/dossier`, print HTML). Fund-linked products ask for the suitability pre-check of the Pax form first (`suitability-form.ts`). In the demo start the Pax specialist's steps are simulated by the backend (`POST demo-review`) and labelled as such; elsewhere the case waits for a real reviewer. In the debug configurations (`start:debug`) the rail also links `/insights`: the aggregate funnel, possible drop-offs, NPS and handover requests for product management (demo start, `GET /api/demo/insights`). The agent dock shows Lukas's avatar renderer (`features/paxi/paxi-avatar.ts`), moved by the ring's activity and the live voice's level.
+The rail's **Contract** tab (`features/journey`, against the backend only) continues after the advice: recommendation with reasons per product and person → Pax review → quote (no invented premium, product documents to download and acknowledge) → application (the four steps a real contract needs are named, not skipped) → submission → Pax review → demo policy in the customer portal, plus the advice dossier in a dialog (`/dossier`, print HTML). Fund-linked products ask for the suitability pre-check of the Pax form first (`suitability-form.ts`). In the demo start the Pax specialist's steps are simulated by the backend (`POST demo-review`) and labelled as such; elsewhere the case waits for a real reviewer. The agent dock shows Lukas's avatar renderer (`features/paxi/paxi-avatar.ts`), moved by the ring's activity and the live voice's level.
 
 ## Live voice
 

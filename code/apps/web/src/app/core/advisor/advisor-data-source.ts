@@ -66,9 +66,8 @@ export function emptySnapshot(caseId: string): AdvisorSnapshot {
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 
 /**
- * The single seam between the UI and the advisor backend. `MockDataSource` replays a scripted
- * synthetic call; `ApiDataSource` implements the same class against the backend.
- * Select the implementation with `dataSource` in the environment, see `provideAdvisorDataSource`.
+ * The single seam between the UI and the advisor backend; `ApiDataSource` implements it,
+ * bound by `provideAdvisorDataSource`.
  */
 export abstract class AdvisorDataSource {
   /** Hot stream of live events. Subscribers only see events emitted after they subscribed. */

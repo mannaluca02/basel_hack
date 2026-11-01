@@ -19,7 +19,7 @@ describe('localeInterceptor', () => {
         provideHttpClientTesting(),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl, dataSource: 'api' },
+          useValue: { apiBaseUrl },
         },
       ],
     });

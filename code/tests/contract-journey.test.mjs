@@ -11,7 +11,7 @@ const credentials={customerAccessCode:'demo-customer-key-at-least-32-characters'
 /**
  * End to end, the way the web app's journey (features/journey) drives the backend in the demo
  * start: recommendation, simulated Pax review, quote, application, submission, simulated
- * acceptance, demo policy in the portal; NPS, dossier, documents and insights alongside.
+ * acceptance, demo policy in the portal; dossier and documents alongside.
  */
 async function demo(t,options={demoStart:true}) {
   const directory=await mkdtemp(join(tmpdir(),'pax-contract-journey-'));
@@ -100,18 +100,11 @@ test('demo start: from the recommendation through quote and application to the d
   assert.equal(document.status,200);
   assert.match(document.headers.get('content-type'),/application\/pdf/);
   assert.match(document.headers.get('x-document-sha256'),/^[a-f0-9]{64}$/);
-
-  // Product management: aggregate only.
-  const insights=await f.call('GET','/api/demo/insights');
-  assert.equal(insights.status,200,JSON.stringify(insights.body));
-  assert.equal(insights.body.currentStageCounts.demo_policy,1);
-  assert.equal(insights.body.containsFinancialAmounts,false);
 });
 
-test('the simulated review and the demo insights exist only in the demo start',async t=>{
+test('the simulated review exists only in the demo start',async t=>{
   const f=await demo(t,{demoStart:false});
   const session=await f.signIn();
   assert.equal(session.status,201);
-  assert.equal((await f.call('GET','/api/demo/insights')).status,404);
   assert.equal((await f.call('POST',`/api/cases/${crypto.randomUUID()}/demo-review`,{})).status,404);
 });
