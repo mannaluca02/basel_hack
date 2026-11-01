@@ -1,7 +1,7 @@
 import { createPaxAvatar } from '../code/avatar-prototype/pax-avatar.js';
-import { config } from './config.js?v=live-qr-20261101';
+import { config } from './config.js?v=paxi-numbered-1-2-3';
 import { createConfetti } from './confetti.js';
-import { createPresentationCharacter, createQrCharacter } from './characters.js';
+import { createPresentationCharacter, createQrCharacter } from './characters.js?v=ernest';
 // Old preview parameters never select a different version of the presentation.
 if(location.search) history.replaceState(null,'',location.pathname+location.hash);
 const slides = [...document.querySelectorAll('.slide')];

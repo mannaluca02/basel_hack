@@ -13,7 +13,7 @@ const people = {
   Lukas: { iris: '#7b8547', skin: ['#f0c4ac', '#dda68d', '#c68a73'], hair: '#302622', style: 'short', beard: 'short', beardColor: '#4a342b' },
   Dario: { iris: '#9bcfec', skin: ['#f2c6ac', '#e5ac8b', '#ca896b'], hair: '#30251f', style: 'curly', beard: 'chinstrap', beardColor: '#3b2b22' },
   Valentin: { iris: '#a8d9f1', skin: ['#f4cfb2', '#e6b18e', '#cf9577'], hair: '#9b7145', style: 'swept', beard: 'goatee', beardColor: '#805d3d', glasses: 'bold' },
-  Ernie: { iris: '#795131', skin: ['#ebbd9d', '#dba17e', '#bd8263'], hair: '#31251f', style: 'wave', beard: 'goatee', beardColor: '#54382a', glasses: 'fine' },
+  Ernest: { iris: '#795131', skin: ['#ebbd9d', '#dba17e', '#bd8263'], hair: '#31251f', style: 'wave', beard: 'goatee', beardColor: '#54382a', glasses: 'fine' },
 };
 function smile(group) {
   path(group, 'M88 130 Q100 140 112 130', { fill: 'none', stroke: '#65362d', 'stroke-width': 2.5, 'stroke-linecap': 'round' });
