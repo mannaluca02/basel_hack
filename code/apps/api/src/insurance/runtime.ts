@@ -2,7 +2,7 @@ import {VoiceIntegrationService} from '../voice/service.js';
 import type {VoiceOptions} from '../voice/providers.js';
 import { HumanHandoverService } from './human-handover.js';
 import { fileURLToPath } from 'node:url';
-import { EncryptedCaseStore,type BootstrapCredentials } from './store.js';
+import { EncryptedCaseStore,type CaseStore,type BootstrapCredentials } from './store.js';
 import { SessionService } from './auth.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { DemoJourneyService } from './journey.js';
@@ -12,7 +12,7 @@ import { ExtractionWorkflow } from './extraction.js';
 import { ModelExtractionConsents,type ModelExtractionOptions } from './model-extraction.js';
 import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
-import { DemoJourney } from './demo-journey.js';
+import { DemoJourney,type personaDraft } from './demo-journey.js';
 import { SuitabilityService } from './suitability.js';
 import { ProductDocuments } from './documents.js';
 import { PrototypeInsights } from './telemetry.js';
@@ -22,7 +22,7 @@ import type { Database } from './types.js';
 import { LiveLogismataProvider,ReplayProvider,type CalculationProvider } from '../logismata/client.js';
 
 export const LIFE_RUNTIME=Symbol('LIFE_RUNTIME');
-export type RuntimeOptions={dataDirectory?:string;provider?:CalculationProvider;providerMode?:'live'|'replay'|'test';
+export type RuntimeOptions={personaDraft?:typeof personaDraft;store?:CaseStore;dataDirectory?:string;provider?:CalculationProvider;providerMode?:'live'|'replay'|'test';
   voice?:VoiceOptions;modelExtraction?:ModelExtractionOptions;token?:string;credentials?:BootstrapCredentials;documents?:ProductDocuments;
   /** Opens POST /api/demo/start: a ready demo case without access code. Local demos only. */
   demoStart?:boolean};
@@ -47,7 +47,7 @@ export function sweepExpired(db:Database,now:Date):void {
 export async function createLifeRuntime(options:RuntimeOptions={}) {
   const mode=options.providerMode??'live';
   if(!options.provider&&mode==='live'&&!options.token)throw new Error('LOGISMATA_BEARER_TOKEN is required for live mode');
-  const store=await EncryptedCaseStore.open(options.dataDirectory??fileURLToPath(new URL('../../../../.local/lifemap/',import.meta.url)));
+  const store=options.store??await EncryptedCaseStore.open(options.dataDirectory??fileURLToPath(new URL('../../../../.local/lifemap/',import.meta.url)));
   try {
     const credentials=options.credentials??await store.credentials();
     const sessions=new SessionService(store,credentials);
@@ -64,7 +64,7 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
       if(store.view(db=>hasExpired(db,now)))void store.transaction(db=>sweepExpired(db,now)).catch(()=>{});
     },60_000);cleanup.unref();
     const estimates=new DraftEstimateService(engine);
-    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey),
+    return {store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
       insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }

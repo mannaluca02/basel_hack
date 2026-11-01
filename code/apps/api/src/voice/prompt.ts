@@ -6,10 +6,10 @@ import { INTAKE_FIELDS } from './lab-intake.js';
 
 interface Skill { file:string; name:string; description:string; body:string; }
 interface SkillModule { loadSkills(directory:string):Promise<Skill[]>; skillsPrompt(skills:Skill[]):string; }
-const source = new URL('../../../../voice-agent/', import.meta.url);
 
 /** Use Dario's files and loader directly, so assigned:true stays the single skill configuration. */
 async function sources() {
+  const source = new URL('../../../../voice-agent/', import.meta.url);
   const loader = await import(new URL('skills.mjs', source).href) as SkillModule;
   const [persona,skills] = await Promise.all([
     readFile(new URL('persona.md', source),'utf8'), loader.loadSkills(fileURLToPath(new URL('skills/',source))),
