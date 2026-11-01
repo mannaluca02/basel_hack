@@ -16,6 +16,7 @@
     "test": "npm run build && node --test tests/*.test.mjs",
     "test:coverage": "npm run build && node --test --experimental-test-coverage --test-coverage-include='apps/api/dist/**' --test-coverage-include='packages/*/dist/**' tests/*.test.mjs",
     "test:all": "npm test && npm --prefix voice-agent test && npm --prefix apps/web test -- --watch=false",
+    "check": "npm test && npm --prefix voice-agent test && npm --prefix apps/web run check && npm run typecheck -w @pax/worker",
     "start": "npm run build && node --env-file-if-exists=../.env apps/api/dist/main.js",
     "dev:demo": "node scripts/dev-demo.mjs",
     "dev:paxi": "node scripts/dev-demo.mjs --paxi",

@@ -11,7 +11,7 @@ export function ambiguityDialogue(c:InsuranceCase){
 }
 export const pendingAcceptanceIds=(dialogue:ReturnType<typeof ambiguityDialogue>)=>[...new Set(dialogue.flatMap(a=>a.answerBatchId?[a.answerBatchId]:[]))];
 /** Intake paths can address a person by ID, while draft mutation paths use an index plus the same stable person ID. */
-export function waitingForAnswer(c:InsuranceCase,path:string,dialogue:ReturnType<typeof ambiguityDialogue>){
+export function waitingForAnswer(path:string,dialogue:ReturnType<typeof ambiguityDialogue>){
   const matches=(a:ReturnType<typeof ambiguityDialogue>[number])=>{
     const aliases=[a.path],match=a.path.match(/^(financial|insurance)\.persons\.(\d+)\.(.*)$/);
     if(match&&a.personId)aliases.push(`${match[1]}.persons.${a.personId}.${match[3]}`);

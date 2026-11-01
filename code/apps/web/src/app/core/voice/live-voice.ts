@@ -252,7 +252,7 @@ export class LiveVoice {
       else this.ring.emotion.set({ emotion: event.emotion, seq: ++this.emotionSeq });
       this.avatarEvents.next(event);
     },
-    onTurn: (speaker, text, segmentation) => {
+    onTurn: (speaker, text) => {
       const epoch = this.epoch,
         sid = this.sessionId,
         personId = this.personId();

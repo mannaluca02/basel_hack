@@ -3,8 +3,9 @@
 // 2. Every intended text/background pair meets WCAG AA (4.5:1) in light and dark.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const tokensPath = join(root, 'src/styles/tokens.css');
 // index.html needs literal theme-color values; meta content cannot read CSS variables.
 const allowLiterals = new Set([tokensPath, join(root, 'src/index.html')]);

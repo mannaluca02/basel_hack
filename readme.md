@@ -395,6 +395,7 @@ Run from `code/` after workspace installation. The default backend tests replace
 | Command | Coverage |
 | --- | --- |
 | `npm test` | TypeScript build, contracts, backend logic, HTTP routes and persisted journeys. |
+| `npm run check` | Backend and standalone voice tests, web token/i18n checks, production build and tests, plus Worker typechecking. Install voice-agent dependencies first. |
 | `npm --prefix apps/web test -- --watch=false` | Angular/Vitest tests. |
 | `npm --prefix apps/web run check:tokens` | Design-token usage and WCAG AA text contrast checks. |
 | `npm --prefix apps/web run check:i18n` | Missing, extra, empty and referenced translation keys in DE/FR/IT/EN. |
@@ -405,7 +406,15 @@ Run from `code/` after workspace installation. The default backend tests replace
 | `npm run test:live:conversation` | Synthetic full conversation using the real extraction model; `LIVE_CALCULATOR=1` also uses Logismata. |
 | `npm run check:persistence -w @pax/worker` | Isolated local Worker restart and encrypted-persistence verification; requires Python 3. |
 
-The [requirements matrix](documentation/baselhack/reports/life-insurance-requirements.md) maps challenge requirements to implementation and verification. The [Worker guide](code/apps/worker/README.md) lists build prerequisites and deployed smoke checks.
+Run the complete offline evaluation checks from the repository root:
+
+```sh
+npm --prefix code ci --ignore-scripts
+npm --prefix code/voice-agent ci --ignore-scripts
+npm --prefix code run check
+```
+
+The [Code checks workflow](.github/workflows/checks.yml) runs this command on feature-branch pushes and pull requests without provider credentials. Backend and web TypeScript builds also reject unused declarations and parameters. The [requirements matrix](documentation/baselhack/reports/life-insurance-requirements.md) maps challenge requirements to implementation and verification. The [Worker guide](code/apps/worker/README.md) lists build prerequisites and deployed smoke checks.
 
 ## Deployment
 

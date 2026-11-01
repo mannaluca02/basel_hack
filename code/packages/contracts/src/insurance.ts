@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AmountFieldSchema, CaseSnapshotSchema, Cents, Id, Month, ScenarioSchema } from './financial.js';
+import { CaseSnapshotSchema, Cents, Id, Month, ScenarioSchema } from './financial.js';
 
 export const LocaleSchema = z.enum(['de', 'fr', 'it', 'en']);
 export const GoalSchema = z.object({

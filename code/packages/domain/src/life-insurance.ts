@@ -1,6 +1,6 @@
 import { CaseSnapshotSchema, DraftSchema, RetirementScenarioSchema,
   type InsuranceDraft, type CaseSnapshot, type RetirementScenario, type Issue } from '@pax/contracts';
-import { annual, calculateCapital, calculateBudget, usable } from './index.js';
+import { annual, calculateBudget, usable } from './index.js';
 
 const problem = (code:string,path:string,message:string):Issue => ({code,path,message});
 export function intakeQuestions(input:InsuranceDraft) {

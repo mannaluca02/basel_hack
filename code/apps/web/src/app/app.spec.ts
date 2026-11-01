@@ -6,7 +6,6 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
 import { routes } from './app.routes';
 import { AdvisorDataSource } from './core/advisor/advisor-data-source';
-import { provideAdvisorDataSource } from './core/advisor/provide-advisor-data-source';
 import { CaseStore } from './core/advisor/store/case-store';
 import {
   FakeDataSource,
@@ -23,7 +22,6 @@ import { provideI18nTesting } from './core/i18n/i18n-testing';
 import { AppLanguage } from './core/i18n/language';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
 import { provideFakePaxAvatar } from './features/paxi/paxi-testing';
-import { stubChartCanvas } from './features/workspace/graphics/graphics-testing';
 import { polyfillDialog } from './core/layout/dialog-testing';
 
 describe('App', () => {

@@ -7,8 +7,9 @@
 // 3. Warns (does not fail) about keys in de.json that src/app never mentions.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 const i18nDir = join(root, 'src/i18n');
 const SOURCE = 'de';
 const LANGUAGES = ['de', 'fr', 'it', 'en'];
