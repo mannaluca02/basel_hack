@@ -136,6 +136,13 @@ export class LiveVoice {
   readonly validPerson = computed(() =>
     this.persons().some((person) => person.personId === this.personId()),
   );
+  /**
+   * A live case without test data that has no person yet: the conversation first gives age and
+   * employment rate, the backend proposes the person from them (voice-lab/turns without personId).
+   */
+  readonly setupMode = computed(() => this.caseReady() && this.persons().length === 0);
+  /** Paxi may talk: about a known person, or to set up the first one. */
+  readonly speakable = computed(() => this.validPerson() || this.setupMode());
   readonly handoverControl = new HandoverControl(this.customer.session, () => {
     const c = this.store.canonical();
     return c ? { caseId: c.id, handover: c.handover } : null;
@@ -284,7 +291,8 @@ export class LiveVoice {
     effect(() => {
       const persons = this.persons();
       if (!persons.some((person) => person.personId === this.personId())) {
-        if (this.active()) this.stop();
+        // A person that disappeared ends the call; the first one appearing (setup) continues it.
+        if (this.active() && this.personId() !== '') this.stop();
         this.personId.set(persons[0]?.personId ?? '');
       }
     });
@@ -300,7 +308,9 @@ export class LiveVoice {
     // value, so no feedback loop.
     effect(() => {
       const rows = this.rows();
-      if (this.state() === 'connected' && rows.length) this.voice.updateContext(this.steer(rows));
+      if (this.state() !== 'connected') return;
+      if (this.setupMode()) this.voice.updateContext(this.setupSteering());
+      else if (rows.length) this.voice.updateContext(this.steer(rows));
     });
     let previousSession = this.customer.session();
     effect(() => {
@@ -466,7 +476,8 @@ export class LiveVoice {
         mode: 'live',
         voiceSessionId: sid,
         messageId,
-        personId,
+        // Without a person yet, the backend sets up the case frame from the conversation.
+        ...(personId ? { personId } : {}),
       });
     try {
       let result: LiveTurnResult;
@@ -514,6 +525,11 @@ export class LiveVoice {
   }
 
   /** The short clarification names gross and year, so it only fits income; other fields repeat their own question. */
+  /** Until the case knows the person: age and employment rate first, naturally, no form. */
+  private setupSteering() {
+    return { setup: true, nextQuestion: this.transloco.translate('voice.setup.question'), neverAskAgain: [] };
+  }
+
   private steer(rows: IntakeRow[]) {
     return steeringContext(
       rows,

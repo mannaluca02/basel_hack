@@ -21,7 +21,8 @@ export const DEMO_PERSONAS={
 export type DemoPersonaId=keyof typeof DEMO_PERSONAS;
 
 export const LoadPersonaSchema=z.object({persona:z.enum(Object.keys(DEMO_PERSONAS) as [DemoPersonaId]),expectedCaseRevision:z.number().int().positive()}).strict();
-export const DemoStartSchema=z.object({locale:z.enum(['de','fr','it','en']).default('de'),fresh:z.boolean().default(false)}).strict();
+/** `empty`: the live configuration's start, a new case without the Mueller persona (no test data). */
+export const DemoStartSchema=z.object({locale:z.enum(['de','fr','it','en']).default('de'),fresh:z.boolean().default(false),empty:z.boolean().default(false)}).strict();
 export const StandardAnalysesSchema=z.object({expectedProfileVersion:z.number().int().positive()}).strict();
 
 export async function personaDraft(id:DemoPersonaId,today=new Date()):Promise<InsuranceDraft> {
@@ -99,6 +100,8 @@ export class DemoJourney {
   async start(input:unknown):Promise<DemoSession> {
     if(!this.demoStart)throw new WorkflowError('NOT_FOUND',404);
     const body=DemoStartSchema.parse(input??{});
+    // Every live start is its own empty case; only the persona demo shares one.
+    if(body.empty)return this.prepareEmpty(body.locale);
     const reusable=this.current&&!body.fresh?await this.current.catch(()=>null):null;
     if(reusable&&this.valid(reusable))return reusable;
     this.current=this.prepare(body.locale);
@@ -196,8 +199,15 @@ export class DemoJourney {
     }
     let c=this.engine.caseFor(actor,caseId);
     if(!c.draftDirty)return {accepted,skipped,profileVersion:c.confirmedVersions.at(-1)?.version??null,runs:[]};
-    await this.engine.confirm(actor,caseId,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,
-      allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
+    try{
+      await this.engine.confirm(actor,caseId,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,
+        allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
+    }catch(error){
+      // A case still being filled by the conversation (live start) cannot be confirmed yet: the
+      // accepted packages stay in the draft, and the answer names what is still missing.
+      if(!(error instanceof WorkflowError)||!['NEEDS_INPUT','DEBT_SERVICE_MISMATCH'].includes(error.code))throw error;
+      return {accepted,skipped,profileVersion:c.confirmedVersions.at(-1)?.version??null,runs:[],missing:error.fields};
+    }
     c=this.engine.caseFor(actor,caseId);
     const profileVersion=c.confirmedVersions.at(-1)!.version;
     const {runs}=await this.runStandardAnalyses(actor,caseId,{expectedProfileVersion:profileVersion});
@@ -218,6 +228,15 @@ export class DemoJourney {
     c=await this.loadPersona(actor,c.id,{persona:'mueller',expectedCaseRevision:c.caseRevision});
     await this.engine.confirm(actor,c.id,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});
     await this.runStandardAnalyses(actor,c.id,{expectedProfileVersion:1});
+    return {sessionToken:login.sessionToken,csrfToken:login.csrfToken,expiresAt:login.expiresAt,caseId:c.id};
+  }
+
+  /** A customer session with a new, empty case: no persona, no analyses. The conversation fills it. */
+  private async prepareEmpty(locale:'de'|'fr'|'it'|'en'):Promise<DemoSession> {
+    const {sessions,credentials}=this.demoStart!;
+    const login=await sessions.login(credentials.customerAccessCode,'live-start');
+    const actor=sessions.authenticate(login.sessionToken);
+    const c=await this.engine.createCase(actor,{locale,timeBudgetMinutes:30,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
     return {sessionToken:login.sessionToken,csrfToken:login.csrfToken,expiresAt:login.expiresAt,caseId:c.id};
   }
 

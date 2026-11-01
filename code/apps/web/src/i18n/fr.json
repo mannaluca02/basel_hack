@@ -513,7 +513,10 @@
     "pending": "Paxi a entendu de nouvelles informations.",
     "accept": "Reprendre et recalculer",
     "accepting": "Reprise en cours …",
-    "acceptFailed": "La reprise n’a pas fonctionné. Veuillez réessayer."
+    "acceptFailed": "La reprise n’a pas fonctionné. Veuillez réessayer.",
+    "setup": {
+      "question": "Demande d’abord naturellement à la personne son âge et son taux d’activité (en pour cent), avant de parler de montants."
+    }
   },
   "journey": {
     "title": "Contrat",

@@ -1,11 +1,11 @@
-import { Injector, signal } from '@angular/core';
+import { Injector, computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import type { LiveVoice } from '../voice/live-voice';
 import { startPaxiWhenReady } from './paxi-call';
 
 describe('startPaxiWhenReady', () => {
   function fakeLive() {
-    return {
+    const live = {
       active: signal(false),
       handoverActive: signal(false),
       signedIn: signal(true),
@@ -16,6 +16,7 @@ describe('startPaxiWhenReady', () => {
       extractionConsent: signal(false),
       start: vi.fn(() => Promise.resolve()),
     };
+    return { ...live, speakable: computed(() => live.validPerson()) };
   }
 
   function watch(live: ReturnType<typeof fakeLive>) {

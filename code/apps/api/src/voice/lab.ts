@@ -8,10 +8,14 @@ import { loadDemoSnapshot } from '../demo/fixtures.js';
 import { mapVoiceObservations } from './portfolio.js';
 import { parseExactAnnualGrossIncome } from './exact-income.js';
 import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, modelObservations, scriptObservation } from './lab-intake.js';
+import { setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
+import type { ResponsesTransport } from '../erni-dialog/responses.js';
+type JsonValue = Parameters<typeof JSON.stringify>[0];
 
 const TurnSchema = z.discriminatedUnion('mode', [
   z.object({mode:z.literal('synthetic'),sample:z.enum(['income','correction','smalltalk',...INTAKE_SAMPLE_IDS]),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
-  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
+  // Without personId only while the case has no person yet: the conversation then sets up the case frame.
+  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional()}).strict(),
 ]);
 const samples = {
   de:{income:'Mein Bruttojahreseinkommen beträgt 119000 CHF.',correction:'Korrektur: Mein Bruttojahreseinkommen beträgt 118000 CHF.',smalltalk:'Guten Morgen!'},
@@ -78,28 +82,31 @@ export class VoiceLabController {
         // Even a rapid stop/resume must invalidate work begun before the handover.
         if(ctx.handover.revision!==c.handover.revision)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
         if(ctx.locale!==c.locale)throw new WorkflowError('STALE_CONTEXT');
-        if(!ctx.personIds.includes(b.personId))throw new WorkflowError('PERSON_REFERENCE_MISMATCH',422);
+        if(b.personId===undefined?ctx.personIds.length>0:!ctx.personIds.includes(b.personId))throw new WorkflowError('PERSON_REFERENCE_MISMATCH',422);
         return ctx;
       };
       let ctx=read();
-      const source={messageId:`lab_${b.messageId}`,turnId:turn?.log.turnId??b.messageId,sourceRef:b.mode==='synthetic'?`synthetic:voice-lab:${b.sample}:${b.personId}`:`voice:${b.mode==='live'?b.voiceSessionId:''}:${b.messageId}:${b.personId}`};
+      const who=b.personId??'setup';
+      const source={messageId:`lab_${b.messageId}`,turnId:turn?.log.turnId??b.messageId,sourceRef:b.mode==='synthetic'?`synthetic:voice-lab:${b.sample}:${who}`:`voice:${b.mode==='live'?b.voiceSessionId:''}:${b.messageId}:${who}`};
       const previous=ctx.proposalBatches.find(batch=>batch.messageId===source.messageId);
       if(previous){
         const expectedRef=b.mode==='synthetic'?source.sourceRef:`voice:${b.voiceSessionId}:${source.messageId}`;
         // A merged batch also carries person-less (global) changes; only person-bound ones can name another person.
-        if(previous.source.sourceRef!==expectedRef||previous.changes.some(change=>change.personId!==undefined&&change.personId!==b.personId))throw new WorkflowError('IDEMPOTENCY_CONFLICT');
+        if(previous.source.sourceRef!==expectedRef||previous.changes.some(change=>change.personId!==undefined&&change.personId!==who))throw new WorkflowError('IDEMPOTENCY_CONFLICT');
         return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter:'rules-v1',externalModelCall:false,route:'canonical replay',request:null,result:{proposalBatch:previous,replayed:true,confirmationStillRequired:true}}};
       }
-      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false;
       const transport=b.mode==='live'?this.r.modelExtraction.options.transport:undefined;
-      if(authored)adapter='authored-script',observations=scriptObservation(b.sample,text,b.messageId,b.personId);
+      if(b.mode==='live'&&b.personId===undefined)return await this.setupTurn(agent,id,c.id,live!,turn!,source,text,transport);
+      const personId=b.personId!;
+      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false;
+      if(authored)adapter='authored-script',observations=scriptObservation(b.sample,text,b.messageId,personId);
       else if(b.mode==='live'&&transport&&this.r.modelExtraction.permission(agent,id).transferAllowed) {
         adapter='model-v1';
         const task=this.r.engine.digitalTasks.begin(id);
         try {
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           const turns=live!.turns.slice(0,live!.turns.indexOf(turn!)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
-          observations=await modelObservations(transport,turns,b.messageId,b.personId,task.signal);
+          observations=await modelObservations(transport,turns,b.messageId,personId,task.signal);
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
         } catch(error) {
@@ -111,7 +118,7 @@ export class VoiceLabController {
         ctx=read();
       } else {
         const income=parseExactAnnualGrossIncome(text);
-        if(income)observations=[{fieldId:'annual_gross_income_chf',personId:b.personId,sourceMessageId:b.messageId,quote:income.quote,value:income.value,precision:'exact',unit:'CHF',period:'year',basis:'gross'}];
+        if(income)observations=[{fieldId:'annual_gross_income_chf',personId,sourceMessageId:b.messageId,quote:income.quote,value:income.value,precision:'exact',unit:'CHF',period:'year',basis:'gross'}];
       }
       // Dry run per observation: an unclear value is turn data (not a CaseAmbiguity, a batch without changes could not be replaced).
       const clarifications:{fieldId:string;quote:string;value:string|null;code:'AMBIGUOUS_VALUE'}[]=[],exact:VoiceObservation[]=[];
@@ -147,6 +154,42 @@ export class VoiceLabController {
       }
       return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications,result}};
     } finally {await this.r.sessions.revoke(agent);}
+  }
+
+  /**
+   * A live case without test data has no person yet. Until the conversation gave the person's age
+   * and employment rate (model-v1, with the extraction consent), the turn only reports what is
+   * missing; then it proposes the case frame for that one person (everything else unknown). The
+   * customer's acceptance creates the person; from then on turns map the intake fields as usual.
+   */
+  private async setupTurn(agent:Actor,id:string,caseId:string,live:ReturnType<LifeRuntime['voice']['transcript']>,turn:typeof live.turns[number],
+    source:{messageId:string;turnId:string;sourceRef:string},text:string,transport:ResponsesTransport|undefined) {
+    const reply=(extra:Record<string,unknown>,result:unknown)=>({mode:'live' as const,source:{...source,text,speaker:'customer'},
+      extraction:{adapter:'model-v1',externalModelCall:true,route:'setup',request:null,clarifications:[],result,...extra}});
+    if(!transport||!this.r.modelExtraction.permission(agent,id).transferAllowed)
+      return reply({externalModelCall:false},{proposalBatch:null,issues:[{code:'SETUP_NEEDS_MODEL',action:'screen_or_human_review'}],confirmationStillRequired:true});
+    const task=this.r.engine.digitalTasks.begin(id);
+    let facts:SetupFacts;
+    try {
+      this.r.modelExtraction.assertTransferAllowed(agent,id);
+      const turns=live.turns.slice(0,live.turns.indexOf(turn)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
+      facts=await setupFacts(transport,turns,task.signal);
+      if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
+    } catch(error) {
+      if(!(error instanceof WorkflowError&&['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'].includes(error.code)))throw error;
+      return reply({},{proposalBatch:null,issues:[{code:'MODEL_EXTRACTION_FAILED',action:'screen_or_human_review'}],confirmationStillRequired:true});
+    } finally {task.finish();}
+    const missing=[...(facts.birthYear===null?['age']:[]),...(facts.employmentRateBps===null?['employment_rate_percent']:[])];
+    if(missing.length)return reply({setup:{missing}},{proposalBatch:null,issues:[],confirmationStillRequired:true});
+    const ctx=this.r.extraction.context(agent,id);
+    if(ctx.personIds.length)throw new WorkflowError('STALE_CONTEXT');
+    const c=this.r.engine.caseFor(agent,id,true);
+    const frame=setupDraft(c.draft,caseId,facts.birthYear!,facts.employmentRateBps!,source.sourceRef);
+    const changes=(['financial','insurance'] as const).filter(key=>c.draft[key]===null).map(key=>({path:key,value:frame[key] as unknown as JsonValue}));
+    const supersedesBatchIds=ctx.proposalBatches.filter(batch=>batch.status==='proposed'&&batch.changes.some(change=>change.path==='financial'||change.path==='insurance')).map(batch=>batch.id);
+    const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:source.messageId,source,expectedCaseRevision:ctx.caseRevision,
+      expectedProfileVersion:ctx.profileVersion,basisDraftHash:ctx.draftHash,changes,ambiguities:[],supersedesBatchIds});
+    return reply({setup:{missing:[],quotes:facts.quotes}},{proposalBatch,issues:[],confirmationStillRequired:true});
   }
 
   private customer(actor:Actor,id:string) {

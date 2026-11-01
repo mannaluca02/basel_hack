@@ -37,6 +37,21 @@ Der Mikrofon-Knopf erscheint nur, wenn das Backend GPT-Live **und** die Modell-E
 `OPENAI_API_KEY` vorhanden ist. Ohne Extraktion blockiert der Start, statt still auf `rules-v1`
 zurückzufallen.
 
+## Live-Test ohne Testdaten
+
+```sh
+npm --prefix code run dev:live   # Backend 3000 (PAX_DEMO_START=1) + App 4200 in der live-Konfiguration
+```
+
+Voraussetzung in der Root-`.env`: `PAX_SYNTHETIC_VOICE_ENABLED=1` und `OPENAI_API_KEY`. Ablauf:
+
+1. Logo-Animation, dann der Zustimmungs-Banner. „Einverstanden“ gibt beide Zustimmungen (Sprache, KI-Auswertung) und startet das Gespräch sofort, ohne weiteren Knopf.
+2. Der Fall ist leer, ohne Müller und ohne Berechnungen. Paxi fragt zuerst nach Alter und Pensum. Sobald beide gesagt sind, schlägt das Backend den Fall-Rahmen mit dieser einen Person vor; alles andere bleibt unbekannt, nichts ist erfunden.
+3. **Übernehmen und neu berechnen** legt die Person an. Danach landen Einkommen, Zivilstand, Pensionskasse, 3a, Wohnkosten, Pensionsalter und Risiko als Vorschläge auf ihr.
+4. Der Chat-Tab zeigt das ganze Gespräch. Berechnungen und Grafiken entstehen erst, wenn das Profil vollständig ist; bis dahin nennt „Übernehmen“, was noch fehlt.
+
+Das Mikrofon unten rechts beendet das Gespräch und setzt es mit einem Tipp fort, ohne erneute Zustimmung. Nachweis: `code/tests/live-start.test.mjs`.
+
 ## Konfigurationen
 
 | Befehl | Konfiguration | Daten | Voice Lab |
@@ -47,6 +62,7 @@ zurückzufallen.
 | `npm run start:debug` | debug | Backend 3000, Demo-Start | ja |
 | `npm run start:debug:lab` | debug-lab | Lab-Backend 3030, Anmeldung | ja |
 | `npm run start:paxi` | paxi | Backend 3000 mit Paxi (3100), Demo-Start | nein |
+| `npm run start:live` | live | Backend 3000, **ohne Testdaten**: jeder Start ein leerer Fall | nein |
 
 Live-Voice gibt es in allen Konfigurationen mit Backend ausser `paxi`: Dort spricht Darios Paxi in
 einem eigenen Fenster (Gesprächsleiste oben), gestartet mit `npm --prefix code run dev:paxi`, das den

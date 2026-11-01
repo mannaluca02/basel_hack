@@ -31,6 +31,8 @@ export class ApiDataSource extends AdvisorDataSource {
   private readonly api = inject(CustomerApi);
   private readonly language = inject(AppLanguage);
   private readonly demoStart = inject(APP_ENVIRONMENT).demoStart === true;
+  /** Live configuration: the start creates an empty case instead of the persona's. */
+  private readonly liveStart = inject(APP_ENVIRONMENT).liveStart === true;
   private starting: Promise<void> | null = null;
   private readonly eventStream = new Subject<AdvisorEvent>();
   private readonly connectionState = new BehaviorSubject<ConnectionState>('disconnected');
@@ -138,7 +140,7 @@ export class ApiDataSource extends AdvisorDataSource {
     if (this.starting) return;
     this.connectionState.next('connecting');
     this.starting = this.api
-      .startDemo()
+      .startDemo(false, this.liveStart)
       .then(() => {
         this.starting = null;
         this.connect();

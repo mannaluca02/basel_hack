@@ -102,10 +102,27 @@ describe('LiveVoice', () => {
     expect(live.personId()).toBe(reviewCase().draft.financial!.persons[0].id);
   });
 
-  it('ends a call that has no person to speak for', () => {
+  it('ends a call when the person it speaks for disappears', () => {
+    loadCase();
     live.state.set('connected');
     TestBed.tick();
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase({ draft: { ...reviewCase().draft, financial: null, insurance: null } }) });
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
     expect(live.state()).toBe('idle');
+  });
+
+  it('talks to set up the first person while the case has none (live start)', () => {
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase({ draft: { ...reviewCase().draft, financial: null, insurance: null } }) });
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
+    expect(live.setupMode()).toBe(true);
+    expect(live.speakable()).toBe(true);
+    expect(live.personId()).toBe('');
+    live.state.set('connected');
+    TestBed.tick();
+    // No person yet is no reason to end the call.
+    expect(live.state()).toBe('connected');
   });
 
   it('offers no call without a loaded case: no person, not available', () => {

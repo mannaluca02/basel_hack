@@ -9,7 +9,9 @@ import { fileURLToPath } from 'node:url';
 
 const code = fileURLToPath(new URL('..', import.meta.url));
 const paxi = process.argv.includes('--paxi');
-const app = paxi ? 'start:paxi' : process.argv.includes('--debug') ? 'start:debug' : 'start:demo';
+// `--live`: the live configuration, end to end without test data (empty case, voice sets it up).
+const live = process.argv.includes('--live');
+const app = paxi ? 'start:paxi' : live ? 'start:live' : process.argv.includes('--debug') ? 'start:debug' : 'start:demo';
 const children = [
   spawn('npm', ['start'], { cwd: code, stdio: 'inherit', env: { ...process.env, PAX_DEMO_START: '1', ...(paxi ? { PAX_VOICE_AGENT: '1' } : {}) } }),
   spawn('npm', ['run', app, '--', '--host', '127.0.0.1', '--port', '4200'], {

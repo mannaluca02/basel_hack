@@ -22,7 +22,7 @@ export function startPaxiWhenReady(live: LiveVoice, injector: Injector, done: ()
       if (live.active() || live.handoverActive()) return giveUp();
       if (!live.signedIn()) return pause();
       timer ??= setTimeout(giveUp, START_TIMEOUT_MS);
-      if (!live.available() || !live.validPerson() || live.busy()) return;
+      if (!live.available() || !live.speakable() || live.busy()) return;
       untracked(() => {
         stop();
         live.consent.set(true);

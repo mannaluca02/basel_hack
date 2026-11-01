@@ -513,7 +513,10 @@
     "pending": "Paxi hat neue Angaben gehört.",
     "accept": "Übernehmen und neu berechnen",
     "accepting": "Wird übernommen …",
-    "acceptFailed": "Übernehmen hat nicht geklappt. Bitte nochmals versuchen."
+    "acceptFailed": "Übernehmen hat nicht geklappt. Bitte nochmals versuchen.",
+    "setup": {
+      "question": "Frag die Person zuerst ganz natürlich, wie alt sie ist und wie viel sie arbeitet (Pensum in Prozent), bevor du nach Beträgen fragst."
+    }
   },
   "journey": {
     "title": "Abschluss",

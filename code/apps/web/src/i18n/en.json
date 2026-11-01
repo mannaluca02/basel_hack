@@ -513,7 +513,10 @@
     "pending": "Paxi heard new details.",
     "accept": "Accept and recalculate",
     "accepting": "Accepting …",
-    "acceptFailed": "Accepting did not work. Please try again."
+    "acceptFailed": "Accepting did not work. Please try again.",
+    "setup": {
+      "question": "First ask the person, naturally, how old they are and how much they work (employment rate in percent), before asking about amounts."
+    }
   },
   "journey": {
     "title": "Contract",

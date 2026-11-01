@@ -513,7 +513,10 @@
     "pending": "Paxi ha sentito nuove informazioni.",
     "accept": "Accetta e ricalcola",
     "accepting": "Accettazione in corso …",
-    "acceptFailed": "L’accettazione non è riuscita. Riprova."
+    "acceptFailed": "L’accettazione non è riuscita. Riprova.",
+    "setup": {
+      "question": "Chiedi prima, in modo naturale, quanti anni ha la persona e quanto lavora (grado di occupazione in percento), prima di chiedere degli importi."
+    }
   },
   "journey": {
     "title": "Contratto",
