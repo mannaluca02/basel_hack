@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { VoiceConnectionSchema, type VoiceConnection, type VoiceProvider } from '@pax/contracts';
 import { WorkflowError } from '../insurance/types.js';
+import { EMOTION_TRIGGERS } from './emotions.js';
 export interface VoiceGateway {
     readonly id: VoiceProvider;
     open(input: {
@@ -13,11 +14,19 @@ export interface VoiceGateway {
     }>;
     stop(providerSessionId: string): Promise<'requested' | 'client_required'>;
 }
-async function jsonRequest(fetcher: typeof fetch, url: string, init: RequestInit) {
+/**
+ * A JSON request to a provider. `retry` may answer a refused request once with a second one
+ * (e.g. without an optional feature); its decision sees the status and the error text only.
+ */
+async function jsonRequest(fetcher: typeof fetch, url: string, init: RequestInit, retry?: (status: number, error: string) => RequestInit | null) {
     try {
-        const r = await fetcher(url, { ...init, redirect: 'error' });
+        let r = await fetcher(url, { ...init, redirect: 'error' });
+        if (!r.ok && retry && r.status < 500) {
+            const second = retry(r.status, (await r.text()).slice(0, 2000));
+            if (second) r = await fetcher(url, { ...second, redirect: 'error' });
+        }
         if (!r.ok) {
-            await r.body?.cancel();
+            await r.body?.cancel().catch(() => undefined);
             throw new WorkflowError('VOICE_PROVIDER_UNAVAILABLE', 503);
         }
         const text = await r.text();
@@ -41,8 +50,13 @@ export class OpenAiLiveGateway implements VoiceGateway {
     }, signal: AbortSignal) {
         if (!input.sdp?.startsWith('v='))
             throw new WorkflowError('VOICE_SDP_REQUIRED', 422);
-        const data = await jsonRequest(this.fetcher, 'https://api.openai.com/v1/live/sessions', { method: 'POST', signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
-            headers: { Authorization: `Bearer ${this.key}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ session: { model: this.model, instructions: input.prompt, audio: { output: { voice: this.voice } }, store: false }, transport: { type: 'webrtc', sdp: input.sdp } }) });
+        // With Paxi's emotion triggers; a project that may not use Decisions gets the voice without them.
+        const request = (triggers: boolean): RequestInit => ({ method: 'POST', signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
+            headers: { Authorization: `Bearer ${this.key}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session: { model: this.model, instructions: input.prompt, audio: { output: { voice: this.voice } }, store: false,
+                ...(triggers ? { triggers: EMOTION_TRIGGERS } : {}) }, transport: { type: 'webrtc', sdp: input.sdp } }) });
+        const data = await jsonRequest(this.fetcher, 'https://api.openai.com/v1/live/sessions', request(true),
+            (_status, error) => /trigger|decision/i.test(error) ? request(false) : null);
         const schema = z.object({ session: z.object({ id: z.string().min(1).max(200) }), transport: z.object({ type: z.literal('webrtc'), sdp: z.string().min(1).max(150000) }) });
         const parsed = schema.safeParse(data);
         if (!parsed.success)

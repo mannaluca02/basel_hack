@@ -21,6 +21,11 @@ export interface AppEnvironment {
    * synthetic case, so there is no sign-in and no review stand.
    */
   readonly demoStart?: boolean;
+  /**
+   * Live configuration: the demo start without test data. Every start is a new, empty case; the
+   * conversation sets up the person and fills it (no Mueller persona, no ready calculations).
+   */
+  readonly liveStart?: boolean;
   /** Debug configuration: the Voice Lab view with trace and raw payloads is reachable. */
   readonly debugVoice?: boolean;
 }

@@ -41,11 +41,6 @@ export class MockDataSource extends AdvisorDataSource {
     });
   }
 
-  /** Total length of the scripted call. */
-  get durationMs(): number {
-    return this.script.at(-1)?.atMs ?? 0;
-  }
-
   snapshot(): Observable<AdvisorSnapshot> {
     return defer(() => of(this.state));
   }

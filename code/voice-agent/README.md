@@ -32,6 +32,7 @@ The server reads the repository-root `.env`, not a file inside `code/voice-agent
 | `PAX_VOICE_AGENT_PORT` | `3100` | HTTP port inside the case backend's process; the server binds to `127.0.0.1`. |
 | `PORT` | `3100` | HTTP port when run on its own (`npm start` here). |
 | `PAX_VOICE_AGENT` | off | `1` makes the case backend start Paxi (`dev:paxi` sets it). |
+| `PAXI_LOG_DIR` | `data/conversations` | Where unlinked conversation logs are written. |
 | `PAX_API_URL` | `http://127.0.0.1:3000` | Valentin's case backend that receives Paxi's proposals once a case is linked. |
 | `PAXI_STEER_TOKEN` | not set | Shared secret for the backend's `POST /api/steer` (bearer token). Without it, backend steering is off. |
 | `PAX_APP_ORIGINS` | `http://localhost:4200,http://127.0.0.1:4200` | Customer app origins allowed to hand a case to Paxi via `/api/case-link`. |

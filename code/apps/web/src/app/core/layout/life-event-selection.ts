@@ -23,8 +23,4 @@ export class LifeEventSelection {
   toggle(event: SelectedLifeEvent): void {
     this.state.update((current) => (current?.eventId === event.eventId ? null : event));
   }
-
-  clear(): void {
-    this.state.set(null);
-  }
 }

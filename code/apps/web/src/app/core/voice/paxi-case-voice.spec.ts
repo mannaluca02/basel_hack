@@ -124,3 +124,155 @@ it('logs a question before its short answer even when their caption quiet timers
     transport.stop();
   } finally {vi.useRealTimers();}
 });
+
+describe('PaxiCaseVoice connection events', () => {
+  interface Peer {
+    ontrack: ((event: unknown) => void) | null;
+    onconnectionstatechange: (() => void) | null;
+    connectionState?: string;
+  }
+  async function connected() {
+    const f = connectedBrowser(), cb = callbacks();
+    const voice = new PaxiCaseVoice(cb, f.browser);
+    await voice.start();
+    return { f, cb, voice, peer: f.peer as unknown as Peer };
+  }
+
+  it('plays the remote voice and hands it to the avatar', async () => {
+    const { f, cb, peer } = await connected();
+    const remote = { getTracks: () => [] };
+    peer.ontrack!({ streams: [remote], track: { stop: vi.fn() } });
+    expect(f.audio.srcObject).toBe(remote);
+    expect(cb.onAudio).toHaveBeenCalledWith(remote);
+    expect(f.audio.play).toHaveBeenCalled();
+  });
+
+  it('fails readably when the browser blocks the audio playback', async () => {
+    const { f, cb, peer } = await connected();
+    f.audio.play.mockRejectedValueOnce(new Error('blocked'));
+    peer.ontrack!({ streams: [{ getTracks: () => [] }], track: { stop: vi.fn() } });
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(cb.onStatus).toHaveBeenLastCalledWith('error', 'AUDIO_PLAYBACK_BLOCKED');
+  });
+
+  it('ends on a lost connection or closed data channel, and ignores events after the end', async () => {
+    const lost = await connected();
+    lost.peer.connectionState = 'connected';
+    lost.peer.onconnectionstatechange!();
+    expect(lost.cb.onStatus).not.toHaveBeenCalledWith('error', expect.anything());
+    lost.peer.connectionState = 'failed';
+    lost.peer.onconnectionstatechange!();
+    expect(lost.cb.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_DISCONNECTED');
+    const late = { stop: vi.fn() };
+    lost.peer.ontrack!({ streams: [], track: late });
+    expect(late.stop).toHaveBeenCalled();
+
+    const closed = await connected();
+    closed.f.channel.onclose!();
+    expect(closed.cb.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_CHANNEL_CLOSED');
+  });
+
+  it('refuses an expired session, an unknown provider and a provider error event', async () => {
+    const expired = connectedBrowser(), cbExpired = callbacks();
+    cbExpired.open.mockResolvedValueOnce(connection(new Date(Date.now() - 1000).toISOString()));
+    await new PaxiCaseVoice(cbExpired, expired.browser).start();
+    expect(cbExpired.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_CONNECT_FAILED');
+
+    const other = connectedBrowser(), cbOther = callbacks();
+    cbOther.open.mockResolvedValueOnce({ ...connection(), connection: { provider: 'elevenlabs' } } as never);
+    await new PaxiCaseVoice(cbOther, other.browser).start();
+    expect(cbOther.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_CONNECT_FAILED');
+
+    const { f, cb } = await connected();
+    f.emit({ type: 'error', error: { message: 'provider says no' } });
+    expect(cb.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_PROVIDER_ERROR');
+    f.emit('not json');
+  });
+
+  it('waits for the ICE candidates, at most two seconds', async () => {
+    vi.useFakeTimers();
+    try {
+      const f = connectedBrowser(), cb = callbacks();
+      const listeners: (() => void)[] = [];
+      Object.assign(f.peer, {
+        iceGatheringState: 'gathering',
+        addEventListener: (_: string, listener: () => void) => listeners.push(listener),
+        removeEventListener: vi.fn(),
+      });
+      const started = new PaxiCaseVoice(cb, f.browser).start();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(cb.open).not.toHaveBeenCalled();
+      (f.peer as { iceGatheringState: string }).iceGatheringState = 'complete';
+      listeners.forEach((listener) => listener());
+      await vi.advanceTimersByTimeAsync(0);
+      expect(cb.open).toHaveBeenCalledOnce();
+      await started;
+
+      const slow = connectedBrowser(), cbSlow = callbacks();
+      Object.assign(slow.peer, { iceGatheringState: 'gathering', addEventListener: vi.fn(), removeEventListener: vi.fn() });
+      const waiting = new PaxiCaseVoice(cbSlow, slow.browser).start();
+      await vi.advanceTimersByTimeAsync(1999);
+      expect(cbSlow.open).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(cbSlow.open).toHaveBeenCalledOnce();
+      await waiting;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('times out when the data channel never opens', async () => {
+    vi.useFakeTimers();
+    try {
+      const f = connectedBrowser(), cb = callbacks();
+      f.channel.readyState = 'connecting';
+      await new PaxiCaseVoice(cb, f.browser).start();
+      await vi.advanceTimersByTimeAsync(20000);
+      expect(cb.onStatus).toHaveBeenLastCalledWith('error', 'VOICE_CONNECT_TIMEOUT');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('PaxiCaseVoice reply emotions', () => {
+  const decision = (sourceType: string, sourceId: string, name: string, choice: unknown, extra: Record<string, unknown> = {}) => ({
+    type: 'decision.event', delegation_id: null, trigger_id: 'trigger', source_event_type: sourceType, source_event_id: sourceId,
+    event: { type: 'decision.completed', decision: { answers: [{ type: 'choice', name, choice }] } }, ...extra,
+  });
+  async function connected() {
+    vi.useFakeTimers();
+    const f = connectedBrowser(), cb = callbacks();
+    await new PaxiCaseVoice(cb, f.browser).start();
+    f.emit({ type: 'session.started' });
+    const emotions = () => cb.onEvent.mock.calls.map(([event]) => event).filter((event) => event.type === 'emotion').map((event) => event.emotion);
+    return { f, emotions };
+  }
+  afterEach(() => vi.useRealTimers());
+
+  it('shows the emotion GPT-Live chose for the customer\'s words and for Paxi\'s own', async () => {
+    const { f, emotions } = await connected();
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_1', delta: 'Mein Vater ist gestorben.' });
+    f.emit(decision('session.input_transcript.delta', 'in_1', 'reply_emotion', 'empathetic'));
+    f.emit({ type: 'session.output_transcript.delta', event_id: 'out_1', delta: 'Das tut mir leid.' });
+    f.emit(decision('session.output_transcript.delta', 'out_1', 'emotion', 'acknowledging'));
+    expect(emotions()).toEqual(['empathetic', 'acknowledging']);
+  });
+
+  it('ignores late results for older fragments, unknown fragments and invalid or failed answers', async () => {
+    const { f, emotions } = await connected();
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_1', delta: 'Hallo' });
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_2', delta: ' zusammen' });
+    f.emit(decision('session.input_transcript.delta', 'in_2', 'reply_emotion', 'pleased'));
+    f.emit(decision('session.input_transcript.delta', 'in_1', 'reply_emotion', 'shocked'));
+    f.emit(decision('session.input_transcript.delta', 'in_unknown', 'reply_emotion', 'curious'));
+    f.emit({ type: 'session.input_transcript.delta', event_id: 'in_3', delta: '!' });
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'furious'));
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'emotion', 'curious'));
+    f.emit(decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'curious', { delegation_id: 'delegation' }));
+    f.emit({ ...decision('session.input_transcript.delta', 'in_3', 'reply_emotion', 'curious'), event: { type: 'decision.failed' } });
+    f.emit(decision('session.other', 'in_3', 'reply_emotion', 'curious'));
+    expect(emotions()).toEqual(['pleased']);
+  });
+});
+

@@ -1,13 +1,14 @@
-import { Injector, signal } from '@angular/core';
+import { Injector, computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import type { LiveVoice } from '../voice/live-voice';
 import { startPaxiWhenReady } from './paxi-call';
 
 describe('startPaxiWhenReady', () => {
   function fakeLive() {
-    return {
+    const live = {
       active: signal(false),
       handoverActive: signal(false),
+      signedIn: signal(true),
       available: signal(false),
       validPerson: signal(false),
       busy: signal(false),
@@ -15,6 +16,7 @@ describe('startPaxiWhenReady', () => {
       extractionConsent: signal(false),
       start: vi.fn(() => Promise.resolve()),
     };
+    return { ...live, speakable: computed(() => live.validPerson()) };
   }
 
   function watch(live: ReturnType<typeof fakeLive>) {
@@ -89,7 +91,7 @@ describe('startPaxiWhenReady', () => {
     expect(done).toHaveBeenCalledOnce();
   });
 
-  it('stops waiting after a minute', () => {
+  it('stops waiting a minute after the sign-in when the case does not become ready', () => {
     vi.useFakeTimers();
     const live = fakeLive();
     const done = watch(live);
@@ -98,6 +100,41 @@ describe('startPaxiWhenReady', () => {
     ready(live);
 
     expect(live.start).not.toHaveBeenCalled();
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it('waits for the sign-in as long as it takes, then starts the call', () => {
+    vi.useFakeTimers();
+    const live = fakeLive();
+    live.signedIn.set(false);
+    const done = watch(live);
+
+    // Ten minutes on the review panel's sign-in: no timeout without a session.
+    vi.advanceTimersByTime(600_000);
+    expect(done).not.toHaveBeenCalled();
+
+    live.signedIn.set(true);
+    TestBed.tick();
+    ready(live);
+    expect(live.start).toHaveBeenCalledOnce();
+  });
+
+  it('counts the minute only while signed in; a sign-out pauses it', () => {
+    vi.useFakeTimers();
+    const live = fakeLive();
+    const done = watch(live);
+
+    vi.advanceTimersByTime(50_000);
+    live.signedIn.set(false);
+    TestBed.tick();
+    vi.advanceTimersByTime(120_000);
+    expect(done).not.toHaveBeenCalled();
+
+    live.signedIn.set(true);
+    TestBed.tick();
+    vi.advanceTimersByTime(59_000);
+    expect(done).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1_000);
     expect(done).toHaveBeenCalledOnce();
   });
 });

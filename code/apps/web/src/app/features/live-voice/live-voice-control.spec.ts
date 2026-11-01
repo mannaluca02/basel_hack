@@ -37,7 +37,7 @@ describe('LiveVoiceControl', () => {
 
   let dto = quietCase();
 
-  async function setup(gptLive = true, demoStart = false, voiceAgentUrl?: string) {
+  async function setup(gptLive = true, demoStart = false, voiceAgentUrl?: string, liveStart = false) {
     consents = [];
     sessionStorage.setItem(
       CUSTOMER_SESSION_KEY,
@@ -59,7 +59,7 @@ describe('LiveVoiceControl', () => {
         provideI18nTesting(),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart, voiceAgentUrl },
+          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart, voiceAgentUrl, liveStart },
         },
         { provide: AdvisorDataSource, useClass: ApiDataSource },
       ],
@@ -182,4 +182,32 @@ describe('LiveVoiceControl', () => {
     expect(mic()).toBeNull();
     expect(element().querySelector('[data-action="accept"]')).not.toBeNull();
   });
+
+  it('closes the consent panel with Cancel or Escape, without starting', async () => {
+    await setup();
+    mic()!.click();
+    fixture.detectChanges();
+    const cancel = Array.from(element().querySelectorAll<HTMLButtonElement>('.panel button')).find((b) => b.textContent?.includes('Abbrechen'))!;
+    cancel.click();
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).toBeNull();
+
+    mic()!.click();
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).not.toBeNull();
+    element().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(element().querySelector('.panel')).toBeNull();
+    expect(microphone).not.toHaveBeenCalled();
+  });
+
+  it('starts again with one tap in the live build: no consent panel, the banner gave both', async () => {
+    await setup(true, true, undefined, true);
+    mic()!.click();
+    await serve();
+    expect(element().querySelector('.panel')).toBeNull();
+    expect(consents).toEqual([expect.objectContaining({ allowSyntheticModelExtraction: true })]);
+    expect(microphone).toHaveBeenCalledOnce();
+  });
 });
+

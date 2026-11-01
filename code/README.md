@@ -24,13 +24,19 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 
 | Befehl | Wirkung |
 |---|---|
-| `npm test` | Vollständiger Build und 121 automatisierte Tests; Provider synthetisch injiziert, kein externer Zugriff |
+| `npm test` | Vollständiger Build und alle Backend-Tests (über 430); Rechner und OpenAI synthetisch ersetzt, kein externer Zugriff |
+| `npm run test:all` | Backend, Voice-Agent und Web-App zusammen |
+| `npm run test:coverage` | Backend-Tests mit Abdeckung je Datei (Web: `npm --prefix apps/web run test:coverage`, Voice-Agent: `npm --prefix voice-agent run test:coverage`) |
 | `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
 | `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
 | `npm run demo` | Frühere Offline-Fachdemo ohne HTTP-Server |
 
 Der Live-Test erzeugt eine eigene temporäre verschlüsselte Datenbank und räumt sie anschließend auf. Die Reviewer-Rolle wird dort ausschließlich für den erfundenen Testfall simuliert; das ist keine fachliche Pax-Freigabe. Optional schreibt `LIFEMAP_LIVE_REPORT=/absoluter/pfad/report.json npm run test:live` einen bereinigten Nachweis ohne Token. Der lokale Beispieldatensatz steht in [insurance-household.json](fixtures/insurance-household.json).
+
+## Testabdeckung
+
+Stand 01.11.2026: Backend 96 % der Funktionen und 99 % der Zeilen, Web-App 95 % und 97 %, Voice-Agent 89 % und 87 % (ohne die Browser-Skripte unter `public/`). End-to-End über HTTP laufen: Demo-Start und Live-Voice (`tests/live-voice-journey.test.mjs`), Abschluss bis zur Demo-Police (`contract-journey`), gewählter Grafikpunkt (`graph-context`), jede Route einmal über den echten Controller (`http-routes`) und Darios Paxi-Server (`voice-agent/server.test.mjs`). Ersetzt werden dabei nur Logismata und OpenAI.
 
 ## Angular anbinden
 

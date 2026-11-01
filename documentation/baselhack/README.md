@@ -4,7 +4,6 @@ Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; d
 
 - [Logik-Backend: Implementierung und Prüfnachweis](reports/logic-backend-implementation.md)
 - [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
-- [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
 - [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
 - [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
 - [Detaillierter Angular-Umsetzungsplan](plans/implementation-plan.md)
@@ -28,6 +27,7 @@ Heruntergeladen und technisch geprüft bedeutet keine vollständige inhaltliche 
 | `references/funds/` | Fondslisten und Fondsinformationen |
 | `references/public-pension-analysis/` | AGB, Datenschutz, synthetische Originalauswertung, Eingabedaten und UI-Textstände |
 | `reports/` | Testbericht mit Beobachtungen und Prüfumfang |
+| `archive/` | Abgeschlossene Arbeitsnotizen (z. B. Earnies Spezifikation und Tickets zum KI-Backend) |
 | `references/api/` | OpenAPI, Schemaindex, JSON-Beispiele und ursprüngliche Rechneransichten |
 | `references/web/` | Webseitenstände nach Hub, Pax-Produkten, Ratgebern, Services und Design getrennt |
 | `references/videos/transcripts/` | Verfügbare Untertitel; MP4-Dateien liegen unter `assets/pax/videos/` im Repo |

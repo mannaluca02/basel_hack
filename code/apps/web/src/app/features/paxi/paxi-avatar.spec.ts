@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { VoiceActivity } from '../../core/voice/voice-activity';
 import { PAX_AVATAR_MODULE, PaxiAvatar } from './paxi-avatar';
 import { FakePaxAvatar, provideFakePaxAvatar } from './paxi-testing';
 
@@ -120,4 +121,22 @@ describe('PaxiAvatar', () => {
     expect(fixture.nativeElement.querySelector('.placeholder')).not.toBeNull();
     expect(fixture.nativeElement.classList).toContain('failed');
   });
+
+  it('shows every reply emotion of the live call, also the same one again', async () => {
+    const fixture = await render();
+    const voice = TestBed.inject(VoiceActivity);
+    const emotions = () => created[0].events.filter((event) => event.type === 'emotion').map((event) => event.emotion);
+
+    voice.emotion.set({ emotion: 'curious', seq: 1 });
+    await settle(fixture);
+    voice.emotion.set({ emotion: 'curious', seq: 2 });
+    await settle(fixture);
+    voice.emotion.set({ emotion: 'empathetic', seq: 3 });
+    await settle(fixture);
+    voice.emotion.set(null);
+    await settle(fixture);
+
+    expect(emotions()).toEqual(['curious', 'curious', 'empathetic']);
+  });
 });
+

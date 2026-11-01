@@ -18,6 +18,7 @@ npm run start:api     # dev server against the real case service, /api proxied t
 npm run start:demo    # same, but opens on a ready synthetic case: no sign-in, no review stand
 npm run start:debug   # demo start plus the Voice Lab tab (live voice trace)
 npm run start:paxi    # demo start with Dario's Paxi in its own window instead of the live voice (code: npm run dev:paxi)
+npm run start:live    # end to end without test data: a new empty case per start, the voice sets it up (code: npm run dev:live)
 npm run start:debug:lab  # Voice Lab against the isolated lab backend (code: npm run start:voice-lab), port 4300
 ```
 
@@ -65,5 +66,5 @@ The rail's **Contract** tab (`features/journey`, against the backend only) conti
 
 ## Live voice
 
-With `PAX_SYNTHETIC_VOICE_ENABLED=1` and `OPENAI_API_KEY` in the root `.env`, the backend offers GPT-Live and the model extraction, and a microphone button appears in the tab rail above the avatar. It asks for both consents (voice transfer, AI extraction), then `core/voice/live-voice.ts` talks over the case backend: `voice/sessions` (WebRTC), every settled turn to `voice/sessions/:id/turns`, every customer turn to `voice-lab/turns` (model-v1). Proposals arrive as packages, the avatar ring shows the activity (`core/voice/voice-activity.ts`) and the Chat tab the transcript. The control loads in its own chunk after the workspace. A human handover, a new session or a language change ends the call. The demo start has no review stand: a card next to the rail offers to accept what Paxi heard (`POST demo-accept`), which confirms the profile and recalculates the scenarios.
+With `PAX_SYNTHETIC_VOICE_ENABLED=1` and `OPENAI_API_KEY` in the root `.env`, the backend offers GPT-Live and the model extraction, and a microphone button appears in the tab rail above the avatar. It asks for both consents (voice transfer, AI extraction), then `core/voice/live-voice.ts` talks over the case backend: `voice/sessions` (WebRTC), every settled turn to `voice/sessions/:id/turns`, every customer turn to `voice-lab/turns` (model-v1). Proposals arrive as packages, the avatar ring shows the activity (`core/voice/voice-activity.ts`) and the Chat tab the transcript. The control loads in its own chunk after the workspace. Paxi's reply emotions come from GPT-Live Decisions triggers that the backend sets on the session (`decision.event` on the data channel). A human handover, a new session or a language change ends the call. The demo start has no review stand: a card next to the rail offers to accept what Paxi heard (`POST demo-accept`), which confirms the profile and recalculates the scenarios.
 

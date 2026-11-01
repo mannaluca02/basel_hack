@@ -69,12 +69,16 @@ export class CustomerApi {
     this.keep({ csrfToken, caseId });
   }
 
-  /** Demo start: the backend's ready synthetic case, without an access code. */
-  async startDemo(fresh = false): Promise<void> {
+  /**
+   * Demo start: the backend's ready synthetic case, without an access code. `empty` (live
+   * configuration) asks for a new case without test data instead.
+   */
+  async startDemo(fresh = false, empty = false): Promise<void> {
     const { csrfToken, caseId } = await firstValueFrom(
       this.http.post<CustomerSession>(`${this.base}/demo/start`, {
         locale: this.language.language(),
         fresh,
+        ...(empty ? { empty: true } : {}),
       }),
     );
     this.keep({ csrfToken, caseId });

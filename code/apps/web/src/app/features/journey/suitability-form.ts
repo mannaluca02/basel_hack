@@ -98,7 +98,7 @@ let nextId = 0;
             step="100"
             inputmode="numeric"
             name="premium"
-            [value]="premium() ?? ''"
+            [value]="francs(premium())"
             (input)="premium.set(chf($any($event.target).value))"
           />
         </label>
@@ -110,7 +110,7 @@ let nextId = 0;
             step="1000"
             inputmode="numeric"
             name="single"
-            [value]="single() ?? ''"
+            [value]="francs(single())"
             (input)="single.set(chf($any($event.target).value))"
           />
         </label>
@@ -321,6 +321,11 @@ export class SuitabilityForm {
     { key: 'lossReaction', label: 'journey.suitability.lossReaction', options: LOSS },
     { key: 'selectedStrategy', label: 'journey.suitability.strategy', options: STRATEGY },
   ];
+
+  /** Cents back to the francs the customer typed. */
+  protected francs(cents: number | null): number | string {
+    return cents === null ? '' : cents / 100;
+  }
 
   protected chf(value: string): number | null {
     const amount = Number(value);

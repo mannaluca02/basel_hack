@@ -127,6 +127,17 @@
                   "with": "src/environments/environment.paxi.ts"
                 }
               ]
+            },
+            "live": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.live.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -158,6 +169,10 @@
             },
             "paxi": {
               "buildTarget": "web:build:paxi",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "live": {
+              "buildTarget": "web:build:live",
               "proxyConfig": "proxy.conf.json"
             }
           },

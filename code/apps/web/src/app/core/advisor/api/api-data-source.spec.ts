@@ -17,6 +17,7 @@ const CASE_ID = 'case_api';
 function setup(
   session: object | null = { csrfToken: 'csrf_1', caseId: CASE_ID },
   demoStart = false,
+  liveStart = false,
 ) {
   sessionStorage.clear();
   if (session) sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(session));
@@ -30,7 +31,7 @@ function setup(
       provideAdvisorDataSource(),
       {
         provide: APP_ENVIRONMENT,
-        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart },
+        useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', demoStart, liveStart },
       },
     ],
   });
@@ -317,4 +318,15 @@ describe('CustomerApi', () => {
     expect(api.session()).toBeNull();
     expect(sessionStorage.getItem(CUSTOMER_SESSION_KEY)).toBeNull();
   });
+
+  it('asks the live start for a new empty case instead of the persona demo', async () => {
+    const { source, http } = setup(null, true, true);
+    source.connect();
+    const start = http.expectOne('/api/demo/start');
+    expect(start.request.body).toEqual({ locale: 'de', fresh: false, empty: true });
+    start.flush({ csrfToken: 'csrf_live', caseId: CASE_ID });
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(FakeEventSource.instances.at(-1)?.url).toBe(`/api/cases/${CASE_ID}/advisor/events`);
+  });
 });
+

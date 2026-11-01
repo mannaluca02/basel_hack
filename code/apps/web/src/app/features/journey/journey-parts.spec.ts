@@ -83,6 +83,61 @@ describe('SuitabilityForm', () => {
   });
 });
 
+describe('SuitabilityForm answers', () => {
+  it('sends every chosen answer, a single investment, and clamps the guaranteed part', async () => {
+    const http = configure();
+    const fixture = TestBed.createComponent(SuitabilityForm);
+    fixture.componentRef.setInput('caseId', CASE);
+    fixture.componentRef.setInput('productId', 'pax_lifestar');
+    fixture.componentRef.setInput('productName', 'Pax LifeStar');
+    fixture.componentRef.setInput('personId', 'person_1');
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    const choose = (name: string, value: string) => {
+      const select = root.querySelector<HTMLSelectElement>(`select[name="${name}"]`)!;
+      select.value = value;
+      select.dispatchEvent(new Event('change'));
+    };
+    const type = (name: string, value: string) => {
+      const input = root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    };
+    choose('netIncome', 'over_250k');
+    choose('netWorth', 'over_300k');
+    choose('annualSavingCapacity', 'over_7k');
+    choose('singleInvestmentCapacity', '150k_300k');
+    choose('investmentGoal', 'high_risk');
+    choose('horizon', '10_to_15_years');
+    choose('securitiesExperience', 'extensive');
+    choose('lossReaction', 'buy_more');
+    choose('selectedStrategy', 'dynamic');
+    type('single', '50000');
+    type('guarantee', '140');
+    const confirm = root.querySelector<HTMLInputElement>('input[name="confirm"]')!;
+    confirm.checked = true;
+    confirm.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(root.querySelector<HTMLInputElement>('input[name="guarantee"]')!.value).toBe('100');
+    // The field shows francs again, not the cents sent to the backend.
+    expect(root.querySelector<HTMLInputElement>('input[name="single"]')!.value).toBe('50000');
+
+    root.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await settle(fixture);
+    http.expectOne(`/api/cases/${CASE}`).flush({ id: CASE, caseRevision: 2 });
+    await settle(fixture);
+    const request = http.expectOne(`/api/cases/${CASE}/suitability`);
+    expect(request.request.body.answers).toEqual({
+      netIncome: 'over_250k', netWorth: 'over_300k', annualSavingCapacity: 'over_7k', singleInvestmentCapacity: '150k_300k',
+      investmentGoal: 'high_risk', horizon: '10_to_15_years', securitiesExperience: 'extensive', lossReaction: 'buy_more',
+      guaranteedPercent: 100, selectedStrategy: 'dynamic', annualPremiumCents: null, singleInvestmentCents: 5_000_000,
+    });
+    request.flush({ code: 'STALE_CONTEXT', message: 'Bitte neu laden.' }, { status: 409, statusText: 'Conflict' });
+    await settle(fixture);
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('Bitte neu laden.');
+  });
+});
+
 describe('InsightsView', () => {
   it('shows the funnel, drop-offs and NPS of the demo cases', async () => {
     const http = configure();
@@ -115,3 +170,15 @@ describe('InsightsView', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('nur im Demo-Start');
   });
 });
+
+describe('InsightsView without the backend', () => {
+  it('says the view is unavailable when the insights cannot be read', async () => {
+    const http = configure();
+    const fixture = TestBed.createComponent(InsightsView);
+    fixture.detectChanges();
+    http.expectOne('/api/demo/insights').flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    await settle(fixture);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('nur im Demo-Start');
+  });
+});
+

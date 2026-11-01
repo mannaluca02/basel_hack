@@ -319,6 +319,7 @@ export class LiveVoiceControl {
   private readonly customer = inject(CustomerApi);
   private readonly store = inject(CaseStore);
   private readonly demoStart = inject(APP_ENVIRONMENT).demoStart === true;
+  private readonly liveStart = inject(APP_ENVIRONMENT).liveStart === true;
 
   protected readonly open = signal(false);
   protected readonly accepting = signal(false);
@@ -339,7 +340,7 @@ export class LiveVoiceControl {
   /** Translation key of the reason Start is disabled, or `null`. */
   protected readonly blocker = computed(() => {
     if (this.live.handoverActive()) return 'lab.setup.handover';
-    if (!this.live.validPerson()) return 'lab.setup.choosePerson';
+    if (!this.live.speakable()) return 'lab.setup.choosePerson';
     if (this.live.busy()) return 'lab.setup.working';
     if (!this.live.consent()) return 'lab.setup.consent';
     if (!this.live.extractionConsent()) return 'lab.intake.extractionBlocker';
@@ -364,7 +365,15 @@ export class LiveVoiceControl {
 
   protected toggle(): void {
     if (this.live.active()) this.live.stop();
+    // Live build: the consent banner gave both consents, so the button only stops and resumes.
+    else if (this.liveStart) void this.resume();
     else this.open.update((open) => !open);
+  }
+
+  private async resume(): Promise<void> {
+    this.live.consent.set(true);
+    this.live.extractionConsent.set(true);
+    if (!this.blocker()) await this.live.start();
   }
 
   protected async start(): Promise<void> {

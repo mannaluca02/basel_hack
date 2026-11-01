@@ -22,6 +22,7 @@ import {
 } from './intake-plan';
 import { INTAKE_TEXT } from './intake-text';
 import { LabTrace } from './lab-trace';
+import type { ReplyEmotion } from './emotions';
 import { PaxiCaseVoice } from './paxi-case-voice';
 import { VoiceActivity } from './voice-activity';
 import { VoiceLabApi } from './voice-lab-api';
@@ -52,7 +53,9 @@ interface PromptSkill {
   name: string;
   description: string;
 }
-type VoiceAvatarEvent = { type: 'activity'; state: 'idle' | 'listening' | 'thinking' };
+type VoiceAvatarEvent =
+  | { type: 'activity'; state: 'idle' | 'listening' | 'thinking' }
+  | { type: 'emotion'; emotion: ReplyEmotion };
 
 /**
  * Earnie's live voice over the case backend, shared by the app and the Voice Lab (debug): GPT-Live
@@ -73,6 +76,7 @@ export class LiveVoice {
   private readonly language = inject(AppLanguage);
   private readonly transloco = inject(TranslocoService);
   private readonly ring = inject(VoiceActivity);
+  private emotionSeq = 0;
   private readonly avatarEvents = new Subject<VoiceAvatarEvent>();
   private sessionId: string | null = null;
   private sequence = 0;
@@ -106,13 +110,15 @@ export class LiveVoice {
   readonly audio = signal<MediaStream | null>(null);
   /** Activity events for the avatar renderer. */
   readonly events = this.avatarEvents.asObservable();
-  private readonly voiceActivity = signal<VoiceAvatarEvent['state']>('idle');
+  private readonly voiceActivity = signal<'idle' | 'listening' | 'thinking'>('idle');
 
   readonly rows = computed(() => {
     const c = this.store.canonical();
     return c ? intakeRows(c, this.personId(), this.intake()) : [];
   });
   readonly active = computed(() => this.state() === 'connecting' || this.state() === 'connected');
+  /** A customer session exists (signed in, or the demo start's session). */
+  readonly signedIn = computed(() => !!this.customer.session());
   readonly caseReady = computed(
     () =>
       this.apiMode &&
@@ -130,6 +136,13 @@ export class LiveVoice {
   readonly validPerson = computed(() =>
     this.persons().some((person) => person.personId === this.personId()),
   );
+  /**
+   * A live case without test data that has no person yet: the conversation first gives age and
+   * employment rate, the backend proposes the person from them (voice-lab/turns without personId).
+   */
+  readonly setupMode = computed(() => this.caseReady() && this.persons().length === 0);
+  /** Paxi may talk: about a known person, or to set up the first one. */
+  readonly speakable = computed(() => this.validPerson() || this.setupMode());
   readonly handoverControl = new HandoverControl(this.customer.session, () => {
     const c = this.store.canonical();
     return c ? { caseId: c.id, handover: c.handover } : null;
@@ -204,7 +217,9 @@ export class LiveVoice {
       });
     },
     onEvent: (event) => {
-      this.voiceActivity.set(event.state);
+      if (event.type === 'activity') this.voiceActivity.set(event.state);
+      // Paxi in the shell shows the emotion; a repeated one counts again (new sequence number).
+      else this.ring.emotion.set({ emotion: event.emotion, seq: ++this.emotionSeq });
       this.avatarEvents.next(event);
     },
     onTrace: (direction, payload) => this.trace.add(direction, 'GPT-Live data channel', payload),
@@ -256,6 +271,9 @@ export class LiveVoice {
       const said = [...this.dialogue()].reverse().find((line) => line.speaker === 'agent');
       this.ring.caption.set(this.active() && said ? said.text : null);
     });
+    effect(() => {
+      if (!this.active()) this.ring.emotion.set(null);
+    });
     this.store.digitalStops.pipe(takeUntilDestroyed()).subscribe((command) => {
       if (command.reason === 'session-ended') {
         this.handoverControl.synchronizeSession();
@@ -273,7 +291,8 @@ export class LiveVoice {
     effect(() => {
       const persons = this.persons();
       if (!persons.some((person) => person.personId === this.personId())) {
-        if (this.active()) this.stop();
+        // A person that disappeared ends the call; the first one appearing (setup) continues it.
+        if (this.active() && this.personId() !== '') this.stop();
         this.personId.set(persons[0]?.personId ?? '');
       }
     });
@@ -289,7 +308,9 @@ export class LiveVoice {
     // value, so no feedback loop.
     effect(() => {
       const rows = this.rows();
-      if (this.state() === 'connected' && rows.length) this.voice.updateContext(this.steer(rows));
+      if (this.state() !== 'connected') return;
+      if (this.setupMode()) this.voice.updateContext(this.setupSteering());
+      else if (rows.length) this.voice.updateContext(this.steer(rows));
     });
     let previousSession = this.customer.session();
     effect(() => {
@@ -455,7 +476,8 @@ export class LiveVoice {
         mode: 'live',
         voiceSessionId: sid,
         messageId,
-        personId,
+        // Without a person yet, the backend sets up the case frame from the conversation.
+        ...(personId ? { personId } : {}),
       });
     try {
       let result: LiveTurnResult;
@@ -503,6 +525,11 @@ export class LiveVoice {
   }
 
   /** The short clarification names gross and year, so it only fits income; other fields repeat their own question. */
+  /** Until the case knows the person: age and employment rate first, naturally, no form. */
+  private setupSteering() {
+    return { setup: true, nextQuestion: this.transloco.translate('voice.setup.question'), neverAskAgain: [] };
+  }
+
   private steer(rows: IntakeRow[]) {
     return steeringContext(
       rows,

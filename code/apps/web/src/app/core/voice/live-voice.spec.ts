@@ -102,10 +102,27 @@ describe('LiveVoice', () => {
     expect(live.personId()).toBe(reviewCase().draft.financial!.persons[0].id);
   });
 
-  it('ends a call that has no person to speak for', () => {
+  it('ends a call when the person it speaks for disappears', () => {
+    loadCase();
     live.state.set('connected');
     TestBed.tick();
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase({ draft: { ...reviewCase().draft, financial: null, insurance: null } }) });
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
     expect(live.state()).toBe('idle');
+  });
+
+  it('talks to set up the first person while the case has none (live start)', () => {
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase({ draft: { ...reviewCase().draft, financial: null, insurance: null } }) });
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
+    expect(live.setupMode()).toBe(true);
+    expect(live.speakable()).toBe(true);
+    expect(live.personId()).toBe('');
+    live.state.set('connected');
+    TestBed.tick();
+    // No person yet is no reason to end the call.
+    expect(live.state()).toBe('connected');
   });
 
   it('offers no call without a loaded case: no person, not available', () => {
@@ -113,4 +130,20 @@ describe('LiveVoice', () => {
     expect(live.validPerson()).toBe(false);
     expect(live.available()).toBe(false);
   });
+
+  it('hands Paxi\'s reply emotions to the shell during a call and clears them after it', () => {
+    loadCase();
+    live.state.set('connected');
+    TestBed.tick();
+    const transport = (live as unknown as { voice: { options: { onEvent(event: unknown): void } } }).voice.options;
+    transport.onEvent({ type: 'emotion', emotion: 'curious' });
+    transport.onEvent({ type: 'emotion', emotion: 'curious' });
+    expect(ring.emotion()?.emotion).toBe('curious');
+    expect(ring.emotion()?.seq).toBe(2);
+
+    live.stop();
+    TestBed.tick();
+    expect(ring.emotion()).toBeNull();
+  });
 });
+

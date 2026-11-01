@@ -1,5 +1,6 @@
 import { test,before,after } from 'node:test';
 import assert from 'node:assert/strict';
+import { sseEvents } from './helpers/sse.mjs';
 import { mkdtemp,rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -95,9 +96,9 @@ test('SSE supplies context references, updates after tempo changes, and closes o
   const c=(await request('POST','/api/cases',session.sessionToken,{locale:'de',timeBudgetMinutes:5,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'})).body;
   const controller=new AbortController();
   const stream=await fetch(`${base}/api/cases/${c.id}/advisor/events`,{headers:{Authorization:`Bearer ${session.sessionToken}`},signal:controller.signal});assert.equal(stream.status,200);
-  const reader=stream.body.getReader();const first=new TextDecoder().decode((await reader.read()).value);assert.match(first,/advisor.context.updated/);assert.ok(!first.includes('grossAnnualIncome'));
+  const events=sseEvents(stream),reader=events.reader;const first=await events.next();assert.match(first,/advisor.context.updated/);assert.ok(!first.includes('grossAnnualIncome'));
   await request('PATCH',`/api/cases/${c.id}/preferences`,session.sessionToken,{timeBudgetMinutes:20});
-  let message='';for(let i=0;i<6&&!message.includes('conversation_preference_changed');i++)message+=new TextDecoder().decode((await reader.read()).value);
+  const message=await events.until('conversation_preference_changed');
   assert.match(message,/refresh_before_next_turn/);
   assert.equal((await request('DELETE','/api/sessions/current',session.sessionToken)).status,200);
   const timeout=setTimeout(()=>controller.abort(),2000);
