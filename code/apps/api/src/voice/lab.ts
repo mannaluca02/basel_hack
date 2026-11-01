@@ -22,7 +22,8 @@ const replaceable=<T extends {status:string;changes:unknown[];ambiguityIds?:stri
 const TurnSchema = z.discriminatedUnion('mode', [
   z.object({mode:z.literal('synthetic'),sample:z.enum(['income','correction','smalltalk',...INTAKE_SAMPLE_IDS]),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
   // Without personId only while the case has no person yet: the conversation then sets up the case frame.
-  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional()}).strict(),
+  // askedKey: the open question Paxi asked last (GET questions), so one statement fills that field and no other.
+  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional(),askedKey:z.string().min(1).max(200).optional()}).strict(),
 ]);
 const samples = {
   de:{income:'Mein Bruttojahreseinkommen beträgt 119000 CHF.',correction:'Korrektur: Mein Bruttojahreseinkommen beträgt 118000 CHF.',smalltalk:'Guten Morgen!'},
@@ -119,7 +120,7 @@ export class VoiceLabController {
           const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id))
             .filter(target=>{const person=/^(?:insurance|financial)\.persons\.([^.]+)\./.exec(target.key)?.[1];return !person||ctx.personIds.includes(person);});
           [observations,answers]=await Promise.all([modelObservations(transport,turns,b.messageId,personId,task.signal),
-            answerObservations(transport,turns,targets,task.signal).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
+            answerObservations(transport,turns,targets,task.signal,b.mode==='live'?b.askedKey:undefined).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
         } catch(error) {

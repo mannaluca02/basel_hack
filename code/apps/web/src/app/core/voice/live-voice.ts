@@ -502,6 +502,7 @@ export class LiveVoice {
   ): Promise<void> {
     if (!personId) this.setupMessages.push(messageId);
     const asked = nextIntakeField(this.rows()),
+      askedKey = this.caseAsk()?.key,
       // Only a question Paxi had the chance to ask counts: an agent line since it became current.
       askedCase = this.dialogue().some((line) => line.speaker === 'agent' && line.id > this.askSince.line)
         ? this.caseAsk()?.key
@@ -515,6 +516,8 @@ export class LiveVoice {
         messageId,
         // Without a person yet, the backend sets up the case frame from the conversation.
         ...(personId ? { personId } : {}),
+        // The profile question Paxi is on: the backend fills that field with this answer, no other.
+        ...(personId && askedKey ? { askedKey } : {}),
       });
     try {
       let result: LiveTurnResult;

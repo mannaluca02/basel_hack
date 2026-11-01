@@ -164,7 +164,8 @@ function fakeModel(intakeFirstTurn,values) {
     // A customer who never corrects anything: answered fields are left alone.
     else args={answers:input.fields.filter(field=>!/Already answered/.test(field.description)).flatMap(field=>{
       const known=Object.entries(values).find(([pattern])=>new RegExp(`^${pattern}$`).test(field.id));
-      return known?[{id:field.id,value:known[1][0],period:known[1][1]??null,quote:'Antwort'}]:[];
+      // One statement fills one field: every answer has its own words in the customer's turn.
+      return known?[{id:field.id,value:known[1][0],period:known[1][1]??null,quote:`Antwort ${input.fields.indexOf(field)}.`}]:[];
     })};
     return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
   };
@@ -205,6 +206,9 @@ test('the intake extraction misses everything: the open questions still take eve
   assert.equal(c.draft.financial.expenses.find(e=>e.id==='housing').amount.value,220000);
 });
 
+/** The customer's turn: the words of every answer the fake model may quote ("Antwort 0." … "Antwort 119."). */
+const ANSWER_TEXT=Array.from({length:120},(_,i)=>`Antwort ${i}.`).join(' ');
+
 /** A whole live conversation over HTTP until the profile is confirmed and calculated. */
 async function converse(t,intake,values) {
   const model=fakeModel(intake,values);
@@ -221,7 +225,7 @@ async function converse(t,intake,values) {
   const say=async personId=>{
     const latest=await current(),messageId=`turn_${crypto.randomUUID()}`;
     await f.customer.call('POST',`${path}/voice/sessions/${sid}/turns`,{speaker:'customer',log:{schemaVersion:'1.0',messageId,caseId:latest.id,correlationId:sid,turnId:messageId,
-      source:'voice',locale:'de',text:'Antwort',transcriptStatus:'final',dataClassification:'synthetic'}});
+      source:'voice',locale:'de',text:ANSWER_TEXT,transcriptStatus:'final',dataClassification:'synthetic'}});
     const r=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId,...(personId?{personId}:{})});
     assert.equal(r.status,201,JSON.stringify(r.body));
     return r.body.extraction;
@@ -364,4 +368,17 @@ test('both models get only the latest exchange, not the whole log',async()=>{
   await answerObservations(transport,[...log,P('Wie alt ist deine Partnerin, und wie viel arbeitet sie?'),K('Sie ist 33'),P('Und das Pensum?'),K('60 Prozent')],married,new AbortController().signal);
   assert.ok(seen[0].some(t=>t.text==='Sie ist 33'));
   assert.ok(!seen[0].some(t=>t.text==='22'),'never the whole log');
+});
+
+test('one statement fills one field: the asked one keeps a quote the model also put elsewhere',()=>{
+  const targets=answerTargets(frame());
+  const parsed={answers:[{id:'insurance.existingAnnualPillar3aContributionCents',value:'3000',period:'year',quote:'dreitausend im Jahr'},
+    {id:'insurance.existingAnnualRetirementSavingCents',value:'3000',period:'year',quote:'dreitausend im Jahr'}]};
+  const said=['Bisher sparen wir dreitausend im Jahr für die Pension.'];
+  assert.deepEqual(validAnswers(targets,parsed,said,'insurance.existingAnnualRetirementSavingCents').map(a=>a.key),['insurance.existingAnnualRetirementSavingCents']);
+  assert.equal(validAnswers(targets,parsed,said).length,1,'without an asked field only the first keeps it');
+  // Different quotes in one sentence stay separate answers.
+  const four=validAnswers(targets,{answers:[{id:'insurance.persons.person_1.pillar2Risk.disabilityAnnualCents',value:'24000',period:'year',quote:'Invalidenrente vierundzwanzigtausend'},
+    {id:'insurance.persons.person_1.pillar2Risk.survivorAnnualCents',value:'18000',period:'year',quote:'Partnerrente achtzehntausend'}]},['Invalidenrente vierundzwanzigtausend und Partnerrente achtzehntausend'],'insurance.persons.person_1.pillar2Risk.disabilityAnnualCents');
+  assert.equal(four.length,2);
 });
