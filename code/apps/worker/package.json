@@ -10,7 +10,7 @@
     "typecheck": "wrangler types .wrangler/worker-configuration.d.ts && tsc -p tsconfig.json",
     "setup:local": "node scripts/setup-local.mjs",
     "check:persistence": "node scripts/check-persistence.mjs",
-    "deploy": "wrangler deploy",
+    "deploy": "node scripts/deploy.mjs",
     "tail": "wrangler tail",
     "diagnose": "node scripts/diagnose.mjs"
   },
