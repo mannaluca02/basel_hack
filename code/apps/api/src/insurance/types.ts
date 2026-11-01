@@ -11,6 +11,8 @@ export type InsuranceCase = InsuranceCaseState & {
   agentTurns:AgentVoiceTurn[];
   /** Suitability pre-checks of the customer; read through /suitability, never in the case DTO. */
   suitabilityChecks:SuitabilityCheck[];idempotency:Record<string,{fingerprint:string;result:unknown}>;
+  /** Created by the live configuration's start: a full store replaces it first. Never in the DTO. */
+  liveStart?:true;
 };
 export type Database = {
   version:1;sessions:Record<string,Actor>;cases:Record<string,InsuranceCase>;audit:AuditEvent[];

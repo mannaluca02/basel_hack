@@ -79,7 +79,7 @@ export function presentJourney<T>(data:T,locale:Locale):T&{locale:Locale;display
   return {...walk(data) as T,locale,displayLabel:t(locale,'common.demo'),documentsLanguageNotice:t(locale,'common.documents')};
 }
 export const localizedCase=(c:InsuranceCase):InsuranceCaseDto=>{
-  const {ownerId,idempotency,confirmationRequests,voiceSessions,agentTurns,suitabilityChecks,modelExtractionConsent,...business}=c;
+  const {ownerId,idempotency,confirmationRequests,voiceSessions,agentTurns,suitabilityChecks,modelExtractionConsent,liveStart:_liveStart,...business}=c;
   return InsuranceCaseDtoSchema.parse({...business,schemaVersion:CASE_DTO_VERSION,toolRuns:c.toolRuns??[],presentation:{locale:c.locale,
     activeRun:c.activeRunId?presentRun(c.runs.find(r=>r.id===c.activeRunId)!,c.locale):null,
     recommendations:c.recommendations.map(r=>presentRecommendation(r,c.locale)),

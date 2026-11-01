@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {FakeVoiceGateway} from './helpers/voice-fixture.mjs';
-import {demoApp} from './helpers/demo-http.mjs';
+import {client,demoApp} from './helpers/demo-http.mjs';
 
 /**
  * The live configuration end to end over HTTP: a start without test data (an empty case), a
@@ -152,26 +152,28 @@ test('a sentence spoken before the person existed is extracted again for the int
   assert.equal((await current()).draft.insurance.persons[0].grossAnnualIncomeCents,9500000);
 });
 
-test('a full store gives up cases nobody can open any more: reloads of the live start never lock it',async t=>{
+test('a full store makes room for a new live start: new tabs and restarts never lock it',async t=>{
   const f=await demoApp(t,{voice:{enabled:true,gateways:[new FakeVoiceGateway()]}});
-  // Every reload is a new sign-in and a new case; the earlier owner sessions expire after an hour.
-  const ids=[];
+  const tabs=[];
   for(let i=0;i<30;i++){
-    const r=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
+    const tab=client(f.base),r=await tab.call('POST','/api/demo/start',{locale:'de',empty:true});
     assert.equal(r.status,201,`start ${i}: ${JSON.stringify(r.body)}`);
-    ids.push(r.body.caseId);
-    await f.runtime.store.transaction(db=>{for(const s of Object.values(db.sessions))if(s.role==='customer')s.expiresAt=new Date(Date.now()-1000).toISOString();});
+    tab.csrf=r.body.csrfToken;tabs.push({tab,caseId:r.body.caseId});
   }
   const cases=await f.runtime.store.view(db=>Object.keys(db.cases));
   assert.ok(cases.length<=25);
-  assert.ok(cases.includes(ids.at(-1)),'the newest case stays');
-  assert.ok(!cases.includes(ids[0]),'the oldest unreachable one went first');
+  assert.ok(cases.includes(tabs.at(-1).caseId),'the newest case stays');
+  assert.ok(cases.includes(f.path.split('/').at(-1)),'the persona case is no live start and stays');
+  assert.ok(!cases.includes(tabs[0].caseId),'the oldest live start went first');
+  // Its tab is signed out, so it starts again instead of talking to a case that is gone.
+  assert.equal((await tabs[0].tab.call('GET',`/api/cases/${tabs[0].caseId}`)).status,401);
 });
 
-test('a full store of reachable cases still refuses a new one',async t=>{
+test('a full store of cases with content still refuses a new one',async t=>{
   const f=await demoApp(t,{voice:{enabled:true,gateways:[new FakeVoiceGateway()]}});
-  let last;
-  for(let i=0;i<30&&(!last||last.status===201);i++)last=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
-  assert.equal(last.status,429);
-  assert.equal(last.body.code,'CASE_CAPACITY');
+  const persona=f.path.split('/').at(-1);
+  await f.runtime.store.transaction(db=>{for(let i=0;i<24;i++){const id=crypto.randomUUID();db.cases[id]={...structuredClone(db.cases[persona]),id};}});
+  const r=await client(f.base).call('POST','/api/demo/start',{locale:'de',empty:true});
+  assert.equal(r.status,429);
+  assert.equal(r.body.code,'CASE_CAPACITY');
 });
