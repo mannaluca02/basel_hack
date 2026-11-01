@@ -12,7 +12,7 @@ export class FakeVoiceGateway {
 }
 export async function voiceFixture(options={}){
  const directory=await mkdtemp(join(tmpdir(),'pax-voice-integration-')),gateway=options.gateway??new FakeVoiceGateway();let r;
- const create=()=>createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials:voiceCredentials,voice:{enabled:options.enabled??true,gateways:[gateway]}});
+ const create=()=>createLifeRuntime({dataDirectory:directory,provider:new SyntheticTestProvider(),providerMode:'test',credentials:voiceCredentials,voice:{enabled:options.enabled??true,gateways:[gateway],resumeAfterRestart:options.resumeAfterRestart}});
  try{
   r=await create();const login=await r.sessions.login(voiceCredentials.customerAccessCode,'voice-test'),customer=r.sessions.authenticate(login.sessionToken);
    let c=await r.engine.createCase(customer,{locale:options.locale??'de',timeBudgetMinutes:10,noticeVersion:PRIVACY_NOTICE.version,dataClassification:'synthetic'});

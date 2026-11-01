@@ -347,7 +347,10 @@ export class VoiceIntegrationService {
     async initialize() {
         await this.engine.store.transaction(db => { for (const c of Object.values(db.cases))
             for (const s of c.voiceSessions)
-                if (active(s)) {
+                if (this.options.resumeAfterRestart && s.status === 'active' && s.providerSessionId) {
+                    // Still live between browser and provider: keep it and its remote handle.
+                    this.handles.set(s.id, { caseId: c.id, provider: s.provider, providerSessionId: s.providerSessionId });
+                } else if (active(s)) {
                     s.status = 'interrupted';
                     s.closeReason = 'server_restart';
                     s.endedAt = now();

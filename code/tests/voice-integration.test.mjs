@@ -122,6 +122,14 @@ test('restart interrupts unfinished persisted sessions, closes remote handles an
   // initialize() is the recovery path used after the encrypted store is reopened following an unclean exit.
   await f.r.voice.initialize();await settle();const session=f.r.voice.transcript(f.agent,f.id,sid).voiceSession;assert.equal(session.closeReason,'server_restart');assert.equal(session.status,'interrupted');assert.equal(f.gateway.stops.length,1);await assert.rejects(f.start({messageId:'restart_start'}),code('VOICE_CONNECTION_NOT_REPLAYABLE'));assert.equal(f.r.voice.transcript(f.agent,f.id,sid).turns.length,1);
 });
+test('with resumeAfterRestart (Workers) an established call survives a restart and is still hung up at the provider later',async t=>{
+  const f=await fixture(t,{resumeAfterRestart:true}),sid=(await f.start({messageId:'resume_start'})).voiceSession.id;await f.turn(sid,'119000');
+  await f.r.voice.initialize();await settle();const session=f.r.voice.transcript(f.agent,f.id,sid).voiceSession;
+  assert.equal(session.status,'active');assert.equal(session.closeReason,null);assert.equal(f.gateway.stops.length,0);
+  await f.turn(sid,'120000');assert.equal(f.r.voice.transcript(f.agent,f.id,sid).turns.length,2);
+  // The kept handle still hangs up at the provider once the session ends.
+  await f.r.voice.close(f.customer,f.id,sid,{reason:'customer_closed'});await settle();assert.equal(f.gateway.stops.length,1);
+});
 test('failed provider starts leave an auditable failed session and cannot be blindly retried',async t=>{
   class Fails extends FakeVoiceGateway {async open(){throw new Error('private upstream key must never escape');}}
   const f=await fixture(t,{gateway:new Fails()});await assert.rejects(f.start({messageId:'failure_start'}),e=>e.code==='VOICE_PROVIDER_UNAVAILABLE'&&!e.message.includes('private'));const session=f.r.voice.list(f.customer,f.id).sessions[0];assert.equal(session.status,'failed');assert.equal(session.closeReason,'provider_failed');await assert.rejects(f.start({messageId:'failure_start'}),code('VOICE_CONNECTION_NOT_REPLAYABLE'));assert.equal(f.r.store.snapshot().cases[f.id].voiceSessions.length,1);
