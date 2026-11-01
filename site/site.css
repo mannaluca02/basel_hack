@@ -1,0 +1,56 @@
+@font-face{font-family:'Pax Civil';src:url('media/fonts/PaxCivil-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Pax Civil';src:url('media/fonts/PaxCivil-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Pax Civil';src:url('media/fonts/PaxCivil-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+/* 1rem = 100 pixels of the 1600 × 900 closing slide, so it scales as one piece. */
+html{font-size:max(58px,min(100vw / 16,100svh / 9))}
+*{box-sizing:border-box}
+body{margin:0;background:#f9f7f0 url('media/grain.svg');background-size:180px 180px;background-blend-mode:multiply;color:#360573;font-family:'Pax Civil',Arial,sans-serif;font-synthesis:none}
+main{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.54rem .9rem .4rem}
+.eyebrow{font-size:.15rem;letter-spacing:.2em;font-weight:700;margin:0 0 .14rem}
+h1{font-size:.73rem;letter-spacing:-.055em;line-height:.98;margin:0;font-weight:700}
+.closing-heading{text-align:center}
+.closing-pair{display:flex;align-items:center;justify-content:center;height:3.8rem;margin-top:.17rem;color:inherit;border-radius:.16rem}
+.qr-mascot{position:relative;width:3.3rem;height:3.3rem;flex:0 0 3.3rem}
+.qr-mascot svg{display:block;width:100%;height:100%}
+.qr-motion{position:relative;width:100%;height:100%;transform-origin:50% 85%}
+.qr-mascot>.qr-floor{position:absolute;width:94%;height:.38rem;left:3%;top:calc(100% + .18rem);transform-origin:center;overflow:visible}
+footer{margin-top:.5rem;text-align:center}
+.team-name{font-size:.32rem;font-weight:700;margin:0 0 .06rem;line-height:1.1}
+.love{font-size:.2rem;margin:0 0 .06rem}
+.love span{color:#df5b7c;margin-right:.05rem;font-size:.18rem}
+.team{display:flex;justify-content:center;gap:.34rem}
+.teammate{width:1.48rem}
+.teammate .head{height:1.58rem;width:1.58rem;margin:0 auto}
+.teammate p{font-size:.22rem;font-weight:500;margin:-.09rem 0 0}
+.teammate:nth-child(2) .head{transform:rotate(4deg)}
+.teammate:nth-child(4) .head{transform:rotate(-5deg)}
+.teammate:nth-child(5) .head{transform:rotate(3deg)}
+.repo{position:absolute;top:.4rem;right:.45rem;padding:.1rem .2rem;border:2px solid currentColor;border-radius:1rem;font-size:.17rem;font-weight:500;color:inherit;text-decoration:none;transition:background-color .2s,color .2s}
+.repo:hover{background:#360573;color:#f9f7f0}
+a:focus-visible{outline:3px solid #360573;outline-offset:4px}
+.portrait-gaze{animation:look-around 8s ease-in-out infinite;animation-delay:var(--look-delay,0s)}
+.round-eye{animation:portrait-blink 5.7s infinite;animation-delay:var(--look-delay,0s)}
+.pointer-eyes{transform:translate(var(--look-x,0px),var(--look-y,0px));transition:transform .17s ease-out}
+.pointer-tracking .portrait-gaze{animation:none;transform:none}
+.teammate .head>svg{transform:translate(var(--head-x,0px),var(--head-y,0px)) rotate(var(--head-turn,0deg));transform-origin:50% 75%;transition:transform .4s ease-out}
+.pointer-tracking .pointer-eyes,.pointer-tracking>svg{transition:none}
+.closing-confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:16}
+@keyframes look-around{0%,12%,100%{transform:translate(0,0)}25%,36%{transform:translate(-3px,-.5px)}57%,70%{transform:translate(3px,0)}84%,89%{transform:translate(0,-.5px)}}
+@keyframes portrait-blink{0%,44%,48%,100%{transform:scaleY(1)}46%{transform:scaleY(.07)}}
+/* Six heads no longer fit one row: stack the slide, three heads per row. */
+@media(max-width:900px){
+  html{font-size:clamp(46px,100vw / 7.2,72px)}
+  main{padding:.5rem .3rem}
+  .eyebrow{font-size:.2rem;letter-spacing:.14em}
+  h1{font-size:.8rem}
+  footer{margin-top:.8rem}
+  .team-name{font-size:.44rem}
+  .love{font-size:.28rem;margin-bottom:.2rem}
+  .love span{font-size:.24rem}
+  .team{display:grid;grid-template-columns:repeat(3,2rem);gap:.1rem}
+  .teammate{width:auto}
+  .teammate .head{height:1.9rem;width:1.9rem}
+  .teammate p{font-size:.28rem}
+  .repo{position:static;margin-top:.5rem;padding:.16rem .36rem;font-size:.26rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
