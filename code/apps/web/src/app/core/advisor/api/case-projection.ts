@@ -106,8 +106,12 @@ export function projectCase(
   const charts: ChartResult[] = [];
   const events = lifeEvents(dto, t, at);
   if (events) charts.push(events);
-  if (retirement) charts.push(incomeTimeline(retirement));
-  if (baseline) charts.push(eventImpact(baseline, retirement, profile?.draft ?? null));
+  // Until the profile is complete and calculated, the charts are drawn provisionally from what the
+  // conversation gave so far, and grow with every answer; the calculated ones replace them.
+  const income = retirement ? incomeTimeline(retirement) : provisionalIncome(dto, at);
+  if (income) charts.push(income);
+  const impact = baseline ? eventImpact(baseline, retirement, profile?.draft ?? null) : provisionalImpact(dto);
+  if (impact) charts.push(impact);
   const pillar3a = profile ? pillar3aGrowth(dto, profile.version, profile.draft) : null;
   if (pillar3a) charts.push(pillar3a);
 
@@ -186,6 +190,111 @@ function incomeTimeline(run: LifeAnalysis): IncomeTimelineChart {
     target: series(annual((p) => p.needCents)),
     milestones: incomeMilestones(timeline.periods),
   };
+}
+
+// --- Provisional charts (live, before the calculation) -----------------------------------------
+
+type Draft = InsuranceCaseDto['draft'];
+type Amount = NonNullable<Draft['financial']>['persons'][number]['income'];
+
+/** A yearly amount, or null while unknown. */
+function yearly(amount: Amount): number | null {
+  return amount.value === null ? null : amount.value * (amount.period === 'month' ? 12 : 1);
+}
+
+/** Every person's yearly income on one basis: net where all said it, else gross where all did; null otherwise. */
+function householdIncome(draft: Draft): { perPerson: Map<string, number>; basis: MoneyUnit['basis'] } | null {
+  const persons = draft.financial?.persons ?? [];
+  if (!persons.length) return null;
+  const net = persons.map((p) => (p.incomeBasis === 'gross' ? null : yearly(p.income)));
+  if (net.every((v) => v !== null)) return { perPerson: new Map(persons.map((p, i) => [p.id, net[i]!])), basis: 'net_after_income_tax' };
+  const gross = persons.map((p) => draft.insurance?.persons.find((x) => x.personId === p.id)?.grossAnnualIncomeCents ?? null);
+  if (gross.every((v) => v !== null)) return { perPerson: new Map(persons.map((p, i) => [p.id, gross[i]!])), basis: 'gross' };
+  return null;
+}
+
+/** Live revision: every change of the case updates the provisional card in place. */
+function provisional(dto: InsuranceCaseDto) {
+  return { ...stable(dto.updatedAt ?? dto.createdAt), reviewReasons: [], profileVersion: 0, scenarioVersionId: 'provisional' };
+}
+
+/**
+ * The income chart from what is known: the income until each person stops working, then the
+ * pension fund pension from the statement. The AHV pension and the gap need the calculation and
+ * stay empty (`null`); before retirement no pension is paid (0). Needs at least one retirement age.
+ */
+function provisionalIncome(dto: InsuranceCaseDto, at: string): IncomeTimelineChart | null {
+  const draft = dto.draft, persons = draft.financial?.persons ?? [];
+  const stops = persons.map((p) => {
+    const age = draft.insurance?.persons.find((x) => x.personId === p.id)?.desiredWorkStopAge;
+    return age ? { person: p, year: p.birthYear + age } : null;
+  });
+  if (!persons.length || stops.some((s) => s === null)) return null;
+  const now = Number(at.slice(0, 4)), first = persons[0]!;
+  const horizon = draft.insurance?.retirementHorizonAge ? first.birthYear + draft.insurance.retirementHorizonAge : null;
+  const lastStop = Math.max(...stops.map((s) => s!.year));
+  const end = Math.min(now + 70, Math.max(lastStop + 1, horizon ?? lastStop + 15));
+  const years = Array.from({ length: Math.max(1, end - now + 1) }, (_, i) => now + i);
+  const income = householdIncome(draft);
+  const working = (year: number, id: string) => year < stops.find((s) => s!.person.id === id)!.year;
+  const sum = (year: number, pick: (id: string, retired: boolean) => number | null) => {
+    let total = 0;
+    for (const p of persons) {
+      const value = pick(p.id, !working(year, p.id));
+      if (value === null) return null;
+      total += value;
+    }
+    return total;
+  };
+  const pension = (id: string) => {
+    const p = draft.insurance?.persons.find((x) => x.personId === id);
+    return p?.withPillar2 === false ? 0 : (p?.retirementPensionAnnualCents ?? null);
+  };
+  const series = (values: (number | null)[]): MoneySeries => ({ values, status: 'provisional' });
+  const allRetired = (year: number) => persons.every((p) => !working(year, p.id));
+  const need = draft.insurance?.retirementNeedAnnualCents ?? null;
+  return {
+    chartId: CHART_INCOME,
+    type: 'income_timeline',
+    status: 'provisional',
+    ...provisional(dto),
+    unit: { ...YEARLY_NET, basis: income?.basis ?? 'net_after_income_tax' },
+    years,
+    series: {
+      employment: series(years.map((y) => sum(y, (id, retired) => (retired ? 0 : (income?.perPerson.get(id) ?? null))))),
+      pillar1: series(years.map((y) => sum(y, (_, retired) => (retired ? null : 0)))),
+      pillar2: series(years.map((y) => sum(y, (id, retired) => (retired ? pension(id) : 0)))),
+      pillar3: series(years.map((y) => sum(y, (_, retired) => (retired ? null : 0)))),
+      gap: series(years.map(() => null)),
+    },
+    target: series(years.map((y) => (allRetired(y) ? need : null))),
+    milestones: incomeMilestones(years.map((y) => ({ month: `${y}-01`,
+      persons: persons.map((p) => ({ phase: working(y, p.id) ? ('working' as const) : ('pension' as const) })) }))),
+  };
+}
+
+/**
+ * Disability and death per person from what is known: the stated need, the pension fund's risk
+ * pension from the statement and the income of the others in the household. The AHV pension and
+ * the gap need the calculation and stay empty. Needs at least one stated need.
+ */
+function provisionalImpact(dto: InsuranceCaseDto): EventImpactChart | null {
+  const draft = dto.draft, income = householdIncome(draft);
+  const total = income ? [...income.perPerson.values()].reduce((a, b) => a + b, 0) : null;
+  const scenarios: EventImpactScenario[] = [];
+  for (const person of draft.insurance?.persons ?? []) {
+    const others = income ? (total ?? 0) - (income.perPerson.get(person.personId) ?? 0) : null;
+    for (const event of ['disability', 'death'] as const) {
+      const needed = event === 'disability' ? person.disabilityNeedAnnualCents : person.deathNeedAnnualCents;
+      if (needed === null) continue;
+      const fund = event === 'disability' ? person.pillar2Risk.disabilityAnnualCents : person.pillar2Risk.survivorAnnualCents;
+      scenarios.push({ event, personId: person.personId, status: 'provisional', incomeBefore: total, needed, gap: null,
+        incomeAfter: { employment: others, pillar1: null, pillar2: person.withPillar2 === false ? 0 : fund, pillar3: null } });
+    }
+  }
+  if (!scenarios.length) return null;
+  return { chartId: CHART_IMPACT, type: 'event_impact', status: 'provisional', ...provisional(dto),
+    unit: { ...YEARLY_NET, basis: income?.basis ?? 'net_after_income_tax' }, scenarios };
 }
 
 type Phase = 'working' | 'bridge' | 'pension';

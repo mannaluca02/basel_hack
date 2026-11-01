@@ -187,7 +187,8 @@
       "requires_review": "Wird geprüft",
       "needs_input": "Angaben fehlen",
       "provider_error": "Berechnung fehlgeschlagen",
-      "stale": "Veraltet"
+      "stale": "Veraltet",
+      "provisional": "Vorläufig"
     },
     "unit": {
       "month": "CHF pro Monat",

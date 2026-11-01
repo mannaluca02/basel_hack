@@ -41,6 +41,7 @@ const STATUS_LOOK: Readonly<Record<ResultStatus, { readonly tone: Tone; readonly
     needs_input: { tone: 'warning', icon: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16M12 8v5M12 16h.01' },
     provider_error: { tone: 'error', icon: 'M6 6l12 12M18 6 6 18' },
     stale: { tone: 'muted', icon: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16M12 8v4l3 2' },
+    provisional: { tone: 'info', icon: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16M8 12h.01M12 12h.01M16 12h.01' },
   };
 
 let nextId = 0;

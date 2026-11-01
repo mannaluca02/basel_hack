@@ -187,7 +187,8 @@
       "requires_review": "En cours de vérification",
       "needs_input": "Informations manquantes",
       "provider_error": "Échec du calcul",
-      "stale": "Obsolète"
+      "stale": "Obsolète",
+      "provisional": "Provisoire"
     },
     "unit": {
       "month": "CHF par mois",

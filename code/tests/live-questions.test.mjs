@@ -470,3 +470,37 @@ test('a quote may join verbatim pieces with "…" or a comma, in order; nothing 
   assert.ok(!spoken(text,'rente achtzehn'),'only whole words');
   assert.ok(!spoken(text,' ... '));
 });
+
+test('live: what the open questions took from a sentence is no longer unclear, so Paxi does not ask it again',async t=>{
+  let turn=0;
+  const transport=async request=>{
+    const name=request.tools[0].name;
+    const args=name==='submit_setup_facts'?{age:{value:'22',quote:'22'},employment_rate_percent:{value:'60',quote:'60 Prozent'}}
+      :name==='submit_intake_observations'?{observations:turn++===0?[{fieldId:'monthly_housing_cost_chf',quote:'Ungefähr tausend Franken',value:'1000',precision:'approximate',period:null,basis:null}]:[]}
+      :{answers:turn===1?[{id:'financial.expenses.housing',value:'1000',period:'month',quote:'Ungefähr tausend Franken'}]:[]};
+    return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
+  };
+  const f=await demoApp(t,{demoStart:true,voice:{enabled:true,gateways:[new FakeVoiceGateway()]},modelExtraction:{enabled:true,transport}});
+  const started=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
+  f.customer.csrf=started.body.csrfToken;
+  const path=`/api/cases/${started.body.caseId}`,current=async()=>(await f.customer.call('GET',path)).body;
+  const notice=(await f.customer.call('GET','/api/extraction/privacy?locale=de')).body;
+  let c=await current();
+  await f.customer.call('POST',`${path}/extraction/consent`,{expectedCaseRevision:c.caseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
+  c=await current();
+  const sid=(await f.customer.call('POST',`${path}/voice/sessions`,{messageId:'not_unclear',expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',
+    dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=offer'})).body.voiceSession.id;
+  const say=async(text,extra={})=>{
+    const messageId=`turn_${crypto.randomUUID()}`;
+    await f.customer.call('POST',`${path}/voice/sessions/${sid}/turns`,{speaker:'customer',log:{schemaVersion:'1.0',messageId,caseId:c.id,correlationId:sid,turnId:messageId,
+      source:'voice',locale:'de',text,transcriptStatus:'final',dataClassification:'synthetic'}});
+    const r=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId,...extra});
+    assert.equal(r.status,201,JSON.stringify(r.body));
+    await f.customer.call('POST',`${path}/demo-accept`,{});
+    return r.body.extraction;
+  };
+  await say('Ich bin 22 und arbeite 60 Prozent');
+  const housing=await say('Ungefähr tausend Franken',{personId:'person_1'});
+  assert.deepEqual(housing.clarifications,[],'taken, so not unclear');
+  assert.equal((await current()).draft.financial.expenses.find(e=>e.id==='housing').amount.value,100000);
+});
