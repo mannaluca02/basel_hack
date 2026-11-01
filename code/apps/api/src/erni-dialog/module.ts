@@ -51,7 +51,7 @@ export class ErniDialogService {
     }
     if(voice.expectedCaseRevision!==undefined&&voice.expectedCaseRevision!==context.caseRevision)throw new WorkflowError('VERSION_CONFLICT');
     const fields=demoFields.filter(field=>field.personId===demo.speakerPersonId);
-    // shortcut: only authored baseline inputs are allowed; extend provenance with the correction/clarification tickets.
+    // only authored baseline inputs are allowed; extend provenance with the correction/clarification tickets.
     if(!fields.length||fields.some(field=>
       !context.personIds.includes(field.personId)||!context.writablePaths.includes(field.path)||
       !context.fields.some(current=>current.path===field.path&&current.personId===field.personId&&current.value===field.value)))throw new WorkflowError('SYNTHETIC_CONTEXT_REQUIRED',422);

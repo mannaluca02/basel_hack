@@ -35,7 +35,7 @@ async function files(dir){
 }
 try{
   await start();
-  execFileSync(process.execPath,['scripts/check.mjs'],{cwd,env:{...process.env,SPIKE_URL:base},stdio:'inherit'});
+  execFileSync(process.execPath,['scripts/check.mjs'],{cwd,env:{...process.env,WORKER_URL:base},stdio:'inherit'});
   const response=await fetch(base+'/api/demo/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
   assert.equal(response.status,201);
   const cookie=response.headers.get('set-cookie').split(';')[0],first=await response.json();
