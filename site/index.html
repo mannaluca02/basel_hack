@@ -6,13 +6,58 @@
 <meta name="description" content="Paxi, a digital companion for the next chapter. Built by team Larpers at BaselHack 2026.">
 <link rel="icon" href="media/icon-96x96.png">
 <link rel="stylesheet" href="site.css">
+<link rel="preload" href="media/fonts/PaxCivil-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="media/fonts/PaxCivil-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="media/fonts/PaxCivil-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="media/qr-paxi-live.svg" as="fetch" crossorigin>
+<link rel="modulepreload" href="site.js">
+<link rel="modulepreload" href="characters.js">
+<link rel="modulepreload" href="pax-avatar.js">
+<link rel="modulepreload" href="confetti.js">
 </head>
 <body>
 <main>
- <div class="closing-heading"><p class="eyebrow">MEET YOUR NEXT CHAPTER</p><h1>Try Paxi yourself.</h1></div>
+<section class="cover" aria-label="Meet Paxi">
+ <img class="logo" src="media/pax-logo.svg" alt="Pax">
+ <div class="cover-copy"><p class="eyebrow">LARPERS · BASELHACK 2026</p><h1>Life changes.<br>Let’s talk.</h1><p class="lede">Meet Paxi, your digital companion<br>for the next chapter.</p></div>
+ <div class="hero-avatar" id="hero-avatar"></div>
+ <p class="cover-note">Hackathon prototype for the Pax challenge. Not an official Pax service.</p>
+</section>
+<section class="architecture" aria-label="Architecture">
+ <p class="eyebrow">UNDER THE HOOD</p><h2>Architecture</h2>
+ <p class="flow-hint">Swipe to see the whole flow →</p>
+ <div class="flow-chart" tabindex="0" role="group" aria-label="Architecture diagram, scrollable"><svg class="architecture-diagram" viewBox="0 0 1420 500" role="img" aria-label="Architecture: customer and browser connected to OpenAI, an integrated voice and case backend, and Logismata">
+<defs><marker id="arch-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#638c00"/></marker><marker id="arch-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#5b2288"/></marker><marker id="arch-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#287e9a"/></marker></defs>
+<rect x="630" y="170" width="780" height="190" rx="22" fill="#f0ebf4" stroke="#d7cce1"/>
+<text x="652" y="197" class="svg-group-title">Integrated backend</text>
+<g fill="none" stroke-width="3" stroke-linejoin="round">
+<path stroke="#638c00" marker-start="url(#arch-green)" marker-end="url(#arch-green)" d="M170 270H240"/>
+<path stroke="#638c00" marker-start="url(#arch-green)" marker-end="url(#arch-green)" d="M500 230H555V60H650"/>
+<path stroke="#5b2288" marker-end="url(#arch-purple)" d="M500 285H660"/>
+<path stroke="#287e9a" marker-end="url(#arch-blue)" d="M860 120V215"/>
+<path stroke="#5b2288" marker-end="url(#arch-purple)" d="M920 280H1050"/>
+<path stroke="#287e9a" marker-start="url(#arch-blue)" marker-end="url(#arch-blue)" d="M1210 335V410"/>
+<path stroke="#287e9a" marker-end="url(#arch-blue)" d="M1050 315H990V475H370V335"/>
+</g>
+<g class="svg-label">
+<text x="185" y="253" fill="#638c00">Talk</text>
+<text x="540" y="110" text-anchor="end" fill="#638c00"><tspan x="540">WebRTC</tspan><tspan x="540" dy="21">audio ↔</tspan></text>
+<text x="518" y="272" fill="#5b2288">Setup / turns</text>
+<text x="876" y="150" fill="#287e9a">Extracted answers</text>
+<text x="935" y="248" fill="#5b2288"><tspan x="935">Turns +</tspan><tspan x="935" dy="20">observations</tspan></text>
+<text x="1225" y="385" fill="#287e9a">Calculations ↔</text>
+<text x="420" y="461" fill="#287e9a">Case updates · charts · review · steering</text>
+</g>
+<rect x="0" y="215" width="170" height="120" rx="19" fill="#edf3dd" stroke="#d9cfdf"/><text x="18" y="247" class="svg-node-title">Customer</text><text x="18" y="277" class="svg-node-copy">Speak · listen</text><text x="18" y="301" class="svg-node-copy">Confirm details</text><rect x="240" y="215" width="260" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="258" y="247" class="svg-node-title">Browser + Paxi</text><text x="258" y="277" class="svg-node-copy">Angular experience</text><text x="258" y="301" class="svg-node-copy">Avatar · transcript · visuals</text><rect x="650" y="0" width="280" height="120" rx="19" fill="#edf3dd" stroke="#d9cfdf"/><text x="668" y="32" class="svg-node-title">OpenAI</text><text x="668" y="62" class="svg-node-copy">Live speech via WebRTC</text><text x="668" y="86" class="svg-node-copy">Structured extraction models</text><rect x="660" y="215" width="260" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="678" y="247" class="svg-node-title">Voice service</text><text x="678" y="277" class="svg-node-copy">Session setup · transcript</text><text x="678" y="301" class="svg-node-copy">Validation · conversation log</text><rect x="1050" y="215" width="335" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="1068" y="247" class="svg-node-title">Case &amp; advice</text><text x="1068" y="277" class="svg-node-copy">Shared confirmed profile</text><text x="1068" y="301" class="svg-node-copy">Scenarios · review · proposals</text><rect x="1050" y="410" width="335" height="90" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="1068" y="442" class="svg-node-title">Logismata</text><text x="1068" y="472" class="svg-node-copy">Risk · pension · budget</text></svg></div>
+ <div class="flow-legend"><span class="legend-green">Audio</span><span class="legend-purple">Transcript &amp; structured context</span><span class="legend-blue">Results &amp; orchestration</span></div>
+ <p class="flow-source">Demo hosted on Cloudflare Workers · The regular flow requires customer confirmation; the live demo accepts voice answers automatically · Calculator exchange stays server-side.</p>
+</section>
+<section class="closing" aria-label="Try Paxi yourself">
+ <div class="closing-heading"><p class="eyebrow">MEET YOUR NEXT CHAPTER</p><h2>Try Paxi yourself.</h2></div>
  <a class="closing-pair" href="https://paxi.rushworks.workers.dev/" aria-label="Try Paxi"><div class="qr-mascot" id="qr-mascot"></div></a>
  <footer><p class="team-name">Larpers</p><p class="love"><span aria-label="love">♥</span> Vibe coded with love</p><div class="team" id="team"></div></footer>
  <a class="repo" href="https://github.com/mannaluca02/basel_hack">View on GitHub</a>
+</section>
 </main>
 <script type="module" src="site.js"></script>
 </body></html>
