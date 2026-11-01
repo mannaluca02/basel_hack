@@ -65,6 +65,19 @@ describe('AgentDock', () => {
     expect(fill().style.strokeDashoffset).toBe('72.5');
   });
 
+  it('draws no fill, not even a round cap, while nothing is captured', async () => {
+    expect(dock().classList).not.toContain('blank');
+
+    await set({ percent: 0 });
+    expect(dock().classList).toContain('blank');
+
+    await set({ percent: null });
+    expect(dock().classList).toContain('blank');
+
+    await set({ percent: 2 });
+    expect(dock().classList).not.toContain('blank');
+  });
+
   it('words 100 % as information complete, never as insured', async () => {
     await set({ percent: 100 });
     expect(description()).toContain('Alle Angaben erfasst');
