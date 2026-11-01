@@ -417,6 +417,28 @@ describe('App voice per configuration', () => {
     expect(root.querySelector('app-call-controls')).toBeNull();
   });
 
+  it('starts talking again after a reload in the live build, without the microphone button', async () => {
+    const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
+    vi.stubGlobal('navigator', { ...navigator, userAgent: navigator.userAgent, mediaDevices: { getUserMedia } });
+    try {
+      await renderWith({ dataSource: 'api', demoStart: true, liveStart: true });
+      expect(getUserMedia).toHaveBeenCalledWith({ audio: true });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('waits for the microphone button after a reload outside the live build', async () => {
+    const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
+    vi.stubGlobal('navigator', { ...navigator, userAgent: navigator.userAgent, mediaDevices: { getUserMedia } });
+    try {
+      await renderWith({ dataSource: 'api', demoStart: true });
+      expect(getUserMedia).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('shows the call bar for Paxi in its own window in the paxi configuration', async () => {
     const root = await renderWith({
       dataSource: 'api',

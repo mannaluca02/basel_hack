@@ -77,6 +77,12 @@ export class LifeInsuranceEngine {
     return this.store.transaction(db=>{
       this.sessions.assertActive(actor,db);
       for(const [key,c] of Object.entries(db.cases))if(c.expiresAt<=now())delete db.cases[key];
+      // Full: the oldest cases nobody can open any more go first. Every sign-in is a new owner id,
+      // so a case without a live owner session and without a review task is unreachable (a reload
+      // of the live start leaves one behind each time).
+      const owners=new Set(Object.values(db.sessions).filter(s=>s.expiresAt>now()).map(s=>s.id));
+      const orphans=Object.values(db.cases).filter(c=>!owners.has(c.ownerId)&&!c.reviewTasks.length).sort((a,b)=>a.updatedAt.localeCompare(b.updatedAt));
+      for(const old of orphans.slice(0,Math.max(0,Object.keys(db.cases).length-24))){delete db.cases[old.id];this.audit(db,actor,old,'unreachable_case_removed');}
       db.feedback=db.feedback.filter(f=>Object.hasOwn(db.cases,f.caseId));
       if(Object.keys(db.cases).length>=25)throw new WorkflowError('CASE_CAPACITY',429);
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),

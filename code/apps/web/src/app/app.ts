@@ -212,8 +212,12 @@ export class App {
       if (tab && this.unread()[tab] > 0) this.store.markRead(tab);
     });
 
-    // Consent lasts the browser session, so after a reload the call resumes right away.
-    if (this.consented()) this.store.connect();
+    // Consent lasts the browser session, so after a reload the call resumes right away; the live
+    // build also starts talking again without the microphone button.
+    if (this.consented()) {
+      this.store.connect();
+      if (this.autoCall && this.env.liveStart) this.callPaxi();
+    }
   }
 
   /** "I agree": store the consent, connect, start the call in this click, wake Paxi. */
