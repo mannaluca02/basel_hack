@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 466 964" fill="none" aria-label="iPhone 15 Pro Max titanium frame">
+<defs><linearGradient id="titanium" x1="0" y1="0" x2="466" y2="964" gradientUnits="userSpaceOnUse"><stop stop-color="#aaa49f"/><stop offset=".25" stop-color="#65605d"/><stop offset=".55" stop-color="#bcb7b0"/><stop offset=".8" stop-color="#45413f"/><stop offset="1" stop-color="#99938d"/></linearGradient></defs>
+<rect x="0" y="165" width="5" height="32" rx="2" fill="#807a75"/><rect x="0" y="231" width="5" height="64" rx="2" fill="#807a75"/><rect x="0" y="315" width="5" height="64" rx="2" fill="#807a75"/><rect x="461" y="258" width="5" height="102" rx="2" fill="#807a75"/>
+<path fill-rule="evenodd" fill="url(#titanium)" d="M74 0H392A72 72 0 0 1 464 72V892A72 72 0 0 1 392 964H74A72 72 0 0 1 2 892V72A72 72 0 0 1 74 0ZM76 16H390A58 58 0 0 1 448 74V890A58 58 0 0 1 390 948H76A58 58 0 0 1 18 890V74A58 58 0 0 1 76 16Z"/>
+<path fill-rule="evenodd" fill="#101012" d="M74 5H392A67 67 0 0 1 459 72V892A67 67 0 0 1 392 959H74A67 67 0 0 1 7 892V72A67 67 0 0 1 74 5ZM76 16H390A58 58 0 0 1 448 74V890A58 58 0 0 1 390 948H76A58 58 0 0 1 18 890V74A58 58 0 0 1 76 16Z"/>
+<path d="M76 16H390A58 58 0 0 1 448 74V890A58 58 0 0 1 390 948H76A58 58 0 0 1 18 890V74A58 58 0 0 1 76 16Z" stroke="#252527" stroke-width=".8"/>
+</svg>
