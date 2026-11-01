@@ -188,3 +188,74 @@ Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, K
 ## Voice am gemeinsamen Fall
 
 [Anbindung für Dario und Erni](../documentation/baselhack/plans/voice-backend-integration.md): Nest-Voice-Modul, serverseitige OpenAI-/ElevenLabs-Adapter, explizite synthetische Voice-Zustimmung, verschlüsselte finale Transkripte und quellengebundene atomare Vorschläge. `npm run demo:voice-integration` prüft den vollständigen Backend-Fluss ohne Mikrofon oder externe Modellaufrufe. `npm run contracts:voice-integration-examples` erzeugt die Team-JSON-Beispiele. Voice bleibt ohne `PAX_SYNTHETIC_VOICE_ENABLED=1` deaktiviert.
+
+## Deploy on Cloudflare
+
+Der Worker **`paxi`** liefert Angular mit `live-production` und die Nest-API unter derselben HTTPS-Origin aus: `https://paxi.<subdomain>.workers.dev`. Der Demo-Start ist bewusst ohne Zugangscode offen. Darios separater Voice-Agent wird nicht deployt; Persona und Skills sind für die integrierte Live-Voice gebündelt.
+
+Voraussetzungen: Node 22+, npm, Cloudflare-Konto mit Workers/Durable Objects und workers.dev-Subdomain. Die folgenden Konto- und Deploy-Befehle sind für die spätere Freigabe vorgesehen. Aus `code/` installieren und lokal prüfen:
+
+```sh
+npm ci --ignore-scripts
+npm run build -w @pax/worker # nur wrangler deploy --dry-run
+npm run typecheck -w @pax/worker
+npm test
+cd apps/worker
+npx wrangler login
+# Alternativ: CLOUDFLARE_API_TOKEN sicher in der Shell/CI bereitstellen.
+```
+
+Einmalig aus `code/apps/worker` die Secrets setzen (Werte interaktiv eingeben, niemals committen):
+
+```sh
+# Einmal einen Schlüssel erzeugen und sicher im Passwortmanager aufbewahren:
+openssl rand -base64 32
+npx wrangler secret put LIFEMAP_STORE_KEY
+npx wrangler secret put LOGISMATA_BEARER_TOKEN
+npx wrangler secret put OPENAI_API_KEY
+# Optional, nur bei Nutzung:
+npx wrangler secret put ELEVENLABS_API_KEY
+npx wrangler secret put ELEVENLABS_AGENT_ID
+npx wrangler secret put PAX_CUSTOMER_ACCESS_CODE
+npx wrangler secret put PAX_REVIEWER_ACCESS_CODE
+```
+
+`LIFEMAP_STORE_KEY` ist ein base64-kodierter 32-Byte-Schlüssel. Bei Folge-Deployments denselben Schlüssel behalten: Verlust oder Austausch macht gespeicherte Fälle unlesbar. Zugangscodes sind optionale Login-Overrides; ohne sie werden Fallback-Codes dauerhaft erzeugt. Sie sperren den Demo-Start nicht. `.dev.vars` ist nur für lokale Entwicklung, kein Ersatz für Remote-Secrets.
+
+Nicht geheime Vars in `apps/worker/wrangler.jsonc`:
+
+| Variable | Wirkung |
+| --- | --- |
+| `PAX_DEMO_START=1` | Offenen Demo-Start aktivieren |
+| `PAX_SYNTHETIC_VOICE_ENABLED=1` | Integrierte Live-Voice aktivieren |
+| `PAX_SYNTHETIC_EXTRACTION_ENABLED=1` | Modellbasierte Extraktion aktivieren |
+| `LIVE_MODEL=gpt-live-1`, `LIVE_VOICE=juni` | Voice-Modell und Stimme |
+| `PAX_PUBLIC_ORIGIN=""` | Request-Origin verwenden; alternativ exakt `https://paxi.<subdomain>.workers.dev` für Schreibzugriffe eintragen |
+
+Deployment und automatische Prüfung aus `code/` (`<subdomain>` ersetzen):
+
+```sh
+npm run deploy -w @pax/worker
+WORKER_URL=https://paxi.<subdomain>.workers.dev npm run check -w @pax/worker
+npm run tail -w @pax/worker
+```
+
+Der Build erzeugt Backend, optimiertes Live-Web, Prompts und PDF-Manifest. Provider-Prüfungen melden fehlende Eingaben als übersprungen; das ist kein vollständiger Live-Nachweis. Für einen echten Voice-Setup-Check zusätzlich `VOICE_SDP_FILE` mit einem frischen Browser-SDP-Angebot angeben. Danach auf einem Telefon die öffentliche URL öffnen: Einwilligung erteilen, Mikrofon erlauben, Paxi sprechen hören, eine Berechnung ausführen und Diagramme prüfen. HTTPS von workers.dev ermöglicht den Mikrofonzugriff. Nach Updates alte Tabs schliessen und neu öffnen (Angular Service Worker).
+
+Logs: `tail` mit Ctrl-C beenden; dauerhaft unter Cloudflare Dashboard → Workers & Pages → paxi → Logs/Observability ansehen. [`observability.enabled`](https://developers.cloudflare.com/workers/wrangler/configuration/#observability) ist eingeschaltet. Rollback aus `code/apps/worker`:
+
+```sh
+npx wrangler deployments list
+npx wrangler rollback # vorherige Version; alternativ: npx wrangler rollback <VERSION_ID>
+```
+
+Ein [Rollback](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback) aktiviert sofort alten Code; er stellt keine alten Falldaten oder verlorenen Schlüssel wieder her. Danach automatischen Check und Telefon-Smoke-Test wiederholen.
+
+Kosten während der Jury begrenzen:
+
+- OpenAI: API Dashboard → Settings → Organisation/Projekt → Limits → Monthly spend limit und Warnschwellen setzen; falls verfügbar „Enforce a hard limit“ aktivieren, reine Warnungen stoppen keine Requests ([Anleitung](https://help.openai.com/en/articles/9186755-managing-projects-in-the-api-platform)).
+- ElevenLabs: Subscription → Manage Subscription → Usage based billing deaktivieren oder Change threshold begrenzen (Legacy); bei PAYG nur ein festes Guthaben bereitstellen ([Abrechnung](https://elevenlabs.io/docs/overview/administration/billing)).
+
+Der Logismata-Token läuft am **2026-11-03 um 23:59:59** ab. Neuen Token im Challenge-Hub unter [Tools](https://pax-hackathon-2026.vercel.app) holen und aus `code/apps/worker` mit `npx wrangler secret put LOGISMATA_BEARER_TOKEN` ersetzen; danach Berechnung prüfen.
+
+Akzeptierte Grenzen: Alle Besucher teilen eine Durable Object-Instanz (für die Jury ausreichend). Maximal 25 Fälle; ein neuer Demo-Start ersetzt bei vollem Store ersetzbare Fälle (zuerst unerreichbare, dann die ältesten) und kann dabei eine aktive Besuchersitzung beenden. `/api/demo/start` hat kein Rate-Limit. Architektur, lokale Einrichtung und Persistenzprüfung: [Worker-Guide](apps/worker/README.md).

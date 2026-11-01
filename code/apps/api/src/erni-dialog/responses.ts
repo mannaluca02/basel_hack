@@ -1,3 +1,4 @@
+import { providerFetch } from '../provider-fetch.js';
 import { z } from 'zod';
 import { Cents } from '@pax/contracts';
 import { WorkflowError } from '../insurance/types.js';
@@ -76,9 +77,10 @@ export class ResponsesIntakeAdapter {
 export function openAiResponsesTransport(apiKey:string):ResponsesTransport {
   if(!apiKey.trim())throw new WorkflowError('MODEL_KEY_REQUIRED',503);
   return async(request,signal)=>{
-    const response=await fetch('https://api.openai.com/v1/responses',{method:'POST',signal,
+    const timeout=AbortSignal.timeout(15000);
+    const response=await providerFetch(fetch,'https://api.openai.com/v1/responses',{method:'POST',signal:signal?AbortSignal.any([signal,timeout]):timeout,
       headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(request)});
-    if(!response.ok)throw new WorkflowError('MODEL_TRANSPORT_FAILED',502);
+    if(!response.ok){await response.body?.cancel().catch(()=>{});throw new WorkflowError('MODEL_TRANSPORT_FAILED',502);}
     return response.json();
   };
 }
