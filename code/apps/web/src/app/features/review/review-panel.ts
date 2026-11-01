@@ -351,14 +351,8 @@ const BATCH_STATUS: Readonly<Record<ProposalBatch['status'], string>> = {
       border-radius: var(--radius-sm);
     }
 
-    h2 {
-      margin: 0 0 0.75rem;
-      font-size: 1.125rem;
-    }
-
     h3 {
       margin: 1rem 0 0.25rem;
-      font-size: 1rem;
     }
 
     dl {
