@@ -5,6 +5,7 @@ Dieses Repo enthält die Teamgrundlage für den Pax Digital Advisor. Aktueller S
 - [Voice-Feature: Setup, Integration und API](code/voice-agent/README.md)
 - [Separate Debugging App: Voice → Backend](code/apps/web/debugging-app/README.md)
 - [Voice Lab: Tests und Live-Nachweise](documentation/baselhack/plans/voice-lab-mvp.md)
+- [Echtzeit-Gesprächsführung: Architektur und Implementierungsspezifikation](documentation/baselhack/plans/realtime-conversation-orchestration.md)
 - [Verbindliche Team-Schnittstellen und gemeinsamer Fall-DTO](documentation/baselhack/plans/team-api-guide.md)
 - [API, Speicher und Datenbank-Ausbau](documentation/baselhack/plans/persistence-and-api.md)
 - [Logik-Backend: Start, API und Team-Integration](code/README.md)
