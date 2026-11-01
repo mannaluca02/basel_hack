@@ -58,6 +58,8 @@ const changes=batch=>Object.fromEntries(batch.changes.map(x=>[x.path,x.value]));
 function fakeModel(...replies){
   const requests=[];
   const transport=async request=>{
+    // Open profile questions (lab-questions.ts) are covered by live-questions.test.mjs.
+    if(request.tools[0].name==='submit_answers')return {status:'completed',output:[{type:'function_call',name:'submit_answers',arguments:'{"answers":[]}'}]};
     requests.push(request);
     const reply=replies.shift();
     if(reply instanceof Error)throw reply;

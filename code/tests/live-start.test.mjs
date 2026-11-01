@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {FakeVoiceGateway} from './helpers/voice-fixture.mjs';
-import {demoApp} from './helpers/demo-http.mjs';
+import {client,demoApp} from './helpers/demo-http.mjs';
 
 /**
  * The live configuration end to end over HTTP: a start without test data (an empty case), a
@@ -13,7 +13,8 @@ function fakeModel(setup,intake) {
   const transport=async request=>{
     requests.push(request);
     const name=request.tools[0].name;
-    const args=name==='submit_setup_facts'?setup.shift()??{age:{value:null,quote:''},employment_rate_percent:{value:null,quote:''}}:{observations:intake.shift()??[]};
+    // The open profile questions (lab-questions.ts) are not part of these tests: no answers.
+    const args=name==='submit_setup_facts'?setup.shift()??{age:{value:null,quote:''},employment_rate_percent:{value:null,quote:''}}:name==='submit_answers'?{answers:[]}:{observations:intake.shift()??[]};
     return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
   };
   return {transport,requests};
@@ -122,4 +123,57 @@ test('without the extraction consent the setup asks for the screen instead of gu
   const r=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId});
   assert.deepEqual(r.body.extraction.result.issues.map(i=>i.code),['SETUP_NEEDS_MODEL']);
   assert.equal(model.requests.length,0,'nothing reaches the model');
+});
+
+test('a sentence spoken before the person existed is extracted again for the intake fields',async t=>{
+  const model=fakeModel([{age:{value:'34',quote:'ich bin 34'},employment_rate_percent:{value:'80',quote:'arbeite 80 Prozent'}}],
+    [[{fieldId:'annual_gross_income_chf',quote:'verdiene 95000 brutto im Jahr',value:'95000',precision:'exact',period:'year',basis:'gross'}]]);
+  const f=await demoApp(t,{demoStart:true,voice:{enabled:true,gateways:[new FakeVoiceGateway()]},modelExtraction:{enabled:true,transport:model.transport}});
+  const started=await f.customer.call('POST','/api/demo/start',{locale:'de',empty:true});
+  f.customer.csrf=started.body.csrfToken;
+  const path=`/api/cases/${started.body.caseId}`,current=async()=>(await f.customer.call('GET',path)).body;
+  const notice=(await f.customer.call('GET','/api/extraction/privacy?locale=de')).body;
+  let c=await current();
+  await f.customer.call('POST',`${path}/extraction/consent`,{expectedCaseRevision:c.caseRevision,noticeVersion:notice.version,noticeHash:notice.noticeHash,dataClassification:'synthetic',allowSyntheticModelExtraction:true});
+  c=await current();
+  const sid=(await f.customer.call('POST',`${path}/voice/sessions`,{messageId:'replay',expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',
+    dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=offer'})).body.voiceSession.id;
+  const messageId='turn_all_in_one';
+  await f.customer.call('POST',`${path}/voice/sessions/${sid}/turns`,{speaker:'customer',log:{schemaVersion:'1.0',messageId,caseId:c.id,correlationId:sid,turnId:messageId,
+    source:'voice',locale:'de',text:'Also ich bin 34, ich arbeite 80 Prozent und verdiene 95000 brutto im Jahr.',transcriptStatus:'final',dataClassification:'synthetic'}});
+  const setup=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId});
+  assert.ok(setup.body.extraction.result.proposalBatch,'the person');
+  await f.customer.call('POST',`${path}/demo-accept`,{});
+  // The same turn again, now for the person: the income is not lost.
+  const again=await f.customer.call('POST',`${path}/voice-lab/turns`,{mode:'live',voiceSessionId:sid,messageId,personId:'person_1'});
+  assert.equal(again.status,201,JSON.stringify(again.body));
+  assert.equal(again.body.extraction.adapter,'model-v1');
+  await f.customer.call('POST',`${path}/demo-accept`,{});
+  assert.equal((await current()).draft.insurance.persons[0].grossAnnualIncomeCents,9500000);
+});
+
+test('a full store makes room for a new live start: new tabs and restarts never lock it',async t=>{
+  const f=await demoApp(t,{voice:{enabled:true,gateways:[new FakeVoiceGateway()]}});
+  const tabs=[];
+  for(let i=0;i<30;i++){
+    const tab=client(f.base),r=await tab.call('POST','/api/demo/start',{locale:'de',empty:true});
+    assert.equal(r.status,201,`start ${i}: ${JSON.stringify(r.body)}`);
+    tab.csrf=r.body.csrfToken;tabs.push({tab,caseId:r.body.caseId});
+  }
+  const cases=await f.runtime.store.view(db=>Object.keys(db.cases));
+  assert.ok(cases.length<=25);
+  assert.ok(cases.includes(tabs.at(-1).caseId),'the newest case stays');
+  assert.ok(cases.includes(f.path.split('/').at(-1)),'the persona case is no live start and stays');
+  assert.ok(!cases.includes(tabs[0].caseId),'the oldest live start went first');
+  // Its tab is signed out, so it starts again instead of talking to a case that is gone.
+  assert.equal((await tabs[0].tab.call('GET',`/api/cases/${tabs[0].caseId}`)).status,401);
+});
+
+test('a full store of cases with content still refuses a new one',async t=>{
+  const f=await demoApp(t,{voice:{enabled:true,gateways:[new FakeVoiceGateway()]}});
+  const persona=f.path.split('/').at(-1);
+  await f.runtime.store.transaction(db=>{for(let i=0;i<24;i++){const id=crypto.randomUUID();db.cases[id]={...structuredClone(db.cases[persona]),id};}});
+  const r=await client(f.base).call('POST','/api/demo/start',{locale:'de',empty:true});
+  assert.equal(r.status,429);
+  assert.equal(r.body.code,'CASE_CAPACITY');
 });

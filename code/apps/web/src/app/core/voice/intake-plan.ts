@@ -38,6 +38,9 @@ export function intakeRows(dto: InsuranceCaseDto, personId: string, memory: Inta
       for (const batch of batches.filter(b => b.status === status).reverse()) {
         const change = batch.changes.find(c => targets[fieldId](c, personId));
         if (change) return { fieldId, status, value: change.value };
+        // The live start's case frame already carries the employment rate the person said.
+        const frame = fieldId === 'employment_rate_percent' ? frameRate(batch.changes, personId) : undefined;
+        if (frame !== undefined) return { fieldId, status, value: frame };
       }
     if ((memory.attempts[fieldId] ?? 0) >= MAX_ATTEMPTS) return { fieldId, status: 'skipped' };
     return { fieldId, status: 'open' };
@@ -45,6 +48,12 @@ export function intakeRows(dto: InsuranceCaseDto, personId: string, memory: Inta
   const asking = rows.find(r => r.status === 'open');
   if (asking) asking.status = 'asking';
   return rows;
+}
+
+/** The employment rate of `personId` in a case-frame change (`financial` set at once), if any. */
+function frameRate(changes: readonly { path: string; value?: unknown }[], personId: string): number | undefined {
+  const frame = changes.find(c => c.path === 'financial')?.value as { persons?: { id: string; employmentRateBps: number }[] } | undefined;
+  return frame?.persons?.find(p => p.id === personId)?.employmentRateBps;
 }
 
 /** The field Paxi asks next: the first unclear one, else the first open one; null when nothing is left. */

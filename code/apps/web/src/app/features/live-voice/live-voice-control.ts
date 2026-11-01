@@ -327,7 +327,8 @@ export class LiveVoiceControl {
   /** Demo start: Paxi heard something that is not accepted yet. */
   protected readonly offerAccept = computed(
     () =>
-      this.demoStart && this.live.caseReady() && (this.store.projection()?.pending.length ?? 0) > 0,
+      // The live build takes proposals over by itself (LiveVoice), so it needs no card.
+      this.demoStart && !this.liveStart && this.live.caseReady() && (this.store.projection()?.pending.length ?? 0) > 0,
   );
   protected readonly panelId = `live-voice-panel-${nextId}`;
   protected readonly titleId = `live-voice-title-${nextId++}`;

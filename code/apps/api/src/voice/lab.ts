@@ -1,6 +1,6 @@
-import { Body, Controller, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { z, ZodError } from 'zod';
-import { DraftSchema, type VoiceObservation } from '@pax/contracts';
+import { DraftSchema, type ProposalChangeInput, type VoiceObservation } from '@pax/contracts';
 import { LIFE_RUNTIME, type LifeRuntime } from '../insurance/runtime.js';
 import { LifeSessionGuard } from '../insurance/http.js';
 import { WorkflowError, type Actor } from '../insurance/types.js';
@@ -9,8 +9,14 @@ import { mapVoiceObservations } from './portfolio.js';
 import { parseExactAnnualGrossIncome } from './exact-income.js';
 import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, modelObservations, scriptObservation } from './lab-intake.js';
 import { setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
+import { answerChanges, answerObservations, answerTargets, openAsks, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
+import { languageNumber } from '../insurance/i18n.js';
 import type { ResponsesTransport } from '../erni-dialog/responses.js';
 type JsonValue = Parameters<typeof JSON.stringify>[0];
+const MODEL_ERRORS=['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'];
+/** Open batches the next proposal replaces (and carries): proposed, with changes, without a clarification. */
+const replaceable=<T extends {status:string;changes:unknown[];ambiguityIds?:string[]|undefined}>(batches:T[])=>
+  batches.filter(batch=>batch.status==='proposed'&&batch.changes.length>0&&!batch.ambiguityIds?.length);
 
 const TurnSchema = z.discriminatedUnion('mode', [
   z.object({mode:z.literal('synthetic'),sample:z.enum(['income','correction','smalltalk',...INTAKE_SAMPLE_IDS]),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
@@ -98,7 +104,7 @@ export class VoiceLabController {
       const transport=b.mode==='live'?this.r.modelExtraction.options.transport:undefined;
       if(b.mode==='live'&&b.personId===undefined)return await this.setupTurn(agent,id,c.id,live!,turn!,source,text,transport);
       const personId=b.personId!;
-      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false;
+      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false,answers:Answer[]=[];
       if(authored)adapter='authored-script',observations=scriptObservation(b.sample,text,b.messageId,personId);
       else if(b.mode==='live'&&transport&&this.r.modelExtraction.permission(agent,id).transferAllowed) {
         adapter='model-v1';
@@ -106,13 +112,19 @@ export class VoiceLabController {
         try {
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           const turns=live!.turns.slice(0,live!.turns.indexOf(turn!)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
-          observations=await modelObservations(transport,turns,b.messageId,personId,task.signal);
+          // The open profile questions are read in the same round: the intake fields of the person
+          // speaking stay with modelObservations, everything else the confirmation needs is here.
+          // Fields of a person not accepted yet wait for the next turn (paths must name a known person).
+          const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id),personId)
+            .filter(target=>{const person=/^(?:insurance|financial)\.persons\.([^.]+)\./.exec(target.key)?.[1];return !person||ctx.personIds.includes(person);});
+          [observations,answers]=await Promise.all([modelObservations(transport,turns,b.messageId,personId,task.signal),
+            answerObservations(transport,turns,targets,task.signal).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
         } catch(error) {
           // A flaky model never ends the conversation; consent, handover and cancellation still stop it.
-          if(!(error instanceof WorkflowError&&['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'].includes(error.code)))throw error;
-          modelFailed=true;observations=[];
+          if(!(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code)))throw error;
+          modelFailed=true;observations=[];answers=[];
         } finally {task.finish();}
         // Read the context only now, so a slow model cannot leave a stale revision or draft hash behind.
         ctx=read();
@@ -152,7 +164,9 @@ export class VoiceLabController {
         if(!code)throw error;
         result={proposalBatch:null,issues:[{code,action:'screen_or_human_review'}],confirmationStillRequired:true};
       }
-      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications,result}};
+      const answered=answers.length?await this.proposeAnswers(agent,id,c.id,b.messageId,source,answers,this.lookup(c.locale)):null;
+      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications,result,
+        ...(answered?{answers:answered}:{})}};
     } finally {await this.r.sessions.revoke(agent);}
   }
 
@@ -187,9 +201,66 @@ export class VoiceLabController {
     const frame=setupDraft(c.draft,caseId,facts.birthYear!,facts.employmentRateBps!,source.sourceRef);
     const changes=(['financial','insurance'] as const).filter(key=>c.draft[key]===null).map(key=>({path:key,value:frame[key] as unknown as JsonValue}));
     const supersedesBatchIds=ctx.proposalBatches.filter(batch=>batch.status==='proposed'&&batch.changes.some(change=>change.path==='financial'||change.path==='insurance')).map(batch=>batch.id);
-    const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:source.messageId,source,expectedCaseRevision:ctx.caseRevision,
+    // Its own message id: once the person exists, the same turn is extracted again for the intake fields.
+    const setupSource={...source,messageId:source.messageId.replace(/^lab_/,'setup_')};
+    const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:setupSource.messageId,source:setupSource,expectedCaseRevision:ctx.caseRevision,
       expectedProfileVersion:ctx.profileVersion,basisDraftHash:ctx.draftHash,changes,ambiguities:[],supersedesBatchIds});
     return reply({setup:{missing:[],quotes:facts.quotes}},{proposalBatch,issues:[],confirmationStillRequired:true});
+  }
+
+  /**
+   * What the profile still needs before the live build can confirm and calculate it, in
+   * conversation order, as Paxi asks it (accepted values plus open proposals count as known).
+   */
+  @Get('questions')
+  questions(@Req() req:{actor:Actor},@Param('caseId') id:string) {
+    const c=this.customer(req.actor,id);
+    return {asks:openAsks(pendingView(c.draft,replaceable(c.proposalBatches).flatMap(batch=>batch.changes),c.id),c.locale)};
+  }
+
+  /**
+   * The answers to the open profile questions as their own batch (`ask_` + message id). It replaces
+   * the open batch, the intake fields of this same turn included, and carries its changes, so
+   * there is still one cumulative proposal to accept. A repeated turn proposes nothing new.
+   */
+  private async proposeAnswers(agent:Actor,id:string,caseId:string,messageId:string,source:{messageId:string;turnId:string;sourceRef:string},answers:Answer[],lookup:LocationLookup) {
+    const ctx=this.r.extraction.context(agent,id),askId=`ask_${messageId}`;
+    if(ctx.proposalBatches.some(batch=>batch.messageId===askId))return null;
+    const open=replaceable(ctx.proposalBatches),carried=open.flatMap(batch=>batch.changes);
+    const view=pendingView(ctx.draft,carried,caseId);
+    // Additions append, so the carried ones stay; a value set again wins.
+    const merge=(changes:ProposalChangeInput[])=>{const paths=new Set(changes.map(change=>change.path));
+      return [...carried.filter(change=>change.path.endsWith('_add')||!paths.has(change.path)),...changes];};
+    // A batch holds at most 50 changes: the first answers in conversation order go now, the rest
+    // stays open and is read again next turn (the quotes are still in the conversation).
+    let take=answers.length,merged:ProposalChangeInput[]=[];
+    for(;take>0;take=Math.min(take-1,Math.floor(take*0.75))) {
+      merged=merge(await answerChanges(view,answers.slice(0,take),source.sourceRef,lookup));
+      if(merged.length<=50)break;
+    }
+    if(take===0||merged.length===carried.length)return {proposalBatch:null,answered:[],issues:[]};
+    answers=answers.slice(0,take);
+    try {
+      const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:askId,source:{...source,messageId:askId},expectedCaseRevision:ctx.caseRevision,
+        expectedProfileVersion:ctx.profileVersion,basisDraftHash:ctx.draftHash,changes:merged,ambiguities:[],supersedesBatchIds:open.map(batch=>batch.id)});
+      return {proposalBatch,answered:answers.map(a=>a.key),issues:[]};
+    } catch(error) {
+      const code=error instanceof ZodError?'DRAFT_INVALID':error instanceof WorkflowError&&['SUPERSESSION_REQUIRED','PATCH_TARGET_MISSING','PERSON_REFERENCE_MISMATCH'].includes(error.code)?'ANSWERS_NOT_PROPOSED':null;
+      if(!code)throw error;
+      return {proposalBatch:null,answered:answers.map(a=>a.key),issues:[{code,action:'screen_or_human_review'}]};
+    }
+  }
+
+  /** A spoken municipality to the calculator's location id, only when exactly one location fits. */
+  private lookup(locale:keyof typeof languageNumber):LocationLookup {
+    return async search=>{
+      const result=await this.r.engine.provider.execute('searchLocation',{Search:search,Language:languageNumber[locale]});
+      const locations=(result.metadata.locations??[]) as {LocationID:number;ZipCode:string|number;City:string}[];
+      const zip=/\b\d{4}\b/.exec(search)?.[0],name=search.replace(/\b\d{4}\b/,'').trim().toLocaleLowerCase();
+      const fits=locations.filter(l=>(!zip||String(l.ZipCode)===zip)&&(!name||l.City.toLocaleLowerCase()===name));
+      const ids=new Set((fits.length?fits:locations).map(l=>l.LocationID));
+      return ids.size===1?[...ids][0]!:null;
+    };
   }
 
   private customer(actor:Actor,id:string) {

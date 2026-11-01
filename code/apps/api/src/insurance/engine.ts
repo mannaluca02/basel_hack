@@ -23,6 +23,17 @@ const now=()=>new Date().toISOString();
 const currentVersion=(c:InsuranceCase)=>c.confirmedVersions.at(-1);
 
 
+/**
+ * Whether a full store may drop a case for a new one. Never a case under review. Otherwise: one
+ * nobody can open any more (every sign-in is a new owner id), a live start's case (each new tab or
+ * restart of the live build starts its own), or a case that holds nothing yet.
+ */
+function replaceable(c:InsuranceCase,unreachable:boolean) {
+  if(c.reviewTasks.length)return false;
+  const untouched=!c.draft.financial&&!c.draft.insurance&&!c.draft.goals.length&&!c.proposalBatches.length&&!c.runs.length;
+  return unreachable||c.liveStart===true||untouched;
+}
+
 export class LifeInsuranceEngine {
   readonly digitalTasks=new DigitalTasks();
   assertDigitalActive(c:InsuranceCase){if(c.handover.stopDigitalConversation)throw new WorkflowError('HUMAN_HANDOVER_ACTIVE');}
@@ -72,17 +83,30 @@ export class LifeInsuranceEngine {
   approved(c:InsuranceCase,run:LifeRun) {
     return c.reviewTasks.filter(t=>t.runId===run.id&&t.profileVersion===run.profileVersion).at(-1)?.status==='approved_for_demo';
   }
-  async createCase(actor:Actor,input:unknown) {
+  /** `liveStart`: a case of the live configuration's start, see `replaceable`. */
+  async createCase(actor:Actor,input:unknown,{liveStart=false}={}) {
     this.role(actor,'customer');const body=CreateInsuranceCaseSchema.parse(input);
     return this.store.transaction(db=>{
       this.sessions.assertActive(actor,db);
       for(const [key,c] of Object.entries(db.cases))if(c.expiresAt<=now())delete db.cases[key];
+      // Full: replaceable cases give way, unreachable ones first, then the oldest.
+      const owners=new Set(Object.values(db.sessions).filter(s=>s.expiresAt>now()).map(s=>s.id));
+      const unreachable=(c:InsuranceCase)=>!owners.has(c.ownerId);
+      const old=Object.values(db.cases).filter(c=>replaceable(c,unreachable(c)))
+        .sort((a,b)=>Number(unreachable(b))-Number(unreachable(a))||a.updatedAt.localeCompare(b.updatedAt));
+      for(const gone of old.slice(0,Math.max(0,Object.keys(db.cases).length-24))){
+        delete db.cases[gone.id];
+        // Its tab notices (stream refused) and starts again.
+        for(const [key,s] of Object.entries(db.sessions))if(s.id===gone.ownerId)delete db.sessions[key];
+        this.audit(db,actor,gone,'case_replaced');
+      }
       db.feedback=db.feedback.filter(f=>Object.hasOwn(db.cases,f.caseId));
       if(Object.keys(db.cases).length>=25)throw new WorkflowError('CASE_CAPACITY',429);
       const c:InsuranceCase={id:randomUUID(),ownerId:actor.id,createdAt:now(),updatedAt:now(),expiresAt:new Date(Date.now()+86400_000).toISOString(),
         locale:body.locale,timeBudgetMinutes:body.timeBudgetMinutes,caseRevision:1,contextRevision:1,
         draft:{financial:null,insurance:null,goals:[],reviewFlags:[]},draftDirty:true,confirmedVersions:[],latestAnalysisRequestId:null,activeRunId:null,
         runs:[],reviewTasks:[],recommendations:[],quotes:[],applications:[],policies:[],graphContext:null,events:[],handover:structuredClone(DEFAULT_HUMAN_HANDOVER),voiceSessions:[],agentTurns:[],suitabilityChecks:[],confirmationRequests:[],modelExtractionConsent:null,proposals:[],proposalBatches:[],ambiguities:[],estimates:[],comparisons:[],idempotency:{}};
+      if(liveStart)c.liveStart=true;
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
   }

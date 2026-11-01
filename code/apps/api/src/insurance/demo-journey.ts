@@ -236,7 +236,7 @@ export class DemoJourney {
     const {sessions,credentials}=this.demoStart!;
     const login=await sessions.login(credentials.customerAccessCode,'live-start');
     const actor=sessions.authenticate(login.sessionToken);
-    const c=await this.engine.createCase(actor,{locale,timeBudgetMinutes:30,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'});
+    const c=await this.engine.createCase(actor,{locale,timeBudgetMinutes:30,noticeVersion:'lifemap-synthetic-v2',dataClassification:'synthetic'},{liveStart:true});
     return {sessionToken:login.sessionToken,csrfToken:login.csrfToken,expiresAt:login.expiresAt,caseId:c.id};
   }
 

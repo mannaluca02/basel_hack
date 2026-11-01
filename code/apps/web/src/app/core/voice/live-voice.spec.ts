@@ -11,6 +11,7 @@ import { Consent } from '../consent/consent';
 import { APP_ENVIRONMENT } from '../config/app-environment';
 import { provideI18nTesting } from '../i18n/i18n-testing';
 import { AppLanguage } from '../i18n/language';
+import { INTAKE_FIELDS } from './intake-plan';
 import { LiveVoice } from './live-voice';
 import { VoiceActivity } from './voice-activity';
 
@@ -144,6 +145,167 @@ describe('LiveVoice', () => {
     live.stop();
     TestBed.tick();
     expect(ring.emotion()).toBeNull();
+  });
+});
+
+
+describe('LiveVoice in the live build', () => {
+  function setup(liveStart: boolean) {
+    sessionStorage.clear();
+    sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify({ caseId: CASE_ID, csrfToken: 'csrf_test' }));
+    const source = new FakeDataSource();
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: reviewCase() });
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideI18nTesting(),
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true, liveStart } },
+        { provide: AdvisorDataSource, useValue: source },
+      ],
+    });
+    TestBed.inject(Consent).grant();
+    const live = TestBed.inject(LiveVoice);
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
+    // A running call: the transport reports a settled customer turn.
+    (live as unknown as { sessionId: string }).sessionId = 'session_1';
+    const transport = (live as unknown as { voice: { options: { onTurn(speaker: string, text: string, how: string): void } } }).voice.options;
+    return { live, http: TestBed.inject(HttpTestingController), say: (text: string) => transport.onTurn('customer', text, 'client-settled') };
+  }
+  const settle = () => new Promise((resolve) => setTimeout(resolve));
+
+  async function answerTurn(http: HttpTestingController) {
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase());
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
+      mode: 'live', source: { text: 'x' },
+      extraction: { adapter: 'model-v1', route: 'VoiceIntegrationService.propose', result: { proposalBatch: { id: 'batch_1' }, issues: [] } },
+    });
+    await settle();
+  }
+
+  it('takes what Paxi heard into the case at once, without the acceptance card', async () => {
+    const { http, say } = setup(true);
+    say('Ich verdiene 95000 Franken brutto im Jahr.');
+    await answerTurn(http);
+    const accept = http.expectOne(`/api/cases/${CASE_ID}/demo-accept`);
+    expect(accept.request.headers.get('X-CSRF-Token')).toBe('csrf_test');
+    accept.flush({ accepted: ['batch_1'], skipped: [], profileVersion: null, runs: [], missing: ['goals'] });
+    await settle();
+  });
+
+  it('leaves the acceptance to the customer outside the live build', async () => {
+    const { http, say } = setup(false);
+    say('Ich verdiene 95000 Franken brutto im Jahr.');
+    await answerTurn(http);
+    http.expectNone(`/api/cases/${CASE_ID}/demo-accept`);
+  });
+
+  /** Every intake field given up on, so the profile questions are next. */
+  const intakeThrough = (live: LiveVoice) =>
+    live.intake.set({ attempts: Object.fromEntries(INTAKE_FIELDS.map((id) => [id, 2])), clarifications: {} });
+  const steer = (live: LiveVoice) =>
+    (live as unknown as { steer(rows: unknown): { done: boolean; nextQuestion: string | null } }).steer(live.rows());
+
+  it('asks the profile questions of the backend once the intake fields are through, and only then is done', () => {
+    const { live } = setup(true);
+    intakeThrough(live);
+    expect(steer(live)).toMatchObject({ done: false, nextQuestion: null });
+    live.caseAsks.set([{ key: 'goals', text: 'Was möchten Sie erreichen?' }]);
+    expect(steer(live)).toMatchObject({ done: false, nextQuestion: 'Was möchten Sie erreichen?' });
+    live.caseAsks.set([]);
+    expect(steer(live).done).toBe(true);
+  });
+
+  it('keeps the intake steering outside the live build', () => {
+    const { live } = setup(false);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Was möchten Sie erreichen?' }]);
+    expect(live.caseAsk()).toBeNull();
+    expect(steer(live).done).toBe(true);
+  });
+
+  it('takes the answers over, reloads the open questions and moves on after two unanswered turns', async () => {
+    const { live, http, say } = setup(true);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Ziele?' }, { key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }]);
+    const turn = async (answers: { proposalBatch: unknown; answered: string[] }) => {
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase());
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
+        mode: 'live', source: { text: 'x' },
+        extraction: { adapter: 'model-v1', route: 'VoiceIntegrationService.propose', result: { proposalBatch: null, issues: [] }, answers },
+      });
+      await settle();
+    };
+
+    say('Wir wollen für die Pension sparen.');
+    await turn({ proposalBatch: { id: 'ask_1' }, answered: ['goals'] });
+    http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: ['ask_1'], skipped: [], profileVersion: null, runs: [], missing: [] });
+    await settle();
+    http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: [{ key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }] });
+    await settle();
+    expect(live.caseAsk()?.key).toBe('insurance.relationshipSinceYear');
+
+    // Two turns without an answer: Paxi stops asking this one, nothing is assumed.
+    for (const text of ['Hmm.', 'Weiss ich nicht.']) {
+      say(text);
+      await turn({ proposalBatch: null, answered: [] });
+      http.expectNone(`/api/cases/${CASE_ID}/demo-accept`);
+    }
+    expect(live.caseAsk()).toBeNull();
+    expect(steer(live).done).toBe(true);
+  });
+
+  it('sets up the person from the first sentence, then extracts that sentence again for her', async () => {
+    sessionStorage.clear();
+    sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify({ caseId: CASE_ID, csrfToken: 'csrf_test' }));
+    const empty = reviewCase({ draft: { ...reviewCase().draft, financial: null, insurance: null }, proposalBatches: [] });
+    const source = new FakeDataSource();
+    source.nextSnapshot = of({ ...emptySnapshot(CASE_ID), canonical: empty });
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideI18nTesting(),
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true, liveStart: true } },
+        { provide: AdvisorDataSource, useValue: source },
+      ],
+    });
+    TestBed.inject(Consent).grant();
+    const live = TestBed.inject(LiveVoice);
+    TestBed.inject(CaseStore).refresh();
+    TestBed.tick();
+    expect(live.setupMode()).toBe(true);
+    (live as unknown as { sessionId: string }).sessionId = 'session_1';
+    const http = TestBed.inject(HttpTestingController);
+    (live as unknown as { voice: { options: { onTurn(a: string, b: string, c: string): void } } }).voice.options
+      .onTurn('customer', 'Ich bin 34, arbeite 80 Prozent und verdiene 95000.', 'client-settled');
+    const turn = { mode: 'live', source: { text: 'x' } };
+
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}`).flush(empty);
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
+    await settle();
+    const setupTurn = http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`);
+    expect(setupTurn.request.body.personId).toBeUndefined();
+    setupTurn.flush({ ...turn, extraction: { adapter: 'model-v1', route: 'setup', result: { proposalBatch: { id: 'setup' }, issues: [] } } });
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: ['setup'], skipped: [], profileVersion: null, runs: [] });
+    await settle();
+    http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+    await settle();
+    const replay = http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`);
+    expect(replay.request.body).toMatchObject({ messageId: setupTurn.request.body.messageId, personId: reviewCase().draft.financial!.persons[0].id });
   });
 });
 

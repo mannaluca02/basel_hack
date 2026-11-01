@@ -111,4 +111,13 @@ describe('intake plan', () => {
     expect(steeringContext(rows, id => `Frage ${id}`, 'Brutto und pro Jahr?')).toMatchObject({ nextQuestion: 'Brutto und pro Jahr?' });
     expect(steeringContext(intakeRows(caseWith(), PERSON, emptyIntakeMemory), id => `Frage ${id}`, 'Brutto und pro Jahr?')).toMatchObject({ nextQuestion: 'Frage annual_gross_income_chf' });
   });
+
+  it('knows the employment rate from the live start\'s case frame, so Paxi does not ask again', () => {
+    const frame = { persons: [{ id: 'person_1', birthYear: 2004, employmentRateBps: 6000 }] };
+    const rows = intakeRows(caseWith(batch('accepted', [{ path: 'financial', value: frame }, { path: 'insurance', value: {} }])), 'person_1', emptyIntakeMemory);
+    expect(row(rows, 'employment_rate_percent')).toMatchObject({ status: 'accepted', value: 6000 });
+    expect(steeringContext(rows, (id) => id).neverAskAgain).toContain('employment_rate_percent');
+    expect(row(intakeRows(caseWith(batch('accepted', [{ path: 'financial', value: frame }])), 'person_2', emptyIntakeMemory), 'employment_rate_percent').status).toBe('open');
+  });
 });
+

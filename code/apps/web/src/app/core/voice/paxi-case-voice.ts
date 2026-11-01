@@ -125,11 +125,12 @@ export class PaxiCaseVoice {
       const direction=this.emotionSources[type];
       if(typeof event['event_id']==='string'&&!direction.events.has(event['event_id']))direction.events.set(event['event_id'],++direction.index);
       const speaker=type==='session.input_transcript.delta'?'customer':'agent';
-      // Persist the preceding speaker before their answer/reply, even when it arrives within
-      // the quiet window. Otherwise a quick reply can merge two separate agent questions.
-      this.settle(speaker==='customer'?'agent':'customer');
       const prior=this.fragments.get(speaker);if(prior)clearTimeout(prior.timer);
       const text=((prior?.text??'')+event['delta']).slice(0,8000);
+      // Persist the preceding speaker before their answer/reply, even when it arrives within
+      // the quiet window. Otherwise a quick reply can merge two separate agent questions. Paxi's
+      // backchannel ("Oh,", "Mhm") is no reply: it must not cut the customer's sentence in two.
+      if(speaker==='customer'||text.trim().length>=BACKCHANNEL_CHARS)this.settle(speaker==='customer'?'agent':'customer');
       const timer=setTimeout(()=>this.settle(speaker),1500);
       this.fragments.set(speaker,{text,timer});
       // Output captions are not an audio/work-state signal. The attached output stream drives
@@ -160,6 +161,10 @@ export class PaxiCaseVoice {
 
   private settle(speaker:'customer'|'agent'):void {
     const fragment=this.fragments.get(speaker);if(!fragment)return;
+    // A short backchannel waits for the customer's sentence, then joins Paxi's next line.
+    if(speaker==='agent'&&this.running&&this.fragments.has('customer')&&fragment.text.trim().length<BACKCHANNEL_CHARS){
+      clearTimeout(fragment.timer);fragment.timer=setTimeout(()=>this.settle('agent'),1500);return;
+    }
     clearTimeout(fragment.timer);this.fragments.delete(speaker);
     if(this.running&&fragment.text.trim())this.options.onTurn(speaker,fragment.text.trim(),'client-settled');
   }
@@ -182,6 +187,9 @@ export class PaxiCaseVoice {
     });
   }
 }
+
+/** Shorter Paxi fragments while the customer speaks are backchannel, not a reply. */
+const BACKCHANNEL_CHARS=20;
 
 type TranscriptType='session.input_transcript.delta'|'session.output_transcript.delta';
 function freshEmotionSources():Record<TranscriptType,{index:number;applied:number;events:Map<string,number>}> {

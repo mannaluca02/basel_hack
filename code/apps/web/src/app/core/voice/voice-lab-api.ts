@@ -10,6 +10,8 @@ export class VoiceLabApi {
   private readonly customer=inject(CustomerApi);
   private readonly base=inject(APP_ENVIRONMENT).apiBaseUrl;
   get<T>(path:string):Promise<T> {return firstValueFrom(this.http.get<T>(`${this.base}/${path}`));}
+  /** A read on the signed-in case (`cases/:caseId/…`). */
+  getCase<T>(path:string):Promise<T> {return firstValueFrom(this.http.get<T>(`${this.base}/cases/${this.caseId()}/${path}`));}
   post<T>(path:string,body:unknown):Promise<T> {
     return firstValueFrom(this.http.post<T>(`${this.base}/cases/${this.caseId()}/${path}`,body,
       {headers:{'X-CSRF-Token':this.customer.session()?.csrfToken??''}}));

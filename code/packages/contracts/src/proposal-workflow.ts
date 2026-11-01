@@ -18,7 +18,9 @@ export const ProposalBatchInputSchema=z.object({messageId:Id,source:ProposalSour
     if(!b.changes.length&&!b.ambiguities.length)ctx.addIssue({code:'custom',path:['changes'],message:'Changes or ambiguities are required'});
     if(b.messageId!==b.source.messageId)ctx.addIssue({code:'custom',path:['source'],message:'Message identity mismatch'});
     for(const key of ['supersedesBatchIds','supersedesProposalIds','resolvesAmbiguityIds'] as const)if(new Set(b[key]).size!==b[key].length)ctx.addIssue({code:'custom',path:[key],message:'Duplicate identity'});
-    if(new Set(b.changes.map(c=>c.path)).size!==b.changes.length)ctx.addIssue({code:'custom',path:['changes'],message:'Duplicate target path'});
+    // An addition (`goals_add`, …) appends one item each, so several may share the path.
+    const set=b.changes.filter(c=>!c.path.endsWith('_add'));
+    if(new Set(set.map(c=>c.path)).size!==set.length)ctx.addIssue({code:'custom',path:['changes'],message:'Duplicate target path'});
   });
 export const ProposalBatchSchema=z.object({id:Id,messageId:Id,source:ProposalSourceSchema,createdAt:z.iso.datetime(),requestHash:hash,
   expectedProfileVersion:revision.nullable(),basisDraftHash:hash,changes:z.array(ProposalChangeInputSchema).max(50),
