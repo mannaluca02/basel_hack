@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { z, ZodError } from 'zod';
 import { DraftSchema, type ProposalChangeInput, type VoiceObservation } from '@pax/contracts';
 import { LIFE_RUNTIME, type LifeRuntime } from '../insurance/runtime.js';
@@ -7,9 +7,10 @@ import { WorkflowError, type Actor } from '../insurance/types.js';
 import { loadDemoSnapshot } from '../demo/fixtures.js';
 import { mapVoiceObservations } from './portfolio.js';
 import { parseExactAnnualGrossIncome } from './exact-income.js';
-import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, modelObservations, scriptObservation } from './lab-intake.js';
-import { setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
-import { answerChanges, answerObservations, answerTargets, isAskedField, keyOfPath, openAsks, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
+import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, intakeObservations, modelObservations, scriptObservation } from './lab-intake.js';
+import { parseSetupFacts, setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
+import { answerChanges, answerObservations, isAskedField, keyOfPath, openAsks, parseAnswers, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
+import { REPORT_TOOLS, liveDelegation, liveTargets, replaceable } from './lab-delegation.js';
 import { languageNumber } from '../insurance/i18n.js';
 import { at } from '../insurance/draft-proposals.js';
 import type { ResponsesTransport } from '../erni-dialog/responses.js';
@@ -19,16 +20,18 @@ const MODEL_ERRORS=['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTP
 const intakeKey=(fieldId:string,personId:string)=>({annual_gross_income_chf:`insurance.persons.${personId}.grossAnnualIncomeCents`,civil_status:'insurance.relationship',
   has_pension_fund:`insurance.persons.${personId}.withPillar2`,pillar_3a_annual_contribution_chf:'insurance.existingAnnualPillar3aContributionCents',
   monthly_housing_cost_chf:'financial.expenses.housing',desired_retirement_age:`insurance.persons.${personId}.desiredWorkStopAge`} as Record<string,string>)[fieldId]??fieldId;
-/** Open batches the next proposal replaces (and carries): proposed, with changes, without a clarification. */
-const replaceable=<T extends {status:string;changes:unknown[];ambiguityIds?:string[]|undefined}>(batches:T[])=>
-  batches.filter(batch=>batch.status==='proposed'&&batch.changes.length>0&&!batch.ambiguityIds?.length);
 
 const TurnSchema = z.discriminatedUnion('mode', [
   z.object({mode:z.literal('synthetic'),sample:z.enum(['income','correction','smalltalk',...INTAKE_SAMPLE_IDS]),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
   // Without personId only while the case has no person yet: the conversation then sets up the case frame.
   // askedKey: the open question Paxi asked last (GET questions), so one statement fills that field and no other.
-  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional(),askedKey:z.string().min(1).max(200).optional()}).strict(),
+  // report: the tool calls of GPT-Live's background model for this turn (lab-delegation.ts), instead of a backend model call.
+  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional(),askedKey:z.string().min(1).max(200).optional(),
+    report:z.object({calls:z.array(z.object({name:z.enum(REPORT_TOOLS),arguments:z.string().max(20000)}).strict()).max(6)}).strict().optional()}).strict(),
 ]);
+type Report=NonNullable<Extract<z.infer<typeof TurnSchema>,{mode:'live'}>['report']>;
+/** The arguments of every call of one tool in a report. */
+const reported=(report:Report,name:typeof REPORT_TOOLS[number])=>report.calls.filter(call=>call.name===name).map(call=>call.arguments);
 const samples = {
   de:{income:'Mein Bruttojahreseinkommen beträgt 119000 CHF.',correction:'Korrektur: Mein Bruttojahreseinkommen beträgt 118000 CHF.',smalltalk:'Guten Morgen!'},
   en:{income:'My annual gross income is 119000 CHF.',correction:'Correction: My annual gross income is 118000 CHF.',smalltalk:'Good morning!'},
@@ -54,7 +57,9 @@ async function baseline() {
       personalAffordableAnnualPremiumCents:index===0?400000:300000}))}});
 }
 
-/** Customer-owned orchestrator. It never accepts a browser-authored agent actor or observations.
+/** Customer-owned orchestrator. It never accepts a browser-authored agent actor or observations; the
+ * background model's tool calls the browser relays (report) are untrusted model output, validated
+ * against the transcript stored here like the backend's own model output.
  * rules-v1 intentionally handles only an explicit annual gross CHF statement. No model inference.
  * All writes still run the normal sourced proposal/voice validation in the canonical runtime.
  */
@@ -108,10 +113,23 @@ export class VoiceLabController {
         return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter:'rules-v1',externalModelCall:false,route:'canonical replay',request:null,result:{proposalBatch:previous,replayed:true,confirmationStillRequired:true}}};
       }
       const transport=b.mode==='live'?this.r.modelExtraction.options.transport:undefined;
-      if(b.mode==='live'&&b.personId===undefined)return await this.setupTurn(agent,id,c.id,live!,turn!,source,text,transport);
+      if(b.mode==='live'&&b.personId===undefined)return await this.setupTurn(agent,id,c.id,live!,turn!,source,text,transport,b.report);
       const personId=b.personId!;
-      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false,answers:Answer[]=[];
+      let adapter='rules-v1',observations:VoiceObservation[]=[],modelFailed=false,answers:Answer[]=[],delegated=false;
       if(authored)adapter='authored-script',observations=scriptObservation(b.sample,text,b.messageId,personId);
+      else if(b.mode==='live'&&b.report&&this.r.modelExtraction.permission(agent,id).transferAllowed) {
+        // GPT-Live's background model read the turn already; its calls are untrusted model output like our own.
+        adapter='model-v1';delegated=true;
+        const turns=live!.turns.slice(0,live!.turns.indexOf(turn!)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
+        const targets=liveTargets(ctx.draft,ctx.proposalBatches,c.id,ctx.personIds);
+        try {
+          observations=reported(b.report,'submit_intake_observations').flatMap(args=>intakeObservations(args,turns,b.messageId,personId));
+          answers=reported(b.report,'submit_answers').flatMap(args=>parseAnswers(args,turns,targets,b.askedKey));
+        } catch(error) {
+          if(!(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code)))throw error;
+          modelFailed=true;observations=[];answers=[];
+        }
+      }
       else if(b.mode==='live'&&transport&&this.r.modelExtraction.permission(agent,id).transferAllowed) {
         adapter='model-v1';
         const task=this.r.engine.digitalTasks.begin(id);
@@ -121,8 +139,7 @@ export class VoiceLabController {
           // The open profile questions are read in the same round: everything the confirmation still
           // needs (the intake fields too, in case modelObservations missed one) and corrections.
           // Fields of a person not accepted yet wait for the next turn (paths must name a known person).
-          const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id))
-            .filter(target=>{const person=/^(?:insurance|financial)\.persons\.([^.]+)\./.exec(target.key)?.[1];return !person||ctx.personIds.includes(person);});
+          const targets=liveTargets(ctx.draft,ctx.proposalBatches,c.id,ctx.personIds);
           [observations,answers]=await Promise.all([modelObservations(transport,turns,b.messageId,personId,task.signal),
             answerObservations(transport,turns,targets,task.signal,b.mode==='live'?b.askedKey:undefined).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
           this.r.modelExtraction.assertTransferAllowed(agent,id);
@@ -187,7 +204,7 @@ export class VoiceLabController {
       // Franken" for the housing, saved per month): otherwise Paxi asks for it again.
       const taken=new Set(answered?.proposalBatch?answered.answered:[]);
       const stillUnclear=clarifications.filter(item=>!taken.has(intakeKey(item.fieldId,personId)));
-      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications:stillUnclear,result,
+      return {mode:b.mode,source:{...source,text,speaker:'customer'},extraction:{adapter,externalModelCall:adapter==='model-v1',...(delegated?{delegated}:{}),route:b.mode==='live'?'VoiceIntegrationService.propose':'ExtractionWorkflow.proposeBatch',request,clarifications:stillUnclear,result,
         ...(answered?{answers:answered}:{})}};
     } finally {await this.r.sessions.revoke(agent);}
   }
@@ -199,17 +216,19 @@ export class VoiceLabController {
    * customer's acceptance creates the person; from then on turns map the intake fields as usual.
    */
   private async setupTurn(agent:Actor,id:string,caseId:string,live:ReturnType<LifeRuntime['voice']['transcript']>,turn:typeof live.turns[number],
-    source:{messageId:string;turnId:string;sourceRef:string},text:string,transport:ResponsesTransport|undefined) {
+    source:{messageId:string;turnId:string;sourceRef:string},text:string,transport:ResponsesTransport|undefined,report?:Report) {
     const reply=(extra:Record<string,unknown>,result:unknown)=>({mode:'live' as const,source:{...source,text,speaker:'customer'},
-      extraction:{adapter:'model-v1',externalModelCall:true,route:'setup',request:null,clarifications:[],result,...extra}});
-    if(!transport||!this.r.modelExtraction.permission(agent,id).transferAllowed)
+      extraction:{adapter:'model-v1',externalModelCall:true,...(report?{delegated:true}:{}),route:'setup',request:null,clarifications:[],result,...extra}});
+    if(!(transport||report)||!this.r.modelExtraction.permission(agent,id).transferAllowed)
       return reply({externalModelCall:false},{proposalBatch:null,issues:[{code:'SETUP_NEEDS_MODEL',action:'screen_or_human_review'}],confirmationStillRequired:true});
     const task=this.r.engine.digitalTasks.begin(id);
     let facts:SetupFacts;
     try {
       this.r.modelExtraction.assertTransferAllowed(agent,id);
       const turns=live.turns.slice(0,live.turns.indexOf(turn)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
-      facts=await setupFacts(transport,turns,task.signal);
+      // The background model reports both facts from the whole conversation, as setupFacts reads them.
+      const args=report?reported(report,'submit_setup_facts').at(-1):undefined;
+      facts=report?args===undefined?{birthYear:null,employmentRateBps:null,quotes:[]}:parseSetupFacts(args,turns):await setupFacts(transport!,turns,task.signal);
       if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
     } catch(error) {
       if(!(error instanceof WorkflowError&&['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'].includes(error.code)))throw error;
@@ -238,6 +257,17 @@ export class VoiceLabController {
   questions(@Req() req:{actor:Actor},@Param('caseId') id:string) {
     const c=this.customer(req.actor,id);
     return {asks:openAsks(pendingView(c.draft,replaceable(c.proposalBatches).flatMap(batch=>batch.changes),c.id),c.locale)};
+  }
+
+  /**
+   * GPT-Live's background model for the case as it is now (lab-delegation.ts): the browser sends it
+   * with session.update after every turn, so the tools know the open fields and the question asked.
+   */
+  @Get('delegation')
+  delegation(@Req() req:{actor:Actor},@Param('caseId') id:string,@Query('askedKey') askedKey:unknown) {
+    const c=this.customer(req.actor,id);
+    const asked=z.string().min(1).max(200).optional().parse(askedKey);
+    return {delegation:liveDelegation(c.draft,c.proposalBatches,c.id,asked)};
   }
 
   /**

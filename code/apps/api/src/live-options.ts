@@ -32,6 +32,8 @@ export function liveAppOptions(env: Env): RuntimeOptions {
       ...(env['ELEVENLABS_AGENT_ID'] ? { elevenLabsAgentId: env['ELEVENLABS_AGENT_ID'] } : {}),
       ...(env['LIVE_MODEL'] ? { liveModel: env['LIVE_MODEL'] } : {}),
       ...(env['LIVE_VOICE'] ? { liveVoice: env['LIVE_VOICE'] } : {}),
+      // GPT-Live's background model reads the turns (LIVE_REPORTS=0: the backend reads them itself).
+      reports: extraction && !!key && env['LIVE_REPORTS'] !== '0',
     },
   };
 }

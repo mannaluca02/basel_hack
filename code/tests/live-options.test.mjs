@@ -16,7 +16,7 @@ test('without flags: live calculator, no demo start, voice and extraction off, n
   assert.equal(options.token,'token');
   assert.equal(options.demoStart,false);
   assert.deepEqual(options.modelExtraction,{enabled:false});
-  assert.deepEqual(options.voice,{enabled:false});
+  assert.deepEqual(options.voice,{enabled:false,reports:false});
 });
 
 test('the live voice wires model-v1 when voice or extraction is on and a key exists',()=>{
@@ -34,8 +34,14 @@ test('voice providers and demo start come from their variables only',()=>{
   const options=liveAppOptions({PAX_DEMO_START:'1',PAX_SYNTHETIC_VOICE_ENABLED:'1',OPENAI_API_KEY:'sk-test',
     ELEVENLABS_API_KEY:'el-key',ELEVENLABS_AGENT_ID:'agent',LIVE_MODEL:'gpt-live-1',LIVE_VOICE:'juni'});
   assert.equal(options.demoStart,true);
-  assert.deepEqual(options.voice,{enabled:true,openAiApiKey:'sk-test',elevenLabsApiKey:'el-key',elevenLabsAgentId:'agent',liveModel:'gpt-live-1',liveVoice:'juni'});
+  assert.deepEqual(options.voice,{enabled:true,openAiApiKey:'sk-test',elevenLabsApiKey:'el-key',elevenLabsAgentId:'agent',liveModel:'gpt-live-1',liveVoice:'juni',reports:true});
   assert.equal(liveAppOptions({PAX_DEMO_START:'true'}).demoStart,false,'only "1" switches it on');
+});
+
+test('GPT-Live\'s background model reads the turns when the extraction has a key, unless LIVE_REPORTS=0',()=>{
+  assert.equal(liveAppOptions({PAX_SYNTHETIC_VOICE_ENABLED:'1',OPENAI_API_KEY:'sk-test'}).voice.reports,true);
+  assert.equal(liveAppOptions({PAX_SYNTHETIC_VOICE_ENABLED:'1',OPENAI_API_KEY:'sk-test',LIVE_REPORTS:'0'}).voice.reports,false);
+  assert.equal(liveAppOptions({PAX_SYNTHETIC_VOICE_ENABLED:'1'}).voice.reports,false,'no key, no model');
 });
 
 test('Paxi starts only with PAX_VOICE_AGENT=1, on port 3100 unless set',async()=>{

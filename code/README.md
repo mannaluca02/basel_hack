@@ -237,6 +237,7 @@ Nicht geheime Vars in `apps/worker/wrangler.jsonc`:
 | `PAX_SYNTHETIC_VOICE_ENABLED=1` | Integrierte Live-Voice aktivieren |
 | `PAX_SYNTHETIC_EXTRACTION_ENABLED=1` | Modellbasierte Extraktion aktivieren |
 | `LIVE_MODEL=gpt-live-1`, `LIVE_VOICE=juni` | Voice-Modell und Stimme |
+| `LIVE_REPORTS=0` | Optional: GPT-Live gibt Sätze mit Angaben nicht an sein Hintergrundmodell (GPT-6 Luna) weiter; das Backend liest dann jeden Satz selbst aus |
 | `PAX_PUBLIC_ORIGIN=""` | Request-Origin verwenden; alternativ exakt `https://paxi.<subdomain>.workers.dev` für Schreibzugriffe eintragen |
 
 Deployment und automatische Prüfung aus `code/` (`<subdomain>` ersetzen):

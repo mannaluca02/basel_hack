@@ -5,7 +5,7 @@ import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, ty
 import { applyChanges, at } from '../insurance/draft-proposals.js';
 import { questionText, t, type Locale } from '../insurance/i18n.js';
 import { WorkflowError } from '../insurance/types.js';
-import { latestExchange } from './exchange.js';
+import { latestExchange, toolRules } from './exchange.js';
 type JsonValue = ProposalChangeInput['value'];
 
 /**
@@ -416,6 +416,35 @@ export function validAnswers(targets: Target[], parsed: z.infer<typeof Arguments
   return single.sort((a, b) => order(a.key) - order(b.key));
 }
 
+/** What the model reads of the conversation: three exchanges only while Paxi asks about the partner (age, then rate); otherwise the latest one. */
+const answerWindow = (turns: { role: 'user' | 'assistant'; text: string }[], asked?: string) => latestExchange(turns, asked === 'financial.partner' ? 3 : 1);
+
+function answerParameters(targets: Target[]) {
+  const parameters = z.toJSONSchema(Arguments);
+  ((parameters.properties as Record<string, { items: { properties: Record<string, unknown> } }>)['answers']!).items.properties['id'] = { type: 'string', enum: targets.map(x => x.key) };
+  return parameters;
+}
+const fieldList = (targets: Target[], asked?: string) => targets.map(x => ({ id: x.key, description: x.description,
+  ...(x.kind.type === 'enum' || x.kind.type === 'list' ? { options: x.kind.options } : {}),
+  ...(isAskedField(x.key, asked) ? { asked: true } : {}) }));
+
+/**
+ * The same extraction as a tool of GPT-Live's background model (lab-delegation.ts): the tool
+ * carries the instructions and the current fields itself. Null when no field is open.
+ */
+export function answersTool(targets: Target[], asked?: string) {
+  if (!targets.length) return null;
+  return { type: 'function', name: 'submit_answers', description: `Submit the user's answers to the listed fields. ${toolRules(INSTRUCTIONS)} Fields: ${JSON.stringify(fieldList(targets, asked))}`,
+    parameters: answerParameters(targets), strict: true };
+}
+
+/** Untrusted tool arguments to typed answers for the latest exchange (validAnswers). Throws INVALID_MODEL_OUTPUT. */
+export function parseAnswers(args: string, turns: { role: 'user' | 'assistant'; text: string }[], targets: Target[], asked?: string): Answer[] {
+  let parsed: z.infer<typeof Arguments>;
+  try { parsed = Arguments.parse(JSON.parse(args)); } catch { throw new WorkflowError('INVALID_MODEL_OUTPUT', 502); }
+  return validAnswers(targets, parsed, answerWindow(turns, asked).filter(x => x.role === 'user').map(x => x.text), asked);
+}
+
 /**
  * The answers in the conversation so far (model-v1, same transport and consent as the intake
  * extraction). Only the latest exchange is read (`latestExchange`), and the quote must come from
@@ -423,25 +452,17 @@ export function validAnswers(targets: Target[], parsed: z.infer<typeof Arguments
  */
 export async function answerObservations(transport: ResponsesTransport, turns: { role: 'user' | 'assistant'; text: string }[], targets: Target[], signal: AbortSignal, asked?: string): Promise<Answer[]> {
   if (!targets.length) return [];
-  // Three exchanges only while Paxi asks about the partner (age, then rate); otherwise the latest one.
-  const window = latestExchange(turns, asked === 'financial.partner' ? 3 : 1);
-  const parameters = z.toJSONSchema(Arguments);
-  ((parameters.properties as Record<string, { items: { properties: Record<string, unknown> } }>)['answers']!).items.properties['id'] = { type: 'string', enum: targets.map(x => x.key) };
   const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, instructions: INSTRUCTIONS,
-    input: [{ role: 'user', content: JSON.stringify({ conversation: window, fields: targets.map(x => ({ id: x.key, description: x.description,
-      ...(x.kind.type === 'enum' || x.kind.type === 'list' ? { options: x.kind.options } : {}),
-      ...(isAskedField(x.key, asked) ? { asked: true } : {}) })) }) }],
-    tools: [{ type: 'function', name: 'submit_answers', description: 'Submit the user\'s answers to the listed fields.', parameters, strict: true }],
+    input: [{ role: 'user', content: JSON.stringify({ conversation: answerWindow(turns, asked), fields: fieldList(targets, asked) }) }],
+    tools: [{ type: 'function', name: 'submit_answers', description: 'Submit the user\'s answers to the listed fields.', parameters: answerParameters(targets), strict: true }],
     tool_choice: 'auto', parallel_tool_calls: false, max_output_tokens: 2500 };
   const raw = await callResponses(transport, request, signal);
-  let parsed: z.infer<typeof Arguments>;
+  let call: ReturnType<typeof submittedCall>;
   try {
-    const call = submittedCall(raw);
-    if (!call) return [];
-    if (call.name !== 'submit_answers' || !call.arguments) throw new Error();
-    parsed = Arguments.parse(JSON.parse(call.arguments));
+    call = submittedCall(raw);
+    if (call && (call.name !== 'submit_answers' || !call.arguments)) throw new Error();
   } catch { throw new WorkflowError('INVALID_MODEL_OUTPUT', 502); }
-  return validAnswers(targets, parsed, window.filter(x => x.role === 'user').map(x => x.text), asked);
+  return call ? parseAnswers(call.arguments!, turns, targets, asked) : [];
 }
 
 /** Resolves a spoken municipality to the calculator's location id; null unless exactly one place fits. */

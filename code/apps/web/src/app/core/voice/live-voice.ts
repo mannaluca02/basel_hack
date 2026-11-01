@@ -25,6 +25,7 @@ import { INTAKE_TEXT } from './intake-text';
 import { LabTrace } from './lab-trace';
 import type { ReplyEmotion } from './emotions';
 import { PaxiCaseVoice } from './paxi-case-voice';
+import { ReportInbox, type ReportCall } from './report-inbox';
 import { VoiceActivity } from './voice-activity';
 import { VoiceLabApi } from './voice-lab-api';
 
@@ -37,6 +38,8 @@ interface LiveTurnResult {
     result: { proposalBatch?: unknown; issues?: { code: string }[] };
     /** The answers to the open profile questions (live, once the person exists). */
     answers?: { proposalBatch: unknown; answered: string[] };
+    /** Read by GPT-Live's background model, not by a backend model call. */
+    delegated?: true;
   };
 }
 /** One open profile question of the backend (`voice-lab/questions`), in conversation order. */
@@ -70,8 +73,10 @@ type VoiceAvatarEvent =
 /**
  * Earnie's live voice over the case backend, shared by the app and the Voice Lab (debug): GPT-Live
  * over WebRTC through `voice/sessions`, every settled turn recorded on the case, every customer
- * turn evaluated by `voice-lab/turns` (model-v1 after the extraction consent). What it hears
- * arrives as proposal packages; only the customer's acceptance changes the draft.
+ * turn evaluated by `voice-lab/turns` (model-v1 after the extraction consent). With reports,
+ * GPT-Live's background model reads the turn and the turn carries its tool calls; otherwise the
+ * backend reads it itself. What it hears arrives as proposal packages; only the customer's
+ * acceptance changes the draft.
  *
  * The conversation keeps running across views; it ends on stop, a new session, a language change
  * or a human handover.
@@ -93,6 +98,9 @@ export class LiveVoice {
   private epoch = 0;
   private destroyed = false;
   private queue: Promise<void> = Promise.resolve();
+  /** The session runs GPT-Live's background model (voice/sessions answered reports: true). */
+  private reports = false;
+  private readonly inbox = new ReportInbox();
 
   readonly apiMode = this.env.dataSource === 'api';
   /** Live configuration: accepted automatically, no acceptance card. */
@@ -223,7 +231,10 @@ export class LiveVoice {
           priorities: this.priority() ? [this.priority()] : [],
         },
       });
-      if (epoch === this.epoch) this.sessionId = response.voiceSession.id;
+      if (epoch === this.epoch) {
+        this.sessionId = response.voiceSession.id;
+        this.reports = response.reports === true;
+      }
       return response;
     },
     opening: () =>
@@ -235,7 +246,12 @@ export class LiveVoice {
     onStatus: (state, detail) => {
       this.state.set(state);
       if (detail) this.error.set(detail);
-      if (state === 'connected') void this.loadAsks(this.epoch);
+      if (state === 'connected') void this.loadAsks(this.epoch).then(() => this.refreshDelegation(this.epoch));
+    },
+    onDelegation: (id) => this.inbox.started(id),
+    onReport: (id, calls) => {
+      this.inbox.finished(id, calls);
+      this.trace.add('local', 'GPT-Live background model', { delegation: id, calls: calls.map((call) => call.name) });
     },
     onAudio: (stream) => {
       this.audio.set(stream);
@@ -411,6 +427,9 @@ export class LiveVoice {
 
   stop(): void {
     ++this.epoch;
+    this.reports = false;
+    this.inbox.clear();
+    this.setupReports.clear();
     this.voice.stop();
     this.state.set('idle');
   }
@@ -501,8 +520,13 @@ export class LiveVoice {
     messageId: string,
     personId: string,
     epoch: number,
+    replayed?: ReportCall[],
   ): Promise<void> {
     if (!personId) this.setupMessages.push(messageId);
+    // The background model's calls for this turn; a setup turn keeps them for its replay.
+    const calls = replayed ?? (this.reports ? await this.inbox.take() : undefined);
+    if (epoch !== this.epoch) return;
+    if (!personId && calls) this.setupReports.set(messageId, calls);
     const asked = nextIntakeField(this.rows()),
       askedKey = this.caseAsk()?.key,
       // Only a question Paxi had the chance to ask counts: an agent line since it became current.
@@ -520,6 +544,7 @@ export class LiveVoice {
         ...(personId ? { personId } : {}),
         // The profile question Paxi is on: the backend fills that field with this answer, no other.
         ...(personId && askedKey ? { askedKey } : {}),
+        ...(calls ? { report: { calls } } : {}),
       });
     try {
       let result: LiveTurnResult;
@@ -551,6 +576,8 @@ export class LiveVoice {
         if (!personId && proposed) await this.replaySetupTurns(sid, epoch);
         await this.loadAsks(epoch);
       }
+      // The background model's tools follow the case: the open fields and the question asked now.
+      await this.refreshDelegation(epoch);
       // A profile question still open after its turn counts as one unanswered attempt.
       if (askedCase && this.caseAsks()?.some((ask) => ask.key === askedCase))
         this.askAttempts.update((attempts) => ({ ...attempts, [askedCase]: (attempts[askedCase] ?? 0) + 1 }));
@@ -578,11 +605,32 @@ export class LiveVoice {
 
   /** Customer turns spoken before the case had a person; extracted again once it has one. */
   private setupMessages: string[] = [];
+  /** The background model's calls of those turns: the replay sends them again, now with the person. */
+  private readonly setupReports = new Map<string, ReportCall[]>();
 
   private async replaySetupTurns(sid: string, epoch: number): Promise<void> {
     const person = (await this.customer.loadCase(this.caseId())).draft.financial?.persons[0]?.id;
     if (!person || epoch !== this.epoch) return;
-    for (const earlier of this.setupMessages.splice(0)) await this.extractLive(sid, earlier, person, epoch);
+    for (const earlier of this.setupMessages.splice(0)) {
+      const calls = this.setupReports.get(earlier);
+      this.setupReports.delete(earlier);
+      await this.extractLive(sid, earlier, person, epoch, calls);
+    }
+  }
+
+  /** With reports: the background model's tools for the case as it is now, sent to GPT-Live. */
+  private async refreshDelegation(epoch: number): Promise<void> {
+    if (!this.reports || epoch !== this.epoch) return;
+    const asked = this.caseAsk()?.key;
+    try {
+      const { delegation } = await this.api.getCase<{ delegation: unknown }>(
+        `voice-lab/delegation${asked ? `?askedKey=${encodeURIComponent(asked)}` : ''}`,
+      );
+      if (epoch === this.epoch) this.voice.updateDelegation(delegation);
+    } catch {
+      // The tools stay as they were; the next turn tries again.
+      this.trace.add('local', 'voice-lab/delegation', { code: 'DELEGATION_UNAVAILABLE' });
+    }
   }
 
   /** Live build: takes over the open proposals right away (POST demo-accept), then reloads. */

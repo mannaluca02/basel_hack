@@ -32,3 +32,9 @@ export function latestExchange(turns: Turn[], exchanges = 1): Turn[] {
   // A long monologue of fragments is capped; the answer is at its end.
   return blocks.slice(start, answer + 1).flatMap(b => b.turns).slice(-8 * exchanges);
 }
+
+/**
+ * An extraction prompt as the description of a tool among several (lab-delegation.ts): without
+ * its closing "Use only submit_…" rule, which the background model's instructions replace.
+ */
+export const toolRules = (instructions: string) => instructions.replace(/\s*Use only submit_\w+.*$/, '');

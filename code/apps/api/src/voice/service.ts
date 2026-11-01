@@ -9,6 +9,7 @@ import { sha256Json } from '../calculation/hash.js';
 import { gatewaysFor, type VoiceOptions, type VoiceGateway } from './providers.js';
 import { mapVoiceObservations, portfolioCatalog } from './portfolio.js';
 import { buildVoicePrompt } from './prompt.js';
+import { REPORT_POLICY, liveDelegation } from './lab-delegation.js';
 import { productText } from '../insurance/i18n.js';
 /**
  * Observations from a separately running voice agent (Paxi) that holds its own provider session.
@@ -93,6 +94,8 @@ export class VoiceIntegrationService {
             throw new WorkflowError(previous.status === 'starting' ? 'VOICE_START_IN_PROGRESS' : 'VOICE_CONNECTION_NOT_REPLAYABLE');
         }
         const prompt = await buildVoicePrompt(b.locale,b.conversationSettings);
+        // The browser keeps the background model's tools current (voice-lab/delegation) from the first turn on.
+        const delegation = this.options.reports && b.provider === 'gpt-live' ? { session: liveDelegation(initial.draft, initial.proposalBatches, initial.id), policy: REPORT_POLICY } : undefined;
         const reserved = await this.engine.edit(actor, id, b.expectedCaseRevision, (c, db) => {
             if (c.locale !== b.locale)
                 throw new WorkflowError('VOICE_LOCALE_MISMATCH', 422);
@@ -115,7 +118,7 @@ export class VoiceIntegrationService {
         this.opening.set(reserved.id,{caseId:id,controller:openingController});
         let created: Awaited<ReturnType<VoiceGateway['open']>> | undefined;
         try {
-            await this.engine.runDigital(actor, id, async (signal) => { created = await gateway.open({ ...(b.sdp === undefined ? {} : { sdp: b.sdp }), locale: b.locale, prompt }, signal); },openingController.signal);
+            await this.engine.runDigital(actor, id, async (signal) => { created = await gateway.open({ ...(b.sdp === undefined ? {} : { sdp: b.sdp }), locale: b.locale, prompt, ...(delegation ? { delegation } : {}) }, signal); },openingController.signal);
             const session = await this.engine.edit(actor, id, undefined, (c, db) => {
                 const s = this.session(actor, c, reserved.id);
                 if (s.status !== 'starting' || s.handoverRevision !== c.handover.revision || c.caseRevision !== b.expectedCaseRevision || c.locale !== b.locale)
@@ -136,7 +139,7 @@ export class VoiceIntegrationService {
                 return this.dto(s);
             });
             this.handles.set(session.id, { caseId: id, provider: b.provider, providerSessionId: created!.providerSessionId });
-            const response = VoiceSessionStartResponseSchema.parse({ voiceSession: session, connection: created!.connection, prompt, replayed: false });
+            const response = VoiceSessionStartResponseSchema.parse({ voiceSession: session, connection: created!.connection, prompt, replayed: false, reports: created!.delegated === true });
             this.cache.set(session.id, { until: Date.now() + 30000, response });
             await this.sweep();
             return response;
