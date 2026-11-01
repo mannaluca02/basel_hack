@@ -154,7 +154,6 @@ Nach erfolgreicher Paketannahme zeigt Luca das neue Gesamtprofil. Danach erzeugt
 - [Gemeinsame Bestätigungsverträge](../../../code/packages/contracts/src/customer-confirmation.ts)
 - [Bestätigungsservice](../../../code/apps/api/src/insurance/customer-confirmations.ts)
 - [Berechneter Rückfragenstatus](../../../code/apps/api/src/insurance/ambiguity-dialogue.ts)
-- [Browser-/Team-Beispiele](../../../code/examples/contracts/team-client.ts)
 - [Zusammenhängende Voice-JSONs](../../../code/fixtures/voice-confirmation/)
 - [Tests](../../../code/tests/customer-confirmations.test.mjs)
 

@@ -41,7 +41,7 @@ ELEVENLABS_AGENT_ID=
 
 Für ElevenLabs einen vorhandenen Agenten mit passenden Demo-Anweisungen, freigegebenen Sprachen und erlaubtem Prompt-Override konfigurieren. Das Backend erstellt oder verändert keine Agenten. Der Browser muss den zurückgegebenen `prompt` und die aktuelle Sprache bei `startSession` übergeben; der Token-Endpunkt konfiguriert den Agenten selbst nicht. OpenAI erhält den initialen Prompt serverseitig beim Aufbau.
 
-Ohne explizites Enable-Flag bleiben beide Provider deaktiviert. `GET /api/voice/providers` zeigt die lokale Konfiguration; das ist kein Provider-Gesundheitscheck. Das Starten des Servers löst keine neue Voice-Providerverbindung aus. Wiederherstellung kann verbliebene Provider-Sessions aus der verschlüsselten Ablage beenden.
+Ohne explizites Enable-Flag bleiben beide Provider deaktiviert. `GET /api/voice/privacy` zeigt in `providers` die lokale Konfiguration; das ist kein Provider-Gesundheitscheck. Das Starten des Servers löst keine neue Voice-Providerverbindung aus. Wiederherstellung kann verbliebene Provider-Sessions aus der verschlüsselten Ablage beenden.
 
 `POST /api/sessions` erzeugt wie bisher eine Kundensitzung. Zugriffscodes bleiben in der geschützten lokalen Datei `code/.local/lifemap/access-codes.json`. Angular verwendet den HttpOnly-Cookie und `X-CSRF-Token`; Erni verwendet ausschließlich serverseitig den fallgebundenen Agent-Grant aus `POST /api/cases/:caseId/agent-access`. Den Grant weder ins Modell noch ins Frontend geben.
 
@@ -51,9 +51,7 @@ Alle Fallrouten beginnen mit `/api/cases/:caseId/voice/sessions`.
 
 | Methode / Pfad | Berechtigung | Ergebnis / interner Aufruf |
 |---|---|---|
-| `GET /api/voice/providers` | öffentlich | verfügbare Provider, keine Schlüssel |
 | `GET /api/voice/privacy?locale=de` | öffentlich | eigener Verarbeitungshinweis, DE/FR/IT/EN |
-| `GET /api/voice/portfolio` | öffentlich | explizite Behandlung aller 37 Intake-Felder |
 | `GET` Session-Basispfad | Kunde / Fall-Agent | `voice.list(actor, caseId)`; Metadaten |
 | `POST` Session-Basispfad | Kunde + CSRF | `voice.start(actor, caseId, input)`; kurzlebige Verbindungsdaten |
 | `GET /:voiceSessionId/transcript` | Kunde / Fall-Agent | `voice.transcript(actor, caseId, sessionId)`; finale Turns |
@@ -61,7 +59,7 @@ Alle Fallrouten beginnen mit `/api/cases/:caseId/voice/sessions`.
 | `POST /:voiceSessionId/extraction` | nur Fall-Agent | `voice.propose(actor, caseId, sessionId, input)`; Paket oder explizite Folgeaufgaben |
 | `POST /:voiceSessionId/close` | Kunde + CSRF | `voice.close(actor, caseId, sessionId, {reason})` |
 
-Erni kann in einem Nest-Feature-Modul `LIFE_RUNTIME` injizieren und diese Methoden direkt nutzen. `LifeSessionGuard` liefert den authentifizierten Actor; keine Actor-Objekte aus Request-Bodies übernehmen. Separate Prozesse verwenden dieselben HTTP-Verträge. Die Spezifikation steht unter `GET /api/openapi.json`; Zod-Typen kommen aus `@pax/contracts`, JSON-Schemas aus `code/packages/contracts/schemas/`. [Browser-/Server-Beispiele](../../../code/examples/contracts/team-client.ts) werden mit reinen DOM-Typen geprüft.
+Erni kann in einem Nest-Feature-Modul `LIFE_RUNTIME` injizieren und diese Methoden direkt nutzen. `LifeSessionGuard` liefert den authentifizierten Actor; keine Actor-Objekte aus Request-Bodies übernehmen. Separate Prozesse verwenden dieselben HTTP-Verträge. Die Spezifikation steht unter `GET /api/openapi.json`; Zod-Typen kommen aus `@pax/contracts`.
 
 ## Dario: Session und Transkripte
 

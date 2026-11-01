@@ -2,7 +2,7 @@ import { DigitalTasks } from './digital-tasks.js';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { CreateInsuranceCaseSchema,DraftSchema,DraftPatchSchema,ConfirmProfileSchema,
-  DEFAULT_HUMAN_HANDOVER,PAX_HUMAN_ADVISOR_CONTACT,RunAnalysisSchema,GraphContextSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft } from '@pax/contracts';
+  DEFAULT_HUMAN_HANDOVER,PAX_HUMAN_ADVISOR_CONTACT,RunAnalysisSchema,ReviewDecisionSchema,LifeAnalysisSchema,CasePreferencesSchema,AdvisorContextSchema,QuestionsResponseSchema,LifeAnalysisResponseSchema, type InsuranceDraft } from '@pax/contracts';
 import { calculateBudget,calculateCapital,intakeQuestions,retirementTimeline,simulateScenario,calculateProgress } from '@pax/domain';
 import { CalculationService,createAnalysisRequest } from '../calculation/calculation.service.js';
 import { sha256Json } from '../calculation/hash.js';
@@ -11,7 +11,6 @@ import type { NormalizedProviderResult } from '../logismata/normalize.js';
 import { buildProviderJobs,deriveRiskNeeds } from './provider-mapper.js';
 import { recommendLifeSolutions } from './products.js';
 import { ambiguityDialogue,pendingAcceptanceIds,waitingForAnswer } from './ambiguity-dialogue.js';
-import { selectedGraphFacts } from './graph.js';
 import { pillarPicture } from './pillars.js';
 import { questionText,presentRecommendation,presentRun,progressText,metricText,statusText } from './i18n.js';
 import type { CaseStore } from './store.js';
@@ -109,12 +108,6 @@ export class LifeInsuranceEngine {
       if(liveStart)c.liveStart=true;
       db.cases[c.id]=c;this.audit(db,actor,c,'case_created');return c;
     });
-  }
-  list(actor:Actor) {
-    this.sessions.assertActive(actor);
-    if(actor.role==='advisor')throw new WorkflowError('FORBIDDEN',403);
-    return this.store.view(db=>Object.values(db.cases).filter(c=>c.expiresAt>now()&&(actor.role==='customer'?c.ownerId===actor.id:c.reviewTasks.length>0))
-      .map(c=>({id:c.id,caseRevision:c.caseRevision,profileVersion:currentVersion(c)?.version??null,locale:c.locale,updatedAt:c.updatedAt,openReviews:c.reviewTasks.filter(t=>t.status==='open').length})));
   }
   async patchDraft(actor:Actor,id:string,input:unknown) {
     this.role(actor,'customer');const body=DraftPatchSchema.parse(input);const {expectedCaseRevision,...patch}=body;
@@ -317,18 +310,6 @@ export class LifeInsuranceEngine {
       return {caseRevision:c.caseRevision,contextRevision:c.contextRevision,run};
     });
   }
-  async selectGraph(actor:Actor,id:string,input:unknown) {
-    this.role(actor,'customer');const graph=GraphContextSchema.parse(input);
-    return this.edit(actor,id,undefined,(c,db)=>{
-      const run=this.activeRun(c);if(graph.caseId!==c.id||graph.runId!==run.id||graph.profileVersion!==run.profileVersion||graph.scenarioVersionId!==run.scenarioVersionId)
-        throw new WorkflowError('STALE_CONTEXT');
-      if(graph.graphId==='retirement_timeline') {
-        if(!run.timeline||graph.periodStart<run.timeline.periods[0]!.month||graph.periodEnd>run.timeline.periods.at(-1)!.month)throw new WorkflowError('STALE_CONTEXT');
-      }else if(graph.periodStart<run.local.periodStart||graph.periodEnd>run.local.periodEnd)throw new WorkflowError('STALE_CONTEXT');
-      const facts=selectedGraphFacts(run,graph);
-      c.graphContext=graph;this.touch(c,'graph_context_changed');this.audit(db,actor,c,'graph_context_changed');return {graph,...facts,runId:run.id,inputHash:run.inputHash};
-    });
-  }
   advisorContext(actor:Actor,id:string) {
     const c=this.caseFor(actor,id,true);const run=!c.handover.stopDigitalConversation&&!c.draftDirty&&!c.ambiguities.some(a=>a.status==='open')?c.runs.find(r=>r.id===c.activeRunId&&r.status!=='stale'):null;
     const questions=this.questions(actor,id);const approved=run?this.approved(c,run):false;
@@ -336,19 +317,9 @@ export class LifeInsuranceEngine {
       currency:m.currency,unit:m.unit,period:m.period,status:m.status,runId:run.id,profileVersion:run.profileVersion,scenarioVersionId:run.scenarioVersionId,humanReviewedForDemo:approved}))??[];
     if(run&&approved)for(const r of run.riskNeeds)if(r.annualGapCents!==null)facts.push({metricId:`risk_${r.scenario}_gap`,value:r.annualGapCents,
       currency:'CHF',unit:'cent',period:'year',status:r.status,runId:run.id,profileVersion:run.profileVersion,scenarioVersionId:run.scenarioVersionId,humanReviewedForDemo:true});
-    const selected=run&&c.graphContext?selectedGraphFacts(run,c.graphContext):null;
-    const values=selected?.series.map(p=>p.value).filter((v):v is number=>v!==null)??[];
-    const projected=selected&&selected.series.length>24?{...selected,series:[],rangeSummary:{points:selected.series.length,
-      first:selected.series[0],last:selected.series.at(-1),minimumKnown:values.length?Math.min(...values):null,
-      maximumKnown:values.length?Math.max(...values):null,unknownPoints:selected.series.length-values.length}}:selected;
     return AdvisorContextSchema.parse({handover:c.handover,humanAdvisorContact:PAX_HUMAN_ADVISOR_CONTACT,caseId:c.id,caseRevision:c.caseRevision,contextRevision:c.contextRevision,profileVersion:currentVersion(c)?.version??null,
       runId:run?.id??null,scenarioVersionId:run?.scenarioVersionId??null,calculationInputHash:run?.inputHash??null,
-      locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:run?c.graphContext:null,
-      contextId:run&&c.graphContext?sha256Json(c.graphContext):null,
-      selectedGraphFacts:projected,
-      maySpeakSelectedAmounts:!!run&&run.status==='current'&&!!c.graphContext&&
-        (!!selected&&(['valid','estimated'].includes(selected.metric.status)||approved))&&
-        (c.graphContext.graphId!=='risk_coverage'||approved),
+      locale:c.locale,tempo:c.timeBudgetMinutes<=10?'compact':'detailed',graphContext:null,contextId:null,selectedGraphFacts:null,maySpeakSelectedAmounts:false,
       calculationStatus:run?.status??(c.latestAnalysisRequestId&&!c.draftDirty?'running':'needs_input'),
       ambiguities:ambiguityDialogue(c),pendingAcceptanceBatchIds:questions.pendingAcceptanceBatchIds,
       approvedFacts:facts.map(f=>({...f,label:metricText(c.locale,f.metricId),statusLabel:statusText(c.locale,f.status)})),nextQuestion:questions.questions[0]??null,missingFields:questions.mandatoryFields,

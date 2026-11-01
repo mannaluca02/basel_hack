@@ -112,7 +112,7 @@ test('HTTP routes share Nest owner authentication, cookie CSRF, safe errors and 
   const path=`/api/cases/${c.id}/voice/sessions`,input={messageId:'http_start',expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=offer'};
   assert.equal((await call('POST',path,null,input)).status,401);assert.equal((await call('POST',path,null,input,{Cookie:`pax_session=${login.sessionToken}`})).status,403);
   const response=await call('POST',path,null,input,{Cookie:`pax_session=${login.sessionToken}`,'X-CSRF-Token':login.csrfToken});assert.equal(response.status,201);VoiceSessionStartResponseSchema.parse(response.body);
-  assert.equal((await call('GET','/api/voice/portfolio')).body.length,37);const spec=(await call('GET','/api/openapi.json')).body;assert.deepEqual(spec.paths['/api/voice/providers'].get.security,[]);assert.ok(spec.paths['/api/cases/{caseId}/voice/sessions'].post.security.length);assert.ok(spec.components.schemas.VoiceTranscript);
+  assert.equal(portfolioCatalog().length,37);const spec=(await call('GET','/api/openapi.json')).body;assert.deepEqual(spec.paths['/api/voice/privacy'].get.security,[]);assert.ok(spec.paths['/api/cases/{caseId}/voice/sessions'].post.security.length);assert.ok(spec.components.schemas.VoiceTranscript);
   const privacy=(await call('GET','/api/privacy?locale=fr')).body;assert.equal(privacy.externalAiTransfer,true);assert.ok(privacy.display.recipients.includes('OpenAI'));
   await call('DELETE','/api/sessions/current',login.sessionToken);await settle();assert.equal(runtime.store.snapshot().cases[c.id].voiceSessions[0].closeReason,'session_revoked');assert.equal(gateway.stops.length,1);
 });

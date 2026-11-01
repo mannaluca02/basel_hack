@@ -29,7 +29,7 @@ flowchart LR
 |---|---|---|
 | Web-App | `code/apps/web` | Angular 22. Paxi in der Mitte, Tabs Grafiken, Risiken, Chat, Info, Abschluss; Live-Stimme über WebRTC; Annahme, Bestätigung, Abschlussweg |
 | API | `code/apps/api` | NestJS. Ein gemeinsamer Fall pro Kunde: Aufnahme, Vorschläge, Bestätigung, Berechnung, Empfehlung, Angemessenheitsprüfung, Demo-Vertragsweg, Dossier; Voice-Sessions und Auswertung der Gesprächsturns |
-| Verträge | `code/packages/contracts` | Zod-Schemas, von API und Web-App gemeinsam benutzt; JSON-Schemas in `schemas/` werden daraus exportiert |
+| Verträge | `code/packages/contracts` | Zod-Schemas, von API und Web-App gemeinsam benutzt; `GET /api/openapi.json` beschreibt die Routen daraus |
 | Fachlogik | `code/packages/domain` | Budget, Kapital, Pflichtfelder (`intakeQuestions`), Lebensversicherungsbedarf |
 | Worker | `code/apps/worker` | Cloudflare Worker `paxi`: dieselbe NestJS-API in einem Durable Object plus die gebaute App als statische Dateien |
 | Voice-Agent | `code/voice-agent` | Darios eigenständiger Paxi (Konfiguration `paxi`). Seine Persona und Skills speisen auch die eingebaute Live-Stimme |

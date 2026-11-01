@@ -108,7 +108,7 @@ Die Backend-Anforderungen B13, B14, B21 und B23 sind jetzt auch in der Angular-A
 - **B14 Dokumente und Summary:** Produktdokumente der Offerte als Download (SHA-256-gebunden) mit Lesebestätigung; Beratungsdossier als druckbares HTML.
 - **Eignungsprüfung (Pax-Formular 0054):** Formular für fondsgebundene Produkte vor der Offerte.
 - **B21 Avatar:** Lukas' Renderer im Agent-Dock, gesteuert vom Aktivitätsring und dem Pegel der Live-Voice.
-- **B23 NPS und Abbruch-Insights:** Ansicht `/insights` mit Trichter, möglichen Abbrüchen, NPS und Übergabewünschen (`GET /api/demo/insights`, nur Aggregate), nur in den Debug-Konfigurationen. Die NPS-Umfrage ist nicht Pflicht und in der App bewusst weggelassen; die Backend-Route `/feedback` bleibt.
+- **B23 NPS und Abbruch-Insights:** Ansicht `/insights` mit Trichter, möglichen Abbrüchen, NPS und Übergabewünschen (`GET /api/demo/insights`, nur Aggregate), nur in den Debug-Konfigurationen. Die NPS-Umfrage ist nicht Pflicht und weggelassen.
 
 Nachweis: `code/tests/contract-journey.test.mjs` (HTTP-End-to-End), Angular-Specs unter `features/journey`, und ein Lauf gegen den Live-Rechner bis zur Demo-Police (Dossier, PDF, Insights). Eine Person ohne eigenes Einkommen oder Vermögen erhält für ihre Produkte keine Offerte; die App erklärt das.
 

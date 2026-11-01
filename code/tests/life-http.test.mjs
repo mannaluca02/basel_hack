@@ -45,7 +45,7 @@ test('case creation requires the current base processing notice',async()=>{
   assert.equal(stale.status,400);
 });
 test('case routes require authentication and do not accept a customer role override',async()=>{
-  assert.equal((await request('GET','/api/cases')).status,401);
+  assert.equal((await request('GET',`/api/cases/${crypto.randomUUID()}`)).status,401);
   const c=await newCase();const result=await request('PATCH',`/api/cases/${c.id}/draft`,customer.sessionToken,{expectedCaseRevision:c.caseRevision,role:'reviewer'});
   assert.equal(result.status,400);
 });
@@ -113,7 +113,6 @@ test('OpenAPI exposes runtime request schemas and private financial data stays p
   assert.equal(spec.body.paths['/api/cases/{caseId}/summaries'].get.responses['200'].content['application/json'].schema.$ref,'#/components/schemas/SummaryBundle');
   const walk=value=>{if(!value||typeof value!=='object')return;if(value.$ref?.startsWith('#/'))assert.ok(resolve(value.$ref),value.$ref);for(const child of Object.values(value))walk(child);};
   walk(spec.body);
-  assert.equal((await request('GET','/api/insights',customer.sessionToken)).status,403);
 });
 test('malformed payloads, oversized bodies and disallowed origins return controlled errors',async()=>{
   const bad=await fetch(`${base}/api/sessions`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{"accessCode":"do-not-echo"'});assert.equal(bad.status,400);assert.ok(!(await bad.text()).includes('do-not-echo'));

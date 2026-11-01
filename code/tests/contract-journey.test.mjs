@@ -92,11 +92,6 @@ test('demo start: from the recommendation through quote and application to the d
   const again=await f.call('POST',`${f.path}/demo-review`,{});
   assert.deepEqual(again.body,{adviceApproved:false,applicationsAccepted:[],policiesIssued:[],simulated:true},'nothing pending changes nothing');
 
-  // NPS per reached stage, once each.
-  for(const stage of ['advice','recommendation','portal'])
-    assert.equal((await f.call('POST',`${f.path}/feedback`,{score:9,stage})).status,201,stage);
-  assert.equal((await f.call('POST',`${f.path}/feedback`,{score:3,stage:'portal'})).body.code,'FEEDBACK_ALREADY_RECORDED');
-
   // Documentation for the customer: the dossier and the acknowledged product documents.
   const dossier=await f.call('GET',`${f.path}/dossier?audience=customer&format=html`,undefined,true);
   assert.equal(dossier.status,200);
@@ -109,7 +104,6 @@ test('demo start: from the recommendation through quote and application to the d
   // Product management: aggregate only.
   const insights=await f.call('GET','/api/demo/insights');
   assert.equal(insights.status,200,JSON.stringify(insights.body));
-  assert.equal(insights.body.nps.responses,3);
   assert.equal(insights.body.currentStageCounts.demo_policy,1);
   assert.equal(insights.body.containsFinancialAmounts,false);
 });

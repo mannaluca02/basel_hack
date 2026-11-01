@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor,type InsuranceCase } from './types.js';
 
@@ -6,16 +5,6 @@ const stage=(c:InsuranceCase)=>c.policies.length?'demo_policy':c.applications.so
   c.recommendations.length?'recommendation':c.runs.length?'analysis':c.confirmedVersions.length?'profile_confirmed':'intake';
 export class PrototypeInsights {
   constructor(readonly engine:LifeInsuranceEngine){}
-  async feedback(actor:Actor,id:string,input:unknown) {
-    if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
-    const b=z.object({score:z.number().int().min(0).max(10),stage:z.enum(['advice','recommendation','portal'])}).strict().parse(input);
-    return this.engine.edit(actor,id,undefined,(c,db)=>{
-      if((b.stage==='advice'&&!c.confirmedVersions.length)||(b.stage==='recommendation'&&!c.recommendations.length)||(b.stage==='portal'&&!c.policies.length))
-        throw new WorkflowError('FEEDBACK_STAGE_NOT_REACHED',422);
-      if(db.feedback.some(f=>f.caseId===c.id&&f.stage===b.stage))throw new WorkflowError('FEEDBACK_ALREADY_RECORDED');
-      db.feedback.push({caseId:c.id,at:new Date().toISOString(),stage:b.stage,score:b.score});this.engine.audit(db,actor,c,'nps_recorded');return {recorded:true};
-    },{allowDuringHandover:true});
-  }
   aggregate(actor:Actor) {
     this.engine.sessions.assertActive(actor);if(actor.role!=='reviewer')throw new WorkflowError('FORBIDDEN',403);
     return this.engine.store.view(db=>{

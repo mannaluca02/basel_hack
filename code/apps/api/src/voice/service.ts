@@ -7,7 +7,7 @@ import { ExtractionWorkflow } from '../insurance/extraction.js';
 import { WorkflowError, type Actor, type InsuranceCase, type StoredVoiceSession } from '../insurance/types.js';
 import { sha256Json } from '../calculation/hash.js';
 import { gatewaysFor, type VoiceOptions, type VoiceGateway } from './providers.js';
-import { mapVoiceObservations, portfolioCatalog } from './portfolio.js';
+import { mapVoiceObservations } from './portfolio.js';
 import { buildVoicePrompt } from './prompt.js';
 import { REPORT_POLICY, liveDelegation } from './lab-delegation.js';
 import { productText } from '../insurance/i18n.js';
@@ -72,7 +72,6 @@ export class VoiceIntegrationService {
     list(actor: Actor, id: string) { const c = this.engine.caseFor(actor, id, true); if (actor.role === 'reviewer')
         throw new WorkflowError('FORBIDDEN', 403); return { caseId: id, sessions: c.voiceSessions.filter(s => actor.role === 'advisor' || s.sessionHash === actor.sessionHash).map(s => this.dto(s)) }; }
     transcript(actor: Actor, id: string, sessionId: string) { const c = this.engine.caseFor(actor, id, true), s = this.session(actor, c, sessionId); return VoiceTranscriptSchema.parse({ caseId: id, voiceSession: this.dto(s), turns: s.turns }); }
-    catalog() { return portfolioCatalog(); }
     async start(actor: Actor, id: string, input: unknown) {
         this.customer(actor);
         const b = CreateVoiceSessionSchema.parse(input), gateway = this.gateways.get(b.provider);

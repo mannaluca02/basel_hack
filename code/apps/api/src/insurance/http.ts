@@ -7,9 +7,9 @@ import { PRIVACY_NOTICE,AdvisorContextUpdatedSchema,PortalDtoSchema,CASE_DTO_VER
 import { LIFE_RUNTIME,type LifeRuntime } from './runtime.js';
 import { WorkflowError,type Actor } from './types.js';
 import { Operations } from '../logismata/contracts.js';
-import { PAX_PRODUCTS } from './products.js';
+
 import { lifeOpenApi } from './openapi.js';
-import { catalog,complianceSteps,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
+import { catalog,complianceSteps,localeOf,localizedCase,errorText,presentJourney,t } from './i18n.js';
 
 type Request={url?:string;paxHttp?:{publicOrigin?:string;sameOrigin?:boolean};protocol?:string;headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
 type Response={setHeader:(key:string,value:string)=>void;status:(code:number)=>Response;json:(value:unknown)=>void;send:(value:unknown)=>void;type:(value:string)=>Response};
@@ -97,7 +97,6 @@ export class ProtectedLifeController {
   @Delete('sessions/current') async logout(@Req() req:Request,@Res({passthrough:true}) res:Response){
     await this.r.sessions.revoke(req.actor);await this.r.voice.sweep();res.setHeader('Set-Cookie',`pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0${secureCookie(req)}`);return {revoked:true};
   }
-  @Get('cases') list(@Req() req:Request){return this.r.engine.list(req.actor);}
   @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}
   @Get('cases/:caseId') get(@Req() req:Request,@Param('caseId') id:string){return localizedCase(this.r.engine.caseFor(req.actor,uuid(id)));}
   @Patch('cases/:caseId/draft') async patch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return localizedCase(await this.r.engine.patchDraft(req.actor,uuid(id),body));}
@@ -113,7 +112,6 @@ export class ProtectedLifeController {
   @Post('cases/:caseId/calculations') analyze(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.analyze(req.actor,uuid(id),body);}
   @Post('cases/:caseId/active-analysis') selectAnalysis(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.selectAnalysis(req.actor,uuid(id),body);}
   @Post('cases/:caseId/comparisons') compare(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.comparisons.create(req.actor,uuid(id),body);}
-  @Get('cases/:caseId/comparisons/:comparisonId') comparison(@Req() req:Request,@Param('caseId') id:string,@Param('comparisonId') comparisonId:string){return this.r.comparisons.get(req.actor,uuid(id),comparisonId);}
   @Post('cases/:caseId/locations') async locations(@Req() req:Request,@Param('caseId') id:string,@Body() input:unknown){
     if(req.actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const c=this.r.engine.caseFor(req.actor,uuid(id));
     const body=z.object({search:z.string().regex(/^[A-Za-zÀ-ÿ0-9 -]{2,60}$/),allowSyntheticCalculatorTransfer:z.literal(true)}).strict().parse(input);
@@ -123,7 +121,6 @@ export class ProtectedLifeController {
     });
   }
   @Post('cases/:caseId/calculator-estimates') estimate(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.estimates.calculate(req.actor,uuid(id),body);}
-  @Get('cases/:caseId/calculator-tools') tools(@Req() req:Request,@Param('caseId') id:string){return this.r.tools.list(req.actor,uuid(id));}
   @Post('cases/:caseId/calculator-tools') tool(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.tools.execute(req.actor,uuid(id),body);}
   @Post('cases/:caseId/recommendations') recommend(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.engine.recommendation(req.actor,uuid(id));}
   @Post('cases/:caseId/reviews') requestReview(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});return this.r.engine.requestReview(req.actor,uuid(id));}
@@ -145,17 +142,12 @@ export class ProtectedLifeController {
     this.r.engine.caseFor(req.actor,uuid(id));const document=await this.r.documents.read(documentId);
     res.type('application/pdf');res.setHeader('Content-Disposition',`attachment; filename="${document.filename}"`);res.setHeader('X-Document-SHA256',document.sha256);res.send(document.bytes);
   }
-  @Get('cases/:caseId/products') products(@Req() req:Request,@Param('caseId') id:string){
-    const locale=this.r.engine.caseFor(req.actor,uuid(id)).locale;return {kind:'educational_catalog_not_personal_recommendations',locale,
-      products:PAX_PRODUCTS.map(p=>({...p,name:productText(locale,p.id),summary:catalog(locale).messages[`summary.${p.id}`]??t(locale,'common.condition')}))};
-  }
   @Post('cases/:caseId/agent-access') agent(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){z.object({}).strict().parse(body??{});this.r.engine.caseFor(req.actor,uuid(id));return this.r.sessions.agentToken(req.actor,id);}
   @Get('cases/:caseId/advisor/context') context(@Req() req:Request,@Param('caseId') id:string){return this.r.engine.advisorContext(req.actor,uuid(id));}
   @Get('cases/:caseId/handover') handover(@Req() req:Request,@Param('caseId') id:string){return this.r.handover.read(req.actor,uuid(id));}
   @Post('cases/:caseId/handover') switchHandover(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.handover.command(req.actor,uuid(id),body);}
   @Post('cases/:caseId/customer-confirmations') createConfirmation(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.confirmations.create(req.actor,uuid(id),body);}
   @Get('cases/:caseId/customer-confirmations/current') currentConfirmation(@Req() req:Request,@Param('caseId') id:string){return this.r.confirmations.current(req.actor,uuid(id));}
-  @Get('cases/:caseId/customer-confirmations/:confirmationId') readConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string){return this.r.confirmations.get(req.actor,uuid(id),requestId);}
   @Post('cases/:caseId/customer-confirmations/:confirmationId/presented') presentConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.presented(req.actor,uuid(id),requestId,body);}
   @Post('cases/:caseId/customer-confirmations/:confirmationId/answer') answerConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.answer(req.actor,uuid(id),requestId,body);}
   @Post('cases/:caseId/customer-confirmations/:confirmationId/cancel') cancelConfirmation(@Req() req:Request,@Param('caseId') id:string,@Param('confirmationId') requestId:string,@Body() body:unknown){return this.r.confirmations.cancel(req.actor,uuid(id),requestId,body);}
@@ -165,10 +157,6 @@ export class ProtectedLifeController {
   @Get('cases/:caseId/advisor/extractor-context') extractorContext(@Req() req:Request,@Param('caseId') id:string){return this.r.extraction.context(req.actor,uuid(id));}
   @Post('cases/:caseId/advisor/proposal-batches') batch(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.extraction.proposeBatch(req.actor,uuid(id),body);}
   @Post('cases/:caseId/advisor/proposal-batches/:batchId/accept') acceptBatch(@Req() req:Request,@Param('caseId') id:string,@Param('batchId') batchId:string,@Body() body:unknown){return this.r.extraction.acceptBatch(req.actor,uuid(id),batchId,body);}
-  @Post('cases/:caseId/ambiguities/:ambiguityId/resolve') resolveAmbiguity(@Req() req:Request,@Param('caseId') id:string,@Param('ambiguityId') ambiguityId:string,@Body() body:unknown){return this.r.extraction.resolveAmbiguity(req.actor,uuid(id),ambiguityId,body);}
-  @Post('cases/:caseId/advisor/proposals') propose(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.advisory.propose(req.actor,uuid(id),body);}
-  @Post('cases/:caseId/advisor/proposals/:proposalId/accept') accept(@Req() req:Request,@Param('caseId') id:string,@Param('proposalId') proposalId:string,@Body() body:unknown){return this.r.advisory.accept(req.actor,uuid(id),proposalId,body);}
-  @Post('cases/:caseId/graph-context') graph(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.selectGraph(req.actor,uuid(id),body);}
   @Patch('cases/:caseId/preferences') preferences(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.engine.preferences(req.actor,uuid(id),body);}
   @Sse('cases/:caseId/advisor/events') events(@Req() req:Request,@Param('caseId') id:string):Observable<MessageEvent> {
     uuid(id);this.r.engine.caseFor(req.actor,id,true);
@@ -191,9 +179,6 @@ export class ProtectedLifeController {
       const timer=setInterval(poll,250);poll();return ()=>clearInterval(timer);
     });
   }
-  @Get('cases/:caseId/audit') audit(@Req() req:Request,@Param('caseId') id:string){this.r.engine.caseFor(req.actor,uuid(id));return this.r.store.view(db=>db.audit.filter(a=>a.caseId===id));}
-  @Post('cases/:caseId/feedback') feedback(@Req() req:Request,@Param('caseId') id:string,@Body() body:unknown){return this.r.insights.feedback(req.actor,uuid(id),body);}
-  @Get('insights') insights(@Req() req:Request){return this.r.insights.aggregate(req.actor);}
   @Delete('cases/:caseId') async remove(@Req() req:Request,@Param('caseId') id:string){
     if(req.actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);
     const result=await this.r.engine.edit(req.actor,uuid(id),undefined,(c,db)=>{
