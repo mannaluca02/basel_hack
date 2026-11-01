@@ -115,3 +115,18 @@ Use `/presentation/` with optional `#1`, `#2` or `#3` for the slide. Legacy prev
 Phone browser chrome now uses the user-supplied IMG_5456.PNG Safari screenshot: the top status area and bottom Safari address controls, excluding the app's own navigation. The live clock is retained. The physical Pro Max camera island and lens remain visible in all phone states; Safari keeps the compact island because this reference has no expanded hotspot indicator.
 
 Safari's page viewport is lowered by approximately 1.4% of the display height: top safe area 7.3%, bottom browser area 9.5%. The original controls stay anchored inside the Pro Max display, the full page area retains its height, and the camera island remains fixed.
+
+## Frozen pitch and interactive backups
+
+The three main pitch slides are frozen as of commit `4773ece`. Backup styles and interactions live in `backups.css` and `backups.js` and are scoped to the supporting slides.
+
+- **A** opens B01: architecture and data exchange.
+- **B** opens B02: implemented prototype features.
+- From a backup, **Right / Page Down** moves to the next backup; **Left / Page Up** goes back.
+- B03 covers deliberate boundaries and deferred production work; B04 covers known limitations.
+- Click a moving word (or focus it and press Enter) for detail. Reduced-motion preferences stop the drift.
+- **Escape / End** returns to the closing pitch slide. The main pitch still ends at slide 3.
+
+Backup claims are based on `code/voice-agent/README.md`, its browser client, `code/README.md` and the source inventory in `FEATURES.md`. “Implemented” refers to the prototype capabilities, not a new end-to-end deployment certification. No backend code was changed or retested for this presentation-only addition.
+
+Backup refinement: the closing slide has a “Backups →” button. B01 is a left-to-right SVG flowchart with distinct audio, transcript/context and results/orchestration colors. B02–B04 use draggable Pax Civil pills; click or Enter expands a lighter detail card. Drag positions last for the current page session. Architecture was rechecked against the current local voice README, case bridge integration and backend README. The recording placeholder topic has been removed.

@@ -156,7 +156,7 @@ function playMoment(i) {
 }
 function next() {
   if(stageBusy)return;
-  if (index !== 1) { if (index < 2) show(index + 1); return; }
+  if (index !== 1) { if (index < slides.length - 1) show(index + 1); return; }
   const active = moments.findIndex(el => ['startup', 'playing', 'finishing'].includes(el.dataset.state));
   if (active >= 0) {
     clearMomentTimer(active);
@@ -301,3 +301,6 @@ const initial = Number(location.hash.slice(1)); if (initial >= 1 && initial <= s
 render();
 
 band.classList.add("band-ready");
+
+// Backup-only interactions; the three pitch slides remain frozen.
+import './backups.js?v=architecture-clean-4';

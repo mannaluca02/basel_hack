@@ -1,0 +1,124 @@
+/* All rules are scoped to backups: the three main slides are frozen. */
+.backup-new{padding:65px 90px;color:#291440}
+.backup-new h2{font-size:58px;line-height:1.12;margin:14px 0 0;max-width:1350px}
+.backup-new .eyebrow{font-size:17px;letter-spacing:.15em}
+.flow-map{width:1260px;margin:22px auto 0;text-align:center}
+.flow-node{background:#fff9;border:1px solid #33076a25;border-radius:20px;padding:13px 24px;font-size:26px;font-weight:500;box-shadow:0 8px 24px #260a4010}
+.flow-node small{display:block;font-size:17px;font-weight:400;line-height:1.4;margin-top:5px;color:#615568}
+.flow-node.customer{width:600px;margin:auto;background:#91ca0017}
+.flow-node.experience{width:950px;margin:auto;border-color:#80b700}
+.flow-link{font-size:17px;line-height:1.5;padding:7px;color:#6b5c78}
+.flow-branches{display:grid;grid-template-columns:1fr 1fr;gap:46px}
+.flow-node.external{border-style:dashed;background:#36066a0a}
+.bridge-note{font-size:19px;line-height:1.5;margin-top:22px;color:#503568}
+.cloud-hint{font-size:20px;color:#75677e;margin-top:17px}
+.word-cloud{position:absolute;left:80px;top:240px;width:1010px;height:560px}
+.word-cloud button{position:absolute;left:var(--x);top:var(--y);translate:-50% -50%;white-space:nowrap;background:none;border:0;color:#4b146e;font-family:inherit;font-weight:500;font-size:var(--word-size);cursor:pointer;padding:9px;animation:backup-drift var(--duration) ease-in-out var(--delay) infinite alternate;transition:color .2s}
+.word-cloud button:nth-child(3n){color:#638900}
+.word-cloud button:hover,.word-cloud button.selected{color:#951cb4;text-decoration:underline;text-underline-offset:8px}
+.word-cloud button:focus-visible{outline:2px solid #6d3199;outline-offset:3px;border-radius:8px}
+.cloud-detail{position:absolute;right:85px;top:300px;width:365px;min-height:335px;padding:30px;border-radius:25px;background:#fff9;border:1px solid #33076a1c;box-shadow:0 18px 55px #260a400b}
+.detail-kicker{font-size:14px;letter-spacing:.15em;color:#74617f;font-weight:500}
+.cloud-detail h3{font-size:32px;line-height:1.15;margin:24px 0 18px;font-weight:700}
+.cloud-detail p{font-size:23px;line-height:1.5;margin:0}
+@keyframes backup-drift{from{transform:translate(-5px,-5px) rotate(-1deg)}to{transform:translate(6px,7px) rotate(1deg)}}
+@media(prefers-reduced-motion:reduce){.word-cloud button{animation:none}}
+/* Pax Civil typography, violet/green accents and soft neutral surfaces. */
+.backup-new{color:#330066;font-family:'Pax Civil',Arial,sans-serif}
+.backup-new h2{font-size:60px;font-weight:700}
+.backup-continue{position:absolute;right:90px;bottom:83px;display:flex;align-items:center;gap:13px;border:1px solid #33006630;border-radius:99px;background:#fff9;color:#330066;padding:13px 20px;font:500 18px 'Pax Civil',Arial;cursor:pointer;z-index:5}
+.backup-continue svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+.backup-continue:hover{background:#eae2f1}
+.flow-chart{position:relative;width:1420px;height:560px;margin-top:40px}
+.flow-wires{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.wire-green{stroke:#78a900;marker-end:url(#arrow-green);marker-start:url(#arrow-green)}
+.wire-purple{stroke:#5b2288;marker-end:url(#arrow-purple)}
+.wire-blue{stroke:#287e9a;marker-end:url(#arrow-blue)}
+.wire-label{font:16px 'Pax Civil',Arial;fill:#64566e}
+.chart-card{position:absolute;width:260px;min-height:120px;border-radius:20px;border:1px solid #33006625;background:#fefdfb;box-shadow:0 7px 25px #33006608;padding:22px;display:flex;justify-content:center;flex-direction:column;gap:12px}
+.chart-card b{font-size:25px;line-height:1.15;font-weight:700}.chart-card span{font-size:19px;line-height:1.4;color:#65566c}
+.chart-customer{left:0;top:205px;width:190px;background:#edf3dd}
+.chart-browser{left:260px;top:190px;width:240px}
+.chart-openai{left:640px;top:30px;height:140px;background:#edf3dd}
+.chart-voice{left:640px;top:205px;height:150px}
+.chart-case{left:1060px;top:330px;width:330px;height:150px;background:#eee7f4}
+.chart-calc{left:640px;top:430px;width:260px;min-height:80px}
+.flow-legend{display:flex;gap:35px;font-size:18px;margin:10px 0 0 180px}.flow-legend span:before{content:'';display:inline-block;width:25px;height:3px;vertical-align:middle;margin-right:10px;background:currentColor}.legend-green{color:#78a900}.legend-purple{color:#5b2288}.legend-blue{color:#287e9a}
+.flow-source{font-size:17px;color:#75677e;margin:24px 0}
+.word-cloud{left:90px;top:250px;width:1400px;height:560px}
+.topic-pill{position:absolute;width:420px;animation:backup-drift var(--duration) ease-in-out var(--delay) infinite alternate;z-index:1}
+.word-cloud .topic-pill button{position:relative;left:auto;top:auto;translate:none;transform:none;animation:none;background:#eee7f4;border:1px solid #33006624;border-radius:99px;padding:17px 26px;color:#330066;font-size:25px;font-weight:500;max-width:420px;white-space:normal;line-height:1.15;touch-action:none;cursor:grab;box-shadow:0 5px 18px #33006606}
+.word-cloud .topic-pill:nth-child(3n) button{background:#eaf2d8;border-color:#78a90040;color:#395100}
+.word-cloud .topic-pill button:hover,.word-cloud .topic-pill button.selected{color:#330066;text-decoration:none;background:#e4d8ee}
+.word-cloud .topic-pill button:focus-visible{border-radius:99px}
+.topic-pill.expanded,.topic-pill.dragging{animation-play-state:paused;z-index:10}
+.topic-pill.dragging button{cursor:grabbing}
+.pill-detail{margin-top:9px;background:#fffef9;border:1px solid #33006615;border-radius:20px;padding:23px;font-size:21px;line-height:1.45;color:#56475e;box-shadow:0 16px 40px #33006618;animation:pill-drop .25s ease-out}
+@keyframes pill-drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.topic-pill,.pill-detail{animation:none}}
+.chart-card{padding:18px;gap:8px}.chart-card b{font-size:22px;line-height:1.15}.chart-card span{font-size:17px;line-height:1.3}
+.flow-chart{margin-top:30px}.flow-legend{margin-top:25px}.flow-source{margin-top:18px}
+/* A single Pax violet family; the lighter body opens between the two pill caps. */
+.word-cloud{top:235px;height:590px}
+.topic-pill{width:max-content;max-width:390px;transition:left .5s ease,top .5s ease}
+.word-cloud .topic-pill button,.word-cloud .topic-pill:nth-child(3n) button{background:#330066;border-color:#330066;color:#fff;font-size:25px;max-width:390px;box-shadow:0 7px 20px #33006614}
+.word-cloud .topic-pill button:hover{background:#4c167a;color:white}
+.topic-pill.expanded{width:390px;animation:none}
+.word-cloud .topic-pill.expanded button{width:100%;border-radius:30px 30px 0 0;border-bottom:0;padding-bottom:18px}
+.topic-pill.expanded:after{content:'';display:block;height:22px;background:#330066;border-radius:0 0 30px 30px}
+.pill-detail{margin:0;border:0;border-radius:0;background:#e9def2;color:#330066;padding:22px 26px;font-size:21px;line-height:1.4;box-shadow:none;animation:pill-drop .3s ease-out}
+.topic-pill.dragging{transition:none}
+.label-green{fill:#638c00}.label-purple{fill:#5b2288}.label-blue{fill:#287e9a}
+.chart-card{box-sizing:border-box;flex-shrink:0;overflow:visible}
+.chart-openai{height:150px;top:20px}.chart-voice{height:150px}.chart-calc{height:90px}
+/* Continuous collision spacing replaces independent drift transforms. */
+.topic-pill{animation:none;transition:none;transform:none}
+.word-cloud .topic-pill.expanded button,.word-cloud .topic-pill.expanded button:hover{background:#8bcb00;border-color:#8bcb00;color:#330066}
+.topic-pill.expanded:after{background:#8bcb00}
+.topic-pill.expanded .pill-detail{background:#e7f3c8;color:#253500}
+.chart-openai{top:0;height:140px}.chart-voice{top:230px;height:150px}
+.flow-wires .wire-label{font-size:15px}
+/* Architecture occupies a wide central band, with a dedicated footer clearance. */
+.flow-chart{height:500px;margin-top:35px}
+.flow-wires{height:500px}
+.flow-wires{aspect-ratio:1420 / 560}
+.chart-customer{left:0;top:210px;width:180px;height:120px}
+.chart-browser{left:250px;top:210px;width:260px;height:120px}
+.chart-openai{left:650px;top:0;width:260px;height:140px}
+.chart-voice{left:650px;top:210px;width:260px;height:150px}
+.chart-case{left:1050px;top:210px;width:340px;height:120px}
+.chart-calc{left:1090px;top:390px;width:300px;height:90px}
+.flow-legend{position:absolute;left:90px;top:780px;margin:0;gap:40px}
+.flow-source{position:absolute;left:90px;right:130px;top:825px;margin:0;font-size:16px}
+.topic-pill{overflow:visible}
+.topic-pill.expanded{overflow:hidden;border-radius:30px}
+.word-cloud .topic-pill button{transition:background-color 1s ease,color 1s ease,border-color 1s ease,border-radius 1s ease;width:100%}
+.topic-pill:after{transition:background-color 1s ease}
+.pill-detail{transition:background-color 1s ease;animation:none}
+@media(prefers-reduced-motion:reduce){.word-cloud .topic-pill button,.pill-detail{transition:none}}
+/* Sequential capsule: widen → unfold → instant green; reverse before recoloring. */
+.word-cloud .topic-pill.expanded button,.word-cloud .topic-pill.expanded button:hover{background:#330066;border-color:#330066;color:white;border-radius:30px;transition:none}
+.topic-pill.expanded:after{display:none;background:#330066;transition:none}
+.topic-pill.expanded .pill-detail{background:#e9def2;color:#330066;transition:none}
+.word-cloud .topic-pill.unfolded button{border-radius:30px 30px 0 0}
+.topic-pill.unfolded:after{display:block}
+.word-cloud .topic-pill.is-green button,.word-cloud .topic-pill.is-green button:hover{background:#8bcb00;border-color:#8bcb00;color:#330066}
+.topic-pill.is-green:after{background:#8bcb00}
+.topic-pill.is-green .pill-detail{background:#e7f3c8;color:#253500}
+/* Hover changes no geometry in any expanded phase. */
+.word-cloud .topic-pill.unfolded button,
+.word-cloud .topic-pill.unfolded button:hover,
+.word-cloud .topic-pill.unfolded.is-green button,
+.word-cloud .topic-pill.unfolded.is-green button:hover{border-radius:30px 30px 0 0;padding:17px 26px 18px;border-bottom:0}
+.word-cloud .topic-pill.is-green button:hover{background:#8bcb00;color:#330066}
+/* Voice and case/advice are modules within one integrated backend. */
+.backend-group{position:absolute;left:620px;top:165px;width:800px;height:215px;border:1px solid #33006630;border-radius:24px;background:#33006605;pointer-events:none}
+.backend-group>span{position:absolute;left:24px;top:13px;font:500 17px 'Pax Civil',Arial,sans-serif;color:#330066}
+/* Keep keyboard navigation functional without visible selection outlines. */
+#deck :focus,#deck :focus-visible{outline:none!important;outline-offset:0!important}
+/* One coordinate system keeps architecture nodes, connectors and labels aligned. */
+.architecture-diagram{width:1420px;height:500px;display:block;overflow:visible;font-family:'Pax Civil',Arial,sans-serif}
+.svg-node-title{font-size:23px;font-weight:700;fill:#330066}
+.svg-node-copy{font-size:17px;font-weight:400;fill:#65566c}
+.svg-group-title{font-size:17px;font-weight:500;fill:#330066}
+.svg-label{font-size:15px;font-weight:400}

@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Larpers · Paxi · BaselHack 2026</title>
-<link rel="stylesheet" href="presentation.css?v=latest-safari-fit">
+<link rel="stylesheet" href="presentation.css?v=architecture-clean-4">
+<link rel="stylesheet" href="backups.css?v=architecture-clean-4">
 </head>
 <body>
 <main id="deck" aria-label="Paxi presentation"><div id="slide-band">
@@ -43,17 +44,36 @@
  <div class="closing-pair"><div class="qr-mascot" id="qr-mascot"></div></div>
  <footer><p class="team-name">Larpers</p><p class="love"><span aria-label="love">♥</span> Vibe coded with love</p><div class="team" id="team"></div></footer><span class="slide-number">03 / 03</span>
 </section>
-<section class="slide backup" data-title="Architecture" aria-label="Supporting slide: Architecture" hidden>
- <p class="eyebrow">SUPPORTING SLIDE 01</p><h2>How Paxi connects the pieces</h2>
- <div class="architecture"><div class="arch-node">Customer<br><small>Voice · language · life story</small></div><div class="arch-arrow">↕</div><div class="arch-node">Angular experience + Paxi avatar<br><small>Transcript · growing visuals · playback</small></div><div class="arch-columns"><div class="arch-node">Voice service ↔ Live speech<br><small>WebRTC · transcript · language switching</small></div><div class="arch-node">Case & advisor backend<br><small>Structured context · calculation orchestration</small></div></div><div class="arch-arrow">↓</div><div class="arch-node">Logismata calculations · scenario / proposal · colleague handoff</div></div>
- <p class="footnote">Component overview based on repository modules. End-to-end links and the exact recorded demo path still require rehearsal verification.</p>
-</section>
-<section class="slide backup feature-slide" data-title="Features, boundaries & next steps" aria-label="Supporting slide: Features and limitations" hidden>
- <p class="eyebrow">SUPPORTING SLIDE 02</p><h2>What’s here. What’s next.</h2>
- <div class="feature-columns"><div><h3>Repository capabilities</h3><ul><li>Voice conversation & four languages</li><li>Animated avatar & playback states</li><li>Transcript & structured intake</li><li>Question priorities & progress</li><li>Refusal handling & conversation resume</li><li>Life context & summary</li><li>Case, scenarios & growing visuals</li><li>Calculations & proposal modules</li><li>Review, documents & demo portal</li></ul></div><div><h3>Prototype boundaries</h3><ul><li>Not a production release</li><li>Synthetic demo data</li><li>Extraction can be wrong or delayed</li><li>Network & model availability matter</li><li>Voice does not recommend products</li><li>Proposal is not a binding policy</li><li>Review remains a separate step</li><li>Integration coverage varies by path</li></ul></div><div><h3>Further implementation</h3><ul><li>Verify every end-to-end journey</li><li>Measure latency & extraction accuracy</li><li>Evaluate language & accessibility</li><li>Strengthen consent & refusal flows</li><li>Production identity & hosting</li><li>Retention & operational monitoring</li><li>Approved advisor/contact workflow</li><li>Validate with users & Pax colleagues</li></ul></div></div>
- <p class="footnote">Capabilities found in the repository; demonstrated scope must match the final recordings. Detailed inventory and evidence: FEATURES.md.</p>
-</section>
+<section class="slide backup backup-new" data-title="Architecture & data flow" aria-label="Backup B01: Architecture" hidden>
+<p class="eyebrow">UNDER THE HOOD</p><h2>Architecture</h2>
+<div class="flow-chart"><svg class="architecture-diagram" viewBox="0 0 1420 500" role="img" aria-label="Architecture: customer and browser connected to OpenAI, an integrated voice and case backend, and Logismata">
+<defs><marker id="arch-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#638c00"/></marker><marker id="arch-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#5b2288"/></marker><marker id="arch-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#287e9a"/></marker></defs>
+<rect x="630" y="170" width="780" height="190" rx="22" fill="#f0ebf4" stroke="#d7cce1"/>
+<text x="652" y="197" class="svg-group-title">Integrated backend</text>
+<g fill="none" stroke-width="3" stroke-linejoin="round">
+<path stroke="#638c00" marker-start="url(#arch-green)" marker-end="url(#arch-green)" d="M170 270H240"/>
+<path stroke="#638c00" marker-start="url(#arch-green)" marker-end="url(#arch-green)" d="M500 230H555V60H650"/>
+<path stroke="#5b2288" marker-end="url(#arch-purple)" d="M500 285H660"/>
+<path stroke="#287e9a" marker-end="url(#arch-blue)" d="M860 120V215"/>
+<path stroke="#5b2288" marker-end="url(#arch-purple)" d="M920 280H1050"/>
+<path stroke="#287e9a" marker-start="url(#arch-blue)" marker-end="url(#arch-blue)" d="M1210 335V410"/>
+<path stroke="#287e9a" marker-end="url(#arch-blue)" d="M1050 315H990V475H370V335"/>
+</g>
+<g class="svg-label">
+<text x="185" y="253" fill="#638c00">Talk</text>
+<text x="540" y="110" text-anchor="end" fill="#638c00"><tspan x="540">WebRTC</tspan><tspan x="540" dy="21">audio ↔</tspan></text>
+<text x="518" y="272" fill="#5b2288">Setup / turns</text>
+<text x="876" y="150" fill="#287e9a">Extracted answers</text>
+<text x="935" y="248" fill="#5b2288"><tspan x="935">Turns +</tspan><tspan x="935" dy="20">observations</tspan></text>
+<text x="1225" y="385" fill="#287e9a">Calculations ↔</text>
+<text x="420" y="461" fill="#287e9a">Case updates · charts · review · steering</text>
+</g>
+<rect x="0" y="215" width="170" height="120" rx="19" fill="#edf3dd" stroke="#d9cfdf"/><text x="18" y="247" class="svg-node-title">Customer</text><text x="18" y="277" class="svg-node-copy">Speak · listen</text><text x="18" y="301" class="svg-node-copy">Confirm details</text><rect x="240" y="215" width="260" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="258" y="247" class="svg-node-title">Browser + Paxi</text><text x="258" y="277" class="svg-node-copy">Angular experience</text><text x="258" y="301" class="svg-node-copy">Avatar · transcript · visuals</text><rect x="650" y="0" width="280" height="120" rx="19" fill="#edf3dd" stroke="#d9cfdf"/><text x="668" y="32" class="svg-node-title">OpenAI</text><text x="668" y="62" class="svg-node-copy">Live speech via WebRTC</text><text x="668" y="86" class="svg-node-copy">Structured extraction models</text><rect x="660" y="215" width="260" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="678" y="247" class="svg-node-title">Voice service</text><text x="678" y="277" class="svg-node-copy">Session setup · transcript</text><text x="678" y="301" class="svg-node-copy">Validation · conversation log</text><rect x="1050" y="215" width="335" height="120" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="1068" y="247" class="svg-node-title">Case &amp; advice</text><text x="1068" y="277" class="svg-node-copy">Shared confirmed profile</text><text x="1068" y="301" class="svg-node-copy">Scenarios · review · proposals</text><rect x="1050" y="410" width="335" height="90" rx="19" fill="#fffdf9" stroke="#d9cfdf"/><text x="1068" y="442" class="svg-node-title">Logismata</text><text x="1068" y="472" class="svg-node-copy">Risk · pension · budget</text></svg></div><div class="flow-legend"><span class="legend-green">Audio</span><span class="legend-purple">Transcript & structured context</span><span class="legend-blue">Results & orchestration</span></div><p class="flow-source">Demo hosted on Cloudflare Workers · Voice observations require customer confirmation · Calculator exchange stays server-side.</p>
+<span class="slide-number">B01</span></section>
+<section class="slide backup backup-new cloud-slide" data-title="Built to listen. Ready to respond." aria-label="Backup B02: features" data-cloud="features" hidden><p class="eyebrow">IMPLEMENTED IN THE PROTOTYPE</p><h2>Built to listen. Ready to respond.</h2><p class="cloud-hint">Drag a pill to arrange it. Click to explore.</p><div class="word-cloud"></div><div class="cloud-detail" aria-live="polite"><span class="detail-kicker">EXPLORE</span><h3>Click any topic</h3><p>Each word opens a closer look at this part of Paxi.</p></div><span class="slide-number">B02</span></section>
+<section class="slide backup backup-new cloud-slide" data-title="Where we draw the line." aria-label="Backup B03: boundaries" data-cloud="boundaries" hidden><p class="eyebrow">DELIBERATE BOUNDARIES</p><h2>Where we draw the line.</h2><p class="cloud-hint">Drag a pill to arrange it. Click to explore.</p><div class="word-cloud"></div><div class="cloud-detail" aria-live="polite"><span class="detail-kicker">EXPLORE</span><h3>Click any topic</h3><p>Each word opens a closer look at this part of Paxi.</p></div><span class="slide-number">B03</span></section>
+<section class="slide backup backup-new cloud-slide" data-title="What still needs work." aria-label="Backup B04: limitations" data-cloud="limitations" hidden><p class="eyebrow">KNOWN LIMITATIONS</p><h2>What still needs work.</h2><p class="cloud-hint">Drag a pill to arrange it. Click to explore.</p><div class="word-cloud"></div><div class="cloud-detail" aria-live="polite"><span class="detail-kicker">EXPLORE</span><h3>Click any topic</h3><p>Each word opens a closer look at this part of Paxi.</p></div><span class="slide-number">B04</span></section>
 </div></main>
 <div id="announcement" class="sr-only" aria-live="polite"></div>
-<script type="module" src="presentation.js?v=latest-safari-fit"></script>
+<script type="module" src="presentation.js?v=architecture-clean-4"></script>
 </body></html>

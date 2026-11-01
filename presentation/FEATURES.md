@@ -38,3 +38,13 @@ Working inventory from repository modules, 2026-10-31. Presence in source is evi
 ## Architecture slide reading
 
 The diagram is a component overview, not a packet-level sequence diagram. The voice service creates Live sessions; browser audio uses WebRTC with the speech provider. Transcript processing produces structured context and progress. The web app also has a case voice adapter and backend modules for advice/calculation. Confirm which paths the selected demo exercises before explaining them as one verified flow. Source pointers: voice server, case voice adapter, backend README and Logismata client above.
+
+## B04 review — 2026-11-01
+
+Removed the financial-assumptions, integration-coverage and different-stores topics from the slide. New limitation wording distinguishes missing production experiences from existing prototype code:
+
+- `insurance/auth.ts` stores sessions through `EncryptedCaseStore`: customer sessions expire after one hour; case-scoped agent grants expire after at most 15 minutes. “No persistence” would be inaccurate. Long-lived cross-device continuity remains a gap.
+- Demo logins create anonymous IDs and access-code roles, not full customer account management.
+- `insurance/telemetry.ts` implements prototype funnel/NPS aggregates; the store includes audit records. “No backend or tracking” would be inaccurate; production operations monitoring is the gap.
+- Human-handover modules and voice steering exist. A proactive live observer/intervention console is not established.
+- Voice naturalness is a team evaluation topic, not a benchmark result. ElevenLabs has both TTS and an agent stack with interruption controls: https://elevenlabs.io/docs/eleven-agents/customization/conversation-flow . The deck describes the chosen full-duplex architecture without claiming ElevenLabs cannot be interrupted.
