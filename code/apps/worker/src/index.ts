@@ -77,7 +77,7 @@ export class LifeInsuranceObject extends DurableObject<Env> {
 export default {
   async fetch(request: Request,env: Env) {
     const path=new URL(request.url).pathname;
-    if(path==='/api'||path.startsWith('/api/'))return env.LIFE.getByName('singleton').fetch(request);
+    if(path==='/api'||path.startsWith('/api/'))return api(request,env,path);
     if(path==='/_products'||path.startsWith('/_products/'))return new Response('Not found',{status:404});
     const response=await env.ASSETS.fetch(request);
     const headers=new Headers(response.headers);
@@ -91,5 +91,22 @@ export default {
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   },
 };
+
+/**
+ * Durable Object console output does not reach `wrangler tail`, so the Worker in front logs API
+ * failures itself: one api_error line from the small JSON error body (code and field names only).
+ */
+async function api(request:Request,env:Env,path:string) {
+  const response=await env.LIFE.getByName('singleton').fetch(request);
+  if(response.status>=400) {
+    const body=await response.clone().json().catch(()=>null) as {code?:unknown;fields?:unknown}|null;
+    const short=path.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,id=>id.slice(0,8));
+    const caseId=short.match(/\/cases\/([^/]+)/)?.[1];
+    (response.status>=500?console.error:console.warn)(JSON.stringify({event:'api_error',method:request.method,path:short,status:response.status,
+      code:typeof body?.code==='string'?body.code:`HTTP_${response.status}`,fields:Array.isArray(body?.fields)?body.fields.filter(f=>typeof f==='string').slice(0,20):[],
+      ...(caseId?{case:caseId}:{})}));
+  }
+  return response;
+}
 
 function failure(error:unknown){return {error:error instanceof Error?error.name:'Error',message:redactDiagnostic(error instanceof Error?error.message:String(error)).slice(0,300)};}
