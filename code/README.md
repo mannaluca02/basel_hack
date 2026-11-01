@@ -242,6 +242,15 @@ npm run tail -w @pax/worker
 
 Der Build erzeugt Backend, optimiertes Live-Web, Prompts und PDF-Manifest. Provider-Prüfungen melden fehlende Eingaben als übersprungen; das ist kein vollständiger Live-Nachweis. Für einen echten Voice-Setup-Check zusätzlich `VOICE_SDP_FILE` mit einem frischen Browser-SDP-Angebot angeben. Danach auf einem Telefon die öffentliche URL öffnen: Einwilligung erteilen, Mikrofon erlauben, Paxi sprechen hören, eine Berechnung ausführen und Diagramme prüfen. HTTPS von workers.dev ermöglicht den Mikrofonzugriff. Nach Updates alte Tabs schliessen und neu öffnen (Angular Service Worker).
 
+Automatisches Deployment: [`.github/workflows/deploy-cloudflare.yml`](../.github/workflows/deploy-cloudflare.yml) läuft bei jedem Push auf `main` (und manuell über „Run workflow“). Zuerst Backend-Tests, Web-Tests und Worker-Typecheck; nur wenn alle grün sind, folgen `npm run deploy -w @pax/worker` und der automatische Check gegen https://paxi.rushworks.workers.dev. Deployments laufen nacheinander, nie parallel. Einmalig in GitHub unter Settings → Secrets and variables → Actions als Repository-Secrets anlegen:
+
+| Secret | Inhalt |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Vorlage „Edit Cloudflare Workers“, beschränkt auf das Konto rushworks.io |
+| `CLOUDFLARE_ACCOUNT_ID` | Konto-ID von rushworks.io (Dashboard → Workers & Pages, rechte Spalte) |
+
+Die Worker-Secrets (`LIFEMAP_STORE_KEY`, `LOGISMATA_BEARER_TOKEN`, `OPENAI_API_KEY`) bleiben in Cloudflare und überstehen jedes Deployment; die CI sieht sie nie. Manuelle Deployments von einem Rechner brauchen weiterhin `CLOUDFLARE_ACCOUNT_ID` in der Shell, sobald das Login mehrere Konten kennt.
+
 Logs: `tail` mit Ctrl-C beenden; dauerhaft unter Cloudflare Dashboard → Workers & Pages → paxi → Logs/Observability ansehen. [`observability.enabled`](https://developers.cloudflare.com/workers/wrangler/configuration/#observability) ist eingeschaltet. Rollback aus `code/apps/worker`:
 
 ```sh

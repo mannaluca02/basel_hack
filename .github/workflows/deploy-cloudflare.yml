@@ -1,0 +1,68 @@
+# Deploys the live configuration (Worker `paxi`) to Cloudflare on every push to main, after the tests.
+# Repo secrets: CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers", account rushworks.io) and
+# CLOUDFLARE_ACCOUNT_ID. The Worker's own secrets (LIFEMAP_STORE_KEY, LOGISMATA_BEARER_TOKEN,
+# OPENAI_API_KEY) live in Cloudflare and are kept across deploys; CI never sees them.
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits instead of cancelling a deploy halfway.
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  WORKER_URL: https://paxi.rushworks.workers.dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: code
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: code/package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Backend tests
+        run: npm test
+      - name: Web tests
+        run: npm --prefix apps/web test -- --watch=false
+      - name: Worker typecheck
+        run: npm run typecheck -w @pax/worker
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: code
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: code/package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Build and deploy the Worker
+        run: npm run deploy -w @pax/worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # App, API, demo start, PDFs, origin check and SSE against the live URL. Calculator and voice
+      # checks are skipped here (no provider secrets in CI); the demo start itself runs real calculations.
+      - name: Smoke test the live URL
+        run: npm run check -w @pax/worker
