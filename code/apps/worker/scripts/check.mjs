@@ -69,10 +69,13 @@ try {
     assert.ok(c.runs.some(run=>run.providerResults?.some(result=>result.status==='valid'&&result.provenance?.mode==='live')), 'Expected successful live calculation');
     console.log('Real Logismata calculation: passed');
   } else console.log('SKIP real Logismata success: LOGISMATA_BEARER_TOKEN missing');
-  if(!hasSecret('OPENAI_API_KEY')) {
+  // Whether the deployed Worker offers voice, asked from the Worker itself: its secrets live in
+  // Cloudflare, not in this environment (the CI has no OPENAI_API_KEY, the Worker may well have one).
+  const voice=request('/api/voice/privacy?locale=de').providers?.some(provider=>provider.provider==='gpt-live'&&provider.available)??false;
+  if(!voice) {
     const result=request(`/api/cases/${first.caseId}/voice/sessions`,['-H','Content-Type: application/json','-H',`X-CSRF-Token: ${first.csrfToken}`,'-d',JSON.stringify({messageId:randomUUID(),expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:'v=0\r\n'})],503);
     assert.equal(result.code,'VOICE_PROVIDER_DISABLED');
-    console.log('Voice setup: disabled only because OPENAI_API_KEY missing; SKIP external session');
+    console.log('Voice setup: disabled on this Worker (no OPENAI_API_KEY); SKIP external session');
   } else if(process.env.VOICE_SDP_FILE) {
     const result=request(`/api/cases/${first.caseId}/voice/sessions`,['-H','Content-Type: application/json','-H',`X-CSRF-Token: ${first.csrfToken}`,'-d',JSON.stringify({messageId:randomUUID(),expectedCaseRevision:c.caseRevision,provider:'gpt-live',locale:'de',dataClassification:'synthetic',noticeVersion:'voice-synthetic-v1',allowExternalVoiceProcessing:true,sdp:readFileSync(process.env.VOICE_SDP_FILE,'utf8')})],201);
     assert.ok(result.connection);console.log('Live voice session setup: passed');
