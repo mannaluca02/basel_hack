@@ -26,7 +26,7 @@ const INSTRUCTIONS = 'Read the whole conversation and submit what the USER said 
  * prompt never asks for a full birth date).
  */
 export async function setupFacts(transport: ResponsesTransport, turns: { role: 'user' | 'assistant'; text: string }[], signal: AbortSignal, today = new Date()): Promise<SetupFacts> {
-  const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, reasoning: { effort: 'low' }, instructions: INSTRUCTIONS,
+  const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, instructions: INSTRUCTIONS,
     input: [{ role: 'user', content: JSON.stringify({ conversation: turns.slice(-24) }) }],
     tools: [{ type: 'function', name: 'submit_setup_facts', description: 'Submit the user\'s age and employment rate.', parameters: z.toJSONSchema(Arguments), strict: true }],
     tool_choice: 'auto', parallel_tool_calls: false, max_output_tokens: 600 };

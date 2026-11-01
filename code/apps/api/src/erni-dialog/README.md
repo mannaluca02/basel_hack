@@ -6,7 +6,7 @@ Das optionale Nest-Modul verwendet ausschließlich `LIFE_RUNTIME`, dessen Authen
 createLifeInsuranceApp(options, [ErniDialogModule.register({ transport })]);
 ```
 
-`transport(request, signal)` ist die einzige austauschbare externe Grenze. Die automatisierten Tests simulieren sie. `ErniDialogModule` ohne Registrierung besitzt keinen aktiven Modelltransport. `openAiResponsesTransport(serverSideApiKey)` stellt denselben Responses-Aufruf für den separat gestarteten synthetischen Modelltest bereit. Der Server verwendet `gpt-6-luna` auf dem Fast-Tier (`service_tier: "fast"`, `ANALYSIS_MODEL`, auch für alle Live-Extraktionen) mit niedrigem Reasoning und einen endlichen Timeout von 15 Sekunden.
+`transport(request, signal)` ist die einzige austauschbare externe Grenze. Die automatisierten Tests simulieren sie. `ErniDialogModule` ohne Registrierung besitzt keinen aktiven Modelltransport. `openAiResponsesTransport(serverSideApiKey)` stellt denselben Responses-Aufruf für den separat gestarteten synthetischen Modelltest bereit. Der Server verwendet `gpt-6-luna` auf dem Fast-Tier (`service_tier: "fast"`, `ANALYSIS_MODEL`, auch für alle Live-Extraktionen) mit mittlerem Reasoning (`medium`) und einen endlichen Timeout von 15 Sekunden.
 
 Schnittstelle und Modell-ID wurden am 31.10.2026 anhand der offiziellen Dokumentation zu [Function Calling](https://developers.openai.com/api/docs/guides/function-calling) und [GPT-5.6 Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) geprüft. Die tatsächliche Verfügbarkeit im verwendeten OpenAI-Konto und die Extraktionsqualität sind erst Gegenstand von Ticket 10.
 
