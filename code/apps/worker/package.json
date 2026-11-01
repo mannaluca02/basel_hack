@@ -9,7 +9,9 @@
     "check": "node scripts/check.mjs",
     "typecheck": "wrangler types .wrangler/worker-configuration.d.ts && tsc -p tsconfig.json",
     "setup:local": "node scripts/setup-local.mjs",
-    "check:persistence": "node scripts/check-persistence.mjs"
+    "check:persistence": "node scripts/check-persistence.mjs",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
   },
   "dependencies": {
     "@pax/api": "0.1.0",

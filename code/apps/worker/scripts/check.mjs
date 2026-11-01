@@ -9,8 +9,8 @@ const varsFile=new URL('../.dev.vars',import.meta.url);
 const vars=existsSync(varsFile)?readFileSync(varsFile,'utf8'):'';
 const hasSecret=name=>Boolean(process.env[name]||new RegExp('^'+name+'=.+','m').test(vars));
 
-// Run against an already-running local workerd. Session cookies never reach stdout or the repo.
-const base=process.env.SPIKE_URL??'http://127.0.0.1:8797';
+// Run against an already-running Worker. Session cookies never reach stdout or the repo.
+const base=process.env.WORKER_URL??process.env.SPIKE_URL??'http://127.0.0.1:8797';
 const temporary=mkdtempSync(join(tmpdir(),'nest-do-check-'));
 const cookies=join(temporary,'cookies');
 function request(path,args=[],status=200) {
