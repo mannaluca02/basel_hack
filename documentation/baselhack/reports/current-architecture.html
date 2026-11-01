@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Pax LifeMap am BaselHack 2026: Architektur, Voice-Datenfluss, Fachrechnung und Demo-Abschluss. Implementierungsstand vom 01.11.2026 mit commitfesten Quellen.">
+  <title>Pax LifeMap · Architektur & Zusammenspiel</title>
+  <style>
+    :root{--bg:#0b111b;--panel:#121c2a;--card:#172436;--line:#2d3c51;--text:#edf3fa;--muted:#a5b6ca;--mint:#8de3c2;--blue:#98beff;--purple:#c0adff;--amber:#f4c987;--radius:18px}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,a{touch-action:manipulation}button{font:inherit}button:focus-visible,a:focus-visible{outline:3px solid var(--mint);outline-offset:5px}a{color:var(--blue);text-underline-offset:4px}code{font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}p,h1,h2,h3{margin:0}p+p{margin-top:12px}.wrap{max-width:1456px;margin:auto;padding:44px 48px 32px}.eyebrow{color:var(--mint);font-size:11px;font-weight:750;letter-spacing:.19em;text-transform:uppercase}.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:32px}.brand{font-size:18px;font-weight:800;letter-spacing:-.04em}.brand span{color:var(--mint)}.stamp{font:12px ui-monospace,monospace;color:var(--muted)}h1{font-size:clamp(34px,4vw,58px);line-height:1.09;letter-spacing:-.045em;max-width:880px;margin-top:13px}.lead{max-width:850px;color:var(--muted);font-size:17px;margin-top:20px}.hero-bottom{display:flex;flex-wrap:wrap;gap:10px;margin:25px 0 32px}.pill{border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:12px;color:var(--muted)}.pill strong{color:var(--text);font-weight:600}.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:34px}.summary article{border:1px solid var(--line);border-radius:var(--radius);padding:19px 22px;background:linear-gradient(135deg,#172536,#111a27)}.summary .num{display:block;font-size:11px;color:var(--mint);letter-spacing:.08em;margin-bottom:7px}.summary h2{font-size:16px;line-height:1.35}.summary p{color:var(--muted);font-size:13px;margin-top:8px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:32px 0 17px}h2{font-size:24px;letter-spacing:-.025em}.hint{font-size:12px;color:var(--muted)}.tabs{display:flex;gap:7px;flex-wrap:wrap;padding:7px;background:#101925;border:1px solid var(--line);border-radius:14px;margin-bottom:18px}.tab{border:0;border-radius:9px;background:transparent;color:var(--muted);padding:10px 18px;cursor:pointer;font-size:13px;font-weight:650}.tab[aria-selected=true]{background:var(--mint);color:#09261d}.tab:hover:not([aria-selected=true]){background:#213047;color:var(--text)}.view-intro{display:flex;justify-content:space-between;gap:24px;margin-bottom:18px;align-items:start}.view-intro p{color:var(--muted);max-width:880px;font-size:14px}.status{white-space:nowrap;font:11px ui-monospace,monospace;color:var(--mint);border:1px solid #395b55;padding:5px 9px;border-radius:6px}.diagram-shell{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#101925}.diagram-toolbar{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 20px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.legend{display:flex;gap:18px;flex-wrap:wrap}.legend span{display:flex;align-items:center;gap:7px}.dot{display:inline-block;width:8px;height:8px;background:var(--mint);border-radius:50%}.dot.blue{background:var(--blue)}.dot.purple{background:var(--purple)}.dot.amber{background:var(--amber)}.print-button{background:transparent;border:1px solid var(--line);border-radius:7px;color:var(--text);padding:5px 10px;cursor:pointer;white-space:nowrap}.diagram-scroll{overflow-x:auto;overscroll-behavior-x:contain}.board{width:1240px;height:958px;position:relative;margin:0 auto;background-image:radial-gradient(#35425666 .7px,transparent .7px);background-size:18px 18px}.lane{position:absolute;top:16px;bottom:16px;width:390px;border:1px solid #29384b88;border-radius:14px;background:#13203355}.lane-label{position:absolute;top:27px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}.lane-label b{color:var(--text);letter-spacing:0;font-size:11px;margin-left:10px;font-weight:500}.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.edge{fill:none;stroke:var(--mint);stroke-width:1.8;stroke-linejoin:round}.edge.audio{stroke:var(--purple)}.edge.event{stroke:var(--blue);stroke-dasharray:5 5}.edge.optional{stroke:var(--amber);stroke-dasharray:5 5}.edge-label rect{fill:#101925;stroke:#2d3c51;stroke-width:.7}.edge-label text{font:10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#d8e2ef;text-anchor:middle;dominant-baseline:central}.node{position:absolute;width:340px;height:160px;border:1px solid #3a4e65;border-radius:13px;background:linear-gradient(135deg,#1a2a3d,#152131);padding:17px 19px;text-align:left;color:var(--text);cursor:pointer;box-shadow:0 7px 18px #0002;transition:border-color .15s,transform .15s}.node:hover{border-color:var(--mint);transform:translateY(-2px)}.node[aria-pressed=true]{border-color:var(--mint);box-shadow:0 0 0 2px #8de3c225}.node.optional{border-style:dashed;border-color:#997b4d}.node.external{background:linear-gradient(135deg,#29263d,#192133);border-color:#665e89}.node.storage{border-color:#42766c;background:linear-gradient(135deg,#193831,#14252d)}.node.muted{background:#131f2d;border-style:dashed}.node .kicker{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mint);margin-bottom:7px}.node.external .kicker{color:var(--purple)}.node.optional .kicker{color:var(--amber)}.node.muted .kicker{color:var(--muted)}.node-title{display:block;font-size:18px;font-weight:720;line-height:1.25;letter-spacing:-.02em}.node-desc{display:block;font-size:12px;color:#bdcbdb;line-height:1.5;margin-top:8px}.node-foot{display:block;position:absolute;bottom:13px;left:19px;right:19px;font:10px ui-monospace,monospace;color:#9db0c6}.node-foot:after{content:'↗';float:right;color:var(--mint);font-size:13px}.below-diagram{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;margin-top:18px}.details,.route-note{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px}.details .eyebrow{font-size:10px}.details h3{font-size:21px;margin:8px 0 12px}.details p,.route-note p{font-size:14px;color:var(--muted)}.detail-path{display:block;margin-top:16px;color:var(--blue);padding-top:14px;border-top:1px solid var(--line)}.route-note h3{font-size:16px;margin-bottom:10px}.route-note ul{padding-left:19px;color:var(--muted);font-size:13px;margin:12px 0 0}.route-note li+li{margin-top:8px}.route-note strong{color:var(--text)}.flow-panel{margin-top:38px}.flow-heading{display:flex;align-items:center;gap:14px;margin-bottom:20px}.flow-heading span{font-size:12px;color:var(--muted)}.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;list-style:none;padding:0;margin:0}.steps li{position:relative;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:18px 14px;min-height:154px}.steps .step-no{font:11px ui-monospace,monospace;color:var(--mint);display:block;margin-bottom:13px}.steps h3{font-size:14px;line-height:1.35}.steps p{font-size:12px;color:var(--muted);margin-top:8px}.steps li:not(:last-child):after{content:'→';position:absolute;right:-10px;top:65px;z-index:1;color:var(--mint);background:var(--bg);line-height:18px}.callout{margin-top:20px;padding:17px 21px;background:#142c29;border:1px solid #36584f;border-left:3px solid var(--mint);border-radius:10px;font-size:14px;color:#c8e9dd}.callout strong{color:#effff9}.facts{display:grid;grid-template-columns:1fr 1fr;gap:18px}.fact{border:1px solid var(--line);border-radius:var(--radius);padding:23px;background:var(--panel)}.fact h3{font-size:16px;margin-bottom:10px}.fact p{color:var(--muted);font-size:13px}.fact code{color:var(--blue)}.source-list{display:grid;grid-template-columns:1fr 1fr;gap:9px 24px;list-style:none;padding:0;font-size:12px}.source-list a{color:var(--muted);overflow-wrap:anywhere}.source-list a:hover{color:var(--mint)}footer{margin-top:34px;border-top:1px solid var(--line);padding-top:19px;display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:11px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}
+    .node{height:174px}.lane-label{top:23px}.lane-label b{display:block;margin:3px 0 0;text-transform:none}
+    .below-diagram>*{min-width:0}.detail-path{overflow-wrap:anywhere}
+    .revision-note{margin:-10px 0 28px;padding:15px 19px;border:1px solid #466356;border-radius:12px;background:#13251f;color:#c9e5d8;font-size:13px}.revision-note code{color:var(--mint)}.config-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.config-table{border-collapse:collapse;width:100%;min-width:700px;background:var(--panel);font-size:13px}.config-table th,.config-table td{text-align:left;padding:13px 17px;border-bottom:1px solid var(--line);vertical-align:top}.config-table th{color:var(--mint);font-size:11px;text-transform:uppercase;letter-spacing:.06em}.config-table td{color:var(--muted)}.config-table tr:last-child td{border-bottom:0}.config-table code{color:var(--text)}.config-note{color:var(--muted);font-size:12px;margin-top:10px}
+    @media(min-width:1450px){.diagram-scroll{padding:0 30px}}
+    @media(max-width:900px){.wrap{padding:28px 22px}.summary{grid-template-columns:1fr}.below-diagram,.facts{grid-template-columns:1fr}.steps{grid-template-columns:repeat(3,1fr)}.steps li:nth-child(3):after{display:none}.source-list{grid-template-columns:1fr}.view-intro{flex-direction:column;gap:10px}.section-head{align-items:start;flex-direction:column;gap:5px}.diagram-toolbar{align-items:start}.legend{gap:7px 13px}.topbar{margin-bottom:24px}.stamp{font-size:10px}.tab{padding:10px 12px}}
+    @media(max-width:480px){.wrap{padding:22px 16px}.steps{grid-template-columns:repeat(2,1fr)}.steps li:nth-child(3):after{display:block}.steps li:nth-child(even):after{display:none}.flow-heading{align-items:start;flex-direction:column;gap:4px}.topbar{align-items:start}.stamp{text-align:right;max-width:140px}footer{flex-direction:column;gap:7px}.print-button{display:none}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+    @media print{body{background:#fff;color:#111;print-color-adjust:exact;-webkit-print-color-adjust:exact}.wrap{padding:0;max-width:none}.topbar,.tabs,.print-button,.hint{display:none}.diagram-scroll{overflow:visible}.board{transform:scale(.69);transform-origin:top left;margin:0}.diagram-shell{height:704px;background:#101925}.diagram-toolbar{background:#101925}.summary,.facts,.steps,.below-diagram{break-inside:avoid}.lead,.hint,footer{color:#444}.summary article,.fact,.details,.route-note,.steps li{background:#f1f5f8;color:#111}.summary p,.fact p,.details p,.route-note p,.steps p,.route-note ul{color:#333}.summary h2,.details h3,.route-note h3,.steps h3,.route-note strong{color:#111}.source-list a{color:#333}h1{font-size:36px}.eyebrow,.summary .num,.steps .step-no,.detail-path{color:#216b56}.status{color:#216b56}.callout{color:#164936;background:#edf7f2}.callout strong{color:#164936}@page{size:A3 portrait;margin:15mm}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="topbar"><div class="brand">pax<span> / </span>LifeMap</div><div class="stamp">MAIN-SNAPSHOT · a02004f · 01.11.2026</div></div>
+    <div class="eyebrow">Architektur für die Evaluation · BaselHack 2026</div>
+    <h1>Wie die Teile<br>zusammenspielen.</h1>
+    <p class="lead">Vom Gespräch zur Vorsorgeanalyse und zum Demo-Abschluss: Angular mit Live-Voice und Paxi-Avatar, ein gemeinsamer NestJS-Fallservice und echte Rechen-APIs. Fünf Ansichten zeigen den implementierten Aufbau und seine Grenzen.</p>
+    <div class="hero-bottom"><span class="pill"><strong>Ein zentraler Fall</strong> · mehrere Zugangswege</span><span class="pill"><strong>Glue Layer im Backend</strong> · Medien im Browser</span><span class="pill">Code-Stand, kein Laufzeit-Monitoring</span></div>
+  </header>
+  <div class="revision-note"><strong>Referenz:</strong> <code>origin/main · a02004f</code> · geprüft am 01.11.2026. Alle Code-Links zeigen auf diesen Commit. Die lokale Entwicklungslinie <code>feature/live-voice-debug</code> mit separater Debug-App ist nicht Bestandteil dieses Snapshots. <a href="current-architecture.md">GitHub-lesbare Architekturdokumentation</a> · Codeprüfung, kein neuer Live-Lauf.</div>
+  <section class="summary" aria-label="Die drei wichtigsten Architekturmerkmale">
+    <article><span class="num">01 / ZUSTAND</span><h2>Das Backend ist die gemeinsame Quelle.</h2><p>Entwurf, Feldvorschläge, bestätigte Profile und Rechenläufe liegen im verschlüsselten Fallstore. Der Angular-Store ist eine Anzeigeprojektion.</p></article>
+    <article><span class="num">02 / GESPRÄCH</span><h2>Sprache und Avatar sind Teil der App.</h2><p>LiveVoice und PaxiCaseVoice steuern WebRTC und Turns. Paxis Renderer folgt Audiopegel, Aktivität und Emotion. dev:live beginnt mit einem leeren synthetischen Fall.</p></article>
+    <article><span class="num">03 / ARCHITEKTUR</span><h2>Modularer Monolith, externe Provider.</h2><p>Ein NestJS-Prozess auf 3000 bündelt Fachlogik, Voice und Demo-Journey. OpenAI liefert Sprache und Extraktion, Logismata die Rechner. Optional: Paxi-Listener auf 3100.</p></article>
+  </section>
+
+  <section aria-labelledby="architecture-title">
+    <div class="section-head"><h2 id="architecture-title">Die aktuelle Architektur</h2><span class="hint">Module anklicken für Aufgaben und Quelldateien · auf kleinen Displays horizontal scrollen</span></div>
+    <div class="tabs" role="tablist" aria-label="Architekturansicht">
+      <button class="tab" id="tab-overview" role="tab" aria-selected="true" aria-controls="architecture-panel" tabindex="0" data-view="overview">01 · App + Live-Voice</button>
+      <button class="tab" id="tab-paxi" role="tab" aria-selected="false" aria-controls="architecture-panel" tabindex="-1" data-view="paxi">02 · Paxi-Fenster · optional</button>
+      <button class="tab" id="tab-lab" role="tab" aria-selected="false" aria-controls="architecture-panel" tabindex="-1" data-view="lab">03 · Debug / Voice Lab</button>
+      <button class="tab" id="tab-erni" role="tab" aria-selected="false" aria-controls="architecture-panel" tabindex="-1" data-view="erni">04 · Dialogmodul · optional</button>
+      <button class="tab" id="tab-journey" role="tab" aria-selected="false" aria-controls="architecture-panel" tabindex="-1" data-view="journey">05 · Demo-Abschluss</button>
+    </div>
+    <div id="architecture-panel" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="view-intro"><p id="view-description"></p><span class="status" id="view-status"></span></div>
+      <div class="diagram-shell">
+        <div class="diagram-toolbar"><div class="legend"><span><i class="dot"></i>Aufruf / Daten</span><span><i class="dot purple"></i>Audio / Modellprovider</span><span><i class="dot blue"></i>Events / Darstellung</span><span><i class="dot amber"></i>Optionaler Anschluss</span></div><button class="print-button" id="print">Drucken / PDF</button></div>
+        <div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollbares Architekturdiagramm"><div class="board" id="board"></div></div>
+      </div>
+      <div class="below-diagram">
+        <section class="details" aria-label="Details zum ausgewählten Modul" aria-live="polite"><div class="eyebrow" id="detail-kicker"></div><h3 id="detail-title"></h3><p id="detail-body"></p><a class="detail-path" id="detail-source"></a></section>
+        <aside class="route-note"><h3 id="note-title"></h3><p id="note-body"></p><ul id="note-list"></ul></aside>
+      </div>
+    </div>
+    <noscript><p>Für die fünf interaktiven Diagrammansichten bitte JavaScript aktivieren. Ablauf, Betriebsarten und Quellen bleiben ohne JavaScript lesbar. Die <a href="current-architecture.md">Markdown-Dokumentation</a> enthält die vollständige statische Architektur.</p></noscript>
+  </section>
+
+  <section class="flow-panel" aria-labelledby="flow-title">
+    <div class="flow-heading"><h2 id="flow-title">Eine Aussage wird zur Berechnung.</h2><span>Regulärer API-Weg · Demo bündelt 04–06 · Live-Demo automatisiert sie</span></div>
+    <ol class="steps">
+      <li><span class="step-no">01 / GESPRÄCH</span><h3>Kunde nennt eine Angabe</h3><p>Text oder Transkript mit Sprecherrolle und eindeutiger Nachrichtenreferenz.</p></li>
+      <li><span class="step-no">02 / EXTRAKTION</span><h3>Backend erkennt Bedeutung</h3><p>Person, Feld, Einheit, Brutto/Netto und Zeitraum prüfen. Bei Mehrdeutigkeit nachfragen.</p></li>
+      <li><span class="step-no">03 / VORSCHLAG</span><h3>Feldvorschlag speichern</h3><p>Ein versioniertes Vorschlagspaket. Der Entwurf ist dadurch noch nicht geändert.</p></li>
+      <li><span class="step-no">04 / ÜBERNAHME</span><h3>Kunde nimmt Änderung an</h3><p>Das Paket wird in den Entwurf übernommen. Die Gesamtbestätigung steht noch aus.</p></li>
+      <li><span class="step-no">05 / BESTÄTIGUNG</span><h3>Gesamtprofil bestätigen</h3><p>Eine zweite Aktion erzeugt eine unveränderliche bestätigte Profilversion.</p></li>
+      <li><span class="step-no">06 / ERGEBNIS</span><h3>Rechnen & darstellen</h3><p>Berechnung separat auslösen. Run und Anzeigeprojektion aktualisieren Grafiken und Kontext.</p></li>
+    </ol>
+    <div class="callout"><strong>Die zentrale Trennung:</strong> Das Modell erzeugt Feldvorschläge, der Workflow übernimmt Angaben, die Fachlogik berechnet Zahlen. Ausdrückliche Kundenbestätigung gilt für den regulären API-Weg. Der Avatar visualisiert Audio, Aktivität und Emotion; er bestätigt keine fachlichen Werte.</div>
+    <div class="callout"><strong>Demo ist nicht gleich Live-Demo:</strong> <code>dev:demo</code> beginnt mit einer vorbereiteten Persona und bietet „Übernehmen und neu berechnen“. <code>dev:live</code> startet leer und ruft <code>POST /api/cases/:id/demo-accept</code> nach neuen Paketen automatisch im Kundenkontext auf. Der Server übernimmt, bestätigt bei vollständigem Profil und berechnet neu; fehlende Pflichtangaben bleiben offen. Diese Automatik ist <strong>keine ausdrückliche Bestätigung jeder Angabe</strong>.</div>
+  </section>
+
+  <section aria-labelledby="config-title">
+    <div class="section-head"><h2 id="config-title">Welcher Start aktiviert welchen Weg?</h2><span class="hint">Die Konfiguration entscheidet, nicht der Port allein.</span></div>
+    <div class="config-scroll" tabindex="0" role="region" aria-label="Startkonfigurationen"><table class="config-table"><thead><tr><th>Startbefehl</th><th>Oberfläche / Backend</th><th>Voice-Weg</th><th>Speicher / Rechner</th></tr></thead><tbody>
+      <tr><td><code>npm start</code> in <code>code/apps/web</code></td><td>4200 · Mock-Oberfläche</td><td>Skript-Anruf</td><td>MockDataSource</td></tr>
+      <tr><td><code>npm run start:api</code> in <code>code/apps/web</code></td><td>4200 → separat gestartetes Backend 3000</td><td>Native LiveVoice, Anmeldung + Review</td><td>LifeMap-Store · Live-Rechner bei regulärem Backend-Start</td></tr>
+      <tr><td><code>npm run dev:demo</code> in <code>code</code></td><td>4200 → 3000 · vorbereiteter Demo-Fall</td><td>Native LiveVoice</td><td>LifeMap-Store · Live-Rechner</td></tr>
+      <tr><td><code>npm run dev:live</code> in <code>code</code></td><td>4200 → 3000 · neuer leerer synthetischer Fall</td><td>Native LiveVoice · automatische Demo-Übernahme</td><td>LifeMap-Store · Live-Rechner erst mit vollständigem Profil</td></tr>
+      <tr><td><code>npm run dev:debug</code> in <code>code</code></td><td>4200 → 3000 · zusätzlich Voice-Lab-Tab</td><td>Dieselbe LiveVoice-Instanz</td><td>LifeMap-Store · Live-Rechner</td></tr>
+      <tr><td><code>npm run dev:paxi</code> in <code>code</code></td><td>4200 → 3000; Paxi-Fenster 3100</td><td>Paxi-Express im Backend-Prozess</td><td>Gemeinsamer Fall · Live-Rechner</td></tr>
+      <tr><td><code>npm run start:voice-lab</code> in <code>code</code><br><code>npm run start:debug:lab</code> in <code>code/apps/web</code></td><td>4300 → 3030 · isolierter Debug-Modus</td><td>Dieselbe native LiveVoice</td><td>Temporärer AES-GCM-Store · Replay-Rechner</td></tr>
+    </tbody></table></div>
+    <p class="config-note">Befehle gelten für den referenzierten Main-Commit. Das normale Backend benötigt <code>LOGISMATA_BEARER_TOKEN</code>; native Live-Voice zusätzlich <code>PAX_SYNTHETIC_VOICE_ENABLED=1</code>, <code>OPENAI_API_KEY</code>, Providerverfügbarkeit und beide Zustimmungen. Die App nutzt den separaten Paxi-Weg ausschließlich in der Konfiguration <code>paxi</code>. Rechner-Replay bedeutet nicht Voice-Replay.</p>
+  </section>
+
+  <section aria-labelledby="rules-title">
+    <div class="section-head"><h2 id="rules-title">Was die Verbindungen zusammenhält</h2></div>
+    <div class="facts">
+      <article class="fact"><h3>Gemeinsame Verträge · @pax/contracts</h3><p>Zod-Schemas und TypeScript-Typen beschreiben Fall, Extraktionskontext, Voice-Nachrichten und Rechenergebnisse. Diese Verträge sind ein gemeinsam genutztes Paket, kein zusätzlicher Netzwerkdienst.</p></article>
+      <article class="fact"><h3>SSE meldet Änderungen, kein vollständiges Profil</h3><p><code>advisor.context.updated</code> signalisiert einen neuen Stand. Die Clients laden den Snapshot/Kontext nach. Revisionen sowie Run-, Profil- und Szenarioreferenzen verhindern die Anzeige veralteter Ergebnisse.</p></article>
+      <article class="fact"><h3>Speicher · ein lokaler Fallstore</h3><p><code>EncryptedCaseStore</code> persistiert Fall-, Sitzungs- und Gesprächsdaten mit AES-GCM und Transaktionen für einen lokalen Node-Prozess. Keine SQL-/Cloud-Datenbank ist eingerichtet. Paxi überspringt JSON-Logs bei fallverknüpften Gesprächen; unverknüpfte Standalone-Gespräche behalten ihre eigene JSON-Ablage.</p></article>
+      <article class="fact"><h3>Handover und Gesprächssteuerung sind verbunden</h3><p>Native LiveVoice reagiert auf SSE-/CaseStore-Stoppsignale. Im Paxi-Weg beendet die App das Fenster-Gespräch über <code>postMessage</code>; zusätzlich liefert die Bridge beim Progress-Poll den Backend-Stopp. Sprache, Aktivität und kurzlebige Agent-Grants werden jetzt zwischen App und Paxi synchronisiert.</p></article>
+    </div>
+  </section>
+  <section aria-labelledby="scope-title">
+    <div class="section-head"><h2 id="scope-title">Was die Evaluation hier sieht</h2><span class="hint">Implementierter PoC · ausschliesslich synthetische Falldaten</span></div>
+    <div class="facts">
+      <article class="fact"><h3>End-to-End-Demoweg</h3><p>Workspace, Live-Voice, Avatar, Szenarien und Abschluss sind verbunden. Der Abschluss-Tab bietet Empfehlung, Eignungsprüfung, Produktauswahl, Dokumentbestätigung, Demo-Antrag und Demo-Police. Dossier und lokales Portal verwenden denselben Fall.</p></article>
+      <article class="fact"><h3>Nachvollziehbare Grenzen</h3><p>Demo-Review simuliert die Fachperson; echte Tarifierung, Underwriting, Identität/AML, Signatur und Policierung sind nicht angebunden. Prämien bleiben ohne Tarif <code>null</code>, Policen haben <code>coverageInForce:false</code> und <code>legalEffect:'none'</code>.</p></article>
+      <article class="fact"><h3>Externe Verarbeitung ist sichtbar</h3><p>Audio geht direkt an OpenAI Live, Textausschnitte an OpenAI Responses und autorisierter Recheninput an Logismata. Serverschlüssel bleiben im Backend. Verschlüsselter lokaler Speicher bedeutet keine rein lokale Verarbeitung; produktive IAM/KMS/TLS-Integration steht aus.</p></article>
+      <article class="fact"><h3>Codebezug statt pauschaler Abnahme</h3><p>Quellen und <a href="current-architecture.md#8-evaluationsumfang-und-nachweise">zugehörige Tests</a> sind commitfest verlinkt. Client-seitig abgeschlossene Turns beweisen weder Provider-Finalität noch gehörte Wiedergabe. Geplante Echtzeit-Orchestrierung und lokale Debug-Arbeiten sind nicht als Main-Funktion ausgewiesen.</p></article>
+    </div>
+  </section>
+  <section aria-labelledby="sources-title">
+    <div class="section-head"><h2 id="sources-title">Quellen · Main-Snapshot a02004f</h2><span class="hint">Commit-feste GitHub-Links; der lokale Branch kann davon abweichen.</span></div>
+    <ul class="source-list">
+      <li><a data-source="code/apps/api/src/main.ts">Backend-Start und optionaler Paxi-Listener · main.ts</a></li>
+      <li><a data-source="code/apps/api/src/live-options.ts">Live-Provider und Responses-Transport · live-options.ts</a></li>
+      <li><a data-source="code/apps/api/src/insurance/app.ts">Nest-Komposition · insurance/app.ts</a></li>
+      <li><a data-source="code/apps/api/src/insurance/runtime.ts">Gemeinsame Runtime · insurance/runtime.ts</a></li>
+      <li><a data-source="code/apps/web/src/app/core/voice/live-voice.ts">Native Gesprächssteuerung · live-voice.ts</a></li>
+      <li><a data-source="code/apps/web/src/app/core/advisor/api/api-data-source.ts">Angular, Gesprächsverlauf und SSE · api-data-source.ts</a></li>
+      <li><a data-source="code/voice-agent/case-bridge.mjs">Paxi-Synchronisierung · case-bridge.mjs</a></li>
+      <li><a data-source="code/voice-agent/server.mjs">Paxi-Listener und bedingte Log-Ablage · server.mjs</a></li>
+      <li><a data-source="code/apps/api/src/voice/lab.ts">Integrierter Voice-Glue · voice/lab.ts</a></li>
+      <li><a data-source="code/apps/api/src/erni-dialog/module.ts">Ernests optionales Modul · erni-dialog/module.ts</a></li>
+      <li><a data-source="code/apps/api/src/insurance/demo-journey.ts">Demo-Übernahme und Neuberechnung · demo-journey.ts</a></li>
+      <li><a data-source="code/apps/api/src/voice/lab-setup.ts">Leerer Live-Start · Personenrahmen aus Alter und Pensum</a></li>
+      <li><a data-source="code/apps/api/src/voice/lab-questions.ts">Offene Profilfragen und strukturierte Antworten</a></li>
+      <li><a data-source="code/apps/web/src/app/features/paxi/paxi-avatar.ts">Integrierter Avatar · Audio und Emotionen</a></li>
+      <li><a data-source="code/apps/web/src/app/features/journey/journey-view.ts">Abschluss, Eignung, Dokumente und Portal · JourneyView</a></li>
+      <li><a data-source="code/scripts/start-voice-lab.mjs">Isolierter Lab-Start · start-voice-lab.mjs</a></li>
+      <li><a data-source="documentation/baselhack/plans/voice-lab-debugging.md">Gemeinsame App, Debug-Konfigurationen und Startbefehle</a></li>
+    </ul>
+  </section>
+  <footer><span>Pax LifeMap · BaselHack 2026 · Main a02004f · 01.11.2026</span><span>Offline nutzbar · Druck: ausgewählte Ansicht · <a href="current-architecture.md">Vollständige Dokumentation</a></span></footer>
+</main>
+<script>
+  'use strict';
+  const snapshot = 'a02004f27cc36044cff68066a907ba1695c1dca6';
+  const sourceRoot = 'https://github.com/mannaluca02/basel_hack/blob/'+snapshot+'/';
+  const root = sourceRoot+'code/';
+  document.querySelectorAll('[data-source]').forEach(link=>{link.href=sourceRoot+link.dataset.source;});
+  const views = {
+    paxi: {
+      description: 'Optionaler Fensterweg mit dev:paxi: Die Angular-Konfiguration paxi öffnet Darios Voice-Seite auf 3100. Nest und Paxi-Express laufen nun im selben Node-Prozess, sprechen intern aber weiterhin über HTTP. Die Bridge synchronisiert Vorschläge, bekannte Angaben, Rückfragen und Empfehlungen mit dem zentralen Fall.',
+      status: 'OPTIONAL · PAX_VOICE_AGENT=1',
+      lanes: ['Browser / Darstellung', 'Backend / Nest-Listener', 'Paxi-Listener / Provider'],
+      ports: [':4200 + Paxi-Fenster :3100', ':3000 · derselbe Node-Prozess', ':3100 im Backend-Prozess; OpenAI extern'],
+      nodes: [
+        {id:'app',col:0,row:0,k:'Luca · Angular · paxi-Konfiguration',title:'App + VoiceAgentLink',desc:'Fallansichten, Anrufsteuerung, Sprache und Avatar-Ring. Agent-Grant vor Ablauf erneuern.',foot:'dev:paxi · environment.paxi.ts',file:'apps/web/src/app/core/advisor/api/voice-agent-link.ts',detail:'Nur environment.paxi.ts setzt voiceAgentUrl auf localhost:3100. VoiceAgentLink öffnet das Fenster, übergibt einen fallgebundenen Agent-Grant und erneuert ihn vor Ablauf. pax.call steuert Ende, Mute, Unterbrechung und Sprache; pax.status liefert Aktivität zurück. ApiDataSource lädt jetzt native Voice-Turns und Agent-Turns zusammen.'},
+        {id:'http',col:1,row:0,k:'Backend · öffentlicher Eingang',title:'HTTP + Sitzungen + SSE',desc:'Fallrouten, Cookie/CSRF, fallgebundene Agentzugänge und Änderungsbenachrichtigungen.',foot:'LifeHttpModule · LIFE_RUNTIME',file:'apps/api/src/insurance/http.ts',detail:'Der normale Start erzeugt createLifeInsuranceApp mit LifeHttpModule und VoiceModule. Der Server prüft Sitzung, Rolle, Fallbindung und schreibende Kundenaktionen. SSE ist eine Änderungsbenachrichtigung: Danach werden aktuelle Daten erneut geladen.'},
+        {id:'paxi',col:2,row:0,k:'Express im Backend-Prozess',title:'Paxi-Listener + Case Bridge',desc:'Eigener HTTP-Listener auf 3100; Session, Extraktion und bidirektionale Fallanbindung.',foot:'main.ts → live-options.startVoiceAgent()',file:'apps/api/src/live-options.ts',detail:'main.ts ruft startVoiceAgent aus live-options.ts auf. Nur bei PAX_VOICE_AGENT=1 importiert diese Funktion server.mjs und startet den Express-Listener. Es ist derselbe Node-Prozess, aber eine eigene Origin mit HTTP-Brücke zur Nest-Schnittstelle. Der eigenständige npm-start-Weg bleibt möglich. Ein belegter Paxi-Port oder fehlende Agent-Abhängigkeiten verhindern nicht den Start des Fall-Backends.'},
+        {id:'voicebrowser',col:0,row:1,k:'Browser-Medien · eigenes Fenster',title:'Paxi Voice Client',desc:'WebRTC, Playback, Transkriptfragmente. postMessage verbindet das Fenster mit der App.',foot:'pax.call ⇄ pax.status · Progress-Poll',file:'voice-agent/public/paxi-voice.js',detail:'Audio läuft direkt zwischen Paxi-Fenster und OpenAI. Der Progress-Poll liefert bekannte Angaben, Rückfragen, Empfehlung und Handover-Stopp. stop_speaking schaltet laufende Ausgabe lokal stumm und ergänzt eine Stoppanweisung; es ist keine serverseitige Provider-Stornierung. Im Fensterweg sind auch Steering, Sprachwechsel, Bestätigungs-Callbacks und Relink nach Serververlust implementiert; die fallverknüpfte Integration ist damit nicht pauschal live abgenommen.'},
+        {id:'voice',col:1,row:1,k:'Dario / Valentin · Nest-Voice',title:'VoiceIntegrationService',desc:'Turns und Beobachtungen speichern; aktuelle regelbasierte Empfehlung an Paxi ausgeben.',foot:'/agent-observations · /agent-recommendation',file:'apps/api/src/voice/service.ts',detail:'Die Bridge sendet Beobachtungen und Turns über die Agent-Routen an Nest. Neu liefert agent-recommendation die Empfehlung des aktiven Runs mit lokalisierten Produktnamen und Suitability-Hinweisen, ohne frei erklärungsbedürftige Beträge. caseState liest außerdem den Extraktionskontext, offene Rückfragen und den Handover-Zustand.'},
+        {id:'openai',col:2,row:1,k:'Externer Provider',title:'OpenAI · Live + Extraktion',desc:'Live-Sprachgespräch; separater Modellaufruf für strukturierte Fragebogen-Antworten.',foot:'Audio direkt · Modellschlüssel auf dem Server',kind:'external',file:'voice-agent/server.mjs',detail:'OpenAI Live verarbeitet das Sprachgespräch. Der Paxi-Server ruft separat sein konfiguriertes Backend-Modell zur Antwortextraktion auf. Das sind unterschiedliche Aufgaben: Sprachwiedergabe ist keine Bestätigung und eine extrahierte Antwort noch keine bestätigte Angabe im Fall.'},
+        {id:'avatar',col:0,row:2,k:'Lukas · lokaler Renderer + App-Ring',title:'Avatar / Fortschritt',desc:'Audio und Emotionen im Fenster; App-Ring folgt zurückgemeldeter Paxi-Aktivität.',foot:'pax.status → VoiceAgentLink.activity',file:'apps/web/src/app/app.ts',detail:'Der Avatar im Paxi-Fenster folgt lokalem Audio und Events. Die Angular-App empfängt über VoiceAgentLink Aktivitätsmeldungen und zeigt diese im Ring; fachlicher Fortschritt kommt weiter aus dem Fall. Das Schließen des Fensters wird erkannt. HumanAdvisor beendet einen offenen Paxi-Anruf nach erfolgreicher Handover-Anforderung sofort per Kontrollnachricht.'},
+        {id:'engine',col:1,row:2,k:'Valentin · Fach- und Workflowlogik',title:'Extraktion + Fall-Engine',desc:'Vorschläge → Übernahme → Profilbestätigung. Danach Analyse, Szenarien, Review und Portal.',foot:'ExtractionWorkflow · LifeInsuranceEngine',file:'apps/api/src/insurance/runtime.ts',detail:'Die gemeinsame Runtime bündelt Extraktionsworkflow, Kundenbestätigungen, Engine, Schätzungen, Vergleiche, Suitability, Dokumente und Demo-Vertragsweg. Reine Fachfunktionen liegen in @pax/domain. Ein Agent kann Vorschläge einreichen, aber keine Kundenbestätigung ersetzen. Erst ein bestätigtes Profil bildet die Grundlage regulärer Analysen.'},
+        {id:'logismata',col:2,row:2,k:'Externer Rechenprovider',title:'Logismata APICalc',desc:'Rechenoperationen über Allowlist, Request-/Response-Mapping und geschützten Servertoken.',foot:'Regulärer Start: providerMode live',kind:'external',file:'apps/api/src/logismata/client.ts',detail:'Der reguläre Backend-Start verwendet LiveLogismataProvider und verlangt LOGISMATA_BEARER_TOKEN. Lokale Fachlogik und Providerergebnisse werden im Rechenlauf zusammengeführt. Ergebnisse werden mit Versions- und Eingabehashreferenzen gespeichert. Replay ist ein ausdrücklich anderer Modus und kein stiller Fehler-Fallback.'},
+        {id:'sync',col:0,row:3,k:'Bidirektionaler Gesprächskontext',title:'Bekanntes / Fragen / Stopp',desc:'Progress-Poll übernimmt Fallwissen und Rückfragen; Handover beendet das Gespräch.',foot:'caseState() · Cache-TTL 4 Sekunden',file:'voice-agent/case-bridge.mjs',detail:'caseState liest Extraktionskontext und aktuelle Produktempfehlung und puffert das Ergebnis höchstens vier Sekunden. Bekannte Werte werden nicht erneut vorgeschlagen. Während des offenen Fensters erneuert die App den 15-Minuten-Grant. Der Poll überträgt das Stoppsignal auch dann, wenn Handover über einen anderen Kanal angefordert wurde.'},
+        {id:'store',col:1,row:3,k:'Zentrale Persistenz · lokal',title:'EncryptedCaseStore',desc:'Fälle, Sitzungen, Vorschläge, Profile und Runs. Eine gemeinsame fachliche Wahrheit.',foot:'code/.local/lifemap/ · AES-GCM',kind:'storage',file:'apps/api/src/insurance/store.ts',detail:'Der verschlüsselte lokale Store persistiert den kanonischen Fall und private Sitzungsdaten. Änderungen laufen über Transaktionen. Der Angular-Store ist eine Projektion daraus. PostgreSQL oder ein Cloud-Storage sind im aktuellen Aufbau nicht eingerichtet.'},
+        {id:'logs',col:2,row:3,k:'Speicherverhalten hängt vom Fall-Link ab',title:'Nur Standalone: JSON-Logs',desc:'Mit caseLink keine zweite JSON-Datei. Turns und Vorschläge gehen an den Fallstore.',foot:'server.mjs · persist(): if (caseLink) return',kind:'muted',file:'voice-agent/server.mjs',detail:'Der neue Code überspringt saveLog für verknüpfte Gespräche. Deren übermittelte Turns und Vorschlagspakete liegen in der verschlüsselten Fallablage; nicht jede interne Fragebogen-/Kontextinformation wird dadurch zum Fall-DTO. Unverknüpfte Standalone-Gespräche schreiben weiterhin nach voice-agent/data/conversations.'}
+      ],
+      edges: [
+        {d:'M372 164 H448',label:'REST',x:410,y:150},
+        {d:'M448 208 H372',type:'event',label:'SSE',x:410,y:223},
+        {d:'M350 84 V62 H1034 V84',label:'Fall-Link / Agent-Grant',x:690,y:62},
+        {d:'M202 258 V310',type:'event',label:'postMessage ⇄',x:202,y:281},
+        {d:'M1034 244 V310',type:'audio',label:'Session / Extraktion',x:1034,y:278},
+        {d:'M372 350 H400 V276 H950 V244',label:'SDP + Transkript',x:810,y:276},
+        {d:'M372 430 H398 V500 H1034 V470',type:'audio',label:'WebRTC · Audio direkt',x:950,y:500},
+        {d:'M864 209 H822 V390 H788',label:'Beobachtungen',x:822,y:301},
+        {d:'M788 444 H840 V299 H1100 V258',type:'event',label:'Fallkontext / Empfehlung',x:950,y:299},
+        {d:'M618 244 V310',label:'Voice-Routen',x:618,y:278},
+        {d:'M618 470 V536',label:'proposeBatch()',x:618,y:502},
+        {d:'M448 130 H420 V612 H448',label:'Kundenaktionen',x:420,y:530},
+        {d:'M202 470 V536',type:'event',label:'Audio / Events',x:202,y:503},
+        {d:'M788 615 H864',label:'Rechnen',x:826,y:601},
+        {d:'M618 696 V762',label:'Transaktion',x:618,y:728},
+        {d:'M202 710 V762',type:'event',label:'Progress-Poll',x:202,y:731},
+        {d:'M1204 209 H1221 V842 H1204',type:'optional',label:'ohne Link',x:1175,y:727}
+      ],
+      default:'paxi',
+      noteTitle:'Gleicher Prozess bedeutet nicht gleiche Schnittstelle',
+      note:'Nest auf 3000 und Paxi-Express auf 3100 teilen nun den Node-Prozess. case-bridge.mjs verwendet trotzdem HTTP, einen fallgebundenen Grant und die bestehenden Agent-Routen.',
+      bullets:['Nur dev:paxi / die paxi-Konfiguration aktivieren diesen Fensterweg; start:api verwendet native LiveVoice.','Neu: Grant-Erneuerung, Sprach- und Aktivitätssync, Rückfragen, Handover-Stopp und Empfehlung des aktiven Runs.','Fallverknüpfte Gespräche erzeugen keine zusätzliche unverschlüsselte JSON-Logdatei mehr.']
+    },
+    overview: {
+       description:'Der native Hauptweg verbindet Angular, Paxi-Avatar und Nest. LiveVoice speichert Turns, VoiceLabController erzeugt quellengebundene Vorschläge und offene Profilfragen. dev:live beginnt mit einem leeren synthetischen Fall und übernimmt Vorschläge automatisch; API und Persona-Demo verwenden andere Bestätigungsabläufe. Audio fliesst direkt zu OpenAI.',
+       status:'NATIV · MAIN a02004f',
+      lanes:['Angular / Browser','NestJS / gemeinsame Runtime','Provider / geteilte Bausteine'],
+      ports:[':4200 · kein zusätzliches Voice-Fenster',':3000 · npm start / dev:demo','Live-Audio + Responses + Logismata'],
+      nodes:[
+        {id:'app',col:0,row:0,k:'Luca / Earnie · Angular',title:'Kunden-App + LiveVoice',desc:'Fallansichten, Mikrofon-Knopf, beide Zustimmungen, Turn-Queue und Gesprächssteuerung.',foot:'LiveVoice als gemeinsamer Angular-Singleton',file:'apps/web/src/app/core/voice/live-voice.ts',detail:'LiveVoice ist ein root-provided Angular-Dienst für die normale App und das Voice Lab. Er prüft Session, Person und Zustimmungen, startet PaxiCaseVoice und reiht Turns ein. Kundenturns gehen nach Speicherung an voice-lab/turns; neue kanonische Vorschläge aktualisieren den Steuerkontext. Er stoppt bei Handover, Session- oder Sprachwechsel. Der Client orchestriert Medien und Requests, das Backend die autorisierten fachlichen Aktionen.'},
+        {id:'session',col:1,row:0,k:'Backend · VoiceModule',title:'Session / Prompt / Consent',desc:'Authentifizierte Voice-Session, SDP-Signaling, Gesprächseinstellungen und Hinweise.',foot:'VoiceIntegrationService.start()',file:'apps/api/src/voice/service.ts',detail:'Der Service baut die providerabhängige Verbindung auf und bindet sie an Fall, Sitzung, Sprache und Ablaufzeit. Synthetische Voice-Verarbeitung und Modell-Extraktion haben eigene Zustimmungen. Die dauerhaften Providerschlüssel bleiben im Backend.'},
+        {id:'prompt',col:2,row:0,k:'Geteilte Dateien · kein zusätzlicher Dienst',title:'Persona + Gesprächs-Skills',desc:'Backend liest Darios persona.md und zugewiesene Skills direkt aus voice-agent/.',foot:'voice/prompt.ts · skills.mjs',kind:'muted',file:'apps/api/src/voice/prompt.ts',detail:'Die integrierte Prompt-Erzeugung verwendet bestehende Voice-Agent-Dateien, statt eine zweite Kopie anzulegen. Die gewählten Skill-IDs und Gesprächseinstellungen fließen in den tatsächlichen Provider-Prompt ein. Dadurch muss der separate Paxi-Server nicht gestartet werden.'},
+        {id:'media',col:0,row:1,k:'Browser · Medienadapter',title:'PaxiCaseVoice',desc:'Mikrofon, WebRTC und Ausgabe. Sprecherwechsel oder Ruhe schließen Fragmente lokal ab.',foot:'core/voice · client-settled ≠ Provider-Finalität',file:'apps/web/src/app/core/voice/paxi-case-voice.ts',detail:'Der aus der Debug-App verschobene Adapter lebt jetzt unter core/voice der normalen Angular-App. Er baut WebRTC auf und liefert Audio, Aktivitätsereignisse sowie mit Sprecherrolle versehene Turns an LiveVoice. Fragmentabschluss bei Sprecherwechsel oder lokaler Ruhe ist keine Garantie für Provider-Finalität oder vollständig abgespielte Bestätigungsfragen.'},
+        {id:'labglue',col:1,row:1,k:'Integrierte Gesprächsorchestrierung',title:'VoiceLabController',desc:'Personenrahmen, Feldextraktion und offene Profilfragen → kumulatives Vorschlagspaket.',foot:'/voice-lab/turns + /questions · model-v1',file:'apps/api/src/voice/lab.ts',detail:'Der Controller liest gespeicherte Kundenturns im fallgebundenen Kontext. Ohne Person erzeugen Alter und Pensum zunächst einen Vorschlag für einen ansonsten unbekannten Personenrahmen. Danach lesen modelObservations und answerObservations Angaben und Antworten auf offene Profilfragen. Feldmapping, Quellzitate und Workflow begrenzen die Änderungen. Bekannte und offene Angaben steuern die nächste Frage. Dies ist kein Aufruf von ErniDialogService.turn.'},
+        {id:'live',col:2,row:1,k:'Externer Sprachprovider',title:'OpenAI Live',desc:'Audio vom Browser direkt zum Provider. Backend baut die Session mit aktuellem Prompt auf.',foot:'SDP: Backend · Audio: WebRTC',kind:'external',file:'apps/api/src/voice/providers.ts',detail:'Das Voice-Modul stellt serverseitige Adapter für OpenAI Live und ElevenLabs bereit. Die native LiveVoice-Integration verwendet OpenAI/WebRTC. Audiodaten werden nicht durch den fachlichen Fallservice gestreamt; dieser verwaltet Sessionmetadaten und Transkripte.'},
+        {id:'review',col:0,row:2,k:'API / Demo / Live-Demo unterscheiden',title:'Übernahme + Bestätigung',desc:'API: getrennte Aktionen. Demo: Button. Live-Demo: automatische Übernahme im Kundenkontext.',foot:'CustomerReview / LiveVoice → demo-accept',file:'apps/web/src/app/core/voice/live-voice.ts',detail:'API trennt Paketannahme, Profilbestätigung und Berechnung. Die Persona-Demo bündelt sie über einen Button. In liveStart ruft LiveVoice nach jedem neuen Paket demo-accept automatisch auf. Fehlende Pflichtangaben verhindern Bestätigung und Berechnung; angenommene Werte bleiben im Entwurf. Diese Demoautomatik ist keine ausdrückliche Einzelbestätigung durch die Person.'},
+        {id:'workflow',col:1,row:2,k:'Gemeinsame Fachlogik + versionierter Zustand',title:'Workflow + Fall-Engine',desc:'Vorschläge speichern, Entwurf übernehmen und vollständige Profile bestätigen und berechnen.',foot:'ExtractionWorkflow · DemoJourney · Engine',file:'apps/api/src/insurance/demo-journey.ts',detail:'ExtractionWorkflow validiert Quellen und erlaubte Pfade, die Engine hält Entwurf, bestätigte Profile und Runs. DemoJourney.acceptPending bündelt Paketannahme, Profilbestätigung und Standardanalysen. Bei unvollständigem Live-Profil liefert es missing statt Zahlen zu erfinden. Die technische Profilbestätigung im Demoablauf darf nicht mit ausdrücklicher Zustimmung zu jedem Wert gleichgesetzt werden.'},
+        {id:'responses',col:2,row:2,k:'Separater Modellaufruf',title:'OpenAI Responses',desc:'Strukturierte Extraktion von Setup, Aufnahmefeldern und Antworten auf offene Profilfragen.',foot:'live-options.ts → openAiResponsesTransport()',kind:'external',file:'apps/api/src/live-options.ts',detail:'liveAppOptions verdrahtet den Responses-Transport bei aktiviertem Voice-/Extraktionsweg und vorhandenem OPENAI_API_KEY. VoiceLabController verwendet ihn für Setup und strukturierte Angaben mit Quellenzitaten. Der Transport stammt aus erni-dialog/responses.ts; das optionale ErniDialogModule wird dadurch nicht registriert. Strukturelle Validierung beweist keine semantische Richtigkeit.'},
+        {id:'avatar',col:0,row:3,k:'Darstellung aus Fall und Live-Medien',title:'Paxi · Chat · Grafiken',desc:'Audiopegel, Aktivität und Emotion steuern Paxi. SSE aktualisiert Fallprojektion und Chat.',foot:'PaxiAvatar · VoiceActivity · ApiDataSource',file:'apps/web/src/app/features/paxi/paxi-avatar.ts',detail:'PaxiAvatar lädt Lukas’ Renderer aus avatar-prototype; ein Sync-Skript kopiert die Quelle vor Start, Build und Tests. Live-Audiopegel steuern den Mund, VoiceActivity liefert Aktivität und Emotion. ApiDataSource lädt Fall, Summary sowie native und Paxi-Turns für Grafiken und Chat. Lokale Audio-Visualisierung beweist weder gehörte Wiedergabe noch bestätigte Finanzwerte.'},
+        {id:'store',col:1,row:3,k:'Zentrale Persistenz · normaler Backend-Start',title:'EncryptedCaseStore',desc:'Fall, Sitzungen, Voice-Turns, Vorschläge, bestätigte Profile und Runs in einer Ablage.',foot:'code/.local/lifemap/ · AES-GCM',kind:'storage',file:'apps/api/src/insurance/store.ts',detail:'Der reguläre Start verwendet die vorhandene lokale verschlüsselte Fallablage. Die native Voice-Schicht legt keinen zweiten schreibenden Fallstore an. Der Lab-Launcher nutzt dieselbe Implementierung mit einem temporären Verzeichnis; das ist eine alternative Backend-Konfiguration.'},
+        {id:'calculator',col:2,row:3,k:'Externer Rechenprovider · regulärer Start',title:'Logismata APICalc',desc:'Die Fall-Engine ruft Rechenoperationen über Allowlist und geschützten Servertoken auf.',foot:'main.ts: providerMode live',kind:'external',file:'apps/api/src/logismata/client.ts',detail:'Der normale main.ts-Start verwendet LiveLogismataProvider mit geschütztem Servertoken. Lokale @pax/domain-Funktionen in der Fachlogik und externe Providerergebnisse bilden gemeinsam die Analyse. Nach demo-accept rechnet DemoJourney die Standardszenarien erneut. Der isolierte Lab-Start ersetzt nur diesen Provider durch exakten Replay.'}
+      ],
+      edges:[
+        {d:'M372 164 H448',label:'REST',x:410,y:149},
+        {d:'M864 164 H788',label:'Prompt',x:826,y:149},
+        {d:'M202 244 V310',type:'event',label:'Start',x:202,y:278},
+        {d:'M788 210 H820 V350 H864',type:'audio',label:'SDP',x:820,y:278},
+        {d:'M372 430 H400 V500 H1034 V470',type:'audio',label:'WebRTC · Audio direkt',x:950,y:500},
+        {d:'M372 350 H410 V281 H510 V258',label:'Turns',x:410,y:281},
+        {d:'M372 390 H448',label:'Auswerten',x:410,y:375},
+        {d:'M618 244 V310',label:'Kontext',x:618,y:278},
+        {d:'M788 415 H807 V580 H864',type:'audio',label:'Extraktion',x:807,y:525},
+        {d:'M618 470 V536',label:'propose()',x:618,y:503},
+        {d:'M448 617 H372',type:'event',label:'SSE',x:410,y:602},
+        {d:'M372 656 H448',label:'Aktion',x:410,y:673},
+        {d:'M618 696 V762',label:'Transaktion',x:618,y:729},
+        {d:'M788 656 H820 V842 H864',label:'Rechnen',x:820,y:729},
+        {d:'M448 811 H372',type:'event',label:'SSE / GET',x:410,y:797},
+        {d:'M100 470 V762',type:'event',label:'Audio / Aktivität',x:100,y:729}
+      ],
+       default:'app',noteTitle:'Ein Fall, drei Bestätigungsabläufe',note:'Native Voice und Voice Lab teilen die Implementierung. Der Startmodus entscheidet, ob Kundenaktionen getrennt, per Demo-Button oder automatisch ausgeführt werden. Ein zusätzliches Fenster auf 3100 braucht dieser Weg nicht.',
+       bullets:['dev:live: leerer synthetischer Fall; Setup aus Alter und Pensum, danach offene Profilfragen.','Live-Demo übernimmt neue Pakete automatisch; das ist keine ausdrückliche Einzelbestätigung.','live-options.ts verbindet den Responses-Transport; ErniDialogModule bleibt optional.']
+    },
+    erni: {
+      description:'Ernests vorhandenes Nest-Modul kapselt den Weg vom finalen Text-/VoiceLog zum unbestätigten Vorschlagspaket. Es ist als optionales Feature implementiert und in einer eigenen Demo verdrahtet, aber weder im normalen main.ts-Start noch im Voice-Lab-Launcher registriert.',
+      status:'IMPLEMENTIERT · OPTIONAL REGISTRIERT',
+      lanes:['Aufrufer / Kundeninteraktion','NestJS / Ernests Modul + Runtime','Adapter / zentrale Infrastruktur'],
+      ports:['Browser oder Serverintegration','gleicher Nest-Prozess','kein eigener Erni-Server nötig'],
+      nodes:[
+        {id:'caller',col:0,row:0,k:'Fallgebundener Agent als Aufrufer',title:'Finaler Text / VoiceLog',desc:'Rollen, Message-ID, Turn und Gesprächsausschnitt. Der aktuelle Demo-Eingang ist begrenzt.',foot:'HTTP nur mit Fall-Agentberechtigung',file:'apps/api/src/erni-dialog/module.ts',detail:'ErniDialogService akzeptiert finale Text- und VoiceLogs über denselben Eingang. Dieses Modul bleibt auf drei serverseitig verfasste synthetische Beispiele und einen definierten Jahresbrutto-Ausgangswert begrenzt. Die inzwischen vorhandene native App-Integration verwendet einen anderen Turn-Eingang: VoiceLabController.'},
+        {id:'erni',col:1,row:0,k:'Ernest / Earnie · Glue im Backend',title:'ErniDialogService.turn()',desc:'Kontext laden, Demo-Herkunft prüfen, Turn sequenzieren und Modellarbeit orchestrieren.',foot:'ErniDialogModule.register({ transport })',kind:'optional',file:'apps/api/src/erni-dialog/module.ts',detail:'Dieses Modul injiziert LIFE_RUNTIME und besitzt keinen eigenen Fallstore. Es prüft Fallbindung und Handover, validiert den erlaubten synthetischen Eingang, schützt Wiederzustellungen und bindet Modellaufrufe an abbrechbare digitale Tasks. Die Registrierung erfolgt explizit als Feature-Modul von createLifeInsuranceApp.'},
+        {id:'ctx',col:2,row:0,k:'Gemeinsame Runtime · lokale Projektion',title:'ExtractorContext',desc:'Personen, erlaubte Felder, offene Pakete, Unklarheiten, Revision und Entwurfshash.',foot:'runtime.extraction.context()',file:'apps/api/src/insurance/extraction.ts',detail:'Der autorisierte Extraktionskontext bleibt lokal und ist keine pauschale Freigabe für externe Modellübertragung. Ernests Adapter erhält nur die kleine synthetische Projektion des aktuellen Demo-Turns. Versionen, Hashes und Berechtigungen ergänzt der Code außerhalb des Modells.'},
+        {id:'customer',col:0,row:1,k:'Kunde · Zustimmung und spätere Aktionen',title:'Kundenclient / Review',desc:'Extraktionshinweis bestätigen; ein entstandenes Paket später ausdrücklich übernehmen.',foot:'Kundenrechte bleiben getrennt vom Agenten',file:'apps/web/src/app/core/advisor/api/customer-review.ts',detail:'Der Kunde erteilt die separate Extraktionszustimmung und entscheidet über Feldvorschläge. Der Erni-Agent darf weder seine eigene Ausgabe übernehmen noch das Gesamtprofil bestätigen. Die automatisierte Dialog-Demo endet bewusst bei einem unbestätigten Vorschlag.'},
+        {id:'gate',col:1,row:1,k:'Backend · direkt vor und nach Modellaufruf',title:'Consent + Stop + Version',desc:'Transferfreigabe prüfen, minimale Projektion bilden, Abort und aktuellen Fallstand prüfen.',foot:'assertTransferAllowed() · digitalTasks',file:'apps/api/src/insurance/model-extraction.ts',detail:'Die Extraktionsfreigabe wird vor dem externen Aufruf und vor dem Einreichen erneut geprüft. Handover und Shutdown brechen laufende Arbeit ab. Ein während der Generierung veränderter Fall verwirft den alten Output; neuere Revisionen werden nicht nachträglich auf alte Modellergebnisse gesetzt.'},
+        {id:'responses',col:2,row:1,k:'Austauschbarer Modelltransport',title:'ResponsesIntakeAdapter',desc:'OpenAI Function Calling mit begrenztem Aufnahme-Tool; Output streng validieren.',foot:'submit_intake_proposals · Timeout',kind:'external',file:'apps/api/src/erni-dialog/responses.ts',detail:'transport(request, signal) ist der austauschbare Provideranschluss. Die Offline-Demo injiziert einen simulierten Transport; die separate OpenAI-Demo injiziert openAiResponsesTransport. Ein nicht registriertes Modul hat keinen aktiven Transport. Das Modell erzeugt Vorschläge und keine bestätigten Finanzwerte.'},
+        {id:'pending',col:0,row:2,k:'Sichtbar nach Nachladen des Falls',title:'Unbestätigtes Paket',desc:'Änderungen und Unklarheiten zur Prüfung anzeigen. Noch kein neuer bestätigter Finanzstand.',foot:'SSE → Snapshot / Review neu laden',file:'apps/web/src/app/features/review/review-panel.ts',detail:'Das Paket wird als Vorschlag im gemeinsamen Fall gespeichert. Seine Existenz verändert weder die bestätigte Profilhistorie noch automatisch den Entwurf. Kunde und Client führen die Übernahme sowie die nachfolgende Profilbestätigung getrennt aus.'},
+        {id:'batch',col:1,row:2,k:'Gemeinsamer Workflow · kein direkter Feldwrite',title:'ExtractionWorkflow',desc:'Output mit Quelle und aktuellen Referenzen binden, validieren und atomar speichern.',foot:'runtime.extraction.proposeBatch()',file:'apps/api/src/insurance/extraction.ts',detail:'Ernests Modul ergänzt Quellenreferenz, erwartete Fall-/Profilversion und den Entwurfshash und ruft proposeBatch auf. Der gemeinsame Workflow prüft erlaubte Pfade und die Gesamtgültigkeit des Pakets. Idempotenz verhindert ein zweites Paket für denselben identischen Turn.'},
+        {id:'contracts',col:2,row:2,k:'Geteiltes Paket · zur Laufzeit validiert',title:'@pax/contracts',desc:'VoiceLog, ExtractorContext, ProposalBatch und die gemeinsamen Fachdaten-Schemas.',foot:'Zod + TypeScript · kein Netzwerkdienst',kind:'muted',file:'packages/contracts/src/index.ts',detail:'Alle Module verwenden gemeinsame Nachrichtentypen und Laufzeitschemas. Ein Schema prüft die Struktur; es beweist nicht, dass eine frei generierte Aussage semantisch wahr ist. Quellenbezug, Feldsemantik und Kundenbestätigung bleiben eigene Aufgaben.'},
+        {id:'demo',col:0,row:3,k:'Aktueller ausführbarer Einstieg',title:'Separate Dialog-Demo',desc:'demo:erni-dialog simuliert das Modell; demo:erni-dialog:openai nutzt OpenAI separat.',foot:'Nicht Bestandteil von npm start',kind:'optional',file:'scripts/demo-erni-dialog.mjs',detail:'Der Demo-Start registriert ErniDialogModule ausdrücklich mit einem Transport. main.ts und der Voice-Lab-Launcher tun dies nicht. Die Testscheibe prüft Jahresbrutto, unverändertes Budget-Netto und Wiederzustellung. Korrekturen, breitere Extraktion und die vollständige Voice-Kundenintegration sind nicht Teil dieser ersten Scheibe.'},
+        {id:'store',col:1,row:3,k:'Gleicher Store wie der Rest des Backends',title:'Zentraler Fallzustand',desc:'Vorschläge und spätere bestätigte Profile werden in derselben Runtime verwaltet.',foot:'Kein zweiter Erni-Fallstore',kind:'storage',file:'apps/api/src/insurance/runtime.ts',detail:'Ernests Modul wird durch die vorhandene Runtime mit Authentisierung, Extraktionsworkflow und Persistenz versorgt. Der gleiche fachliche Fall kann später durch Kundenaktionen bestätigt und durch die Engine berechnet werden. Ein zusätzlicher Erni-Server oder separater Fachspeicher ist dafür nicht nötig.'},
+        {id:'next',col:2,row:3,k:'Unterschied zwischen Modul und Integration',title:'LiveVoice ≠ ErniDialog',desc:'Die App nutzt VoiceLabController und den Responses-Transport, nicht diesen Turn-Eingang.',foot:'Kein automatischer LiveVoice → ErniDialog-Aufruf',kind:'optional',file:'apps/api/src/erni-dialog/README.md',detail:'Die native App-Voice ist jetzt vorhanden. Sie ruft über LiveVoice den VoiceLabController auf und verwendet den gemeinsamen Responses-Transport. Das ist keine automatische Registrierung von ErniDialogModule. Optionaler Paxi-Fensterweg, integrierte Orchestrierung und begrenztes Erni-Modul bleiben im Main-Snapshot unterscheidbare Pfade.'}
+      ],
+      edges:[
+        {d:'M372 164 H448',type:'optional',label:'Turn',x:410,y:149},
+        {d:'M864 164 H788',label:'Kontext',x:826,y:149},
+        {d:'M618 244 V310',label:'Prüfen',x:618,y:278},
+        {d:'M372 390 H448',label:'Consent',x:410,y:375},
+        {d:'M788 390 H864',type:'audio',label:'Modell',x:826,y:375},
+        {d:'M1034 470 V503 H670 V536',label:'Tool-Output prüfen',x:870,y:503},
+        {d:'M618 470 V536',label:'Gate erneut',x:618,y:503},
+        {d:'M448 616 H372',type:'event',label:'SSE',x:410,y:601},
+        {d:'M864 616 H788',type:'event',label:'Schemas',x:826,y:601},
+        {d:'M618 696 V762',label:'Speichern',x:618,y:729},
+        {d:'M372 842 H420 V180 H448',type:'optional',label:'Registrierung',x:420,y:728},
+        {d:'M864 842 H788',type:'optional',label:'Anschluss',x:826,y:827}
+      ],
+      default:'erni',noteTitle:'Ernests Modul und native App-Voice auseinanderhalten',note:'Die native Live-Voice ist integriert. Dieses optionale ErniDialogModule ist weiterhin die begrenzte Demo-Scheibe mit eigenem Turn-Eingang; lediglich sein Responses-Transport wird im regulären Weg wiederverwendet.',
+      bullets:['main.ts lädt LifeHttpModule + VoiceModule über createLifeInsuranceApp, ohne ErniDialogModule.','main.ts und der Lab-Launcher konfigurieren jetzt beide den Responses-Transport für VoiceLabController.','Gestrichelt = optionale Registrierung dieses Moduls. Der Hauptweg ist bereits in Ansicht 01 dargestellt.']
+    }
+  };
+  views.journey = {
+    description:'Der Abschluss-Tab macht die persistierte Backend-Journey bedienbar: vom aktuellen Analyseergebnis über Empfehlung, Review, Produktauswahl und Dokumente bis zur Demo-Police im lokalen Portal. Im Demo-Start simuliert demo-review die Reviewer-Schritte; ohne diesen Start bleibt die getrennte Reviewer-Rolle erforderlich.',
+    status:'IMPLEMENTIERT · DEMO OHNE DECKUNG',
+    lanes:['Angular / Kundeninteraktion','NestJS / Fach- und Journeylogik','Daten / Prüfung / Dokumente'],
+    ports:[':4200 · Abschluss-Tab',':3000 · dieselbe Runtime','lokale Persistenz · keine echte Policierungs-API'],
+    nodes:[
+      {id:'journeyui',col:0,row:0,k:'Angular · Abschluss-Tab',title:'JourneyView + JourneyApi',desc:'Empfehlung, Status und nächste zulässige Aktion aus Summary und Portal anzeigen.',foot:'features/journey · gleiche Kundensitzung',file:'apps/web/src/app/features/journey/journey-view.ts',detail:'JourneyView lädt Summary, Portal und Suitability. Die Ansicht reagiert auf Kontextrevisionen und eigene Aktionen; veraltete Antworten werden nicht als neuester Zustand übernommen. Produktwahl, Dokumentbestätigung, Antrag und Einreichung sind bedienbar. Alle fachlichen Übergänge bleiben im Backend.'},
+      {id:'recommendation',col:1,row:0,k:'Regelbasierte Ableitung · keine freie LLM-Zahl',title:'Aktueller Lauf → Empfehlung',desc:'Bestätigter Bedarf, Versionen und persönliche Mittel begrenzen Produktkandidaten.',foot:'LifeInsuranceEngine · products.ts',file:'apps/api/src/insurance/products.ts',detail:'Kandidaten stammen aus aktuellem bestätigtem Bedarf und Rechenlauf. Erklärbare Regeln begrenzen Alternativen und persönliche Finanzierbarkeit. Kein neuer Vertrag ist ein mögliches Ergebnis. Eine alte Empfehlung wird nach Profil-/Runwechsel nicht als aktuelle Abschlussgrundlage behandelt.'},
+      {id:'reviewer',col:2,row:0,k:'Separate Rolle oder ausdrückliche Demo-Simulation',title:'Fachreview / demo-review',desc:'Prüfgründe und Kriterien entscheiden. Demo-Start kann die Rolle simulieren.',foot:'DemoJourney.review() · simulated:true',kind:'optional',file:'apps/api/src/insurance/demo-journey.ts',detail:'demo-review verwendet nur bei aktiviertem Demo-Start das Demo-Prüfkonto und reguläre Reviewer-Methoden. Es kann offene Beratungsprüfung freigeben und eingereichte Demo-Anträge prüfen beziehungsweise Demo-Policen ausstellen. Das ist keine tatsächliche Pax-Fachfreigabe. Ohne Demo-Start benötigt der Fall den separaten Reviewer.'},
+      {id:'suitabilityui',col:0,row:1,k:'Kundenseitige Auswahl und Angaben',title:'Produkte + Eignung wählen',desc:'Kandidaten je Person auswählen; Eignungsformular für ausgewählte fondsgebundene Produkte.',foot:'SuitabilityForm · persönliche Mittel',file:'apps/web/src/app/features/journey/suitability-form.ts',detail:'Die Oberfläche erfasst die Eignungsangaben für qualifizierte Produkte und zeigt Prüfstatus sowie Ablehnungsgründe. Sie ersetzt weder die backendseitigen Regeln noch die Fachprüfung. Fehlende eigene Mittel können eine Offerte verhindern, auch wenn der Haushalt insgesamt Einkommen hat.'},
+      {id:'quote',col:1,row:1,k:'Backend · autorisierte Kundenaktion',title:'Eignung + Demo-Offerte',desc:'Aktuelle Empfehlung, Auswahl, Eignung und Mittel prüfen; Dokumente an die Offerte binden.',foot:'SuitabilityService · DemoJourneyService',file:'apps/api/src/insurance/journey.ts',detail:'Die Demo-Konfiguration referenziert Produkte, Person, Empfehlung und aktuellen Analysekontext. Eignung, persönliche Finanzierbarkeit und Review-Gates bleiben serverseitig. Ohne echte Pax-Tarifierung ist die Prämie null. Es wird keine erfundene Prämie als Angebot ausgegeben.'},
+      {id:'documents',col:2,row:1,k:'Lokale Dokumentquellen · feste Allowlist',title:'Produkt-PDFs + SHA-256',desc:'Gebundene Dokumentreferenzen, Archivstand und Lesebestätigung vor dem nächsten Schritt.',foot:'ProductDocuments · keine freien Dateipfade',kind:'storage',file:'apps/api/src/insurance/documents.ts',detail:'Produktdokumente kommen aus einer festen Allowlist. SHA-256 und Dokument-ID binden den ausgewiesenen Stand an die Demo-Konfiguration. Archivierte deutschsprachige Originale sind keine zugesicherten aktuellen Vertragsfassungen in allen App-Sprachen. Die Oberfläche verlangt die gesonderte Dokumentbestätigung.'},
+      {id:'applicationui',col:0,row:2,k:'Explizite Kundenaktionen',title:'Antrag + Einreichung',desc:'Dokumente bestätigen, Demo-Antrag erzeugen und separat einreichen; Status sichtbar halten.',foot:'JourneyApi · Revisions- und Idempotenzschutz',file:'apps/web/src/app/core/advisor/api/journey-api.ts',detail:'Die App sendet die vorgesehenen Journey-Kommandos statt lokale Policenobjekte zu erzeugen. Backendzustände unterscheiden Entwurf, Einreichung, Prüfung, Rückfrage, Ablehnung und Demo-Annahme. Versions- und Idempotenzregeln verhindern einen doppelten Antrag oder das Weiterverwenden einer veralteten Offerte.'},
+      {id:'application',col:1,row:2,k:'Persistierte State-Machine',title:'Prüfung → Demo-Police',desc:'Review, Annahme und Policenerstellung sind getrennte Übergänge mit Rollenprüfung.',foot:'coverageInForce:false · legalEffect:none',file:'apps/api/src/insurance/journey.ts',detail:'Eine eingereichte Anwendung wird gesondert geprüft und für die Demo angenommen. Erst danach darf die Reviewer-Rolle eine Demo-Police ausstellen. Demo-Markierung, coverageInForce:false und legalEffect:none bleiben erhalten. Echte Identität/AML, Underwriting, Signatur und Policierung sind nicht angebunden.'},
+      {id:'store',col:2,row:2,k:'Gleicher kanonischer Fall',title:'EncryptedCaseStore',desc:'Review, Offerten, Anträge, Policen und technische Audit-Ereignisse gemeinsam persistieren.',foot:'AES-GCM · lokaler Node-Prozess',kind:'storage',file:'apps/api/src/insurance/store.ts',detail:'Journeyobjekte liegen zusammen mit Entwurf, Profilen und Runs im verschlüsselten Fallstore. Es gibt kein zweites unabhängiges Abschluss-Backend und keine angebundene Pax-Policen-Datenbank. Private Besitzer- und Sitzungsdaten werden nicht als vollständiger öffentlicher Fall ausgegeben.'},
+      {id:'portal',col:0,row:3,k:'Darstellung und Download',title:'Portal + Beratungsdossier',desc:'Gespeicherte Demo-Police, Produktdokumente und druckbares Dossier aus gleichem Fall.',foot:'DossierDialog · lokales Portal',file:'apps/web/src/app/features/journey/dossier-dialog.ts',detail:'Die Oberfläche zeigt die gespeicherten Portalobjekte. Das Dossier ist ein druckbares HTML-Dokument, das der Browser als PDF speichern kann. Es gibt keinen automatischen Versand und keinen nachgewiesenen Anschluss an ein produktives Pax-Kundenportal.'},
+      {id:'dossier',col:1,row:3,k:'Gemeinsamer Snapshot und aktuelle Referenzen',title:'Summary + DossierService',desc:'Kunden- und Reviewersicht desselben Snapshots; Ergebnisse und Vorbehalte nachvollziehbar.',foot:'DossierService · snapshotId',file:'apps/api/src/insurance/dossier.ts',detail:'Die beiden Summary-Sichten beziehen sich auf denselben Snapshot. Rechenergebnisse, Herkunft, offene Prüfgründe und Demo-Vertragsobjekte bleiben unterscheidbar. Locale verändert die Präsentation, nicht die zugrunde liegenden Finanzwerte.'},
+      {id:'limits',col:2,row:3,k:'Implementierungsgrenze',title:'Demo ≠ Versicherungsvertrag',desc:'Keine echte Deckung, keine Tarifprämie, keine reale Fachfreigabe durch die Simulation.',foot:'Synthetischer PoC · Release-Gates offen',kind:'optional',file:'apps/api/src/insurance/journey.ts',detail:'Die Evaluation kann den vollständigen lokalen Demoablauf sehen. Produktive IAM/KMS/TLS/Storage-Integration und echte Geschäfts-APIs sind gesonderte Integrationen. Eine Demo-Police oder simulierte Review-Aktion darf nicht als rechtswirksamer Versicherungsvertrag ausgegeben werden.'}
+    ],
+    edges:[
+      {d:'M372 164 H448',label:'Summary / Portal',x:410,y:149},
+      {d:'M788 164 H864',type:'optional',label:'Prüfauftrag',x:826,y:149},
+      {d:'M202 258 V310',type:'event',label:'Auswahl',x:202,y:281},
+      {d:'M372 390 H448',label:'Offerte anfragen',x:410,y:375},
+      {d:'M618 258 V310',label:'Gates prüfen',x:618,y:281},
+      {d:'M864 390 H788',type:'event',label:'Dokumentbindung',x:826,y:375},
+      {d:'M202 484 V536',type:'event',label:'Dokumente lesen',x:202,y:505},
+      {d:'M372 616 H448',label:'Einreichen',x:410,y:601},
+      {d:'M618 484 V536',label:'Antragsentwurf',x:618,y:505},
+      {d:'M788 616 H864',label:'Transaktion',x:826,y:601},
+      {d:'M202 710 V762',type:'event',label:'Status nachladen',x:202,y:733},
+      {d:'M448 842 H372',type:'event',label:'HTML / Summary',x:410,y:827},
+      {d:'M618 710 V762',label:'Snapshot',x:618,y:733},
+      {d:'M1034 710 V762',type:'optional',label:'Demo-Kennzeichnung',x:1034,y:733}
+    ],
+    default:'journeyui',
+    noteTitle:'Geschäftsweg sichtbar, echte Deckung gesperrt',
+    note:'Die Demo-Journey verwendet dieselbe Runtime, dieselben Referenzen und denselben Store wie die Beratung. Die Oberfläche macht den Ablauf bedienbar; fachliche und rollenbezogene Gates bleiben im Backend.',
+    bullets:['Demo-Review simuliert die Reviewer-Rolle; es ist keine Pax-Fachabnahme.','Ohne echte Tarifierung bleibt die Prämie null. Die Demo-Police erzeugt keinen Versicherungsschutz.','Dossier, Dokumente und Portal sind lokal implementiert; produktive Pax-Geschäfts-APIs fehlen.']
+  };
+  // Debug and debug-lab share the native app's implementation. Only the build, backend target,
+  // trace visibility and calculation/storage mode differ; this is not another Angular project.
+  views.lab = {
+    ...views.overview,
+    description:'Das bisherige Projekt debugging-app wurde in die normale Angular-App zurückgeführt. debug und debug-lab schalten /voice-lab und den Trace frei. Beide verwenden denselben LiveVoice-Singleton; ein Gespräch läuft beim Wechsel zwischen Workspace und Lab-Tab weiter. Nur debug-lab nutzt optional ein isoliertes Backend auf 3030.',
+    status:'GLEICHE APP · DEBUG / DEBUG-LAB',
+    lanes:['Angular / Debug-Konfiguration','NestJS / Backend-Konfiguration','Provider / gleiche Implementierung'],
+    ports:['debug :4200 · debug-lab :4300','normal :3000 · isoliertes Lab :3030','Live-Audio / Responses; Rechner je Start'],
+    nodes:views.overview.nodes.map(node=>{
+      const overrides={
+        app:{k:'Gleiche Angular-App · Debug-Build',title:'Workspace + Voice-Lab-Tab',desc:'debugVoice aktiviert /voice-lab, Feldübersicht und Payload-Trace. LiveVoice bleibt dieselbe Instanz.',foot:'debug / debug-lab · kein zweites Projekt',file:'apps/web/src/app/features/voice-lab/voice-lab.ts',detail:'Das separate Verzeichnis apps/web/debugging-app ist im Main-Snapshot entfernt. debug und debug-lab tauschen Environment und Debug-Routen per Build-Konfiguration aus und kompilieren mit tsconfig.debug.json. Nur diese Konfigurationen enthalten den Lab-Tab und Trace-Interceptor. Die normalen Builds enthalten die native Voice-Funktion ohne Debug-Oberfläche.'},
+         avatar:{k:'Debug-Darstellung · browserlokal',title:'Avatar + Payload-Trace',desc:'Gleiche VoiceActivity, zusätzlich Rohdaten und ein speicherbegrenzter In-Memory-Trace.',foot:'core/voice/lab-trace.ts',file:'apps/web/src/app/core/voice/lab-trace.ts',detail:'Der Debug-Tab zeigt den gleichen kanonischen Vorschlagsstand und die gleiche LiveVoice-Instanz wie die normale Oberfläche. Trace und Rohdaten werden in der Debug-Konfiguration sichtbar; der Browser-Trace ist speicherbegrenzt. Das Gespräch endet nicht durch einen Tabwechsel. Der persistente Stepper des lokalen Feature-Branches ist nicht Bestandteil dieses Main-Snapshots.'},
+        store:{k:'Backend-Ziel entscheidet über die Ablage',title:'Normaler oder Lab-Store',desc:'debug: LifeMap-Store. debug-lab: temporärer AES-GCM-Store unter pax-voice-lab-*.',foot:'scripts/start-voice-lab.mjs · isolierter Modus',file:'scripts/start-voice-lab.mjs',detail:'dev:debug startet das normale Backend auf 3000 mit Live-Rechner und Demo-Fall. start:voice-lab startet dagegen die gleiche Backend-Implementierung auf 3030 mit temporärer Ablage und Replay-Rechner. start:debug:lab verbindet die App auf 4300 über proxy.lab.conf.json mit diesem isolierten Backend.'},
+        calculator:{k:'Rechenmodus ist keine Voice-Einstellung',title:'Live oder exakter Replay',desc:'debug → Logismata live. debug-lab → Replay-Rechner; Sprache und Extraktion bleiben live möglich.',foot:'main.ts vs. scripts/start-voice-lab.mjs',file:'scripts/start-voice-lab.mjs',detail:'Nur der isolierte Lab-Launcher setzt providerMode auf replay. Der normale Debug-Start verwendet LiveLogismataProvider. In beiden Varianten können OpenAI Live und Responses echte externe Aufrufe durchführen, wenn Flag, Schlüssel und Zustimmungen vorliegen. Replay beim Rechner bedeutet nicht Replay beim Sprachgespräch.'}
+      };
+      return {...node,...overrides[node.id]};
+    }),
+    default:'app',
+    noteTitle:'Debug ist jetzt eine Konfiguration, keine zweite App',
+    note:'Die frühere Trennung in normale App und eigenes Debug-Projekt gilt für diesen Main-Stand nicht mehr. Gemeinsame Services steuern jetzt beide Oberflächen.',
+    bullets:['dev:debug: normale App 4200 + normales Backend 3000 + zusätzlicher Lab-Tab.','start:debug:lab + start:voice-lab: App 4300 + isoliertes Backend 3030 mit temporärem Store und Replay-Rechner.','main.ts und Lab-Launcher verdrahten beide model-v1. Das ErniDialogModule wird von keinem dieser Startpunkte registriert.']
+  };
+  const board = document.getElementById('board');
+  const tabs = [...document.querySelectorAll('[role=tab]')];
+  let currentView;
+  function element(tag, className, text) {
+    const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;
+  }
+  function selectNode(node) {
+    board.querySelectorAll('.node').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.node===node.id)));
+    document.getElementById('detail-kicker').textContent=node.k;
+    document.getElementById('detail-title').textContent=node.title;
+    document.getElementById('detail-body').textContent=node.detail;
+    const source=document.getElementById('detail-source');source.textContent='↗ code/'+node.file;source.href=root+node.file;
+  }
+  function svgElement(tag, attributes={}) {
+    const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [key,value] of Object.entries(attributes))el.setAttribute(key,value);return el;
+  }
+  function render(name, updateHash=false) {
+    const view=views[name];currentView=name;
+    tabs.forEach(tab=>{const active=tab.dataset.view===name;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
+    document.getElementById('architecture-panel').setAttribute('aria-labelledby','tab-'+name);
+    document.getElementById('view-description').textContent=view.description;
+    document.getElementById('view-status').textContent=view.status;
+    document.getElementById('note-title').textContent=view.noteTitle;
+    document.getElementById('note-body').textContent=view.note;
+    const list=document.getElementById('note-list');list.replaceChildren(...view.bullets.map(text=>element('li','',text)));
+    board.replaceChildren();
+    view.lanes.forEach((title,index)=>{
+      const lane=element('div','lane');lane.style.left=(8+index*416)+'px';lane.setAttribute('aria-hidden','true');board.append(lane);
+      const label=element('div','lane-label',title);label.style.left=(29+index*416)+'px';label.append(element('b','',view.ports[index]));board.append(label);
+    });
+    const svg=svgElement('svg',{viewBox:'0 0 1240 958',class:'edges','aria-hidden':'true'});
+    const defs=svgElement('defs');
+    [['default','#8de3c2'],['audio','#c0adff'],['event','#98beff'],['optional','#f4c987']].forEach(([type,color])=>{
+      const marker=svgElement('marker',{id:'arrow-'+type,viewBox:'0 0 10 10',refX:'9',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto-start-reverse'});marker.append(svgElement('path',{d:'M0 0 L10 5 L0 10 Z',fill:color}));defs.append(marker);
+    });svg.append(defs);
+    view.edges.forEach(edge=>{svg.append(svgElement('path',{d:edge.d,class:'edge '+(edge.type||''),'marker-end':'url(#arrow-'+(edge.type||'default')+')'}));});
+    view.edges.forEach(edge=>{
+      const group=svgElement('g',{class:'edge-label'}),width=edge.label.length*5.6+16;
+      group.append(svgElement('rect',{x:edge.x-width/2,y:edge.y-10,width,height:20,rx:5}));
+      const text=svgElement('text',{x:edge.x,y:edge.y});text.textContent=edge.label;group.append(text);svg.append(group);
+    });board.append(svg);
+    view.nodes.forEach(node=>{
+      const button=element('button','node '+(node.kind||''));button.type='button';button.dataset.node=node.id;button.style.left=(32+node.col*416)+'px';button.style.top=(84+node.row*226)+'px';button.setAttribute('aria-pressed','false');
+      button.append(element('span','kicker',node.k),element('span','node-title',node.title),element('span','node-desc',node.desc),element('span','node-foot',node.foot));button.addEventListener('click',()=>selectNode(node));board.append(button);
+    });
+    selectNode(view.nodes.find(node=>node.id===view.default));
+    if(updateHash)history.replaceState(null,'','#'+name);
+  }
+  tabs.forEach((tab,index)=>{
+    tab.addEventListener('click',()=>render(tab.dataset.view,true));
+    tab.addEventListener('keydown',event=>{
+      let next;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;
+      event.preventDefault();tabs[next].focus();render(tabs[next].dataset.view,true);
+    });
+  });
+  window.addEventListener('hashchange',()=>{const name=location.hash.slice(1);if(Object.hasOwn(views,name)&&name!==currentView)render(name);});
+  document.getElementById('print').addEventListener('click',()=>window.print());
+  render(Object.hasOwn(views,location.hash.slice(1))?location.hash.slice(1):'overview');
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 # Pax BaselHack – Teamgrundlage
 
-Quellenstand: 30.10.2026. Planung nach Workshop fortgeschrieben am 31.10.2026; der Lebensversicherungs-Backend-PoC ist implementiert und geprüft. Angular, KI-Dialog, Voice und Avatar werden durch die jeweiligen Teammitglieder angebunden; echte Abschlüsse bleiben gesperrt.
+Recherche-Quellenstand: 30.10.2026; Workshop-Planung vom 31.10.2026. Die aktuelle Gesamtarchitektur für die Evaluation (01.11.2026) beschreibt die integrierte Angular-App, Voice, Avatar, Fachrechnung und den lokalen Demo-Abschluss. Ältere Planungs- und Backendberichte dokumentieren ihren jeweiligen damaligen Stand.
 
+- [Architektur für die Evaluation: System, Datenfluss und Grenzen](reports/current-architecture.md)
+- [Interaktive Architekturansicht (HTML, lokal im Browser öffnen)](reports/current-architecture.html)
 - [Logik-Backend: Implementierung und Prüfnachweis](reports/logic-backend-implementation.md)
-- [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
 - [Backend-Requirements und Live-Nachweise](reports/life-insurance-requirements.md)
 - [Bestätigte Workshop-Entscheide und Rollen](plans/workshop-decisions.md)
 - [Workflow und Schnittstellen I01–I10](plans/interface-contracts.md)
@@ -28,7 +29,7 @@ Heruntergeladen und technisch geprüft bedeutet keine vollständige inhaltliche 
 | `references/products/` | Broschüren, Produktblätter, Basisinformationen und technische Tarifunterlagen |
 | `references/funds/` | Fondslisten und Fondsinformationen |
 | `references/public-pension-analysis/` | AGB, Datenschutz, synthetische Originalauswertung, Eingabedaten und UI-Textstände |
-| `reports/` | Testbericht mit Beobachtungen und Prüfumfang |
+| `reports/` | Architekturansicht, Implementierungs- und Testberichte mit Prüfumfang |
 | `references/api/` | OpenAPI, Schemaindex, JSON-Beispiele und ursprüngliche Rechneransichten |
 | `references/web/` | Webseitenstände nach Hub, Pax-Produkten, Ratgebern, Services und Design getrennt |
 | `references/videos/transcripts/` | Verfügbare Untertitel; MP4-Dateien liegen unter `assets/pax/videos/` im Repo |
