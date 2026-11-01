@@ -16,6 +16,7 @@ import {
 import {
   AgentActivity,
   EventImpactScenario,
+  IncomeMilestone,
   LifeEvent,
   RiskItem,
   TranscriptEntry,
@@ -311,7 +312,15 @@ function risk(atSec: number, item: RiskInput): ScriptStep {
 
 // --- Mock calculation output (Rappen) ----------------------------------------------------------
 
-const TIMELINE_YEARS = [2026, 2030, 2035, 2040, 2045, 2050, 2054, 2056, 2060, 2065, 2070];
+const TIMELINE_YEARS = [2026, 2030, 2035, 2040, 2045, 2050, 2054, 2056, 2060, 2066, 2070];
+/** FE-31: 2054 mixes salary and pension, so it is no bar; 2066 is ten years into the pension. */
+const TIMELINE_MILESTONES: readonly IncomeMilestone[] = [
+  { year: 2026, kind: 'today' },
+  { year: 2050, kind: 'last_working' },
+  { year: 2056, kind: 'first_pension' },
+  { year: 2066, kind: 'pension_plus_10' },
+  { year: 2070, kind: 'end' },
+];
 const WORKING = [0, 0, 0, 0, 0, 0];
 
 const PILLAR3A_YEARS = [2026, 2031, 2036, 2041, 2046, 2051, 2056];
@@ -546,6 +555,7 @@ function incomeChart(
           ],
           status: 'valid',
         },
+        milestones: TIMELINE_MILESTONES,
       },
     }),
   };

@@ -17,6 +17,7 @@ import {
   ChartType,
   EventImpactChart,
   ImpactEventKind,
+  IncomeMilestoneKind,
   IncomeTimelineChart,
   LifeEvent,
   LifeEventsChart,
@@ -119,19 +120,29 @@ export interface ChartView {
 /** Colour of the band behind the year of the selected life event. */
 const SELECTED_TOKEN: CssToken = '--border-focusring';
 
+/** One category of a year axis: the year it stands for and the text ECharts draws for it. */
+interface AxisYear {
+  readonly year: number;
+  readonly category: string;
+}
+
+const plainYears = (years: readonly number[]): AxisYear[] =>
+  years.map((year) => ({ year, category: String(year) }));
+
 /**
- * Marks the year of the selected life event as a band on the category axis, when the chart has
- * that year; a year between two sampled ones is not guessed onto the axis.
+ * Marks the year of the selected life event as a band on the category axis, when the chart draws
+ * that year; a year between two drawn ones is not guessed onto the axis.
  */
 function withSelectedYear(
   view: ChartView,
-  years: readonly number[],
+  axis: readonly AxisYear[],
   ctx: ChartContext,
   choice: ViewChoice,
 ): ChartView {
   const event = choice.event;
   const option = view.option as (ChartOption & { series: (BarSeriesOption | LineSeriesOption)[] }) | null;
-  if (!event || !option || !years.includes(event.year)) return view;
+  const bar = event && axis.find((entry) => entry.year === event.year);
+  if (!event || !option || !bar) return view;
   const year = String(event.year);
   const [first, ...rest] = option.series;
   const marked = {
@@ -139,7 +150,7 @@ function withSelectedYear(
     markArea: {
       silent: true,
       itemStyle: { color: ctx.token(SELECTED_TOKEN), opacity: 0.18 },
-      data: [[{ xAxis: year }, { xAxis: year }]],
+      data: [[{ xAxis: bar.category }, { xAxis: bar.category }]],
     },
   } as BarSeriesOption | LineSeriesOption;
   return {
@@ -191,6 +202,14 @@ const AFTER_PARTS: readonly ('employment' | Pillar)[] = [
   'pillar2',
   'pillar3',
 ];
+
+const MILESTONE_KEYS: Readonly<Record<IncomeMilestoneKind, string>> = {
+  today: 'graphics.milestone.today',
+  last_working: 'graphics.milestone.last_working',
+  first_pension: 'graphics.milestone.first_pension',
+  pension_plus_10: 'graphics.milestone.pension_plus_10',
+  end: 'graphics.milestone.end',
+};
 
 const SERIES_KEYS = {
   employment: 'graphics.series.employment',
@@ -258,11 +277,11 @@ export function buildChartView(
 ): ChartView {
   switch (chart.type) {
     case 'income_timeline':
-      return withSelectedYear(incomeTimeline(chart, ctx), chart.years, ctx, choice);
+      return withSelectedYear(incomeTimeline(chart, ctx), incomeAxis(chart, ctx), ctx, choice);
     case 'event_impact':
       return eventImpact(chart, ctx, choice);
     case 'pillar3a_growth':
-      return withSelectedYear(pillar3aGrowth(chart, ctx), chart.years, ctx, choice);
+      return withSelectedYear(pillar3aGrowth(chart, ctx), plainYears(chart.years), ctx, choice);
     case 'life_events':
       return lifeEvents(chart, ctx);
   }
@@ -270,21 +289,67 @@ export function buildChartView(
 
 // --- per type ----------------------------------------------------------------------------------
 
-/** Stacked income per pillar over the years, the backend's gap hatched on top, target as a line. */
+/**
+ * FE-31: the bars of the income chart, at most five: the backend's milestones, named by meaning and
+ * year. Without milestones only the first and the last year, never one bar per year.
+ */
+function incomeAxis(chart: IncomeTimelineChart, ctx: ChartContext): (AxisYear & { readonly index: number })[] {
+  const named = chart.milestones.map((m) => ({ year: m.year, label: ctx.t(MILESTONE_KEYS[m.kind]) }));
+  const ends = [...new Set([chart.years[0], chart.years.at(-1)])].flatMap((year) =>
+    year === undefined ? [] : [{ year, label: null }],
+  );
+  return (named.length > 0 ? named : ends)
+    .map(({ year, label }) => ({
+      year,
+      index: chart.years.indexOf(year),
+      category: label === null ? String(year) : `${wrapWords(label)}\n${year}`,
+    }))
+    .filter((entry) => entry.index >= 0);
+}
+
+/**
+ * Characters per axis line. Five bars on a 375 px phone leave about 55 px per label, less in German,
+ * whose axis shows full amounts; measured in the Orca browser at 375 px in all four languages.
+ */
+const AXIS_LINE = 6;
+
+/**
+ * Breaks a label at spaces into lines of at most `AXIS_LINE` characters, so five labels fit side by
+ * side on a phone. A longer single word keeps its own line.
+ */
+export function wrapWords(label: string, max = AXIS_LINE): string {
+  const lines: string[] = [];
+  for (const word of label.split(' ')) {
+    const last = lines.at(-1);
+    if (last !== undefined && last.length + 1 + word.length <= max) lines[lines.length - 1] = `${last} ${word}`;
+    else lines.push(word);
+  }
+  return lines.join('\n');
+}
+
+/**
+ * Stacked income per pillar at the milestone years, the backend's gap hatched on top, target as a
+ * line. Only picks backend values; the table keeps every year.
+ */
 function incomeTimeline(chart: IncomeTimelineChart, ctx: ChartContext): ChartView {
-  const years = chart.years.map(String);
+  const axis = incomeAxis(chart, ctx);
+  const pick = (values: readonly (number | null)[]) => axis.map(({ index }) => francs(values[index] ?? null));
   const bars: BarSeriesOption[] = INCOME_PARTS.map((part) => ({
     ...(part === 'gap' ? gapBar(ctx) : bar(part, ctx)),
     stack: 'income',
-    data: chart.series[part].values.map(francs),
+    data: pick(chart.series[part].values),
   }));
   const target: LineSeriesOption = {
     ...line('target', ctx, 'dashed'),
-    data: chart.target.values.map(francs),
+    data: pick(chart.target.values),
   };
+  const milestone = new Map(chart.milestones.map((m) => [m.year, ctx.t(MILESTONE_KEYS[m.kind])]));
   return {
     ...noExtras,
-    option: { ...frame(ctx, years), series: [...bars, target] },
+    option: {
+      ...frame(ctx, axis.map((entry) => entry.category)),
+      series: [...bars, target],
+    },
     legend: [
       ...INCOME_PARTS.map((part) =>
         legendItem(part, part === 'gap' ? 'hatched' : 'bar', ctx, chart.series[part].status, chart),
@@ -297,8 +362,8 @@ function incomeTimeline(chart: IncomeTimelineChart, ctx: ChartContext): ChartVie
         ...INCOME_PARTS.map((part) => ctx.t(SERIES_KEYS[part])),
         ctx.t(SERIES_KEYS.target),
       ],
-      rows: years.map((year, i) => ({
-        header: year,
+      rows: chart.years.map((year, i) => ({
+        header: milestone.has(year) ? `${year} · ${milestone.get(year)}` : String(year),
         cells: [...INCOME_PARTS.map((part) => chart.series[part]), chart.target].map((series) =>
           amount(series.values[i] ?? null, ctx),
         ),
@@ -369,7 +434,7 @@ function eventImpact(chart: EventImpactChart, ctx: ChartContext, choice: ViewCho
   return {
     ...noExtras,
     option: {
-      ...frame(ctx, categories, { everyLabel: true }),
+      ...frame(ctx, categories),
       series: [
         ...[before, ...after, gap].map((series) => ({ ...series, barMaxWidth: 72 })),
         neededLine,
@@ -434,7 +499,7 @@ function pillar3aGrowth(chart: Pillar3aGrowthChart, ctx: ChartContext): ChartVie
   };
   return {
     ...noExtras,
-    option: { ...frame(ctx, years, { everyLabel: true }), series },
+    option: { ...frame(ctx, years), series },
     legend: [
       ...parts.map((part) => legendItem(part, marks[part], ctx, chart.series[part].status, chart)),
       ...(payout === null
@@ -540,11 +605,11 @@ function motion(ctx: ChartContext): ChartOption {
 }
 
 /**
- * Category x axis and money y axis, themed from the tokens. `everyLabel` keeps ECharts from
- * dropping category labels: for a few categories that must all be named (before/after, the 3a
- * years). Long year axes keep the automatic thinning, or their labels would run into each other.
+ * Category x axis and money y axis, themed from the tokens. Every chart has only a few categories
+ * that must all be named (before/after, the 3a years, the income milestones of FE-31), so ECharts
+ * may not drop any category label.
  */
-function frame(ctx: ChartContext, categories: readonly string[], { everyLabel = false } = {}) {
+function frame(ctx: ChartContext, categories: readonly string[]) {
   const muted = ctx.token('--text-muted');
   return {
     ...motion(ctx),
@@ -563,7 +628,7 @@ function frame(ctx: ChartContext, categories: readonly string[], { everyLabel = 
     xAxis: {
       type: 'category',
       data: [...categories],
-      axisLabel: { color: muted, ...(everyLabel ? { interval: 0, hideOverlap: false } : {}) },
+      axisLabel: { color: muted, interval: 0, hideOverlap: false },
       axisLine: { lineStyle: { color: muted } },
       axisTick: { show: false },
     },

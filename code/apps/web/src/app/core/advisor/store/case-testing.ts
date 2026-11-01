@@ -80,6 +80,10 @@ export function incomeChart(overrides: Partial<IncomeTimelineChart> = {}): Incom
       gap: { values: [0, null], status: 'needs_input' },
     },
     target: valid([null, 8_000_000]),
+    milestones: [
+      { year: 2030, kind: 'today' },
+      { year: 2060, kind: 'first_pension' },
+    ],
     ...overrides,
   };
 }

@@ -200,6 +200,13 @@
       "net_after_income_tax": "netto dopo l’imposta sul reddito",
       "capital": "capitale"
     },
+    "milestone": {
+      "today": "Oggi",
+      "last_working": "Fine lavoro",
+      "first_pension": "Pensione",
+      "pension_plus_10": "+10 anni",
+      "end": "Fine piano"
+    },
     "series": {
       "employment": "Reddito da lavoro",
       "pillar1": "1° pilastro (AVS/AI)",

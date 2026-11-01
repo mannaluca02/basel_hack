@@ -200,6 +200,13 @@
       "net_after_income_tax": "net après impôt sur le revenu",
       "capital": "capital"
     },
+    "milestone": {
+      "today": "Aujourd’hui",
+      "last_working": "Avant retraite",
+      "first_pension": "Retraite",
+      "pension_plus_10": "+10 ans",
+      "end": "Fin du plan"
+    },
     "series": {
       "employment": "Revenu du travail",
       "pillar1": "1er pilier (AVS/AI)",
