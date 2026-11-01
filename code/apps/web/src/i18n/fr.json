@@ -532,6 +532,7 @@
     "intro": "De la recommandation à la police dans le portail client, en passant par l’offre et la proposition. Tout est une démo avec des données fictives : aucun contrat, aucune couverture d’assurance.",
     "steps": {
       "label": "Progression",
+      "position": "Étape {{number}} :",
       "recommendation": "Recommandation",
       "quote": "Offre",
       "application": "Proposition",

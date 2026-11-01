@@ -532,6 +532,7 @@
     "intro": "Von der Empfehlung über Offerte und Antrag bis zur Police im Kundenportal. Alles ist eine Demo mit erfundenen Daten: kein Vertrag, kein Versicherungsschutz.",
     "steps": {
       "label": "Fortschritt",
+      "position": "Schritt {{number}}:",
       "recommendation": "Empfehlung",
       "quote": "Offerte",
       "application": "Antrag",

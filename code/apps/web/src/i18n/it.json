@@ -532,6 +532,7 @@
     "intro": "Dalla raccomandazione, attraverso offerta e proposta, fino alla polizza nel portale clienti. È tutto una demo con dati inventati: nessun contratto, nessuna copertura assicurativa.",
     "steps": {
       "label": "Avanzamento",
+      "position": "Passo {{number}}:",
       "recommendation": "Raccomandazione",
       "quote": "Offerta",
       "application": "Proposta",

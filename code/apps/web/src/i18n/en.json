@@ -532,6 +532,7 @@
     "intro": "From the recommendation through quote and application to the policy in the customer portal. Everything is a demo with invented data: no contract, no insurance cover.",
     "steps": {
       "label": "Progress",
+      "position": "Step {{number}}:",
       "recommendation": "Recommendation",
       "quote": "Quote",
       "application": "Application",

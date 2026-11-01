@@ -83,7 +83,7 @@ let nextId = 0;
   imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <form class="form" [attr.aria-labelledby]="id + '-title'" (submit)="submit($event)">
+    <form class="form card" [attr.aria-labelledby]="id + '-title'" (submit)="submit($event)">
       <h3 [id]="id + '-title'">
         {{ 'journey.suitability.title' | transloco: { product: productName() } }}
       </h3>
@@ -98,6 +98,7 @@ let nextId = 0;
             step="100"
             inputmode="numeric"
             name="premium"
+            class="field"
             [value]="francs(premium())"
             (input)="premium.set(chf($any($event.target).value))"
           />
@@ -110,6 +111,7 @@ let nextId = 0;
             step="1000"
             inputmode="numeric"
             name="single"
+            class="field"
             [value]="francs(single())"
             (input)="single.set(chf($any($event.target).value))"
           />
@@ -120,7 +122,7 @@ let nextId = 0;
       @for (field of fields; track field.key) {
         <label>
           <span>{{ field.label | transloco }}</span>
-          <select [name]="field.key" (change)="set(field.key, $any($event.target).value)">
+          <select class="field" [name]="field.key" (change)="set(field.key, $any($event.target).value)">
             @for (option of field.options; track option.value) {
               <option [value]="option.value" [selected]="answers()[field.key] === option.value">
                 {{ option.label | transloco }}
@@ -138,12 +140,13 @@ let nextId = 0;
           max="100"
           step="10"
           name="guarantee"
+          class="field"
           [value]="answers().guaranteedPercent"
           (input)="setGuarantee($any($event.target).value)"
         />
       </label>
 
-      <label class="confirm">
+      <label class="confirm choice">
         <input
           type="checkbox"
           name="confirm"
@@ -177,18 +180,9 @@ let nextId = 0;
     </form>
   `,
   styles: `
-    .form {
-      display: grid;
-      gap: 0.75rem;
-      padding: 1rem;
-      border: var(--stroke-border) solid var(--border-soft);
-      border-radius: var(--radius-m);
-    }
-
+    // Card, fields, checkbox and button come from src/styles.scss.
     h3 {
       margin: 0;
-      font-size: 1rem;
-      font-weight: var(--font-weight-bold);
     }
 
     .note {
@@ -203,54 +197,20 @@ let nextId = 0;
       gap: 0.75rem;
     }
 
-    label {
+    // Pax UI: the label above the field in small paragraph text.
+    label:not(.choice) {
       display: grid;
-      gap: 0.25rem;
+      gap: 0.5rem;
       font-size: 0.875rem;
     }
 
-    input,
-    select {
-      min-height: 2.75rem;
-      padding: 0.5rem 0.75rem;
-      border: var(--stroke-s) solid var(--border-default);
-      border-radius: var(--radius-sm);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-    }
-
-    .confirm {
-      display: flex;
-      gap: 0.5rem;
-      align-items: flex-start;
-    }
-
-    .confirm input {
-      min-height: auto;
-    }
-
-    .action {
-      justify-self: start;
-      min-height: 2.75rem;
-      padding: 0.5rem 1rem;
-      border: 0;
-      border-radius: var(--radius-full);
-      color: var(--text-on-brand);
-      background: var(--bg-brand);
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
+    .field {
+      font-size: 1rem;
     }
 
     .result {
-      padding: 0.75rem;
-      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-m);
       background: var(--bg-success);
       color: var(--text-success);
 

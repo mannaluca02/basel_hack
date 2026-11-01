@@ -277,34 +277,6 @@ let nextId = 0;
       gap: 0.5rem;
     }
 
-    .action {
-      min-height: 2.75rem;
-      padding: 0.5rem 1rem;
-      border: var(--stroke-s) solid var(--border-default);
-      border-radius: var(--radius-full);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-
-      &:disabled {
-        color: var(--text-muted);
-        cursor: not-allowed;
-      }
-    }
-
-    .action--primary {
-      border-color: transparent;
-      color: var(--text-on-brand);
-      background: var(--bg-brand);
-
-      &:disabled {
-        color: var(--text-on-brand);
-        opacity: 0.5;
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .label {
         transition: none;

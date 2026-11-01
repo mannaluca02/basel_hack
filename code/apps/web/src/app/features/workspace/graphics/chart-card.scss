@@ -2,13 +2,9 @@
   display: block;
 }
 
+// The card surface comes from src/styles.scss; a chart card sits a little tighter.
 .card {
-  display: grid;
   gap: 0.5rem;
-  padding: 1rem;
-  border: var(--stroke-border) solid var(--border-soft);
-  border-radius: var(--radius-xl);
-  background: var(--bg-default);
   transition:
     background-color 600ms ease-out,
     border-color 600ms ease-out;

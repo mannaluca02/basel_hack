@@ -42,7 +42,7 @@ import { VoiceCall } from '../../core/voice/voice-call';
               {{ 'call.stopSpeaking' | transloco }}
             </button>
           }
-          <button type="button" class="action action--end" (click)="call.end()">
+          <button type="button" class="action action--danger" (click)="call.end()">
             {{ 'call.end' | transloco }}
           </button>
         }
@@ -84,31 +84,10 @@ import { VoiceCall } from '../../core/voice/voice-call';
       margin: 0;
     }
 
-    .action {
-      padding: 0.375rem 0.875rem;
-      border: var(--stroke-s) solid var(--border-default);
-      border-radius: var(--radius-sm);
-      color: var(--text-default);
-      background: var(--bg-default);
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-    }
-
+    // Buttons from src/styles.scss; muted is the one state of their own.
     .action[aria-pressed='true'] {
       color: var(--text-warning);
       background: var(--bg-warning);
-    }
-
-    .action--primary {
-      border-color: var(--bg-brand);
-      color: var(--text-on-brand);
-      background: var(--bg-brand);
-    }
-
-    .action--end {
-      border-color: var(--border-error);
-      color: var(--text-error);
     }
   `,
 })

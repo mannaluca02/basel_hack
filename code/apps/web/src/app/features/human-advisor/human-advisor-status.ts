@@ -18,7 +18,12 @@ import { HumanAdvisor } from '../../core/advisor/api/human-advisor';
           {{ 'human.requested' | transloco }}
           <a [href]="'tel:' + advisor.contact().phone">{{ advisor.contact().displayPhone }}</a>
         </p>
-        <button type="button" class="action" [disabled]="advisor.busy()" (click)="advisor.resume()">
+        <button
+          type="button"
+          class="action action--compact"
+          [disabled]="advisor.busy()"
+          (click)="advisor.resume()"
+        >
           {{ 'human.resume' | transloco }}
         </button>
       </div>
@@ -76,17 +81,6 @@ import { HumanAdvisor } from '../../core/advisor/api/human-advisor';
     .status a {
       color: inherit;
       font-weight: 700;
-    }
-
-    .action {
-      padding: 0.125rem 0.5rem;
-      border: var(--stroke-s) solid var(--border-soft);
-      border-radius: var(--radius-sm);
-      color: inherit;
-      background: none;
-      font: inherit;
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
     }
 
     .failed {
