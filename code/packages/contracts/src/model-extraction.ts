@@ -17,6 +17,5 @@ export const ModelExtractionPermissionSchema=z.object({caseId:Id,caseRevision:re
   consent:z.object({noticeVersion:z.string().min(1).max(80),noticeHash:hash,locale:LocaleSchema,acceptedAt:z.iso.datetime()}).strict().nullable(),
   transferAllowed:z.boolean(),blockedReason:z.enum(['disabled','consent_missing','notice_changed','human_handover_active']).nullable()}).strict()
   .refine(p=>p.transferAllowed===(p.blockedReason===null),'Transfer permission and blocked reason disagree');
-export type ModelExtractionNotice=z.infer<typeof ModelExtractionNoticeSchema>;
 export type ModelExtractionConsent=NonNullable<z.infer<typeof ModelExtractionPermissionSchema>['consent']>;
 export type ModelExtractionPermission=z.infer<typeof ModelExtractionPermissionSchema>;

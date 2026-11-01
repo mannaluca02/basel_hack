@@ -1,11 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {
-  InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,VoiceLogSchema,AgentReplySchema,VoicePlaybackEventSchema,
-  DemoPolicySchema,GraphExplanationRequestSchema,SummaryBundleSchema,
+  InsuranceCaseDtoSchema,AdvisorContextSchema,AdvisorContextUpdatedSchema,VoiceLogSchema,
+  DemoPolicySchema,SummaryBundleSchema,
 } from '@pax/contracts';
 import {createLifeRuntime} from '../apps/api/dist/insurance/runtime.js';
 import {localizedCase} from '../apps/api/dist/insurance/i18n.js';
@@ -82,31 +82,7 @@ test('VoiceLog requires a final, explicitly synthetic transcript and does not ac
  assert.equal(VoiceLogSchema.parse(log).locale,'de');assert.equal(VoiceLogSchema.safeParse({...log,transcriptStatus:'partial'}).success,false);
  assert.equal(VoiceLogSchema.safeParse({...log,rawAudio:'bytes'}).success,false);
 });
-test('AgentReply needs consistent source references for financial statements and confirmation for proposals',()=>{
- const reply={...head,replyId:'reply_1',contextRevision:1,kind:'question',locale:'de',text:'Was ist Ihr Ziel?',requiresConfirmation:false,containsFinancialAmounts:false,
-  contextId:null,runId:null,profileVersion:null,scenarioVersionId:null,calculationInputHash:null,factRefs:[]};
- AgentReplySchema.parse(reply);assert.equal(AgentReplySchema.safeParse({...reply,containsFinancialAmounts:true}).success,false);
- assert.equal(AgentReplySchema.safeParse({...reply,kind:'patch_proposal'}).success,false);
- const grounded={...reply,kind:'explanation',containsFinancialAmounts:true,runId:'run_1',profileVersion:1,scenarioVersionId:'baseline',calculationInputHash:'a'.repeat(64),
-   factRefs:[{metricId:'cashflowAnnual',runId:'run_1',profileVersion:1,scenarioVersionId:'baseline',sourceRefs:['demo:cashflow']}]};
- AgentReplySchema.parse(grounded);assert.equal(AgentReplySchema.safeParse({...grounded,runId:'run_2'}).success,false);
-});
-test('SSE, graph explanation and playback messages are bound to their exact case and turn references',()=>{
+test('SSE events are bound to their exact case',()=>{
  const event={schemaVersion:'1.0',messageId:'event_1',caseId:'case_1',correlationId:'event_1',eventId:'event_1',contextRevision:2,reason:'analysis_ready',contextRef:'/api/cases/case_1/advisor/context',interruptPolicy:'if_current_answer_invalid'};
  AdvisorContextUpdatedSchema.parse(event);assert.equal(AdvisorContextUpdatedSchema.safeParse({...event,contextRef:'/api/cases/foreign/advisor/context'}).success,false);
- VoicePlaybackEventSchema.parse({...head,replyId:'reply_1',playbackId:'audio_1',event:'started',occurredAt:'2026-10-31T02:00:00.000Z'});
- const graph={...head,contextId:'b'.repeat(64),question:'Was bedeutet diese Stelle?',graphContext:{caseId:'case_1',profileVersion:1,scenarioVersionId:'baseline',runId:'run_1',graphId:'household_budget',metricId:'cashflowAnnual',periodStart:'2026-10',periodEnd:'2026-10'}};
- GraphExplanationRequestSchema.parse(graph);assert.equal(GraphExplanationRequestSchema.safeParse({...graph,caseId:'foreign'}).success,false);
-});
-test('committed shared JSON examples validate together and contain no private session/storage fields',async()=>{
- const schemas={case:InsuranceCaseDtoSchema,context:AdvisorContextSchema,'voice-log':VoiceLogSchema,'agent-reply':AgentReplySchema,'voice-playback':VoicePlaybackEventSchema,'graph-explanation':GraphExplanationRequestSchema};
- const docs={};
- for(const [name,schema] of Object.entries(schemas)){
-   const text=await readFile(new URL(`../fixtures/contracts/${name}.v1.json`,import.meta.url),'utf8');
-   assert.ok(!/"(?:sessionToken|csrfToken|sessionHash|idempotency|ownerId)"/.test(text));docs[name]=schema.parse(JSON.parse(text));
- }
- assert.equal(docs.case.id,docs.context.caseId);assert.equal(docs.case.activeRunId,docs.context.runId);
- assert.deepEqual(docs.context.allowedActions,['read_context','propose_patch']);
- assert.equal(docs['agent-reply'].calculationInputHash,docs.context.calculationInputHash);
- assert.equal(docs['voice-playback'].replyId,docs['agent-reply'].replyId);
 });

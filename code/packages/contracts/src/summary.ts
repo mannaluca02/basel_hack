@@ -33,5 +33,4 @@ export const SummaryBundleSchema=z.object({schemaVersion:z.literal(CASE_DTO_VERS
   });
 export type PortalDto=z.infer<typeof PortalDtoSchema>;
 export type CustomerSummary=z.infer<typeof CustomerSummarySchema>;
-export type AdvisorSummary=z.infer<typeof AdvisorSummarySchema>;
 export type SummaryBundle=z.infer<typeof SummaryBundleSchema>;
