@@ -1,3 +1,4 @@
+import { providerFetch } from '../provider-fetch.js';
 import { readFile } from 'node:fs/promises';
 import { Operations,RequestSchemas,type Operation } from './contracts.js';
 import { normalizeResponse,type NormalizedProviderResult } from './normalize.js';
@@ -102,8 +103,8 @@ export class LiveLogismataProvider implements CalculationProvider {
       for(let attempt=0;attempt<2;attempt++) {
         const timeout=AbortSignal.timeout(this.timeout);const combined=signal?AbortSignal.any([timeout,signal]):timeout;
         try {
-          const response=await this.transport(`${BASE_URL}/operation/standard/${Operations[operation].id}`,{
-            method:'POST',redirect:'error',credentials:'omit',cache:'no-store',signal:combined,
+          const response=await providerFetch(this.transport, `${BASE_URL}/operation/standard/${Operations[operation].id}`,{
+            method:'POST',cache:'no-store',signal:combined,
             headers:{Authorization:`Bearer ${this.#token}`,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(request)});
           if(response.status===401||response.status===403) {await response.body?.cancel().catch(()=>{});throw new ProviderFailure('UNAUTHORIZED');}
           if(response.status===429 || response.status>=500) {

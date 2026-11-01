@@ -219,3 +219,20 @@ For HTTP/SSE checks, start `npm run dev -w @pax/worker -- --port 8797` separatel
 Verified locally on Node 24.22.2: root suite 470 tests (469 pass, 1 skip, 0 fail), Worker typecheck and dry-run build pass. Real eviction, production memory/CPU at the 20 MB cap, and enabled voice-provider alarm behavior remain unverified. Whole-database encryption still copies the entire database per write; chunking solves per-value storage limits, not peak memory or throughput.
 
 Task D local verification: backend 461 passed / one skipped; web 487 passed (52 files); Worker typecheck and deploy dry run passed. Extended HTTP checks passed at port 8799 and over tailnet HTTPS, including SPA fallback, JS/CSS, PDF blocking, authenticated PDF hashes, same-origin demo start and SSE. Browser boot reached the consent screen without console errors or failed requests after disabling critical-CSS inlining. Worker bundle: 3773.98 KiB / gzip 773.58 KiB. Generated assets: 6,525,311 bytes (4,994,798 PDF; 1,530,513 web, 62 files). Initial Angular bundle 501.38 kB produces a non-fatal 500 kB budget warning. Real provider success was skipped without secrets. No public deployment or physical-phone microphone test was performed.
+
+## Provider transport compatibility (task E)
+
+With Wrangler 4.156.0, compatibility date `2026-10-30` and `nodejs_compat`, the original real voice check returned 503. Temporary error-name/message logging identified `TypeError: Invalid redirect value, must be one of "follow" or "manual"` before the outbound request was sent. A local workerd probe confirmed `credentials:'omit'`, `cache:'no-store'` and `AbortSignal.any`/`timeout` are accepted. The incompatibility was `redirect:'error'`, also used by Logismata and voice hangup. [Cloudflare's Request documentation](https://developers.cloudflare.com/workers/runtime-apis/request/) describes this restriction.
+
+All external provider transports now use `api/src/provider-fetch.ts`: manual redirects, explicit refusal/cancellation of every 3xx response, omitted ambient credentials and stripped Cookie headers. Existing caller timeouts and Logismata's fixed host remain unchanged. Responses previously used the default redirect-following policy; it now uses the same guard and a transport-level 15-second signal bound, including response-body reads. The ASSETS binding fetch is internal and unchanged.
+
+Local verification on Node 24 (no account access/deploy):
+
+- `SPIKE_URL=http://127.0.0.1:8802 VOICE_SDP_FILE=/tmp/task-e-offer.sdp npm run check -w @pax/worker`: fresh headless Chromium offer, `Live voice session setup: passed` (201); HTTP, authenticated PDFs, origins and SSE also passed.
+- Temporary dedicated workerd harness importing the compiled provider clients: `LiveLogismataProvider.execute('saving3aLimits',{})` with a deliberately invalid token reached the real allowlisted host: HTTP 401, normal `UNAUTHORIZED` mapping. Successful calculations remain unverified without a valid Logismata token.
+- The same workerd harness called `openAiResponsesTransport` with the configured key and analysis model: HTTP 200, JSON parsed successfully.
+- Unit coverage includes all 3xx statuses, body cancellation, cookie stripping, caller error mappings, real Node redirect refusal, pre-aborted requests and timeouts while waiting for headers or reading bodies. Existing Logismata two-attempt timeout tests remain in place.
+
+Temporary error logging and the dedicated harness were removed after verification. No credentials, SDP answers or provider response content were logged or committed.
+
+Final checks: `npm test` — 474 tests, 473 passed, one pre-existing optional voice-agent skip, zero failures; Worker typecheck and dry-run build passed. All task E Wrangler dev/workerd processes were stopped.

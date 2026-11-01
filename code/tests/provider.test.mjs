@@ -60,7 +60,7 @@ test('a retirement response with a different need is held for review',()=> {
 test('live transport stays on the allowlisted server and keeps credentials out of returned results',async()=> {
   let calls=0;const p=new LiveLogismataProvider({...options,fetchImpl:async(url,init)=> {
     calls++;assert.equal(url,'https://baselhackathon2026.azurewebsites.net/viper/operation/standard/APICalc_getSaving3aLimits');
-    assert.equal(init.headers.Authorization,'Bearer server-only-test-token');assert.equal(init.redirect,'error');return response();
+    assert.equal(init.headers.get('Authorization'),'Bearer server-only-test-token');assert.equal(init.redirect,'manual');return response();
   }});
   const r=await p.execute('saving3aLimits',{});assert.equal(calls,1);assert.equal(r.provenance.mode,'live');
   assert.ok(!JSON.stringify(r).includes(options.token));assert.ok(!JSON.stringify(p).includes(options.token));
