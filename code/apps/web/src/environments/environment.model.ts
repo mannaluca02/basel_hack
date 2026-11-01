@@ -1,15 +1,10 @@
-/** Where the advisor data comes from: scripted synthetic replay or the real backend. */
-export type DataSourceMode = 'mock' | 'api';
-
 /**
  * Build-time frontend configuration.
  * Everything here ends up in the public bundle: never put tokens or other secrets in it.
  */
 export interface AppEnvironment {
-  readonly production: boolean;
   /** Base URL of the advisor backend. Relative so the app talks to its own origin. */
   readonly apiBaseUrl: string;
-  readonly dataSource: DataSourceMode;
   /**
    * Origin of the separate voice agent (Paxi) the customer can hand the case to; only the `paxi`
    * configuration sets it, the others talk through the live voice in the app. Must be `localhost`
@@ -26,6 +21,4 @@ export interface AppEnvironment {
    * conversation sets up the person and fills it (no Mueller persona, no ready calculations).
    */
   readonly liveStart?: boolean;
-  /** Debug configuration: the Voice Lab view with trace and raw payloads is reachable. */
-  readonly debugVoice?: boolean;
 }

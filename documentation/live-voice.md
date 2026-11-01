@@ -1,6 +1,6 @@
 # Live-Stimme
 
-Stand: 01.11.2026. Wie Paxi spricht, zuhört und das Gehörte in den Fall bringt. Starten und Debuggen: [Live-Voice und Voice Lab](baselhack/plans/voice-lab-debugging.md).
+Stand: 01.11.2026. Wie Paxi spricht, zuhört und das Gehörte in den Fall bringt.
 
 ## Ablauf
 
@@ -53,3 +53,19 @@ Paxi verlangt keine echten Namen, Geburtsdaten oder Gesundheitsdaten, erfindet k
 ## Sicherheit
 
 Die Tool-Aufrufe kommen über den Browser ins Backend. Das Backend prüft sie gegen das Transkript, das es selbst gespeichert hat, und nur mit erteilter Extraktions-Einwilligung. Ein manipulierter Browser könnte trotzdem Werte mit passendem Zitat einreichen. Für erfundene Daten ist das vertretbar; vor echten Kundendaten gehört die Delegation auf eine serverseitige Verbindung (Sideband) zur Session.
+
+## Starten und prüfen
+
+In der Root-`.env`: `OPENAI_API_KEY` und `PAX_SYNTHETIC_VOICE_ENABLED=1` (das schaltet auch die Extraktion ein). Dann im Verzeichnis `code/`:
+
+```sh
+npm run dev:live   # leerer Fall, Paxi stellt die Person im Gespräch auf und rechnet
+npm run dev:demo   # Demo-Fall Müller, Übernahme über die Karte
+```
+
+Der Mikrofon-Knopf erscheint nur, wenn das Backend GPT-Live und die Extraktion anbietet; ohne Extraktion startet kein Gespräch, statt still auf die Regel-Erkennung zurückzufallen. Der Modellweg wird beim Start verdrahtet (`apps/api/src/live-options.ts`): nach einer Änderung an der `.env` das Backend neu starten.
+
+Paxis Gesprächsführung kommt aus `code/voice-agent/persona.md` und den Skills mit `assigned: true` (`friendly-conversation`, `proposing-plans`); `GET /api/voice/settings` liefert sie, die gewählten Skills, das Zeitbudget und ein bevorzugtes Thema gehen beim Start als `conversationSettings` in den Prompt. Änderungen an den Skills gelten ab der nächsten Session.
+
+Im Browser zeigt die Konsole unter dem Filter `[paxi]` Fehler mit Code (`api_error`, `voice_error`). Automatisch geprüft wird der Weg über HTTP mit ersetztem OpenAI: `tests/live-voice-journey.test.mjs`, `tests/live-start.test.mjs`, `tests/live-reports.test.mjs`, `tests/live-questions.test.mjs`; ein ganzes erfundenes Gespräch mit dem echten Modell läuft mit `npm run test:live:conversation`.
+

@@ -19,7 +19,7 @@ function setup() {
       provideHttpClientTesting(),
       provideI18nTesting(),
       provideAdvisorDataSource(),
-      { provide: APP_ENVIRONMENT, useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api', voiceAgentUrl: PAXI } },
+      { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', voiceAgentUrl: PAXI } },
     ],
   });
   return { link: TestBed.inject(VoiceAgentLink), http: TestBed.inject(HttpTestingController) };
@@ -136,7 +136,7 @@ describe('VoiceAgentLink', () => {
         provideHttpClientTesting(),
         provideI18nTesting(),
         provideAdvisorDataSource(),
-        { provide: APP_ENVIRONMENT, useValue: { production: false, apiBaseUrl: '/api', dataSource: 'api' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api' } },
       ],
     });
     const link = TestBed.inject(VoiceAgentLink);

@@ -60,7 +60,7 @@ export class LocaleFormat {
   }
 }
 
-// The pipes are impure so they re-run when the locale signal changes; LocaleFormat caches the
+// The pipe is impure so it re-runs when the locale signal changes; LocaleFormat caches the
 // Intl formatters, so a re-run is cheap. `null`/`undefined` render as an empty string.
 
 @Pipe({ name: 'chf', pure: false })
@@ -68,29 +68,5 @@ export class ChfPipe implements PipeTransform {
   private readonly format = inject(LocaleFormat);
   transform(value: number | null | undefined, options?: Intl.NumberFormatOptions): string {
     return value == null ? '' : this.format.chf(value, options);
-  }
-}
-
-@Pipe({ name: 'localeNumber', pure: false })
-export class LocaleNumberPipe implements PipeTransform {
-  private readonly format = inject(LocaleFormat);
-  transform(value: number | null | undefined, options?: Intl.NumberFormatOptions): string {
-    return value == null ? '' : this.format.number(value, options);
-  }
-}
-
-@Pipe({ name: 'localePercent', pure: false })
-export class LocalePercentPipe implements PipeTransform {
-  private readonly format = inject(LocaleFormat);
-  transform(ratio: number | null | undefined, options?: Intl.NumberFormatOptions): string {
-    return ratio == null ? '' : this.format.percent(ratio, options);
-  }
-}
-
-@Pipe({ name: 'localeDate', pure: false })
-export class LocaleDatePipe implements PipeTransform {
-  private readonly format = inject(LocaleFormat);
-  transform(value: DateInput | null | undefined, options?: Intl.DateTimeFormatOptions): string {
-    return value == null ? '' : this.format.date(value, options);
   }
 }

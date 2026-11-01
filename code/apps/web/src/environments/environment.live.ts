@@ -7,9 +7,7 @@ import { AppEnvironment } from './environment.model';
  * PAX_SYNTHETIC_VOICE_ENABLED=1 and OPENAI_API_KEY.
  */
 export const environment: AppEnvironment = {
-  production: false,
   apiBaseUrl: '/api',
-  dataSource: 'api',
   demoStart: true,
   liveStart: true,
 };

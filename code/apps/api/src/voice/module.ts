@@ -16,14 +16,10 @@ class PublicVoiceController {
     constructor(
     @Inject(LIFE_RUNTIME)
     private readonly r: LifeRuntime) { }
-    @Get('providers')
-    providers() { return this.r.voice.providers(); }
     @Get('privacy')
     privacy(
     @Query('locale')
     selected: unknown) { return this.r.voice.privacy(selected === undefined ? 'de' : z.enum(['de', 'fr', 'it', 'en']).parse(selected)); }
-    @Get('portfolio')
-    catalog() { return this.r.voice.catalog(); }
     @Get('settings')
     settings() { return voicePromptSettings(); }
 }
@@ -65,16 +61,6 @@ class CaseVoiceController {
     sid: string,
     @Body()
     body: unknown) { return this.r.voice.ingest(req.actor, uuid(id), uuid(sid), body); }
-    @Post(':voiceSessionId/extraction')
-    extraction(
-    @Req()
-    req: Request,
-    @Param('caseId')
-    id: string,
-    @Param('voiceSessionId')
-    sid: string,
-    @Body()
-    body: unknown) { return this.r.voice.propose(req.actor, uuid(id), uuid(sid), body); }
     @Post(':voiceSessionId/close')
     close(
     @Req()

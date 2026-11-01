@@ -37,7 +37,6 @@ export const ExtractorContextBaseSchema=z.object({handover:HumanHandoverSchema.d
   writablePaths:z.array(z.string().max(200)).max(3000),
   policy:z.object({noRawHealthData:z.literal(true),noProviderTokens:z.literal(true),noExternalAiTransferAuthorized:z.literal(true),customerConfirmationRequired:z.literal(true)}).strict(),
 }).strict();
-export type ProposalBatchInput=z.infer<typeof ProposalBatchInputSchema>;
 export type ProposalBatch=z.infer<typeof ProposalBatchSchema>;
 export type ProposalChangeInput=z.infer<typeof ProposalChangeInputSchema>;
 export type CaseAmbiguity=z.infer<typeof CaseAmbiguitySchema>;

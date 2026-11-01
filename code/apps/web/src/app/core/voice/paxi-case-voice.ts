@@ -17,7 +17,8 @@ export interface PaxiCaseVoiceOptions {
   onTurn(speaker:'customer'|'agent',text:string,segmentation:'client-settled'):void;
   onAudio(stream:MediaStream|null):void;
   onEvent(event:{type:'activity';state:'idle'|'listening'|'thinking'}|{type:'emotion';emotion:ReplyEmotion}):void;
-  onTrace(direction:'send'|'receive'|'local',payload:unknown):void;
+  /** Optional diagnostics of the data channel and local decisions. */
+  onTrace?(direction:'send'|'receive'|'local',payload:unknown):void;
   /** GPT-Live handed a turn to its background model (sessions with reports). */
   onDelegation?(id:string):void;
   /** The background model's tool calls of one delegation, once its response finished (possibly none). */
@@ -126,7 +127,7 @@ export class PaxiCaseVoice {
   private message(raw:unknown):void {
     let event:Record<string,unknown>;
     try {event=JSON.parse(String(raw)) as Record<string,unknown>;}catch{return;}
-    this.options.onTrace('receive',event);
+    this.options.onTrace?.('receive',event);
     if(typeof event['event_id']==='string') {
       if(this.seen.has(event['event_id']))return;
       this.seen.add(event['event_id']);if(this.seen.size>1000)this.seen.delete(this.seen.values().next().value!);
@@ -141,7 +142,7 @@ export class PaxiCaseVoice {
       const provider=Object.fromEntries(['type','code','message','param'].filter(key=>typeof source?.[key]==='string').map(key=>[key,diagnosticText(source![key] as string)]));
       // The notes are optional: a refused tool update or delegation costs the reports, not the call.
       if(/delegation|tool_outputs|function_call_outputs|responses_validation/i.test(['code','param','message'].map(key=>source?.[key]).filter(v=>typeof v==='string').join(' ')))
-        this.options.onTrace('local',{code:'DELEGATION_ERROR',provider,conversationContinues:true});
+        this.options.onTrace?.('local',{code:'DELEGATION_ERROR',provider,conversationContinues:true});
       else this.fail('VOICE_PROVIDER_ERROR',{provider});
     }
     else if(type==='session.delegation.created')this.delegationStarted(event);
@@ -235,12 +236,12 @@ export class PaxiCaseVoice {
 
   private send(payload:unknown):void {
     if(!this.running||this.channel?.readyState!=='open')return;
-    this.channel.send(JSON.stringify(payload));this.options.onTrace('send',payload);
+    this.channel.send(JSON.stringify(payload));this.options.onTrace?.('send',payload);
   }
   private fail(code:string,details:Record<string,unknown>={}):void {console.warn('[paxi]',{event:'voice_error',code,...details});this.stop();this.options.onStatus('error',code);}
   private async closeRemote(sessionId:string):Promise<void> {
     try {await this.options.close(sessionId);}
-    catch {this.options.onTrace('local',{code:'REMOTE_CLOSE_FAILED',localMediaStopped:true});}
+    catch {this.options.onTrace?.('local',{code:'REMOTE_CLOSE_FAILED',localMediaStopped:true});}
   }
   private ice(peer:RTCPeerConnection):Promise<void> {
     if(peer.iceGatheringState==='complete')return Promise.resolve();

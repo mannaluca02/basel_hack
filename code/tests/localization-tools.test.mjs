@@ -48,7 +48,7 @@ test('translation catalogs cover identical customer keys in all four languages w
 test('processing notice and safe error messages respect locale before authentication',async()=>{
   for(const locale of ['de','fr','it','en']){
     const privacy=await call('GET','/api/privacy',undefined,{'Accept-Language':locale+'-CH'},null);assert.equal(privacy.body.locale,locale);assert.ok(privacy.body.display.storage);
-    const error=await call('GET','/api/cases',undefined,{'Accept-Language':locale+'-CH'},null);assert.equal(error.status,401);assert.equal(error.body.code,'UNAUTHORIZED');assert.equal(error.body.locale,locale);assert.equal(error.headers.get('content-language'),locale);
+    const error=await call('GET',`/api/cases/${crypto.randomUUID()}`,undefined,{'Accept-Language':locale+'-CH'},null);assert.equal(error.status,401);assert.equal(error.body.code,'UNAUTHORIZED');assert.equal(error.body.locale,locale);assert.equal(error.headers.get('content-language'),locale);
     assert.notEqual(error.body.message,'UNAUTHORIZED');
   }
   assert.equal((await call('GET','/api/translations?locale=es',undefined,{},null)).status,400);
@@ -93,7 +93,6 @@ test('all 24 declared provider operations have one exact archived reference',asy
 });
 test('all eight extra calculators are protected opt-in estimates and leave the financial run unchanged',async()=>{
   let c=await newCase('fr',true);const analysis=await analyze(c);const path=`/api/cases/${c.id}/calculator-tools`;
-  const list=await call('GET',path);assert.equal(list.body.length,8);
   for(const op of AdditionalOperations){
     c=(await call('GET',`/api/cases/${c.id}`)).body;const input=await toolInput(op,c);
     const r=await call('POST',path,input);assert.equal(r.status,201,JSON.stringify(r.body));assert.equal(r.body.operation,op);assert.equal(r.body.scope,'isolated_calculator_estimate');assert.equal(r.body.profileMutated,false);

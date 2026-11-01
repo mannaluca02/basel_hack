@@ -4,10 +4,7 @@ import { provideI18nTesting } from './i18n-testing';
 import { AppLanguage } from './language';
 import {
   ChfPipe,
-  LocaleDatePipe,
   LocaleFormat,
-  LocaleNumberPipe,
-  LocalePercentPipe,
 } from './locale-format';
 
 // Exact strings depend on the ICU/CLDR version of the runtime (Node vs. each browser), so these
@@ -64,28 +61,23 @@ describe('LocaleFormat', () => {
 });
 
 @Component({
-  imports: [ChfPipe, LocaleNumberPipe, LocalePercentPipe, LocaleDatePipe],
+  imports: [ChfPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span>{{ amount | chf }}</span
-    ><span>{{ amount | localeNumber }}</span
-    ><span>{{ 0.125 | localePercent }}</span
-    ><span>{{ day | localeDate }}</span
-    ><span>{{ missing | chf }}</span>`,
+  template: `<span>{{ amount | chf }}</span><span>{{ missing | chf }}</span>`,
 })
 class FormatHost {
   readonly language = inject(AppLanguage);
   protected readonly amount = 1234.5;
-  protected readonly day = DAY;
   protected readonly missing: number | null = null;
 }
 
-describe('locale pipes', () => {
+describe('chf pipe', () => {
   beforeEach(() => {
     localStorage.clear();
     TestBed.configureTestingModule({ providers: [provideI18nTesting()] });
   });
 
-  it('re-render an OnPush view when the language changes, without reload', async () => {
+  it('re-renders an OnPush view when the language changes, without reload', async () => {
     const fixture = TestBed.createComponent(FormatHost);
     await fixture.whenStable();
     const texts = () =>
@@ -93,20 +85,14 @@ describe('locale pipes', () => {
         s.textContent?.trim(),
       );
 
-    const [chf, number, percent, date, missing] = texts();
+    const [chf, missing] = texts();
     expect(chf).toMatch(/^CHF/);
-    expect(number).toMatch(/^1.234\.5$/);
-    expect(percent).toMatch(/^12\.5/);
-    expect(date).toBe('31.10.2026');
     expect(missing).toBe('');
 
     await fixture.componentInstance.language.use('fr');
     await fixture.whenStable();
 
-    const [chfFr, numberFr, percentFr, dateFr] = texts();
+    const [chfFr] = texts();
     expect(chfFr).toMatch(/CHF$/);
-    expect(numberFr).toMatch(/^1.234,5$/);
-    expect(percentFr).toMatch(/^12,5/);
-    expect(dateFr).toMatch(/oct/);
   });
 });

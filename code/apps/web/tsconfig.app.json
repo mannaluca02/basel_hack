@@ -9,8 +9,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/app/debug-routes.voice.ts",
-    "src/app/features/voice-lab/**"
+    "src/**/*.spec.ts"
   ]
 }

@@ -29,7 +29,7 @@ flowchart LR
 |---|---|---|
 | Web-App | `code/apps/web` | Angular 22. Paxi in der Mitte, Tabs Grafiken, Risiken, Chat, Info, Abschluss; Live-Stimme über WebRTC; Annahme, Bestätigung, Abschlussweg |
 | API | `code/apps/api` | NestJS. Ein gemeinsamer Fall pro Kunde: Aufnahme, Vorschläge, Bestätigung, Berechnung, Empfehlung, Angemessenheitsprüfung, Demo-Vertragsweg, Dossier; Voice-Sessions und Auswertung der Gesprächsturns |
-| Verträge | `code/packages/contracts` | Zod-Schemas, von API und Web-App gemeinsam benutzt; JSON-Schemas in `schemas/` werden daraus exportiert |
+| Verträge | `code/packages/contracts` | Zod-Schemas, von API und Web-App gemeinsam benutzt; `GET /api/openapi.json` beschreibt die Routen daraus |
 | Fachlogik | `code/packages/domain` | Budget, Kapital, Pflichtfelder (`intakeQuestions`), Lebensversicherungsbedarf |
 | Worker | `code/apps/worker` | Cloudflare Worker `paxi`: dieselbe NestJS-API in einem Durable Object plus die gebaute App als statische Dateien |
 | Voice-Agent | `code/voice-agent` | Darios eigenständiger Paxi (Konfiguration `paxi`). Seine Persona und Skills speisen auch die eingebaute Live-Stimme |
@@ -66,9 +66,8 @@ Alle Befehle im Verzeichnis `code/`, Zugangsdaten in der Root-`.env` (Vorlage `.
 |---|---|---|
 | `npm run dev:live` | `live` | Das Produkt: leerer Fall, Paxi stellt die Person im Gespräch auf, übernimmt automatisch und rechnet |
 | `npm run dev:demo` | `demo` | Demo-Start mit der Persona Müller, fertig gerechnet; Live-Stimme mit Übernahme-Karte |
-| `npm run dev:debug` | `debug` | Wie `demo`, plus Voice-Lab-Ansicht mit Trace |
 | `npm run dev:paxi` | `paxi` | Darios eigenständiger Paxi in eigenem Fenster (Port 3100) |
-| `npm --prefix apps/web start` | `development` | Nur die App mit Mock-Daten, ohne Backend |
+| `npm start` und `npm --prefix apps/web start` | `development` | Backend und App einzeln, mit Anmeldung und Review-Stand |
 
 Die Backend-Seite ist immer `npm start` (Port 3000) mit `PAX_DEMO_START=1`; `dev:*` startet Backend und App (Port 4200) zusammen. Die öffentliche Version ist der Build `live-production` auf dem Worker.
 

@@ -75,41 +75,19 @@
           }
         </a>
       }
-      @if (liveVoice) {
-        <a class="tab" routerLink="/journey" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
-          <span class="glyph">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M7 3h7l5 5v13H7ZM14 3v5h5M10 14.5l1.8 1.8L15.5 12.5" />
-            </svg>
-          </span>
-          <span class="label">{{ 'nav.journey' | transloco }}</span>
-        </a>
-      }
-      @if (debugVoice) {
-        <a class="tab" routerLink="/voice-lab" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
-          <span class="glyph">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9" />
-            </svg>
-          </span>
-          <span class="label">{{ 'lab.title' | transloco }}</span>
-        </a>
-        <a class="tab" routerLink="/insights" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
-          <span class="glyph">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M4 20h16M7 16v-5M12 16V6M17 16v-8" />
-            </svg>
-          </span>
-          <span class="label">{{ 'insights.title' | transloco }}</span>
-        </a>
-      }
+      <a class="tab" routerLink="/journey" routerLinkActive="tab--active" ariaCurrentWhenActive="page">
+        <span class="glyph">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 3h7l5 5v13H7ZM14 3v5h5M10 14.5l1.8 1.8L15.5 12.5" />
+          </svg>
+        </span>
+        <span class="label">{{ 'nav.journey' | transloco }}</span>
+      </a>
     </nav>
 
     <!-- The live voice loads after the workspace, in its own chunk. -->
-    @if (liveVoice) {
-      @defer (on idle) {
-        <app-live-voice-control class="live-voice" />
-      }
+    @defer (on idle) {
+      <app-live-voice-control class="live-voice" />
     }
   </div>
 

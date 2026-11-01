@@ -58,8 +58,6 @@ export const ComplianceStepSchema=z.object({
 }).strict();
 
 export type SuitabilityAnswers=z.infer<typeof SuitabilityAnswersSchema>;
-export type SuitabilityCheckInput=z.infer<typeof SuitabilityCheckInputSchema>;
 export type SuitabilityCheck=z.infer<typeof SuitabilityCheckSchema>;
 export type SuitabilityView=z.infer<typeof SuitabilityViewSchema>;
-export type ComplianceStep=z.infer<typeof ComplianceStepSchema>;
 export type InvestmentStrategy=z.infer<typeof InvestmentStrategySchema>;

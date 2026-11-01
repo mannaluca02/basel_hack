@@ -127,7 +127,7 @@ test('the confirmation HTTP routes enforce cookie CSRF and expose shared request
  const path=`/api/cases/${c.id}/customer-confirmations`,body={expectedCaseRevision:c.caseRevision,target:{kind:'confirm_profile'},channel:'screen',questionTurnId:'http_profile_turn',questionReplyId:'http_profile_reply'};
  assert.equal((await call('POST',path,body,{Cookie:`pax_session=${login.sessionToken}`})).status,403);
  const q=(await call('POST',path,body,{Cookie:`pax_session=${login.sessionToken}`,'X-CSRF-Token':login.csrfToken})).body;CustomerConfirmationSchema.parse(q);
- assert.equal((await call('GET',`${path}/current`,null,auth)).body.confirmation.id,q.id);assert.equal((await call('GET',`${path}/${q.id}`)).status,401);
+ assert.equal((await call('GET',`${path}/current`,null,auth)).body.confirmation.id,q.id);assert.equal((await call('GET',`${path}/current`)).status,401);
  const binding={expectedCaseRevision:q.basisCaseRevision,questionId:q.questionId,questionHash:q.questionHash,questionTurnId:q.questionTurnId,questionReplyId:q.questionReplyId};
  assert.equal((await call('POST',`${path}/${q.id}/presented`,{...binding,reviewDisplayed:true,profileAndAssumptionsDisplayed:true,privacyNoticeDisplayed:true},auth)).status,201);
  const result=await call('POST',`${path}/${q.id}/answer`,{...binding,channel:'screen',decision:'accept',answerMessageId:'http_screen_answer'},auth);assert.equal(result.status,201);assert.equal(result.body.profileVersion,1);

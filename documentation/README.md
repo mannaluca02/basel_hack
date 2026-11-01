@@ -21,7 +21,6 @@ Stand: 01.11.2026. Pax Challenge, BaselHack 2026: „Pax Digital Advisor“, ein
 | [Bestätigungen und Unklarheiten](baselhack/plans/voice-confirmation-and-dialogue.md) | Gebundene Kundenbestätigungen, Gesprächsstatus beantworteter Unklarheiten |
 | [Voice-Sessions im Backend](baselhack/plans/voice-backend-integration.md) | `/voice/sessions`, Transkript, GPT-Live- und ElevenLabs-Adapter |
 | [Persönliche Beratung](baselhack/plans/human-advisor-handover.md) | Der Übergabe-Schalter und was er stoppt |
-| [Live-Voice und Voice Lab](baselhack/plans/voice-lab-debugging.md) | Starten, Debug-Konfiguration, Trace |
 | [Paxi-Voice-Agent](../code/voice-agent/README.md) | Darios eigenständiger Paxi, Persona, Skills, Fragebogen |
 | [Worker](../code/apps/worker/README.md) | Cloudflare-Betrieb, Prüfung, Diagnose |
 

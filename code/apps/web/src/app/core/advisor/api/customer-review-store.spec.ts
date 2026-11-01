@@ -28,7 +28,7 @@ describe('review mutations update the canonical view without SSE notifications',
     vi.stubGlobal('EventSource', FakeEventSource);
     TestBed.configureTestingModule({ providers: [
       provideHttpClient(), provideHttpClientTesting(), provideI18nTesting(),
-      { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api' } },
+      { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api' } },
       { provide: AdvisorDataSource, useClass: ApiDataSource },
     ] });
     TestBed.inject(Consent).grant();

@@ -79,12 +79,6 @@ test('corrections supersede complete open batches with reciprocal links and cann
  await assert.rejects(f.propose('cannot_replace',changes,{supersedesBatchIds:[next.id]}),e=>e.code==='PROPOSAL_NOT_OPEN');
  InsuranceCaseDtoSchema.parse(localizedCase(f.get()));
 });
-test('legacy open proposals can be replaced explicitly by a batch and become unacceptably superseded',async t=>{
- const f=await fixture(t),old=await f.r.advisory.propose(f.agent,f.id,{messageId:'legacy',path:'financial.persons.0.income.value',value:8200000,expectedProfileVersion:1});
- const batch=await f.propose('replace_legacy',[f.change('financial.persons.0.income.value',8100000)],{supersedesProposalIds:[old.id]});
- assert.equal(f.get().proposals[0].replacedByBatchId,batch.id);await assert.rejects(f.r.advisory.accept(f.customer,f.id,old.id,{expectedCaseRevision:f.get().caseRevision,accept:true}),e=>e.code==='PROPOSAL_NOT_OPEN');
- InsuranceCaseDtoSchema.parse(localizedCase(f.get()));
-});
 test('ambiguities have stable identities and provenance, persist, block confirmation and resolve with customer-accepted answers',async t=>{
  const f=await fixture(t),path='financial.persons.0.income.value';
  await f.propose('question',[],{ambiguities:[{path,personId:'person_demo_1',question:'Ist dieses Einkommen pro Monat oder Jahr?',source:{messageId:'question',turnId:'turn_question',sourceRef:'synthetic:question'}}]});
@@ -93,15 +87,6 @@ test('ambiguities have stable identities and provenance, persist, block confirma
  const batch=await f.propose('answer',[f.change(path,8100000)],{resolvesAmbiguityIds:[ambiguity.id]});
  assert.equal(f.get().ambiguities[0].status,'open');await f.accept(batch);assert.equal(f.get().ambiguities[0].status,'resolved');assert.equal(f.get().ambiguities[0].resolvedByBatchId,batch.id);
  await f.confirm();InsuranceCaseDtoSchema.parse(localizedCase(f.get()));
-});
-test('customer can resolve a clarification without changing financial data; agents cannot resolve, accept or confirm',async t=>{
- const f=await fixture(t),path='insurance.relationship';await f.propose('question',[],{ambiguities:[{path,question:'Welche Situation gilt?',source:{messageId:'question',turnId:'turn_1',sourceRef:'synthetic:question'}}]});
- const id=f.get().ambiguities[0].id,body={expectedCaseRevision:f.get().caseRevision,resolved:true,resolutionSourceRef:'synthetic:customer_clarified'};
- await assert.rejects(f.r.extraction.resolveAmbiguity(f.agent,f.id,id,body),e=>e.code==='FORBIDDEN');
- await assert.rejects(f.r.extraction.acceptBatch(f.agent,f.id,'any',{expectedCaseRevision:f.get().caseRevision,accept:true}),e=>e.code==='FORBIDDEN');
- await assert.rejects(f.r.extraction.proposeBatch(f.customer,f.id,f.input('customer',[])),e=>e.code==='FORBIDDEN');
- const hash=f.ctx().draftHash;await f.r.extraction.resolveAmbiguity(f.customer,f.id,id,body);assert.equal(f.ctx().draftHash,hash);
- InsuranceCaseDtoSchema.parse(localizedCase(f.get()));
 });
 test('empty cases can initialize financial and insurance structures in one validated batch without granting confirmation',async t=>{
  const f=await fixture(t,false),draft=await lifeDraft();assert.equal(f.ctx().profileVersion,null);
@@ -136,7 +121,6 @@ test('HTTP extraction routes, OpenAPI and optional Nest feature modules share th
  const proposed=await call('POST',`/api/cases/${c.id}/advisor/proposal-batches`,agent.sessionToken,input);assert.equal(proposed.status,201);ProposalBatchSchema.parse(proposed.body);
  const openapi=(await call('GET','/api/openapi.json')).body;assert.ok(openapi.paths['/api/cases/{caseId}/advisor/extractor-context']);assert.ok(openapi.components.schemas.ExtractorContext);
  assert.equal(ProposalBatchInputSchema.safeParse({...input,changes:[{path:'insurance.relationship',value:'single'},{path:'insurance.relationship',value:'married'}]}).success,false);
- assert.equal(runtime.engine.list(runtime.sessions.authenticate(customer.sessionToken)).length,1);
 });
 
 test('open extraction ambiguities withhold spoken facts and block new advice calculations until resolved',async t=>{

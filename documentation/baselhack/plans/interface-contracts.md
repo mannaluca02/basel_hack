@@ -297,14 +297,14 @@ Die konkrete Anbieterschnittstelle für Tools oder Sitzungsupdates wird vor der 
 
 Der [Start-/Integrationsleitfaden](../../../code/README.md) und `/api/openapi.json` beschreiben die ausführbaren Routen. Die TypeScript-/Zod-Verträge in `code/packages/contracts` sind für implementierte Payloads maßgeblich. Die obigen Turn-/Voice-Nachrichten bleiben die Integrationsaufgabe von Dario und Earnie; es wird keine dort noch fehlende Antwortgenerierung behauptet.
 
-Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt `/graph-context`, Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
+Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
 
 
 ## 10. Implementierter Backend-Anschluss (31.10.2026)
 
 Der [Start-/Integrationsleitfaden](../../../code/README.md) und `/api/openapi.json` beschreiben die ausführbaren Routen. Die TypeScript-/Zod-Verträge in `code/packages/contracts` sind für implementierte Payloads maßgeblich. Die obigen Turn-/Voice-Nachrichten bleiben die Integrationsaufgabe von Dario und Earnie; es wird keine dort noch fehlende Antwortgenerierung behauptet.
 
-Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt `/graph-context`, Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
+Der gemeinsame Fall wird im geschützten Backend gehalten. Earnie liest vor jeder Antwort `/advisor/context`; `/advisor/events` meldet Kontextrevisionen zum erneuten Einlesen. Luca setzt Szenarien und gespeicherte `/comparisons`; Lukas verwendet `progress` mit getrenntem `reviewOpen`. Finanzielle Profiländerungen werden vorgeschlagen, vom Kunden akzeptiert und anschließend separat bestätigt/berechnet. Kein Transkript mutiert still den bestätigten Fall. Die gemeinsame Team-Abnahme bleibt ausstehend.
 
 
 ## 11. Verbindlicher Shared-Vertrag v1 und Team-Anbindung

@@ -20,4 +20,3 @@ export const HumanHandoverViewSchema=z.object({caseId:Id,caseRevision:z.number()
 export const HumanHandoverCommandResponseSchema=HumanHandoverViewSchema.extend({command:z.object({messageId:Id,action:z.enum(['request','resume']),replayed:z.boolean(),changed:z.boolean()}).strict()}).strict();
 export type HumanHandover=z.infer<typeof HumanHandoverSchema>;
 export type HumanHandoverView=z.infer<typeof HumanHandoverViewSchema>;
-export type HumanHandoverCommand=z.infer<typeof HumanHandoverCommandSchema>;

@@ -42,7 +42,6 @@ export const SessionResponseSchema=z.object({sessionToken:z.string().regex(/^[A-
 export const AgentAccessResponseSchema=z.object({sessionToken:z.string().regex(/^[A-Za-z0-9_-]{40,100}$/),role:z.literal('advisor'),caseId:Id,expiresAt:z.iso.datetime()}).strict();
 export type AdvisorContext=z.infer<typeof AdvisorContextSchema>;
 export type AdvisorContextUpdated=z.infer<typeof AdvisorContextUpdatedSchema>;
-export type WholeLifeProgress=z.infer<typeof WholeLifeProgressSchema>;
 export type QuestionsResponse=z.infer<typeof QuestionsResponseSchema>;
 export type ApiError=z.infer<typeof ApiErrorSchema>;
 export type SessionResponse=z.infer<typeof SessionResponseSchema>;

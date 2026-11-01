@@ -35,7 +35,7 @@ Der Live-Test erzeugt eine eigene temporäre verschlüsselte Datenbank und räum
 
 ## Testabdeckung
 
-Stand 01.11.2026: Backend 96 % der Funktionen und 99 % der Zeilen, Web-App 95 % und 97 %, Voice-Agent 89 % und 87 % (ohne die Browser-Skripte unter `public/`). End-to-End über HTTP laufen: Demo-Start und Live-Voice (`tests/live-voice-journey.test.mjs`), Abschluss bis zur Demo-Police (`contract-journey`), gewählter Grafikpunkt (`graph-context`), jede Route einmal über den echten Controller (`http-routes`) und Darios Paxi-Server (`voice-agent/server.test.mjs`). Ersetzt werden dabei nur Logismata und OpenAI.
+Stand 01.11.2026: Backend 96 % der Funktionen und 99 % der Zeilen, Web-App 95 % und 97 %, Voice-Agent 89 % und 87 % (ohne die Browser-Skripte unter `public/`). End-to-End über HTTP laufen: Demo-Start und Live-Voice (`tests/live-voice-journey.test.mjs`), Abschluss bis zur Demo-Police (`contract-journey`), jede Route einmal über den echten Controller (`http-routes`) und Darios Paxi-Server (`voice-agent/server.test.mjs`). Ersetzt werden dabei nur Logismata und OpenAI.
 
 ## Angular anbinden
 
@@ -108,8 +108,7 @@ Der Kunde kann `/agent-access` aufrufen; der kurzlebige Bearer-Token ist ausschl
 1. Earnie liest vor jeder Antwort `/advisor/context`. Dieser Stand enthält Versionen, aktuell zulässige Fakten, ausgewählte Grafikdaten, letzte passende Szenariodifferenz, Rückfrage, Sprache, Tempo und Fortschritt. Er enthält keine Provider-Tokens oder Gesundheitsrohdaten und erteilt keine Erlaubnis für externe Modellübertragung.
 2. `/advisor/events` liefert SSE-Ereignisse `advisor.context.updated` mit Referenzen und Kontextrevision, keine vollständigen finanziellen Datensätze. Nach einem Event wird der aktuelle Kontext neu gelesen. Reconnect liefert den aktuellen Snapshot; ein garantierter vollständiger Event-Replay wird nicht versprochen.
 3. Einkommens-/Profil-/Szenariowechsel können eine laufende Antwort ungültig machen. Earnie/Dario vergleichen Run, Profil, Kontext und Turn und verwerfen dann den alten Antwort-/Audiostand. Tempoänderungen und neue Vorschläge werden vor der nächsten Antwort eingelesen. Audio-Unterbrechung und Playback-Events implementiert Dario.
-4. Ein Transkript erzeugt nur `/advisor/proposals`. Der Kunde akzeptiert über `/accept`; danach bleiben Gesamtbestätigung und Neuberechnung getrennt notwendig. Eine Änderung des Entwurfs macht einen älteren Vorschlag ungültig.
-5. Luca setzt `/graph-context` mit exaktem Fall/Run/Profil/Szenario/Person/Kennzahl/Zeitraum. Zeitachsenbereiche bleiben Monatsserien; längere Bereiche erhalten eine kompakte Bereichszusammenfassung. Gesprochene Zahlen dürfen nur aus den passenden freigegebenen Fakten kommen.
+4. Ein Transkript erzeugt nur Vorschlagspakete (`/advisor/proposal-batches`). Der Kunde akzeptiert über `/accept`; danach bleiben Gesamtbestätigung und Neuberechnung getrennt notwendig. Eine Änderung des Entwurfs macht einen älteren Vorschlag ungültig.
 
 Der fachliche Fortschritt steht unter `context.progress`, einschließlich Pflichtgruppen und getrenntem `reviewOpen`. 100 % Aufnahme bedeutet keine 100 % Absicherung. Lukas nutzt diese Daten für den vereinbarten Fortschrittsring am Agenten.
 
@@ -130,9 +129,6 @@ Alle Prämien sind `null` mit `pax_tariff_api_unavailable`. Alle Policen tragen 
 Synthetische Datenklassifikation und Hinweisversion sind Pflicht; echte Kundendatenklassifikation und Gesundheitsrohdaten werden an der Eingabeschnittstelle abgewiesen. Fachwerte bleiben verschlüsselt gespeichert; Audit-Ereignisse enthalten technische IDs/Aktionen statt vollständiger Profile. Kunden dürfen ausschließlich eigene Fälle lesen. Die Reviewer-Rolle sieht Fälle erst nach einer Review-Anfrage. Agenten erhalten minimale fallgebundene Projektionen.
 
 Sitzungen laufen nach einer Stunde, Agentzugänge nach 15 Minuten, Fälle nach 24 Stunden aus. Die automatische Bereinigung läuft minütlich, nach Neustart wieder; abgelaufene Fälle sind sofort nicht mehr abrufbar. `DELETE /cases/:id` entfernt den Fall mit zugehörigem NPS und Agentzugängen. Technische Audit-Einträge werden begrenzt und nach 24 Stunden regelmäßig bereinigt; Löschung ist dort als technische Aktion dokumentiert. Für den produktiven Betrieb braucht es eine Pax-freigegebene Aufbewahrungs-/Lösch-/Backup-Strategie, Schlüsselverwaltung, TLS/IAM und rechtliche Prüfung.
-
-Optionales `/feedback` nimmt einen NPS-Wert ohne Freitext je erreichtem Schritt an. `/insights` liefert ausschließlich der Reviewer-Rolle aggregierte Phasen-/NPS-/Blocker-Signale. Zehn Minuten Inaktivität ohne Police ist ausdrücklich ein potenzieller Drop-off, kein nachgewiesener Abbruch. Diese Feedback-/Insights-Routen führen keine externen Analytics-/Modellaufrufe aus.
-
 
 ## Vollständige Tool-Abdeckung und vier Sprachen
 
@@ -168,7 +164,7 @@ Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjek
 
 Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/architecture.md#datenhaltung) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
 
-Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt 40 [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und alle Backend-Tests.
+Für Komponenten ausserhalb von TypeScript beschreibt `GET /api/openapi.json` alle Routen mit ihren Schemas.
 
 ## Dialogextraktion und Vorschlagspakete
 

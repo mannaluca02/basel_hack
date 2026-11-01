@@ -40,7 +40,7 @@ Auslöser ist die ausdrückliche Kundenaktion „Mit einem Berater sprechen“ o
 
 Für den vermittelten Sprachwunsch ist `source=voice` möglich, weiterhin über den Kundenclient. Das bestätigt keine Finanzangaben und keinen Versicherungsvertrag. Intern verwendet ein Nest-Modul `runtime.handover.command(customerActor, caseId, input)` und `runtime.handover.read(authorizedActor, caseId)`.
 
-Die Antwort ist `HumanHandoverCommandResponseSchema`: `caseId`, `caseRevision`, `contextRevision`, `handover`, `contact`, sowie `command` mit `messageId`, `action`, `changed` und `replayed`. [Typisierter Browser-Aufruf und Stop-Handler](../../../code/examples/contracts/team-client.ts).
+Die Antwort ist `HumanHandoverCommandResponseSchema`: `caseId`, `caseRevision`, `contextRevision`, `handover`, `contact`, sowie `command` mit `messageId`, `action`, `changed` und `replayed`.
 
 Zur Wiederaufnahme sendet der Kunde `action=resume` mit neuer Nachrichten-ID und aktueller Fallrevision. Die Flags werden `false`, Status `digital`, und `resumedAt` wird gesetzt. Offene menschliche Review-Aufgaben bleiben offen. Es folgt ein neuer Gesprächszug mit frisch geladenem Kontext; alte Voice-/Modellantworten werden nicht fortgesetzt.
 

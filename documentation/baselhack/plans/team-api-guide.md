@@ -35,10 +35,8 @@ npm start
 | [conversation.ts](../../../code/packages/contracts/src/conversation.ts) | VoiceLog, AgentReply, VoicePlaybackEvent, GraphExplanationRequest |
 | [summary.ts](../../../code/packages/contracts/src/summary.ts) | Portal und Kunden-/Fachpersonen-Summary desselben Snapshots |
 | [financial.ts](../../../code/packages/contracts/src/financial.ts), [insurance.ts](../../../code/packages/contracts/src/insurance.ts), [life-analysis.ts](../../../code/packages/contracts/src/life-analysis.ts) | Fachliche Eingaben und vollständige Rechenausgaben |
-| [team-client.ts](../../../code/examples/contracts/team-client.ts) | Tatsächlich kompilierte Client-Beispiele für alle Rollen |
-| [JSON-Schemas](../../../code/packages/contracts/schemas/) | Zehn versionierte Exporte für z. B. Python-Komponenten |
 
-`npm run typecheck:clients` kompiliert die Team-Beispiele mit DOM-Typen und ohne Node-Ambienttypen. `npm run contracts:export` aktualisiert die JSON-Schemas; `npm run contracts:check` prüft deren Aktualität. Beide Prüfungen sind Teil von `npm test`. `npm run contracts:examples` erzeugt ausserdem sechs vollständig synthetische [zusammengehörige JSON-Beispiele](../../../code/fixtures/contracts/). Sie enthalten keine Sitzungs-/Providerzugangsdaten und verwenden einen injizierten Testprovider; ihre IDs sind keine bestehenden Serverfälle. Die laufende API liefert `/api/openapi.json` mit denselben Eingabe-/Antwortschemas und einer SSE-Datenschema-Referenz.
+Die vollständige Routenbeschreibung mit Schemas liefert `GET /api/openapi.json`.
 
 ```ts
 import {
@@ -117,9 +115,6 @@ Alle folgenden Pfade beginnen mit `/api`. `:id` bezeichnet die serverseitige Fal
 | `POST /cases/:id/agent-access` | `{}` | `AgentAccessResponseSchema` |
 | `GET /cases/:id/advisor/context` | Kunde oder Agent-Bearer | `AdvisorContextSchema` |
 | `GET /cases/:id/advisor/events` | Derselbe berechtigte Kontext | SSE; Daten: `AdvisorContextUpdatedSchema` |
-| `POST /cases/:id/advisor/proposals` | `AdvisorProposalInputSchema` | `AgentProposalSchema`; nur Agent |
-| `POST /cases/:id/advisor/proposals/:proposalId/accept` | `AcceptProposalInputSchema` | Neue Revision; Gesamtbestätigung bleibt notwendig |
-| `POST /cases/:id/graph-context` | Ausschliesslich `GraphContextSchema` | Exakt geprüfte Grafikfakten |
 | `PATCH /cases/:id/preferences` | `CasePreferencesSchema`; mindestens Locale oder Zeitbudget | Neue Kontextrevision, Finanzlauf bleibt gültig |
 | `GET /cases/:id/summaries` | Kunde oder Reviewer | `SummaryBundleSchema` |
 | `GET /cases/:id/portal` | Kunde oder Reviewer | `PortalDtoSchema` |
@@ -135,7 +130,6 @@ Der ausführbare [Startleitfaden](../../../code/README.md) und OpenAPI dokumenti
 2. `InsuranceCaseDtoSchema.parse()` auf eingelesenen Fall anwenden. Fachobjekte und übersetzte `presentation` verwenden.
 3. Formulare mit `DraftPatchSchema` und der zuletzt gelesenen Revision senden. Nur beabsichtigte Teilbereiche übergeben; keine schreibbare Kopie des gesamten Fall-DTO erzeugen.
 4. Nach Kundenbestätigung `ConfirmProfileSchema` senden, danach `RunAnalysisSchema`. Grafiken aus `run` und passenden Anzeigen aus `presentation` rendern.
-5. Für „Diese Stelle erklären“ den inneren GraphContext an `/graph-context` senden. Der gemeinsame `GraphExplanationRequestSchema` beschreibt zusätzlich die Nachricht mit Frage/Turn an Earnie, nicht den HTTP-Body dieses Endpunkts.
 6. Kunden-/Fachperson-Summary aus `SummaryBundleSchema` verwenden; keine zweite finanzielle Zusammenfassung berechnen.
 
 ### Earnie – KI-/Dialog-Backend

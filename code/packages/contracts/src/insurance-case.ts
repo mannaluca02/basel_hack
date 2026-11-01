@@ -119,7 +119,6 @@ export const InsuranceCaseDtoSchema=InsuranceCaseStateSchema.extend({schemaVersi
     if(c.graphContext&&(c.graphContext.caseId!==c.id||c.graphContext.runId!==c.activeRunId||c.graphContext.profileVersion!==c.confirmedVersions.at(-1)?.version||c.graphContext.scenarioVersionId!==runs.get(c.graphContext.runId)?.scenarioVersionId))fail('graphContext','Invalid graph reference');
     if(c.presentation.locale!==c.locale||c.presentation.portal.locale!==c.locale||c.presentation.activeRun?.locale!==undefined&&c.presentation.activeRun.locale!==c.locale)fail('presentation','Presentation locale mismatch');
   });
-export const InsuranceCaseSchema=InsuranceCaseDtoSchema;
 export type InsuranceCaseDto=z.infer<typeof InsuranceCaseDtoSchema>;
 export type InsuranceCase=InsuranceCaseDto;
 export type InsuranceCaseState=z.infer<typeof InsuranceCaseStateSchema>;
@@ -135,7 +134,6 @@ export type ScenarioComparison=z.infer<typeof ScenarioComparisonSchema>;
 export type AgentProposal=z.infer<typeof AgentProposalSchema>;
 export type LifeRun=z.infer<typeof LifeAnalysisSchema>;
 export type RiskNeed=z.infer<typeof import('./life-analysis.js').RiskNeedSchema>;
-export type RunPresentation=z.infer<typeof RunPresentationSchema>;
 export type CalculatorToolRun=z.infer<typeof CalculatorToolRunSchema>;
 export const LifeAnalysisResponseSchema=z.object({caseRevision:revision,contextRevision:revision,run:LifeAnalysisSchema,presentation:RunPresentationSchema}).strict();
 

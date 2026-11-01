@@ -31,7 +31,6 @@ import {
 - [Workflow-Service](../../../code/apps/api/src/insurance/extraction.ts)
 - [Pfadfreigaben und Entwurfsänderung](../../../code/apps/api/src/insurance/draft-proposals.ts)
 - [HTTP-Controller](../../../code/apps/api/src/insurance/http.ts)
-- [Typisierte Client-Beispiele](../../../code/examples/contracts/team-client.ts)
 - [Zusammenhängende synthetische JSON-Beispiele](../../../code/fixtures/extraction/)
 
 Die Erweiterungen werden gemeinsam aus demselben Workspace gebaut. Die Fall-Hauptversion bleibt im PoC `1.0`; alte strikte Clients müssen auf die neuen Verträge aktualisiert werden, weil zusätzliche Eigenschaften und der Vorschlagsstatus `superseded` hinzukommen. Ältere verschlüsselte Fälle erhalten beim Öffnen leere `proposalBatches` und `ambiguities`; vorhandene Daten werden nicht gelöscht.
@@ -58,7 +57,6 @@ Die API-Basis ist für den lokalen Start `http://127.0.0.1:3000/api`. Für Brows
 | Aktueller Extraktionszustand | `GET /advisor/extractor-context` | `extraction.context(actor,id)` | Kunde / fallbezogener Agent |
 | Vorschläge und Unklarheiten einreichen | `POST /advisor/proposal-batches` | `extraction.proposeBatch(actor,id,input)` | Agent |
 | Paket atomar in Entwurf übernehmen | `POST /advisor/proposal-batches/:batchId/accept` | `extraction.acceptBatch(actor,id,batchId,input)` | Kunde |
-| Unklarheit ohne Datenänderung klären | `POST /ambiguities/:ambiguityId/resolve` | `extraction.resolveAmbiguity(actor,id,ambiguityId,input)` | Kunde |
 | Gesamtprofil bestätigen | `POST /confirmations` | `engine.confirm(actor,id,input)` | Kunde |
 | Beratung/Erklärung lesen | `GET /advisor/context` | `engine.advisorContext(actor,id)` | autorisierter Kontextzugriff |
 | Änderungen abonnieren | `GET /advisor/events` | bestehender SSE-Controller | autorisierter Kontextzugriff |
@@ -145,7 +143,7 @@ Die aktuelle Positivliste erlaubt keine beliebigen Lösch- oder Neuordnungsopera
 - Annahme invalidiert aktiven Lauf, laufende Analyseanforderung und Grafikkontext. Bestätigte Profile und historische Ergebnisse bleiben als Historie erhalten.
 - `UNRESOLVED_AMBIGUITIES` bedeutet: offene Rückfragen klären, bevor das Gesamtprofil bestätigt oder erneut beraten wird.
 
-Legacy-`/advisor/proposals` bleibt verfügbar. Für neue Extraktion nur die Paket-API verwenden; explizite Legacy-Ersetzung ist über `supersedesProposalIds` unterstützt.
+Die früheren Einzelvorschläge (`/advisor/proposals`) gibt es nicht mehr; `supersedesProposalIds` bleibt nur für gespeicherte Altfälle im Vertrag.
 
 ## Nest-Anbindung und Verantwortungsgrenze
 

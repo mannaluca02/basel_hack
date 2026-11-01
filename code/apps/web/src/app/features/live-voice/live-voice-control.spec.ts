@@ -60,7 +60,7 @@ describe('LiveVoiceControl', () => {
         provideI18nTesting(),
         {
           provide: APP_ENVIRONMENT,
-          useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart, voiceAgentUrl, liveStart },
+          useValue: { apiBaseUrl: '/api', demoStart, voiceAgentUrl, liveStart },
         },
         { provide: AdvisorDataSource, useClass: ApiDataSource },
       ],

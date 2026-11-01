@@ -331,7 +331,7 @@ export class LiveVoiceControl {
     effect(() => {
       const session = this.customer.session();
       untracked(() => {
-        if (session && this.live.apiMode) void this.live.loadNotice();
+        if (session) void this.live.loadNotice();
       });
     });
   }

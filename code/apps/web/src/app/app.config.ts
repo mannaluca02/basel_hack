@@ -8,18 +8,13 @@ import { provideI18n } from './core/i18n/i18n.providers';
 import { apiErrorInterceptor } from './core/http/diagnostics';
 import { localeInterceptor } from './core/i18n/locale.interceptor';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
-import { labTraceInterceptor } from './core/voice/lab-trace';
-import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     { provide: RouteReuseStrategy, useClass: KeepAliveRouteReuseStrategy },
-    provideHttpClient(withFetch(), withInterceptors(
-        // The trace records only while the Voice Lab is open, and exists only in debug builds.
-        environment.debugVoice ? [apiErrorInterceptor, localeInterceptor, labTraceInterceptor] : [apiErrorInterceptor, localeInterceptor],
-      ),),
+    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor, localeInterceptor])),
     provideI18n(),
     provideAdvisorDataSource(),
     provideServiceWorker('ngsw-worker.js', {

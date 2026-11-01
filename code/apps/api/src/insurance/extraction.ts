@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { ExtractorContextSchema,ProposalBatchInputSchema,AcceptProposalInputSchema,ResolveAmbiguityInputSchema,AmbiguityResolutionSchema,ProposalAcceptanceSchema,
+import { ExtractorContextSchema,ProposalBatchInputSchema,AcceptProposalInputSchema,ProposalAcceptanceSchema,
   PAX_HUMAN_ADVISOR_CONTACT,type ProposalBatch } from '@pax/contracts';
 import { ambiguityDialogue } from './ambiguity-dialogue.js';
 import { LifeInsuranceEngine } from './engine.js';
@@ -98,14 +98,5 @@ export class ExtractionWorkflow {
     for(const a of c.ambiguities.filter(a=>batch.resolvesAmbiguityIds.includes(a.id))){a.status='resolved';a.resolvedAt=batch.acceptedAt;a.resolvedByBatchId=batch.id;a.resolutionSourceRef=batch.source.sourceRef;}
     this.engine.touch(c,'draft_changed');this.engine.audit(db,actor,c,'agent_proposal_batch_accepted');
     return ProposalAcceptanceSchema.parse({caseRevision:c.caseRevision,contextRevision:c.contextRevision,confirmationStillRequired:true,draft:c.draft});
-  }
-  async resolveAmbiguity(actor:Actor,id:string,ambiguityId:string,input:unknown){
-    if(actor.role!=='customer')throw new WorkflowError('FORBIDDEN',403);const b=ResolveAmbiguityInputSchema.parse(input);
-    return this.engine.edit(actor,id,b.expectedCaseRevision,(c,db)=>{
-      const a=c.ambiguities.find(a=>a.id===ambiguityId);if(!a||a.status!=='open')throw new WorkflowError('AMBIGUITY_NOT_OPEN');
-      a.status='resolved';a.resolvedAt=new Date().toISOString();a.resolutionSourceRef=b.resolutionSourceRef;
-      this.engine.touch(c,'ambiguity_resolved');this.engine.audit(db,actor,c,'ambiguity_resolved');
-      return AmbiguityResolutionSchema.parse({caseRevision:c.caseRevision,contextRevision:c.contextRevision,ambiguity:a});
-    });
   }
 }

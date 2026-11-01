@@ -10,12 +10,10 @@ import { DossierService } from './dossier.js';
 import { CustomerConfirmations } from './customer-confirmations.js';
 import { ExtractionWorkflow } from './extraction.js';
 import { ModelExtractionConsents,type ModelExtractionOptions } from './model-extraction.js';
-import { AdvisoryTools } from './advisory.js';
 import { DraftEstimateService } from './estimates.js';
 import { DemoJourney,type personaDraft } from './demo-journey.js';
 import { SuitabilityService } from './suitability.js';
 import { ProductDocuments } from './documents.js';
-import { PrototypeInsights } from './telemetry.js';
 import { ScenarioComparisonService } from './comparison.js';
 import { AdditionalCalculatorTools } from './tools.js';
 import type { Database } from './types.js';
@@ -67,8 +65,8 @@ export async function createLifeRuntime(options:RuntimeOptions={}) {
     const voiceCleanup=options.internalTimers===false?undefined:setInterval(()=>{void sweepVoice().catch(()=>{});},5000);voiceCleanup?.unref();
     const cleanup=options.internalTimers===false?undefined:setInterval(()=>{void sweepRetention().catch(()=>{});},60_000);cleanup?.unref();
     const estimates=new DraftEstimateService(engine);
-    return {sweepRetention,sweepVoice,store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),advisory:new AdvisoryTools(engine),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
-      insights:new PrototypeInsights(engine),comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
+    return {sweepRetention,sweepVoice,store,sessions,engine,documents,journey,dossier,extraction,modelExtraction,confirmations,voice,handover:new HumanHandoverService(engine,()=>voice.sweep()),estimates,suitability:new SuitabilityService(engine),demo:new DemoJourney(engine,estimates,extraction,options.demoStart?{sessions,credentials}:null,journey,options.personaDraft),
+      comparisons:new ScenarioComparisonService(engine),tools:new AdditionalCalculatorTools(engine),providerMode:mode,get closed(){return closed;},async close(){if(!closed){closed=true;clearInterval(cleanup);clearInterval(voiceCleanup);engine.digitalTasks.close();await voice.shutdown();await store.close();}}};
   }catch(error){await store.close();throw error;}
 }
 export type LifeRuntime=Awaited<ReturnType<typeof createLifeRuntime>>;

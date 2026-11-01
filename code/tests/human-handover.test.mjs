@@ -56,7 +56,7 @@ test('handover invalidates pending spoken confirmations and blocks digital write
  await f.command('request');assert.equal(f.r.confirmations.get(f.customer,f.id,question.id).status,'invalidated');
  const tests=[()=>f.r.engine.patchDraft(f.customer,f.id,{expectedCaseRevision:f.get().caseRevision}),()=>f.r.engine.confirm(f.customer,f.id,{expectedCaseRevision:f.get().caseRevision,confirmProfileAndAssumptions:true,allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'}),
  ()=>f.r.engine.analyze(f.customer,f.id,{expectedCaseRevision:f.get().caseRevision,expectedProfileVersion:1,scenarioVersionId:'paused',scenario:{kind:'baseline'}}),()=>f.r.estimates.calculate(f.customer,f.id,{}),()=>f.r.tools.execute(f.customer,f.id,{}),
- ()=>f.r.advisory.propose(f.agent,f.id,{messageId:'legacy_paused',path:'goals.0.priority',value:1,expectedProfileVersion:1}),()=>f.r.extraction.proposeBatch(f.agent,f.id,{})];
+ ()=>f.r.extraction.proposeBatch(f.agent,f.id,{})];
  for(const work of tests)await assert.rejects(work,e=>e.code==='HUMAN_HANDOVER_ACTIVE');
  await f.r.engine.preferences(f.customer,f.id,{locale:'fr'});assert.equal(f.r.handover.read(f.customer,f.id).handover.wantsHumanAdvisor,true);
  await f.command('resume');await f.r.extraction.acceptBatch(f.customer,f.id,batch.id,{expectedCaseRevision:f.get().caseRevision,accept:true});assert.equal(f.get().draft.insurance.persons[0].grossAnnualIncomeCents,11900000);

@@ -1,12 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 import { DEFAULT_HUMAN_HANDOVER } from '@pax/contracts';
-import { APP_ENVIRONMENT } from '../../config/app-environment';
 import { Consent } from '../../consent/consent';
 import { provideI18nTesting } from '../../i18n/i18n-testing';
 import { AdvisorDataSource, AdvisorSnapshot } from '../advisor-data-source';
-import { MOCK_CALL_SCRIPT } from '../mock/mock-call-script';
-import { provideAdvisorDataSource } from '../provide-advisor-data-source';
 import { CaseStore } from './case-store';
 import { CASE_ID, FakeDataSource, chart, contextUpdate, event, info, risk, snapshot } from './case-testing';
 
@@ -203,44 +200,5 @@ describe('CaseStore before consent', () => {
 
     expect(store.loaded()).toBe(true);
     expect(store.risks().map((r) => r.riskId)).toEqual(['risk_after']);
-  });
-});
-
-describe('CaseStore with the scripted mock call', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideI18nTesting(),
-        provideAdvisorDataSource(),
-        {
-          provide: APP_ENVIRONMENT,
-          useValue: { production: false, apiBaseUrl: '/api', dataSource: 'mock' },
-        },
-      ],
-    });
-  });
-
-  afterEach(() => vi.useRealTimers());
-
-  it('ends with the full case and one unread count per new or updated item', () => {
-    vi.useFakeTimers();
-    TestBed.inject(Consent).grant();
-    const store = TestBed.inject(CaseStore);
-    store.connect();
-    vi.advanceTimersByTime(MOCK_CALL_SCRIPT.at(-1)!.atMs + 1_000);
-
-    expect(store.charts().map((c) => [c.chartId, c.revision])).toEqual([
-      ['chart_life_events', 2],
-      ['chart_pillar3a_growth', 2],
-      ['chart_income_timeline', 2],
-      ['chart_event_impact', 2],
-    ]);
-    expect(store.progress()?.percent).toBe(100);
-    expect(store.unread()).toEqual({
-      graphics: 4,
-      risks: 4,
-      chat: store.transcript().length,
-      info: 6,
-    });
   });
 });

@@ -30,8 +30,4 @@ export class ScenarioComparisonService {
       c.comparisons.push(result);this.engine.touch(c,'comparison_available');this.engine.audit(db,actor,c,'scenario_comparison_created');return result;
     });
   }
-  get(actor:Actor,id:string,comparisonId:string) {
-    const c=this.engine.caseFor(actor,id);const result=c.comparisons.find(r=>r.id===comparisonId);if(!result)throw new WorkflowError('NOT_FOUND',404);
-    return {...result,stale:c.draftDirty||result.profileVersion!==c.confirmedVersions.at(-1)?.version};
-  }
 }

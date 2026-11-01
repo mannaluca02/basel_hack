@@ -160,7 +160,7 @@ export class VoiceLabController {
       // A case the conversation set up (live start): the intake extraction only fills what is still
       // empty. It sees eight fields only, so it took "20000 more saving" for the 3a; corrections of
       // answered fields go through answerObservations, which knows every field and needs the latest
-      // sentence. With a persona (demo, Voice Lab) the intake extraction stays the correction path.
+      // sentence. With a persona (demo) the intake extraction stays the correction path.
       const liveSetup=ctx.proposalBatches.some(batch=>batch.messageId.startsWith('setup_'));
       const view=adapter==='model-v1'&&liveSetup?pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id):null;
       // 'unknown' is the placeholder of relationship and risk appetite, not an answer.

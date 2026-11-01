@@ -5,7 +5,6 @@ import { provideRouter } from '@angular/router';
 import { CUSTOMER_SESSION_KEY } from '../../core/advisor/api/customer-api';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
-import { InsightsView } from './insights-view';
 import { SuitabilityForm } from './suitability-form';
 
 const CASE = 'case_parts';
@@ -25,7 +24,7 @@ function configure(demoStart = true) {
       provideHttpClientTesting(),
       provideI18nTesting(),
       provideRouter([]),
-      { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart } },
+      { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', demoStart } },
     ],
   });
   return TestBed.inject(HttpTestingController);
@@ -135,50 +134,6 @@ describe('SuitabilityForm answers', () => {
     request.flush({ code: 'STALE_CONTEXT', message: 'Bitte neu laden.' }, { status: 409, statusText: 'Conflict' });
     await settle(fixture);
     expect(root.querySelector('[role="alert"]')?.textContent).toContain('Bitte neu laden.');
-  });
-});
-
-describe('InsightsView', () => {
-  it('shows the funnel, drop-offs and NPS of the demo cases', async () => {
-    const http = configure();
-    const fixture = TestBed.createComponent(InsightsView);
-    fixture.detectChanges();
-    http.expectOne('/api/demo/insights').flush({
-      caseCount: 3,
-      currentStageCounts: { recommendation: 2, demo_policy: 1 },
-      potentialDropoffs: { recommendation: 1 },
-      dropoffDefinition: '',
-      blockingReasons: { LIFE_INSURANCE_DEMO_REVIEW_REQUIRED: 3 },
-      humanHandover: { requested: 1 },
-      nps: { responses: 2, score: 50 },
-    });
-    await settle(fixture);
-    const root = fixture.nativeElement as HTMLElement;
-    const row = Array.from(root.querySelectorAll('tbody tr')).find((tr) =>
-      tr.textContent?.includes('Empfehlung'),
-    )!;
-    expect(row.textContent).toMatch(/Empfehlung\s*2\s*1/);
-    expect(root.querySelector('.figures')?.textContent).toContain('50');
-    expect(root.textContent).toContain('LIFE_INSURANCE_DEMO_REVIEW_REQUIRED');
-  });
-
-  it('is not available outside the demo start', () => {
-    const http = configure(false);
-    const fixture = TestBed.createComponent(InsightsView);
-    fixture.detectChanges();
-    http.expectNone('/api/demo/insights');
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('nur im Demo-Start');
-  });
-});
-
-describe('InsightsView without the backend', () => {
-  it('says the view is unavailable when the insights cannot be read', async () => {
-    const http = configure();
-    const fixture = TestBed.createComponent(InsightsView);
-    fixture.detectChanges();
-    http.expectOne('/api/demo/insights').flush({ code: 'NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
-    await settle(fixture);
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('nur im Demo-Start');
   });
 });
 

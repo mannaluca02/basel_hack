@@ -39,7 +39,7 @@ describe('LiveVoice', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api' } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api' } },
         { provide: AdvisorDataSource, useValue: source },
       ],
     });
@@ -160,7 +160,7 @@ describe('LiveVoice in the live build', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true, liveStart } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', demoStart: true, liveStart } },
         { provide: AdvisorDataSource, useValue: source },
       ],
     });
@@ -379,7 +379,7 @@ describe('LiveVoice in the live build', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18nTesting(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', dataSource: 'api', demoStart: true, liveStart: true } },
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '/api', demoStart: true, liveStart: true } },
         { provide: AdvisorDataSource, useValue: source },
       ],
     });

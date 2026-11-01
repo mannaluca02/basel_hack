@@ -23,4 +23,4 @@ Die App liefert diese Dokumente im Abschlussweg aus (`DOCUMENTS` in `code/apps/a
 
 ## Logismata-Beispiele (`api/`)
 
-`api/examples/*.json` sind echte Antworten der 24 Logismata-Operationen mit erfundenen Daten. Der Replay-Rechner der Tests und des Voice Labs antwortet damit (`code/apps/api/src/logismata/client.ts`, `code/tests/helpers/life-fixture.mjs`). `api/openapi/schema-index.json` ist der Index der OpenAPI-Schemas für `code/tests/localization-tools.test.mjs`; die vollständige Spezifikation ist [APICalc-swagger.yaml](../../challenge_material/APICalc-swagger.yaml).
+`api/examples/*.json` sind echte Antworten der 24 Logismata-Operationen mit erfundenen Daten. Der Replay-Rechner der Tests antwortet damit (`code/apps/api/src/logismata/client.ts`, `code/tests/helpers/life-fixture.mjs`). `api/openapi/schema-index.json` ist der Index der OpenAPI-Schemas für `code/tests/localization-tools.test.mjs`; die vollständige Spezifikation ist [APICalc-swagger.yaml](../../challenge_material/APICalc-swagger.yaml).

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { Cents,ProviderResultSchema,type CalculatorToolRun } from '@pax/contracts';
-import { Operations,RequestSchemas } from '../logismata/contracts.js';
+import { RequestSchemas } from '../logismata/contracts.js';
 import { LifeInsuranceEngine } from './engine.js';
 import { sha256Json } from '../calculation/hash.js';
 import { WorkflowError,type Actor } from './types.js';
@@ -28,8 +28,6 @@ export const AdditionalToolRequestSchema=z.discriminatedUnion('operation',[
   option('inheritanceAll'),option('inheritanceGroup'),option('inheritanceBeneficiary'),option('corporateEntityTax')]);
 export class AdditionalCalculatorTools {
   constructor(readonly engine:LifeInsuranceEngine){}
-  list(actor:Actor,id:string){this.engine.caseFor(actor,id);return AdditionalOperations.map(operation=>({operation,operationId:Operations[operation].id,
-    requestUnits:'CHF_CENTS',moneyFields:AdditionalMoneyFields[operation],scope:'isolated_calculator_estimate',requiresSeparateDomainReview:!['taxBaseInfo','searchLocationGeo','estateGainFields'].includes(operation)}));}
   async execute(actor:Actor,id:string,input:unknown) {
     return this.engine.runDigital(actor,id,signal=>this.executeDigital(actor,id,input,signal));
   }

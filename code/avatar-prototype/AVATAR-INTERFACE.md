@@ -20,7 +20,7 @@ Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). In the app: [`paxi-case-voice.ts`](
 
 `attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level, localAudioActive }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
 
-### Voice Lab: optional local audio visual (not playback evidence)
+### Optional local audio visual (not playback evidence)
 
 ```js
 avatar.attachAudio(remoteStream);
