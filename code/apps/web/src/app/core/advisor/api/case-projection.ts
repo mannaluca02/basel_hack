@@ -5,6 +5,8 @@ import type {
   ChartResult,
   EventImpactChart,
   EventImpactScenario,
+  IncomeMilestone,
+  IncomeMilestoneKind,
   IncomeTimelineChart,
   LifeEvent,
   Pillar3aGrowthChart,
@@ -182,7 +184,42 @@ function incomeTimeline(run: LifeAnalysis): IncomeTimelineChart {
       ),
     },
     target: series(annual((p) => p.needCents)),
+    milestones: incomeMilestones(timeline.periods),
   };
+}
+
+type Phase = 'working' | 'bridge' | 'pension';
+
+/**
+ * FE-31: the years the income chart draws, read from the backend's phase flags only. A year counts
+ * as working or pension only when all its periods have every person in that phase, so a year with
+ * half a salary and half a pension never stands for either. Duplicates keep the first kind.
+ */
+export function incomeMilestones(
+  periods: readonly { readonly month: string; readonly persons: readonly { readonly phase: Phase }[] }[],
+): IncomeMilestone[] {
+  const byYear = new Map<number, Phase[][]>();
+  for (const period of periods) {
+    const year = Number(period.month.slice(0, 4));
+    byYear.set(year, [...(byYear.get(year) ?? []), period.persons.map((x) => x.phase)]);
+  }
+  const years = [...byYear.keys()];
+  if (years.length === 0) return [];
+  const fully = (year: number, phase: Phase) =>
+    byYear.get(year)!.every((persons) => persons.every((p) => p === phase));
+  const end = years.at(-1)!;
+  const firstPension = years.find((year) => fully(year, 'pension'));
+  const plus10 = firstPension === undefined ? undefined : firstPension + 10;
+  const candidates: [number | undefined, IncomeMilestoneKind][] = [
+    [years[0], 'today'],
+    [[...years].reverse().find((year) => fully(year, 'working')), 'last_working'],
+    [firstPension, 'first_pension'],
+    [plus10 !== undefined && plus10 < end && byYear.has(plus10) ? plus10 : undefined, 'pension_plus_10'],
+    [end, 'end'],
+  ];
+  const picked = new Map<number, IncomeMilestoneKind>();
+  for (const [year, kind] of candidates) if (year !== undefined && !picked.has(year)) picked.set(year, kind);
+  return [...picked].sort(([a], [b]) => a - b).map(([year, kind]) => ({ year, kind }));
 }
 
 const EVENTS = [

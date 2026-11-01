@@ -106,6 +106,24 @@ export interface IncomeTimelineChart extends ChartBase {
   /** Every pillar is always present (rule 2); unknown values are `null`, not dropped. */
   readonly series: Readonly<Record<'employment' | Pillar | 'gap', MoneySeries>>;
   readonly target: MoneySeries;
+  /**
+   * FE-31: the few years the chart draws as bars, ascending and unique; `years` and the series keep
+   * every year for the table and the audit trail. Picked from the backend's phase flags, never from
+   * amounts. Empty when unknown: the chart then shows the first and the last year.
+   */
+  readonly milestones: readonly IncomeMilestone[];
+}
+
+/**
+ * Today, the last full year in which everyone works, the first full year in which everyone draws a
+ * pension, ten years later, and the end of the timeline. Mixed years are never a milestone.
+ */
+export type IncomeMilestoneKind =
+  'today' | 'last_working' | 'first_pension' | 'pension_plus_10' | 'end';
+
+export interface IncomeMilestone {
+  readonly year: number;
+  readonly kind: IncomeMilestoneKind;
 }
 
 export type ImpactEventKind = 'disability' | 'death' | 'retirement';
