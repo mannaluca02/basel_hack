@@ -14,7 +14,7 @@
   "sources": {
     "contracts": "code/packages/contracts/src (feature/life-insurance-live-backend): InsuranceIntakeSchema, InsurancePersonSchema, PersonSchema, GoalSchema",
     "pension_analysis": "documentation/challenge_material/pax-vorsorgeanalyse-einzelperson.pdf (Personenangaben)",
-    "public_analysis": "documentation/baselhack/references/public-pension-analysis/inputs/fictitious-family.json",
+    "public_analysis": "Public Pax/vlot pension analysis, synthetic family input (archived 2026-10-30, in the git history)",
     "suitability_check": "documentation/challenge_material/pax-angemessenheitspruefung.pdf (sections A to C)",
     "main_intake": "code/packages/domain/src/life-insurance.ts intakeQuestions() and question.* texts in code/apps/api/src/insurance/messages.ts on main"
   },

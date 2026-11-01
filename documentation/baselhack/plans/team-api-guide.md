@@ -4,7 +4,7 @@ Neu: [Gemeinsamer Übergabeschalter zur persönlichen Beratung](human-advisor-ha
 
 Neu: [Voice-Backend, Provider und Transkripte](voice-backend-integration.md).
 
-Neu: [Hinweis und Zustimmung für Earnies synthetische OpenAI-Extraktion](model-extraction-notice.md).
+Neu: [Hinweis und Zustimmung für Earnies synthetische OpenAI-Extraktion](../../compliance.md#drei-getrennte-einwilligungen).
 
 Neu: [Voice-Bestätigung und Rückfragenstatus für Dario/Erni](voice-confirmation-and-dialogue.md).
 

@@ -1,6 +1,6 @@
 # Gemeinsamer Schalter für persönliche Beratung
 
-Stand: 31.10.2026. Backend, gemeinsame Verträge, Stoppsignal und Beispiel-Clients sind implementiert. Entsprechend der Absprache liefert der Backendteil ausschließlich Kontaktdaten; es gibt keine Anwahl, keinen `tel:`-Redirect und keine Telefonieintegration. Den sichtbaren Schalter und die tatsächlichen Audio-/Avatar-/Modellmodule schließen deren Besitzer an.
+Stand: 31.10.2026. Seit dem 01.11.2026 bietet Paxi die Übergabe im Gespräch nicht mehr an und verspricht keinen Kontakt (`apps/api/src/voice/prompt.ts`); der Schalter bleibt in der App (`features/human-advisor`, `core/voice/handover-control.ts`). Backend, gemeinsame Verträge, Stoppsignal und Beispiel-Clients sind implementiert. Entsprechend der Absprache liefert der Backendteil ausschließlich Kontaktdaten; es gibt keine Anwahl, keinen `tel:`-Redirect und keine Telefonieintegration. Den sichtbaren Schalter und die tatsächlichen Audio-/Avatar-/Modellmodule schließen deren Besitzer an.
 
 ## Zustand und Auslöser
 

@@ -21,7 +21,7 @@ Einwilligung am Start nach ausdrücklicher Nutzerbestätigung; optionale Pax-Coo
 | Weitere Deckungen | Keine bestehenden Lebensversicherungen angegeben |
 | Wohnen | Miete inklusive Nebenkosten CHF 2’400 monatlich |
 
-Alle Einzelwerte und Einheiten stehen im [reproduzierbaren Eingabedatensatz](../references/public-pension-analysis/inputs/fictitious-family.json). Die Beträge sind Testwerte und keine Kundendaten.
+Alle Einzelwerte und Einheiten stehen im reproduzierbaren Eingabedatensatz. Die Beträge sind Testwerte und keine Kundendaten.
 
 Der Ablauf: Lebenssituation → persönliche Angaben → Partner → Zivilstand → Kinder → Erwerb beider Personen → Pensionskassen → Sparen/Vermögen → bestehende Policen → Wohnsituation → Übersicht/Familienvorsorge/Pensionierung/Steuern/Lösung → Abschlussdialog → Pax-Ergebnisseite → PDF-Download. Das Abschließen friert die Analyse laut Dialog ein; es wurde kein Versicherungsvertrag abgeschlossen.
 
@@ -74,10 +74,10 @@ Produktlinks und ein Pax-Care-Checkout-Link waren auf der Ergebnisseite sichtbar
 
 ## Gesicherte Dateien und Grenzen des Downloads
 
-- [Unveränderte Originalauswertung mit Testdaten](../references/public-pension-analysis/reports/analysis-fictitious-family.pdf), 17 Seiten. Enthält eine technisch erzeugte Referenz auf ausschließlich diesen synthetischen Fall.
-- [Nutzungsbedingungen](../references/public-pension-analysis/legal/terms-de.pdf), 3 Seiten; [Datenschutzhinweise](../references/public-pension-analysis/legal/privacy-de.pdf), 6 Seiten. Öffentlich beim Test verlinkte Fassungen vom Oktober 2023; dies ist keine Aussage über deren juristische Aktualität.
-- [Maschinenlesbares Test-/Herkunftsprotokoll](../catalog/public-pension-analysis.json), mit Beobachtungen, Einschränkungen und SHA-256-Prüfsummen.
-- [Textstände der UI-Schritte](../references/public-pension-analysis/snapshots/) und [Screenshots](../evidence/screenshots/public-pension-analysis/); Session-IDs in Textständen redigiert, Menü-Screenshot mit Analyse-ID nicht übernommen.
-- [Gerenderte PDF-Seiten](../generated/previews/public-pension-analysis/report/); Text für alle 17 Seiten extrahiert, Seiten 1/4/6/11 visuell geprüft. Die AGB-/Datenschutz-PDFs wurden technisch geöffnet und textlich gesichtet; jeweils Seite 2 zusätzlich gerendert.
+- Unveränderte Originalauswertung mit Testdaten, 17 Seiten. Enthält eine technisch erzeugte Referenz auf ausschließlich diesen synthetischen Fall.
+- Nutzungsbedingungen, 3 Seiten; Datenschutzhinweise, 6 Seiten. Öffentlich beim Test verlinkte Fassungen vom Oktober 2023; dies ist keine Aussage über deren juristische Aktualität.
+- Maschinenlesbares Test-/Herkunftsprotokoll, mit Beobachtungen, Einschränkungen und SHA-256-Prüfsummen.
+- Textstände der UI-Schritte und Screenshots; Session-IDs in Textständen redigiert, Menü-Screenshot mit Analyse-ID nicht übernommen.
+- Gerenderte PDF-Seiten; Text für alle 17 Seiten extrahiert, Seiten 1/4/6/11 visuell geprüft. Die AGB-/Datenschutz-PDFs wurden technisch geöffnet und textlich gesichtet; jeweils Seite 2 zusätzlich gerendert.
 
 Der geladene Frontend-Stand liegt ausschließlich lokal unter `documentation/baselhack/private/public-pension-analysis/site/`: zwei HTML-Stände, 42 direkt beobachtete öffentliche Skript-/Style-/Schrift-/Bilddateien sowie sechs weitere mit der Browser-Archivierung gesicherte Assets. Herkunft und Prüfsummen stehen im Testkatalog. Tracking-Skripte wurden nicht zusätzlich geladen. Das ist kein Backend- oder Quellcode-Export und keine lauffähige Offline-Kopie. Fremdsoftware wird nicht in den PoC eingebaut oder mit Git veröffentlicht. Der bestehende Logismata-Token wurde für diesen Test nicht verwendet oder verändert.

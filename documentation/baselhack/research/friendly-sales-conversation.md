@@ -4,7 +4,7 @@ Research date: 2026-10-31. Status: research and proposed conversation design; th
 
 ## Recommendation
 
-Use a consultative conversation: understand the person's situation, reflect their priorities, explain the value of the next step, and invite them to choose it. The pitch is an invitation to understand their situation better and, if wanted, speak with a Pax colleague. Paxi's current role excludes recommending or pitching products; see the [persona](../../../code/voice-agent/persona.md) and [voice documentation](../../../code/voice-agent/README.md).
+Use a consultative conversation: understand the person's situation, reflect their priorities, explain the value of the next step, and invite them to choose it. The pitch is an invitation to understand their situation better. Paxi proposes fitting plans itself at the end, need before product (skill `proposing-plans`), and never hands over to a colleague; see the [persona](../../../code/voice-agent/persona.md) and [voice documentation](../../../code/voice-agent/README.md).
 
 The commercial purpose should be clear. Friendly language should make that purpose easier to understand, without disguising it as friendship or neutral advice. Introduce Paxi as a digital assistant of Pax, then use short sentences, informal “du” and Swiss Standard German. The examples below are original draft copy, not research quotations or financial advice.
 

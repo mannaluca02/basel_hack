@@ -1,3 +1,0 @@
-# Versions used to extract and verify the local source archive.
-pypdf==6.10.0
-cryptography==50.0.2

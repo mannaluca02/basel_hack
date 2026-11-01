@@ -1,5 +1,7 @@
 # Live-Voice in der App und Voice Lab (Debug-Konfiguration)
 
+Wie die Live-Stimme funktioniert (GPT-Live, Hintergrundmodell GPT-6 Luna, Prüfung): [Live-Stimme](../../live-voice.md). Mit `LIVE_REPORTS=0` liest das Backend jeden Satz selbst aus.
+
 Earnies Live-Voice läuft direkt in der normalen Web-App: Mikrofon-Knopf in der Tab-Leiste über dem
 Avatar, beide Zustimmungen (Sprachtransfer, KI-Extraktion), dann GPT-Live über das Fall-Backend.
 Was Paxi hört, kommt als Vorschlagspaket; erst die Übernahme ändert den Entwurf. Der Avatar-Ring zeigt
@@ -32,7 +34,7 @@ npm --prefix code/apps/web run start:debug:lab     # App 4300, /api → 3030
 ```
 
 Der Mikrofon-Knopf erscheint nur, wenn das Backend GPT-Live **und** die Modell-Extraktion anbietet.
-`code/apps/api/src/main.ts` verdrahtet `model-v1` (OpenAI Responses), sobald
+`code/apps/api/src/live-options.ts` verdrahtet `model-v1` (OpenAI Responses), sobald
 `PAX_SYNTHETIC_VOICE_ENABLED=1` oder `PAX_SYNTHETIC_EXTRACTION_ENABLED=1` gesetzt und ein
 `OPENAI_API_KEY` vorhanden ist. Ohne Extraktion blockiert der Start, statt still auf `rules-v1`
 zurückzufallen.
@@ -160,6 +162,6 @@ Die Backend-Grenzen zu erfundenen Daten, überprüften Berechnungen, Bestätigun
 gelten weiterhin und stehen explizit am Ende des Prompts. Änderungen an den Markdown-Skills werden
 bei der nächsten Session gelesen. Die Sprache folgt der Sprachwahl der App; ein Wechsel beendet das Gespräch und fragt die Zustimmungen neu ab.
 
-**Neustart nötig:** Der Modellpfad wird beim Start des Backends verdrahtet (`code/apps/api/src/main.ts`
+**Neustart nötig:** Der Modellpfad wird beim Start des Backends verdrahtet (`code/apps/api/src/live-options.ts`
 bzw. `code/scripts/start-voice-lab.mjs`). Ein bereits laufendes Backend kennt ihn nicht: stoppen und
 neu starten, der Schlüssel kommt aus der Root-`.env`.

@@ -1,41 +1,45 @@
-# Documentation index
+# Dokumentation
 
-Everything we know about the Pax Challenge (BaselHack 2026), collected on 2026-10-30
-from the challenge hub, the Logismata API and the material PDFs.
+Stand: 01.11.2026. Pax Challenge, BaselHack 2026: „Pax Digital Advisor“, ein KI-Vorsorgeberater zum Selbstbedienen. Unser Beitrag ist Paxi, mit dem man spricht.
 
-| File | Contents |
+## Das System
+
+| Dokument | Inhalt |
 |---|---|
-| [Friendly sales conversations: research and examples](baselhack/research/friendly-sales-conversation.md) | Evidence on follow-up questions, autonomy and reactance; Paxi pitch, sample dialogue, hesitation handling and proposed improvements. Distilled into Paxi's skill [`friendly-conversation.md`](../code/voice-agent/skills/friendly-conversation.md) |
-| [Voice feature: setup and integration](../code/voice-agent/README.md) | Paxi demo, configuration, browser callbacks, HTTP API, language switching, questionnaire extraction, logs and troubleshooting |
-| [Customer data portfolio](../code/voice-agent/questionnaire.json) | All 53 customer details Pax needs (person, family, income, living, provision, goals, calculation needs, suitability check), with tier, type, casual question, backend contract path and source; used by the Paxi voice agent |
-| [Voice backend integration](baselhack/plans/voice-backend-integration.md) | Nest routes, shared observations, 37-field mapping, provider setup and Dario/Erni handoff |
-| [Model extraction notice](baselhack/plans/model-extraction-notice.md) | Separate OpenAI extraction notice, hash-bound customer consent and Earnie's server-side gate |
-| [Logic backend implementation](baselhack/reports/logic-backend-implementation.md) | Runtime schemas, domain calculations, NestJS demo, Logismata adapter and validation evidence |
-| [Workflow and interface contracts](baselhack/plans/interface-contracts.md) | VoiceLog, shared case, calculation result, replies, playback and export contracts from the second photo |
-| [Workshop decisions](baselhack/plans/workshop-decisions.md) | Confirmed UI/roles, feature interpretation and explicit open details |
-| [Detailed Angular implementation plan](baselhack/plans/implementation-plan.md) | Screens, domain logic, AI, interfaces, state machine, security and 55 acceptance cases |
-| [Implementation backlog](baselhack/plans/implementation-backlog.md) | 37 workshop tickets (34 P0), named owners, dependencies, estimates and acceptance criteria |
-| [Advisor plan: requirements](baselhack/plans/advisor-plan.md#3-anforderungen-an-das-ergebnis) | Must-haves, nice-to-haves, no-gos, legal framework turned into concrete requirements, demo checklist |
-| [Logismata API](baselhack/references/api/) | Logismata APICalc: auth, all 24 operations, enum codes, verified example calls, quirks |
-| [Advisor plan: domain and recommendations](baselhack/plans/advisor-plan.md) | Swiss 3-pillar basics, personas, Pax "Vorsorgecheck" structure, suitability scoring, Pax product catalogue |
-| [Sources and tools](baselhack/references/README.md) | Challenge hub, reference calculators, Quicksale, Pax UI (Angular), Pax brand |
-| [Public Pax/vlot analysis test](baselhack/reports/public-pension-analysis.md) | Current public flow, synthetic fixture, 17-page PDF export and open findings |
-| [Five-person team plan](baselhack/plans/team-plan.md) | Responsibilities, schedule and integration checkpoints |
-| [challenge_material/challenge.md](challenge_material/challenge.md) | Original challenge text from baselhack.ch |
-| [challenge_material/APICalc-swagger.yaml](challenge_material/APICalc-swagger.yaml) | OpenAPI 3.1 spec of the Logismata API (downloaded from the hub) |
-| `challenge_material/*.pdf` | The 10 material PDFs (German only) |
+| [Architektur](architecture.md) | Bausteine, ein Gespräch von der Stimme bis zur Police, Datenhaltung, Konfigurationen, Deployment, Tests |
+| [Live-Stimme](live-voice.md) | GPT-Live, das Hintergrundmodell GPT-6 Luna, Prüfung des Gehörten, Emotionen, Rückfall |
+| [Compliance und Regeln](compliance.md) | Erfundene Daten, Einwilligungen, Gesprächsregeln, Bestätigung durch die Person, Angemessenheitsprüfung, Pflichtschritte eines echten Abschlusses |
+| [Requirements-Matrix](baselhack/reports/life-insurance-requirements.md) | Anforderungen der Challenge und von Pax, zugeordnet zu Code und Tests, mit Live-Nachweis |
 
-## Key facts at a glance
+## Schnittstellen und Module
 
-- **Challenge:** "Pax Digital Advisor", an AI self-service pension advisor. Sponsor Pax, prize CHF 1,500.
-- **Hub:** https://pax-hackathon-2026.vercel.app (password protected, password in local `.env` as `PAX_HUB_PASSWORD`).
-- **API:** `https://baselhackathon2026.azurewebsites.net/viper`, the token is local in the repo-root `.env` as `LOGISMATA_BEARER_TOKEN`.
-- **Token expiry:** 2026-11-03 23:59:59 (decoded from the JWT `exp` claim).
-- **Domain experts on site:** Cem and Claude (Pax), Friday and Sunday.
-- **Follow-up for winners:** further PoC work with the Pax innovation team, possible working-student positions or theses.
+| Dokument | Inhalt |
+|---|---|
+| [Team-API-Leitfaden](baselhack/plans/team-api-guide.md) | Routen, Rollen, Payloads, Versionsschutz, SSE |
+| [Schnittstellen I01–I10](baselhack/plans/interface-contracts.md) | Die Verträge aus dem Workshop und ihre Schemas in `@pax/contracts` |
+| [Extraktion und Vorschlagspakete](baselhack/plans/erni-extractor-integration.md) | Extraktor-Kontext, Pakete, Ersetzen, Unklarheiten |
+| [Bestätigungen und Unklarheiten](baselhack/plans/voice-confirmation-and-dialogue.md) | Gebundene Kundenbestätigungen, Gesprächsstatus beantworteter Unklarheiten |
+| [Voice-Sessions im Backend](baselhack/plans/voice-backend-integration.md) | `/voice/sessions`, Transkript, GPT-Live- und ElevenLabs-Adapter |
+| [Persönliche Beratung](baselhack/plans/human-advisor-handover.md) | Der Übergabe-Schalter und was er stoppt |
+| [Live-Voice und Voice Lab](baselhack/plans/voice-lab-debugging.md) | Starten, Debug-Konfiguration, Trace |
+| [Paxi-Voice-Agent](../code/voice-agent/README.md) | Darios eigenständiger Paxi, Persona, Skills, Fragebogen |
+| [Worker](../code/apps/worker/README.md) | Cloudflare-Betrieb, Prüfung, Diagnose |
 
-## Secrets
+## Fachwissen
 
-The hub password and the API token are **not** stored in tracked files, because this
-repository is on GitHub. All local secrets and switches live in one gitignored file, `.env` at the repo root (permissions `0600`).
-[`.env.example`](../.env.example) is its template; the backend, the voice agent and the avatar prototype all read the same file.
+| Dokument | Inhalt |
+|---|---|
+| [Beratungsplan](baselhack/plans/advisor-plan.md) | Drei Säulen, Personas, Pax-Vorsorgecheck, Empfehlungen „Bedarf vor Produkt“, Produktkatalog |
+| [Öffentliche Pax/vlot-Analyse](baselhack/reports/public-pension-analysis.md) | Der heutige öffentliche Ablauf von Pax als Vergleich |
+| [Freundliche Verkaufsgespräche](baselhack/research/friendly-sales-conversation.md) | Grundlage von Paxis Gesprächsführung (Skill `friendly-conversation`) |
+| [Pax-UI-Bausteine](baselhack/research/pax-ui-controls.md) | Gemessene Pax-Styles und die bewussten Abweichungen für WCAG AA |
+| [Referenzen](baselhack/references/README.md) | Produkt-PDFs und Logismata-Beispiele, die Code und Tests benutzen |
+| [Challenge-Material](challenge_material/) | Challenge-Text, Logismata-OpenAPI, Rechtsrahmen, Personas, Musteranalysen und Offerten von Pax |
+
+## Eckdaten
+
+- **Challenge-Hub:** https://pax-hackathon-2026.vercel.app (Passwort in der lokalen `.env` als `PAX_HUB_PASSWORD`).
+- **Logismata-API:** `https://baselhackathon2026.azurewebsites.net/viper`, Token in der `.env` als `LOGISMATA_BEARER_TOKEN`; läuft am **03.11.2026 23:59:59** ab.
+- **Live:** https://paxi.rushworks.workers.dev (Cloudflare Worker `paxi`).
+
+Zugangsdaten stehen nie in getrackten Dateien: alles liegt in der gitignorierten `.env` im Repo-Root, Vorlage [`.env.example`](../.env.example); auf dem Worker in den Cloudflare-Secrets.

@@ -1,10 +1,10 @@
 # Pax LifeMap – Lebensversicherungs-Backend
 
-Stand: 31.10.2026 · Valentin · Feature `feature/life-insurance-live-backend` · TypeScript/NestJS/Zod, Node 22.
+Stand: 01.11.2026 · TypeScript/NestJS/Zod, Node 22–24. Überblick über das ganze System: [Architektur](../documentation/architecture.md).
 
 Das Backend bildet den bestätigten Workshop-Zuschnitt LOG-01–LOG-07 als funktionierenden PoC ab: ein geschützter gemeinsamer JSON-Fall, bedarfsorientierte Aufnahme, drei Säulen, Lebensversicherung, Szenarien, nachgelagerte Pax-Produktfamilien, Fachreview und gespeicherter Demo-Vertragsweg bis ins Portal. Die reguläre Anwendung verwendet echte Logismata-Rechner. Angular, KI-Dialog, Voice und Avatar werden durch Luca, Earnie, Dario und Lukas angebunden.
 
-Die [Requirements-Matrix](../documentation/baselhack/reports/life-insurance-requirements.md) trennt implementierte Backend-Funktionen, automatische Nachweise, Team-Integration und Produktionsfreigaben. Der [Implementierungsbericht](../documentation/baselhack/reports/logic-backend-implementation.md) beschreibt Architektur und fachliche Grenzen.
+Die [Requirements-Matrix](../documentation/baselhack/reports/life-insurance-requirements.md) trennt implementierte Backend-Funktionen, automatische Nachweise, Team-Integration und Produktionsfreigaben. Der [Implementierungsbericht](../documentation/architecture.md) beschreibt Architektur und fachliche Grenzen.
 
 ## Start und Prüfung
 
@@ -20,7 +20,7 @@ npm start
 
 Der Dienst bindet an `http://127.0.0.1:3000`; `PORT=3001 npm start` ändert den Port. Mit `PAX_VOICE_AGENT=1` läuft im selben Prozess Darios Voice-Agent Paxi auf `http://localhost:3100` (eigene Origin für Seite, Origin-Prüfung und `postMessage`); dafür einmal `npm install` in `code/voice-agent`. Das braucht nur die App-Konfiguration `paxi`: `npm run dev:paxi` startet beides. Sonst spricht die App über die eingebaute Live-Voice. `PAX_VOICE_AGENT_PORT` ändert den Port. Ist der Port belegt oder fehlt die Installation, startet das Backend trotzdem und meldet das. Öffentliche Einstiege sind `/api/privacy`, `/api/status` und `/api/openapi.json`. Alle Fall-, Dokument-, Portal- und Gesprächsdaten benötigen eine Sitzung. Der Start gibt ausschließlich den Pfad der lokalen Zugangscode-Datei aus.
 
-Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichnis (0700), getrennte Kunden-/Reviewer-Zugangscodes und ein Schlüssel (0600), verschlüsselte Fall-/Sitzungsdaten sowie eine Prozesssperre. `.local/` ist Git-ignoriert. Der Speicher ist für einen lokalen Node-Prozess ausgelegt. Kein Deployment und keine Freigabe für echte Kundendaten sind eingerichtet.
+Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichnis (0700), getrennte Kunden-/Reviewer-Zugangscodes und ein Schlüssel (0600), verschlüsselte Fall-/Sitzungsdaten sowie eine Prozesssperre. `.local/` ist Git-ignoriert. Der Speicher ist für einen lokalen Node-Prozess ausgelegt; öffentlich läuft dieselbe API auf dem Cloudflare Worker (siehe unten). Eine Freigabe für echte Kundendaten gibt es nicht.
 
 | Befehl | Wirkung |
 |---|---|
@@ -168,7 +168,7 @@ Archivierte Vertrags-PDFs bleiben gekennzeichnete deutschsprachige Originale. Si
 
 Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjekte werden aus `@pax/contracts` importiert und dort aus Zod abgeleitet. Es gibt keine zweite handgeschriebene Backend-Definition dieser Fachdaten mehr. Private Besitz-/Sitzungs-/Idempotenzdaten bleiben serverseitige Ergänzungen und werden nicht im HTTP-Fall ausgegeben. Fallantworten tragen `schemaVersion:"1.0"`; Create, GET, Draft-Patch und Bestätigung verwenden dasselbe validierte Format. Auch Agent-Kontext, SSE, Rechenausgabe, Portal und Summary verwenden gemeinsame Laufzeitverträge.
 
-Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/baselhack/plans/persistence-and-api.md) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
+Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/architecture.md#datenhaltung) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
 
 Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt zehn [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und 121 automatisierte Tests. VoiceLog, AgentReply und Playback sind bereitgestellte Team-Nachrichtenschemas; ihre tatsächlichen STT-/LLM-/TTS-/Avatar-Transporte bleiben die Implementierung der zuständigen Teammitglieder.
 

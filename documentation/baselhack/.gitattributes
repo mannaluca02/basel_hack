@@ -1,3 +1,2 @@
-# Preserve captured third-party sources and generated extraction bytes.
+# Captured third-party sources: keep their bytes unchanged.
 references/** -text -whitespace
-generated/** -text -whitespace

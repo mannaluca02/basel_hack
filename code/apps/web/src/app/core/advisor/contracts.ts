@@ -1,8 +1,7 @@
 /**
  * Frontend mirror of the planned interface contracts I04, I05, I08, I09 and I10.
- * Source: documentation/baselhack/plans/interface-contracts.md (draft 1.1) and
- * documentation/baselhack/catalog/interface-contracts.json. Required fields follow the catalog;
- * fields the catalog leaves open (metric shape, summary sections, progress groups) are frontend
+ * Source: documentation/baselhack/plans/interface-contracts.md (draft 1.1). Required fields
+ * follow it; fields it leaves open (metric shape, summary sections, progress groups) are frontend
  * proposals and are listed in FE-06 (#13) for confirmation with the backend owners.
  *
  * Rule 3: every amount here is produced by the backend (or the mock). The UI formats it, it never
