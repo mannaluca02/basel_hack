@@ -229,7 +229,7 @@ describe('LiveVoice in the live build', () => {
     expect(steer(live).done).toBe(true);
   });
 
-  it('takes the answers over, reloads the open questions and moves on after two unanswered turns', async () => {
+  it('takes the answers over and reloads the open questions', async () => {
     const { live, http, say } = setup(true);
     intakeThrough(live);
     live.caseAsks.set([{ key: 'goals', text: 'Ziele?' }, { key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }]);
@@ -251,18 +251,43 @@ describe('LiveVoice in the live build', () => {
     http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: ['ask_1'], skipped: [], profileVersion: null, runs: [], missing: [] });
     await settle();
     http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
-    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: [{ key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }] });
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: [{ key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }, { key: 'insurance.sharedChildren', text: 'Kinder?' }] });
     await settle();
     expect(live.caseAsk()?.key).toBe('insurance.relationshipSinceYear');
 
-    // Two turns without an answer: Paxi stops asking this one, nothing is assumed.
-    for (const text of ['Hmm.', 'Weiss ich nicht.']) {
+    // An answer Paxi had no chance to ask for yet (no agent line since) costs nothing.
+    say('Hmm.');
+    await turn({ proposalBatch: null, answered: [] });
+    expect(live.caseAsk()?.key).toBe('insurance.relationshipSinceYear');
+  });
+
+  it('puts an unanswered question at the back of the queue, never away, and is done only when nothing is open', async () => {
+    const { live, http, say } = setup(true);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Ziele?', about: 'goals' }, { key: 'insurance.sharedChildren', text: 'Kinder?' }]);
+    expect(steer(live)).toMatchObject({ done: false, nextQuestion: 'Ziele?', nextQuestionMeans: 'goals' });
+    const agent = (live as unknown as { voice: { options: { onTurn(a: string, b: string, c: string): void } } }).voice.options;
+    const unanswered = async (text: string) => {
+      agent.onTurn('agent', 'Was ist dir wichtig?', 'client-settled');
       say(text);
-      await turn({ proposalBatch: null, answered: [] });
-      http.expectNone(`/api/cases/${CASE_ID}/demo-accept`);
-    }
-    expect(live.caseAsk()).toBeNull();
-    expect(steer(live).done).toBe(true);
+      // The agent's turn and the customer's are recorded one after the other.
+      for (let i = 0; i < 6; i++) {
+        await settle();
+        http.match(`/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+        http.match(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).forEach((r) => r.flush({}));
+      }
+      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
+        mode: 'live', source: { text }, extraction: { adapter: 'model-v1', route: 'x', result: { proposalBatch: null, issues: [] }, answers: { proposalBatch: null, answered: [] } },
+      });
+      await settle();
+      steer(live);
+    };
+    await unanswered('Weiss nicht.');
+    expect(live.caseAsk()?.key).toBe('insurance.sharedChildren');
+    await unanswered('Auch nicht.');
+    // Both tried once: the first comes round again; nothing is dropped, so not done.
+    expect(live.caseAsk()?.key).toBe('goals');
+    expect(steer(live).done).toBe(false);
   });
 
   it('sets up the person from the first sentence, then extracts that sentence again for her', async () => {

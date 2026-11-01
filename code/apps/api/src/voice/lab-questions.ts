@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DraftSchema, type InsuranceDraft, type ProposalChangeInput } from '@pax/contracts';
 import { calculateBudget, calculateCapital, intakeQuestions } from '@pax/domain';
 import { callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
-import { applyChanges } from '../insurance/draft-proposals.js';
+import { applyChanges, at } from '../insurance/draft-proposals.js';
 import { questionText, t, type Locale } from '../insurance/i18n.js';
 import { WorkflowError } from '../insurance/types.js';
 type JsonValue = ProposalChangeInput['value'];
@@ -16,15 +16,12 @@ type JsonValue = ProposalChangeInput['value'];
  */
 
 /** One open question: `key` names the field (the domain path, or a budget key), `text` is what Paxi asks. */
-export type Ask = { key: string; text: string };
+export type Ask = { key: string; text: string; about?: string };
 
 const GOAL_KINDS = ['retirement', 'family', 'home', 'income_protection', 'survivor_protection'] as const;
 const DEBT_KINDS = ['mortgage', 'consumer', 'education', 'other'] as const;
 const BUDGET_CATEGORIES = ['living', 'tax', 'provision', 'reserve'] as const;
 
-/** Fields the intake extraction (lab-intake.ts) already reads for the person speaking; never asked twice. */
-const intakeOwned = (personId: string) => new Set(['insurance.relationship', 'insurance.existingAnnualPillar3aContributionCents', 'financial.expenses.housing',
-  ...['grossAnnualIncomeCents', 'withPillar2', 'desiredWorkStopAge'].map(key => `insurance.persons.${personId}.${key}`)]);
 
 type Kind =
   | { type: 'chf'; period: 'year' | 'month' | 'once' }
@@ -37,11 +34,12 @@ type Kind =
   | { type: 'years_list' }
   | { type: 'place' };
 
-type Target = { key: string; kind: Kind; description: string };
+/** `correction`: an answered field, only taken when the final user turn changes it. */
+type Target = { key: string; kind: Kind; description: string; correction?: true };
 
 const PERSON_FIELDS: Record<string, { kind: Kind; description: string }> = {
   providerSex: { kind: { type: 'enum', options: ['female', 'male'] }, description: 'sex as recorded in the pension documents' },
-  grossAnnualIncomeCents: { kind: { type: 'chf', period: 'year' }, description: 'gross annual income in CHF' },
+  grossAnnualIncomeCents: { kind: { type: 'chf', period: 'year' }, description: 'gross income in CHF (brutto, or an income the user did not call net); set period to month or year as said' },
   withPillar2: { kind: { type: 'bool' }, description: 'whether there is an occupational pension fund (Pensionskasse), true or false' },
   retirementPensionAnnualCents: { kind: { type: 'chf', period: 'year' }, description: 'annual retirement pension of the pension fund (PK-Rente, from the pension statement) in CHF' },
   desiredWorkStopAge: { kind: { type: 'int', min: 50, max: 80 }, description: 'age at which to stop working' },
@@ -175,21 +173,49 @@ export function askText(draft: InsuranceDraft, key: string, locale: Locale): str
   return person && person !== draft.financial?.persons[0]?.id ? t(locale, 'voice.ask.forPartner').replace('{question}', text) : text;
 }
 
+/** The open questions as Paxi asks them; `about` says in plain words what the answer must give. */
 export function openAsks(draft: InsuranceDraft, locale: Locale): Ask[] {
-  return openKeys(draft).map(key => ({ key, text: askText(draft, key, locale) }));
+  const targets = openTargets(draft);
+  return openKeys(draft).map(key => {
+    const about = (key === 'financial.partner' ? targets.filter(x => x.key.startsWith('partner.')) : targets.filter(x => x.key === key)).map(x => x.description).join('; ');
+    return { key, text: askText(draft, key, locale), ...(about ? { about } : {}) };
+  });
 }
 
-/** The fields the model may answer this turn, with what each means. */
-export function answerTargets(draft: InsuranceDraft, speakingPersonId: string): Target[] {
-  const owned = intakeOwned(speakingPersonId), first = draft.financial?.persons[0]?.id, targets: Target[] = [];
+/** Answered scalar fields the customer may still correct (relationship, amounts, ages, choices). */
+const CORRECTABLE_CASE = ['insurance.relationship', 'insurance.relationshipSinceYear', 'insurance.sharedChildren', 'insurance.riskCapitalStrategy',
+  'insurance.retirementNeedAnnualCents', 'insurance.annualReturnBps', 'insurance.retirementHorizonAge', 'insurance.annualSavingCents',
+  'insurance.existingAnnualRetirementSavingCents', 'insurance.existingAnnualPillar3aContributionCents'] as const;
+
+/**
+ * The fields the model may answer this turn, with what each means: every open question (the
+ * intake fields too, so one the intake extraction missed is still taken), and the answered
+ * scalar fields as corrections.
+ */
+export function answerTargets(draft: InsuranceDraft): Target[] {
+  const targets = openTargets(draft), open = new Set(targets.map(x => x.key)), i = draft.insurance, first = draft.financial?.persons[0]?.id;
+  if (!i) return targets;
+  const correction = (key: string, kind: Kind, description: string, current: unknown) => {
+    if (open.has(key) || current === null || current === undefined) return;
+    targets.push({ key, kind, description: `${description}. Already answered (${JSON.stringify(current)}): only if the user corrects or changes it in the final user turn`, correction: true });
+  };
+  for (const key of CORRECTABLE_CASE) correction(key, CASE_FIELDS[key]!.kind, CASE_FIELDS[key]!.description, at(draft, key));
+  for (const p of i.persons) for (const [field, spec] of Object.entries(PERSON_FIELDS)) {
+    if (field === 'deathNeedExcludesRepaidDebtService') continue;
+    correction(`insurance.persons.${p.personId}.${field}`, spec.kind, `${spec.description} (${p.personId === first ? 'the customer' : 'the partner'})`, at(p, field));
+  }
+  return targets;
+}
+
+function openTargets(draft: InsuranceDraft): Target[] {
+  const first = draft.financial?.persons[0]?.id, targets: Target[] = [];
   for (const key of openKeys(draft)) {
-    if (owned.has(key)) continue;
     const person = /^(insurance|financial)\.persons\.([^.]+)\.(.+)$/.exec(key);
     const who = person && person[2] !== first ? 'the partner' : 'the customer';
     if (key === 'financial.partner') {
       for (const sub of ['partner.age', 'partner.employment_rate_percent']) targets.push({ key: sub, ...CASE_FIELDS[sub]! });
     } else if (person && person[1] === 'financial' && person[3] === 'income') {
-      targets.push({ key, kind: { type: 'chf', period: 'month' }, description: `income of ${who} that remains after social deductions and income tax, in CHF; set period to month or year as said` });
+      targets.push({ key, kind: { type: 'chf', period: 'month' }, description: `net income of ${who} that remains after social deductions and income tax, in CHF; only if the user called it net (netto, after taxes, what remains or is paid out); a gross income or an income the user confirmed as brutto is never this field; set period to month or year as said` });
     } else if (person && PERSON_FIELDS[person[3]!]) {
       const field = PERSON_FIELDS[person[3]!]!;
       targets.push({ key, kind: field.kind, description: `${field.description} (${who})` });
@@ -235,12 +261,13 @@ function amount(text: string): number | null {
 
 /** Untrusted model output to typed answers: unknown ids, values off their unit and quotes not said by the user are dropped. */
 export function validAnswers(targets: Target[], parsed: z.infer<typeof Arguments>, userTurns: string[]): Answer[] {
-  const said = userTurns.map(text => text.toLocaleLowerCase());
-  const verbatim = (quote: string) => quote.trim().length > 0 && said.some(text => text.includes(quote.trim().toLocaleLowerCase()));
+  const said = userTurns.map(text => text.toLocaleLowerCase()), last = said.at(-1) ?? '';
+  const verbatim = (quote: string, final: boolean) => quote.trim().length > 0 && (final ? [last] : said).some(text => text.includes(quote.trim().toLocaleLowerCase()));
   const out: Answer[] = [];
   for (const a of parsed.answers) {
     const target = targets.find(x => x.key === a.id);
-    if (!target || a.value === null || !verbatim(a.quote) || out.some(x => x.key === a.id)) continue;
+    // A correction must be said now: an answer from earlier in the window is not a change.
+    if (!target || a.value === null || !verbatim(a.quote, !!target.correction) || out.some(x => x.key === a.id)) continue;
     const raw = a.value.trim(), k = target.kind, quote = a.quote.trim();
     const push = (value: Answer['value'], period: Answer['period'] = 'once') => out.push({ key: a.id, value, period, quote });
     if (k.type === 'chf') {
@@ -410,7 +437,10 @@ export async function answerChanges(draft: InsuranceDraft, answers: Answer[], so
       debtPayoffCents: null, debtTreatment: null, deathNeedExcludesRepaidDebtService: false, personalAffordableAnnualPremiumCents: null });
   }
   // A partner added by this very batch gets its consequences next turn: person paths must name a person of `draft`.
-  return [...changes, ...consequences(pendingView(draft, changes, f.caseId), sourceRef, new Set(changes.map(c => c.path)), new Set(i.persons.map(p => p.personId)))];
+  // A value the profile already holds is no change (a correction repeating the answer, say).
+  const changed = changes.filter(c => c.path.endsWith('_add') || JSON.stringify(at(draft, c.path)) !== JSON.stringify(c.value));
+  if (!changed.length) return [];
+  return [...changed, ...consequences(pendingView(draft, changed, f.caseId), sourceRef, new Set(changed.map(c => c.path)), new Set(i.persons.map(p => p.personId)))];
 }
 
 /**

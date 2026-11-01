@@ -112,10 +112,10 @@ export class VoiceLabController {
         try {
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           const turns=live!.turns.slice(0,live!.turns.indexOf(turn!)+1).map(t=>({role:t.speaker==='customer'?'user' as const:'assistant' as const,text:t.log.text}));
-          // The open profile questions are read in the same round: the intake fields of the person
-          // speaking stay with modelObservations, everything else the confirmation needs is here.
+          // The open profile questions are read in the same round: everything the confirmation still
+          // needs (the intake fields too, in case modelObservations missed one) and corrections.
           // Fields of a person not accepted yet wait for the next turn (paths must name a known person).
-          const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id),personId)
+          const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id))
             .filter(target=>{const person=/^(?:insurance|financial)\.persons\.([^.]+)\./.exec(target.key)?.[1];return !person||ctx.personIds.includes(person);});
           [observations,answers]=await Promise.all([modelObservations(transport,turns,b.messageId,personId,task.signal),
             answerObservations(transport,turns,targets,task.signal).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
@@ -229,7 +229,9 @@ export class VoiceLabController {
     const open=replaceable(ctx.proposalBatches),carried=open.flatMap(batch=>batch.changes);
     const view=pendingView(ctx.draft,carried,caseId);
     // Additions append, so the carried ones stay; a value set again wins.
-    const merge=(changes:ProposalChangeInput[])=>{const paths=new Set(changes.map(change=>change.path));
+    // What the intake extraction read from this same turn stays (it checks period and basis itself).
+    const intake=new Set(open.find(batch=>batch.messageId===`lab_${messageId}`)?.changes.map(change=>change.path)??[]);
+    const merge=(answered:ProposalChangeInput[])=>{const changes=answered.filter(change=>!intake.has(change.path)),paths=new Set(changes.map(change=>change.path));
       return [...carried.filter(change=>change.path.endsWith('_add')||!paths.has(change.path)),...changes];};
     // A batch holds at most 50 changes: the first answers in conversation order go now, the rest
     // stays open and is read again next turn (the quotes are still in the conversation).
