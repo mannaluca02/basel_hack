@@ -3,12 +3,17 @@ import {handleAsNodeRequest} from 'cloudflare:node';
 import {randomBytes} from 'node:crypto';
 import {createLifeInsuranceApp} from '../../api/dist/insurance/app.js';
 import {ProductDocuments} from '../../api/dist/insurance/documents.js';
-import {ProviderFailure} from '../../api/dist/logismata/client.js';
+import {LiveLogismataProvider} from '../../api/dist/logismata/client.js';
+import {normalizePersonaDraft} from '../../api/dist/insurance/demo-journey.js';
+import {configureVoicePrompt} from '../../api/dist/voice/prompt.js';
+import prompt from '../generated/prompt.json';
+import manifest from '../generated/documents.json';
+import {workerOptions,type WorkerConfig} from './config.js';
 import persona from '../../../fixtures/personas/mueller.json';
-import {DraftSchema} from '@pax/contracts';
+
 import {memoryStore} from './memory-store.js';
 
-interface Env {LIFE: DurableObjectNamespace<LifeInsuranceObject>}
+interface Env {ASSETS:Fetcher;LIFE: DurableObjectNamespace<LifeInsuranceObject>}
 
 export class LifeInsuranceObject extends DurableObject<Env> {
   private boot?: Promise<void>;
@@ -17,17 +22,15 @@ export class LifeInsuranceObject extends DurableObject<Env> {
   private async start() {
     const started=Date.now();
     const credentials={customerAccessCode:randomBytes(32).toString('hex'),reviewerAccessCode:randomBytes(32).toString('hex')};
-    // shortcut: no PDFs or calculator transport in this spike; replace with real asset/provider injection.
-    const documents=ProductDocuments.empty();
+    const options=workerOptions(this.env as unknown as WorkerConfig);
+    configureVoicePrompt({...prompt,loader:{skillsPrompt:skills=>skills.map(skill=>prompt.sections[skill.file as keyof typeof prompt.sections]).join('\n\n')}});
+    const documents=await ProductDocuments.fromAssets(manifest,this.env.ASSETS);
+    // Defer credential validation until calculation so status/demo remain usable without local secrets.
+    let provider:LiveLogismataProvider|undefined;
     const {app}=await createLifeInsuranceApp({
-      personaDraft:async()=>{
-        const draft=DraftSchema.parse(structuredClone(persona.draft));
-        const financial=draft.financial!;financial.valuationDate=new Date().toISOString().slice(0,10);
-        for(const asset of financial.assets)if(asset.availableFrom<financial.valuationDate)asset.availableFrom=financial.valuationDate;
-        return draft;
-      },
-      store:memoryStore(credentials),credentials,documents,demoStart:true,providerMode:'test',
-      provider:{async execute(){throw new ProviderFailure('UNAVAILABLE');}},
+      ...options,personaDraft:async(_id,today)=>normalizePersonaDraft(persona,today),
+      store:memoryStore(credentials),credentials,documents,
+      provider:{execute(...args:Parameters<LiveLogismataProvider['execute']>){return (provider??=new LiveLogismataProvider({token:options.token??''})).execute(...args);}},
     });
     await app.listen(0);
     const address=app.getHttpServer().address();
@@ -38,7 +41,10 @@ export class LifeInsuranceObject extends DurableObject<Env> {
 
   async fetch(request: Request) {
     await (this.boot??=this.start());
-    return handleAsNodeRequest(this.port!,request);
+    const headers=new Headers(request.headers);
+    headers.set('x-forwarded-proto',new URL(request.url).protocol.slice(0,-1));
+    headers.set('host',new URL(request.url).host);
+    return handleAsNodeRequest(this.port!,new Request(request,{headers}));
   }
 }
 

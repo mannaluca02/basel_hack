@@ -1,0 +1,4 @@
+LOGISMATA_BEARER_TOKEN=replace-me
+OPENAI_API_KEY=replace-me
+ELEVENLABS_API_KEY=replace-me
+ELEVENLABS_AGENT_ID=replace-me
