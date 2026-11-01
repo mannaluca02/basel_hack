@@ -504,6 +504,7 @@ export class LiveVoice {
   ): Promise<void> {
     if (!personId) this.setupMessages.push(messageId);
     const asked = nextIntakeField(this.rows()),
+      askedKey = this.caseAsk()?.key,
       // Only a question Paxi had the chance to ask counts: an agent line since it became current.
       askedCase = this.dialogue().some((line) => line.speaker === 'agent' && line.id > this.askSince.line)
         ? this.caseAsk()?.key
@@ -517,6 +518,8 @@ export class LiveVoice {
         messageId,
         // Without a person yet, the backend sets up the case frame from the conversation.
         ...(personId ? { personId } : {}),
+        // The profile question Paxi is on: the backend fills that field with this answer, no other.
+        ...(personId && askedKey ? { askedKey } : {}),
       });
     try {
       let result: LiveTurnResult;
@@ -537,13 +540,15 @@ export class LiveVoice {
       }
       if (epoch !== this.epoch) return;
       this.extracted(result);
-      // Live build: what Paxi heard goes into the case at once (and recalculates once the profile
-      // is complete), so the charts follow the conversation without a button.
-      if (this.liveStart && (result.extraction.result.proposalBatch || result.extraction.answers?.proposalBatch)) {
+      // Live build: after every question and answer, what Paxi heard goes into the case, the case
+      // is checked (complete: confirmed and calculated; a failed calculation is retried) and the
+      // charts and open questions are reloaded, without a button.
+      const proposed = !!(result.extraction.result.proposalBatch || result.extraction.answers?.proposalBatch);
+      if (this.liveStart && (personId || proposed)) {
         await this.acceptLive(epoch);
         // The person now exists: what was said before her (income in the same sentence as the
         // age, say) is extracted again for the intake fields.
-        if (!personId) await this.replaySetupTurns(sid, epoch);
+        if (!personId && proposed) await this.replaySetupTurns(sid, epoch);
         await this.loadAsks(epoch);
       }
       // A profile question still open after its turn counts as one unanswered attempt.
@@ -633,7 +638,19 @@ export class LiveVoice {
     if ((ask?.key ?? '') !== this.askSince.key) this.askSince = { key: ask?.key ?? '', line: this.sequence };
     // A skipped intake field may come back as a profile question (the backend still needs it).
     const neverAskAgain = rows.filter((r) => r.status === 'proposed' || r.status === 'accepted').map((r) => r.fieldId);
-    return { ...context, neverAskAgain, done: !ask, nextQuestion: ask?.text ?? null, ...(ask?.about ? { nextQuestionMeans: ask.about } : {}) };
+    const analysis = ask ? null : this.analysis();
+    return { ...context, neverAskAgain, done: !ask, nextQuestion: ask?.text ?? null, ...(ask?.about ? { nextQuestionMeans: ask.about } : {}),
+      ...(analysis ? { analysis } : {}) };
+  }
+
+  /** The calculated result, for Paxi to explain itself: the recommended products and key figures. */
+  private analysis() {
+    const presentation = this.store.canonical()?.presentation;
+    const products = (presentation?.recommendations.at(-1)?.candidates ?? []).slice(0, 3)
+      .map((c) => ({ product: c.productName, why: c.explanation }));
+    const keyFigures = (presentation?.activeRun?.metrics ?? []).filter((m) => m.valueCents !== null).slice(0, 8)
+      .map((m) => `${m.label}: ${m.formatted} (${m.periodLabel})`);
+    return products.length || keyFigures.length ? { products, keyFigures } : null;
   }
 
   private extracted(result: LiveTurnResult): void {

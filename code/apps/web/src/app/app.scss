@@ -5,9 +5,11 @@
   --tab-size: 3rem;
   --icon-size: 1.5rem;
   // Paxi's two spots, read by the stage and by the Dynamic View that makes room for him.
+  // Phones: 15 % larger than on wider screens. The lower bound stays, so in landscape (small dvh)
+  // the caption below Paxi still fits.
   --paxi-top: 1.5rem;
-  --paxi-centre: clamp(8rem, 28dvh, 14rem);
-  --paxi-corner: 5.175rem;
+  --paxi-centre: clamp(8rem, 32dvh, 16.1rem);
+  --paxi-corner: 5.95rem;
   --paxi-gap: 0.75rem;
 
   display: grid;
@@ -31,6 +33,7 @@
   :host {
     --tab-size: 3.25rem;
     --icon-size: 1.75rem;
+    --paxi-centre: clamp(8rem, 28dvh, 14rem);
     --paxi-corner: 6.9rem;
     --paxi-gap: 1.25rem;
   }
@@ -113,9 +116,6 @@
   // Room for Paxi in the corner, so he never covers the last card.
   padding-bottom: max(calc(var(--paxi-corner) + 2 * var(--paxi-gap)), env(safe-area-inset-bottom));
   padding-left: max(1rem, env(safe-area-inset-left));
-  // Same pace as Paxi's move to the corner (PaxiStage), so content and Paxi travel together.
-  transition: padding-top 900ms cubic-bezier(0.65, 0, 0.2, 1);
-
   // Focused by script only, as the landing point after consent; not a control, so no ring.
   &:focus-visible {
     outline: none;
@@ -123,9 +123,21 @@
   }
 }
 
-// Paxi in the centre: the content starts below him and his caption.
-:host([data-paxi='centre']) .view {
-  padding-top: calc(var(--paxi-top) + var(--paxi-centre) + 6rem);
+// The shown tab fades in as Paxi moves to the corner (same pace as the move, PaxiStage).
+.tab-content {
+  transition:
+    opacity 900ms cubic-bezier(0.65, 0, 0.2, 1),
+    visibility 0s;
+}
+
+// Paxi in the centre has the stage alone: no tab heading, no empty state. Banners and the call
+// controls above stay visible. Hidden, not removed: the tabs stay alive and keep their scroll.
+:host([data-paxi='centre']) .tab-content {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 200ms ease-out,
+    visibility 0s 200ms;
 }
 
 .stage {
@@ -243,7 +255,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .view {
+  .tab-content,
+  :host([data-paxi='centre']) .tab-content {
     transition: none;
   }
 

@@ -32,6 +32,7 @@ let nextId = 0;
   host: {
     '[attr.data-activity]': 'activity()',
     '[class.unknown]': 'percent() === null',
+    '[class.blank]': '!percent()',
   },
   template: `
     <button
@@ -123,11 +124,18 @@ let nextId = 0;
       stroke-dasharray: 3 3;
     }
 
+    // Round ends: a few per cent read as a dot on the ring, not as a square tick.
     .fill {
       stroke: var(--icon-brand-contrast);
       stroke-width: 3.5;
+      stroke-linecap: round;
       stroke-dasharray: 100;
       transition: stroke-dashoffset 600ms ease-out;
+    }
+
+    // A round cap draws a dot even for an empty arc: nothing captured shows no fill at all.
+    :host(.blank) .fill {
+      visibility: hidden;
     }
 
     // The avatar itself shows listening, thinking and speaking; a full halo for those could be

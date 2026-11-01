@@ -32,7 +32,10 @@
     @if (reviewEnabled) {
       <app-review-panel />
     }
-    <router-outlet />
+    <!-- The shown tab; hidden while Paxi has the stage alone (see app.scss). -->
+    <div class="tab-content">
+      <router-outlet />
+    </div>
   </main>
 
   <app-paxi-stage

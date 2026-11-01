@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import type { AgentActivity } from '../../core/advisor/ui-models';
 import { VoiceActivity } from '../../core/voice/voice-activity';
-import { connectAvatarAudio, type PaxAvatar } from '../../core/voice/voice-avatar';
+import { connectAvatarAudio, followAvatarVoice, type PaxAvatar } from '../../core/voice/voice-avatar';
 
 export interface PaxAvatarModule {
   createPaxAvatar(host: HTMLElement): PaxAvatar;
@@ -49,8 +49,9 @@ const AVATAR_ACTIVITY: Readonly<Record<AgentActivity, 'idle' | 'listening' | 'th
  * Paxi, drawn by `pax-avatar.js`. Created after the first render outside NgZone (its animation
  * frames must not trigger change detection) and destroyed with the component.
  *
- * With a call in the app, the remote voice drives the mouth (`audio`, a local audio visual only,
- * never playback evidence). Without one (scripted mock, Paxi in its own window), a speaking
+ * With a call in the app, the remote voice drives the mouth and splits into reply segments, during
+ * which the reply emotions of GPT-Live show (`followAvatarVoice`; a visual heuristic only, never
+ * playback evidence); between replies listening and thinking. Without one (scripted mock, Paxi in its own window), a speaking
  * activity drives it with a generated level, so Paxi still talks while the advisor speaks.
  */
 @Component({
@@ -100,6 +101,8 @@ export class PaxiAvatar {
   protected readonly failed = signal(false);
   /** What drives the mouth right now, so a new activity does not reattach the same source. */
   private source: MediaStream | 'generated' | null = null;
+  /** Ends following the call's voice (reply segments for the emotions). */
+  private unfollow: (() => void) | null = null;
   private readonly zone = inject(NgZone);
 
   constructor() {
@@ -121,6 +124,7 @@ export class PaxiAvatar {
 
     inject(DestroyRef).onDestroy(() => {
       destroyed = true;
+      this.unfollow?.();
       this.avatar()?.destroy();
     });
 
@@ -147,7 +151,12 @@ export class PaxiAvatar {
     const source = audio ?? (activity === 'speaking' ? 'generated' : null);
     if (source !== this.source) {
       this.source = source;
-      connectAvatarAudio(avatar, source === 'generated' ? speechLevel : source);
+      this.unfollow?.();
+      this.unfollow = null;
+      // The call's voice: reply segments, so GPT-Live's emotions show while Paxi speaks. Without a
+      // call there are no emotions: the generated level keeps the lively explaining pose.
+      if (source && source !== 'generated') this.unfollow = followAvatarVoice(avatar, source);
+      else connectAvatarAudio(avatar, source === 'generated' ? speechLevel : null);
     }
     avatar.handle({ type: 'activity', state: AVATAR_ACTIVITY[activity] });
   }

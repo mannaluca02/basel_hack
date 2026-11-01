@@ -29,6 +29,7 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 | `npm run test:coverage` | Backend-Tests mit Abdeckung je Datei (Web: `npm --prefix apps/web run test:coverage`, Voice-Agent: `npm --prefix voice-agent run test:coverage`) |
 | `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
+| `npm run test:live:conversation` | Ein ganzes erfundenes Live-Gespräch von A bis Z mit der echten Erkennung (`OPENAI_API_KEY`): Person anlegen, jede offene Frage, Übernahme, Speichern, Berechnung; Bericht Satz für Satz und Feld für Feld (erwartet → gespeichert). `LIVE_CALCULATOR=1` rechnet mit Logismata. Dasselbe Gespräch läuft ohne Netz in `tests/live-conversation.test.mjs`; Skript und Antworten stehen in `tests/helpers/live-conversation.mjs` |
 | `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
 | `npm run demo` | Frühere Offline-Fachdemo ohne HTTP-Server |
 

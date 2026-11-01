@@ -85,7 +85,8 @@ describe('PaxiAvatar', () => {
     await settle(fixture);
 
     expect(created[0].audio).toEqual([voice, null]);
-    expect(visuals(created[0])).toEqual([true, false]);
+    // Reply segments instead of the local audio visual, so the reply emotions can show.
+    expect(visuals(created[0])).toEqual([false, false]);
   });
 
   it('moves the mouth with a generated level while the advisor speaks without audio here', async () => {

@@ -200,6 +200,13 @@
       "net_after_income_tax": "net after income tax",
       "capital": "capital"
     },
+    "milestone": {
+      "today": "Today",
+      "last_working": "Before retiring",
+      "first_pension": "Retired",
+      "pension_plus_10": "+10 years",
+      "end": "End of plan"
+    },
     "series": {
       "employment": "Employment income",
       "pillar1": "Pillar 1 (AHV/IV)",
