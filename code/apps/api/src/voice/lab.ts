@@ -13,7 +13,7 @@ import { answerChanges, answerObservations, isAskedField, keyOfPath, openAsks, p
 import { REPORT_TOOLS, liveDelegation, liveTargets, replaceable } from './lab-delegation.js';
 import { languageNumber } from '../insurance/i18n.js';
 import { at } from '../insurance/draft-proposals.js';
-import type { ResponsesTransport } from '../erni-dialog/responses.js';
+import type { ResponsesTransport } from '../model/responses.js';
 type JsonValue = Parameters<typeof JSON.stringify>[0];
 const MODEL_ERRORS=['MODEL_TIMEOUT','MODEL_TRANSPORT_FAILED','INVALID_MODEL_OUTPUT'];
 /** The open-question key of an intake field of the person speaking (lab-questions.ts). */

@@ -7,7 +7,7 @@ import profileConfirmationJson from '../../../../../../../fixtures/voice-confirm
 
 /**
  * The specs run on the JSON the real backend produced for the journey "119'000 CHF gross → package
- * → acceptance → profile confirmation" (`npm run contracts:voice-examples`), not on hand-made
+ * → acceptance → profile confirmation" (frozen JSON in `code/fixtures/voice-confirmation`), not on hand-made
  * look-alikes. Only imported by specs.
  */
 export const CASE_ID = extractor.caseId;

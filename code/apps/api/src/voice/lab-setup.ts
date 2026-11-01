@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DraftSchema, EMPTY_INSURANCE, type InsuranceDraft } from '@pax/contracts';
-import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
+import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../model/responses.js';
 import { WorkflowError } from '../insurance/types.js';
 import { toolRules } from './exchange.js';
 

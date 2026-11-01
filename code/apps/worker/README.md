@@ -78,4 +78,3 @@ The live browser message includes the error code. In browser DevTools → Consol
 
 One DO serves everyone; this is suitable for a jury, not a horizontally scaled service. The store holds at most 25 cases. At capacity, a new demo start replaces replaceable cases (unreachable first, then oldest), which can end an active visitor's session. `/api/demo/start` is not rate limited. Set provider spending limits before judging. Microphone access requires HTTPS outside localhost; workers.dev provides it. Real provider success and a phone smoke test still need deployed credentials and the public URL.
 
-Earlier local feasibility measurements are in [HISTORY.md](HISTORY.md).

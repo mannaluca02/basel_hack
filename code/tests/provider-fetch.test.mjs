@@ -4,7 +4,7 @@ import {createServer} from 'node:http';
 import {providerFetch} from '../apps/api/dist/provider-fetch.js';
 import {OpenAiLiveGateway,ElevenLabsGateway} from '../apps/api/dist/voice/providers.js';
 import {LiveLogismataProvider} from '../apps/api/dist/logismata/client.js';
-import {openAiResponsesTransport} from '../apps/api/dist/erni-dialog/responses.js';
+import {openAiResponsesTransport} from '../apps/api/dist/model/responses.js';
 
 test('provider fetch strips cookies, omits credentials and preserves authorization and cancellation',async()=>{
   const signal=AbortSignal.timeout(1000);

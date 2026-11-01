@@ -2,7 +2,7 @@
 
 Stand: 01.11.2026 · TypeScript/NestJS/Zod, Node 22–24. Überblick über das ganze System: [Architektur](../documentation/architecture.md).
 
-Das Backend bildet den bestätigten Workshop-Zuschnitt LOG-01–LOG-07 als funktionierenden PoC ab: ein geschützter gemeinsamer JSON-Fall, bedarfsorientierte Aufnahme, drei Säulen, Lebensversicherung, Szenarien, nachgelagerte Pax-Produktfamilien, Fachreview und gespeicherter Demo-Vertragsweg bis ins Portal. Die reguläre Anwendung verwendet echte Logismata-Rechner. Angular, KI-Dialog, Voice und Avatar werden durch Luca, Earnie, Dario und Lukas angebunden.
+Das Backend bildet den bestätigten Workshop-Zuschnitt LOG-01–LOG-07 als funktionierenden PoC ab: ein geschützter gemeinsamer JSON-Fall, bedarfsorientierte Aufnahme, drei Säulen, Lebensversicherung, Szenarien, nachgelagerte Pax-Produktfamilien, Fachreview und gespeicherter Demo-Vertragsweg bis ins Portal. Die reguläre Anwendung verwendet echte Logismata-Rechner. Darauf bauen die Angular-App, die Live-Stimme mit Paxi und sein Avatar auf ([Architektur](../documentation/architecture.md)).
 
 Die [Requirements-Matrix](../documentation/baselhack/reports/life-insurance-requirements.md) trennt implementierte Backend-Funktionen, automatische Nachweise, Team-Integration und Produktionsfreigaben. Der [Implementierungsbericht](../documentation/architecture.md) beschreibt Architektur und fachliche Grenzen.
 
@@ -24,14 +24,12 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 
 | Befehl | Wirkung |
 |---|---|
-| `npm test` | Vollständiger Build und alle Backend-Tests (über 430); Rechner und OpenAI synthetisch ersetzt, kein externer Zugriff |
+| `npm test` | Vollständiger Build und alle Backend-Tests (über 440); Rechner und OpenAI synthetisch ersetzt, kein externer Zugriff |
 | `npm run test:all` | Backend, Voice-Agent und Web-App zusammen |
 | `npm run test:coverage` | Backend-Tests mit Abdeckung je Datei (Web: `npm --prefix apps/web run test:coverage`, Voice-Agent: `npm --prefix voice-agent run test:coverage`) |
 | `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
 | `npm run test:live:conversation` | Ein ganzes erfundenes Live-Gespräch von A bis Z mit der echten Erkennung (`OPENAI_API_KEY`): Person anlegen, jede offene Frage, Übernahme, Speichern, Berechnung; Bericht Satz für Satz und Feld für Feld (erwartet → gespeichert). `LIVE_CALCULATOR=1` rechnet mit Logismata. Dasselbe Gespräch läuft ohne Netz in `tests/live-conversation.test.mjs`; Skript und Antworten stehen in `tests/helpers/live-conversation.mjs` |
-| `npm run start:demo` | Frühere, ausdrücklich separate Offline-HTTP-Demo mit festen Fixtures unter `/api/demo/` |
-| `npm run demo` | Frühere Offline-Fachdemo ohne HTTP-Server |
 
 Der Live-Test erzeugt eine eigene temporäre verschlüsselte Datenbank und räumt sie anschließend auf. Die Reviewer-Rolle wird dort ausschließlich für den erfundenen Testfall simuliert; das ist keine fachliche Pax-Freigabe. Optional schreibt `LIFEMAP_LIVE_REPORT=/absoluter/pfad/report.json npm run test:live` einen bereinigten Nachweis ohne Token. Der lokale Beispieldatensatz steht in [insurance-household.json](fixtures/insurance-household.json).
 
@@ -103,7 +101,7 @@ Der Providerzugang ist auf den dokumentierten Host und Operationspfade begrenzt.
 
 Ein HTTP-200 ist keine fachliche Freigabe. Die beobachteten Risikoantworten mit Code `0` bleiben `requires_review`; eine Reviewer-Entscheidung ist gesondert sichtbar und verändert diese ursprüngliche Datenqualität nicht.
 
-## Darios Agent dynamisch informieren
+## Agent-Zugang: Kontext, Ereignisse, Vorschläge
 
 Der Kunde kann `/agent-access` aufrufen; der kurzlebige Bearer-Token ist ausschließlich für Earnies serverseitige Integration bestimmt. Dieser Agent darf nur für den freigegebenen Fall Kontext/Events lesen und erlaubte Änderungen vorschlagen. Er darf weder den vollständigen Fall lesen noch Kundenangaben bestätigen, Reviews genehmigen oder Verträge auslösen.
 
@@ -170,25 +168,17 @@ Der vollständige, versionierte `InsuranceCaseDto` und alle Fachdaten-Unterobjek
 
 Der [Team-API-Leitfaden](../documentation/baselhack/plans/team-api-guide.md) dokumentiert Rollen, konkrete Endpunkte, Payloads, Versionsschutz und das Nachladen für Voice. [API und Datenbank](../documentation/architecture.md#datenhaltung) erklärt den vorhandenen verschlüsselten Speicher und den konkreten späteren PostgreSQL-Ausbau. Eine SQL-/Cloud-Datenbank wurde nicht eingerichtet.
 
-Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt zehn [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und 121 automatisierte Tests. VoiceLog, AgentReply und Playback sind bereitgestellte Team-Nachrichtenschemas; ihre tatsächlichen STT-/LLM-/TTS-/Avatar-Transporte bleiben die Implementierung der zuständigen Teammitglieder.
+Die [Client-Beispiele](examples/contracts/team-client.ts) kompilieren mit `npm run typecheck:clients` ohne Node-Typen. `npm run contracts:export` erzeugt 40 [standalone JSON-Schemas](packages/contracts/schemas/) für TypeScript-fremde Komponenten. `npm test` prüft Browser-Typen, Export-Aktualität und alle Backend-Tests.
 
 ## Dialogextraktion und Vorschlagspakete
 
-Ernis Modul bindet über die autorisierte Extraktor-Projektion und atomare Vorschlagspakete an denselben Runtime/Fallservice an. Siehe [Integration, Bestätigung und Zuständigkeiten](../documentation/baselhack/plans/erni-extractor-integration.md). `npm run demo:extraction` führt den synthetischen Backend-Durchlauf aus; `npm run contracts:extraction-examples` exportiert die sechs JSON-Beispiele in `fixtures/extraction`. OpenAI wird von diesem Durchlauf nicht aufgerufen.
+Was die Stimme hört, wird zu atomaren Vorschlagspaketen am Fall; erst die Annahme durch den Kunden ändert den Entwurf. [Extraktion und Vorschlagspakete](../documentation/baselhack/plans/erni-extractor-integration.md), [Bestätigungen und Unklarheiten](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md), [Live-Stimme](../documentation/live-voice.md). Die JSON-Beispiele in `fixtures/extraction`, `fixtures/voice-confirmation` und `fixtures/human-handover` sind eingefrorene Testdaten.
 
-Der erste vollständige Dialog-Moduldurchlauf ist über `npm run demo:erni-dialog` ohne externe Dienste und über `npm run demo:erni-dialog:openai` separat mit einem serverseitigen `OPENAI_API_KEY` ausführbar. Beide prüfen den Jahresbrutto-Pflichtfall und unverändertes Budget-Netto; der zweite sendet ausschließlich den eigens erfundenen Demo-Ausschnitt an OpenAI. [Startbefehle, Grenzen und Verarbeitungshinweis](apps/api/src/erni-dialog/README.md). Darios echter Voice-/Bestätigungsanschluss ist damit noch nicht abgenommen.
-
-Den Prüfstand im Angular-Client gegen den echten Fallservice startet `npm run demo:customer-review` mit synthetischen Daten; Details stehen im [Web-README](apps/web/README.md).
-
-Gebundene Kundenbestätigungen und der Gesprächsstatus beantworteter Unklarheiten sind in [Darios/Ernis Voice-Anbindung](../documentation/baselhack/plans/voice-confirmation-and-dialogue.md) beschrieben. `npm run demo:voice-confirmation` testet ausschließlich jährliches Brutto mit zwei getrennten synthetischen Antworten; Budget-Netto bleibt unverändert.
-
-Die providerneutrale [Offline-Voice-Pipeline](apps/api/src/voice/README.md) prüft Audio → STT → Maskierung → Dialog → TTS → Wiedergabe über injizierte Adapter. `npm run test:voice` testet Ablauf, Abbruch und echte Runtime-Bestätigungen; `npm run evaluate:voice` liefert getrenntes Funktions-/Codequalitätsfeedback mit höchstens fünf Versuchen. Der verpflichtende Maskierungs-Hook bereitet die spätere Presidio-Mittelschicht vor. Echte STT-/TTS-Dienste und Browser-Audio sind damit noch nicht getestet.
-
-Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, Kontexten und SSE verfügbar. [Routen und Zuständigkeiten](../documentation/baselhack/plans/human-advisor-handover.md). `npm run demo:handover` prüft Request/Stoppsignal/Replay/Resume ohne Anruf oder externe API-Aufrufe.
+Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, Kontexten und SSE verfügbar: [Routen und Zuständigkeiten](../documentation/baselhack/plans/human-advisor-handover.md).
 
 ## Voice am gemeinsamen Fall
 
-[Anbindung für Dario und Erni](../documentation/baselhack/plans/voice-backend-integration.md): Nest-Voice-Modul, serverseitige OpenAI-/ElevenLabs-Adapter, explizite synthetische Voice-Zustimmung, verschlüsselte finale Transkripte und quellengebundene atomare Vorschläge. `npm run demo:voice-integration` prüft den vollständigen Backend-Fluss ohne Mikrofon oder externe Modellaufrufe. `npm run contracts:voice-integration-examples` erzeugt die Team-JSON-Beispiele. Voice bleibt ohne `PAX_SYNTHETIC_VOICE_ENABLED=1` deaktiviert.
+[Voice-Sessions im Backend](../documentation/baselhack/plans/voice-backend-integration.md): Nest-Voice-Modul, serverseitige OpenAI-/ElevenLabs-Adapter, explizite synthetische Voice-Zustimmung, verschlüsselte finale Transkripte und quellengebundene atomare Vorschläge. `npm run demo:voice-integration` prüft den vollständigen Backend-Fluss ohne Mikrofon oder externe Modellaufrufe. `npm run contracts:voice-integration-examples` erzeugt die Team-JSON-Beispiele. Voice bleibt ohne `PAX_SYNTHETIC_VOICE_ENABLED=1` deaktiviert.
 
 ## Deploy on Cloudflare
 

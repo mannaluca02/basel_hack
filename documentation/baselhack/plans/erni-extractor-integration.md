@@ -2,7 +2,7 @@
 
 Aktuelle Ergänzung für Dario und Erni: [Gebundene Voice-Bestätigung und Gesprächsstatus beantworteter Unklarheiten](voice-confirmation-and-dialogue.md).
 
-Stand: 31.10.2026. Implementierte gemeinsame Grundlage in `feature/life-insurance-live-backend`. Extraktion mit OpenAI sowie STT/TTS sind Aufgaben der jeweiligen Module und werden hier noch nicht aufgerufen.
+Stand: 31.10.2026, ergänzt am 01.11.2026. Die Verträge (Extraktor-Kontext, Pakete, Ersetzen, Unklarheiten) gelten unverändert. Das hier geplante separate `ErniDialogModule` wurde nie angeschlossen und ist entfernt: Die Live-Extraktion läuft über `voice-lab/turns` mit GPT-Lives Hintergrundmodell oder dem eigenen Modellaufruf des Backends ([Live-Stimme](../../live-voice.md)).
 
 ## Die sieben Absprachen
 
@@ -33,7 +33,6 @@ import {
 - [HTTP-Controller](../../../code/apps/api/src/insurance/http.ts)
 - [Typisierte Client-Beispiele](../../../code/examples/contracts/team-client.ts)
 - [Zusammenhängende synthetische JSON-Beispiele](../../../code/fixtures/extraction/)
-- [Ausführbarer Durchlauf](../../../code/scripts/demo-extraction.mjs)
 
 Die Erweiterungen werden gemeinsam aus demselben Workspace gebaut. Die Fall-Hauptversion bleibt im PoC `1.0`; alte strikte Clients müssen auf die neuen Verträge aktualisiert werden, weil zusätzliche Eigenschaften und der Vorschlagsstatus `superseded` hinzukommen. Ältere verschlüsselte Fälle erhalten beim Öffnen leere `proposalBatches` und `ambiguities`; vorhandene Daten werden nicht gelöscht.
 
@@ -183,9 +182,8 @@ Im Repo-Unterordner `code`:
 
 ```sh
 npm test
-npm run demo:extraction
 ```
 
-Der Durchlauf verwendet absichtlich den synthetischen Testprovider, erzeugt temporäre verschlüsselte Speicherung und entfernt sie anschließend. Er benötigt keinen Logismata- oder OpenAI-Schlüssel. Er prüft Paketannahme → vorgeschlagene Beträge → Profilversion 2 → Berechnung auf Version 2. `npm run contracts:extraction-examples` exportiert sechs zusammengehörige Beispiel-JSONs; die IDs daraus existieren nicht im laufenden Server.
+Der Ablauf ist in `tests/extraction-workflow.test.mjs` abgedeckt. Er verwendet absichtlich den synthetischen Testprovider, erzeugt temporäre verschlüsselte Speicherung und entfernt sie anschließend. Er benötigt keinen Logismata- oder OpenAI-Schlüssel. Er prüft Paketannahme → vorgeschlagene Beträge → Profilversion 2 → Berechnung auf Version 2. `npm run contracts:extraction-examples` exportiert sechs zusammengehörige Beispiel-JSONs; die IDs daraus existieren nicht im laufenden Server.
 
 Für den ersten gemeinsamen Test ersetzt Erni den simulierten Extraktionsoutput durch sein Modul: „Mein Bruttojahreseinkommen ist 119'000 CHF“, danach eine Korrektur vor Annahme und eine Rückfrage zur Periodizität. Abnahme: richtige Person, ausschließlich jährliches Brutto in Rappen und unverändertes Budget-Netto, explizite Ersetzung, atomare Annahme, Rückfrage bis Kundenantwort offen, anschließende Profilbestätigung, neue Berechnung und aktualisierter Gesprächskontext. Zusätzlich zwei gleichzeitige Browseränderungen testen; keine stille Überschreibung.

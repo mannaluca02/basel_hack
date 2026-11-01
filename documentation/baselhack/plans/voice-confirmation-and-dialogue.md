@@ -162,12 +162,11 @@ Im `code`-Workspace:
 
 ```sh
 npm test
-npm run demo:voice-confirmation
 ```
 
-Der Durchlauf verwendet temporäre verschlüsselte Speicherung und den synthetischen Testprovider. Er simuliert zwei finale Antworten, ruft aber weder OpenAI noch echte Spracherkennung, TTS oder Live-Logismata auf. Er prüft: nur jährliches Brutto geändert → Budget-Netto unverändert → beantwortete Frage nicht wiederholt → erstes Ja übernimmt Paket → zweites Ja bestätigt Profilversion 2 → Berechnung auf Version 2.
+`tests/customer-confirmations.test.mjs` verwendet temporäre verschlüsselte Speicherung und den synthetischen Testprovider. Er simuliert zwei finale Antworten, ruft aber weder OpenAI noch echte Spracherkennung, TTS oder Live-Logismata auf. Er prüft: nur jährliches Brutto geändert → Budget-Netto unverändert → beantwortete Frage nicht wiederholt → erstes Ja übernimmt Paket → zweites Ja bestätigt Profilversion 2 → Berechnung auf Version 2.
 
-`npm run contracts:voice-examples` erzeugt acht zusammenhängende Vertragsbeispiele und einen Ergebnisnachweis. Die IDs sind Offline-Beispiele, keine laufenden Serverfälle. Bestätigungsfragen in diesen Dateien sind beim späteren Lesen abgelaufen und werden im echten Ablauf immer neu erzeugt.
+`fixtures/voice-confirmation` enthält acht eingefrorene Vertragsbeispiele und einen Ergebnisnachweis. Die IDs sind Offline-Beispiele, keine laufenden Serverfälle. Bestätigungsfragen in diesen Dateien sind beim späteren Lesen abgelaufen und werden im echten Ablauf immer neu erzeugt.
 
 Die neuen Context-Felder und der Paketstatus `rejected` erfordern, dass alle Teams denselben aktuellen Stand von `@pax/contracts` bauen. Bestehende verschlüsselte Fälle erhalten beim Öffnen eine leere private Liste der Bestätigungsanforderungen. Es wird keine weitere Datenbank eingerichtet.
 

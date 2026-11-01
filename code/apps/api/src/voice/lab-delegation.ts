@@ -1,5 +1,5 @@
 import type { InsuranceDraft, ProposalChangeInput } from '@pax/contracts';
-import { ANALYSIS_MODEL } from '../erni-dialog/responses.js';
+import { ANALYSIS_MODEL } from '../model/responses.js';
 import { intakeTool } from './lab-intake.js';
 import { answersTool, answerTargets, pendingView } from './lab-questions.js';
 import { setupTool } from './lab-setup.js';

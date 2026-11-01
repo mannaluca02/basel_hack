@@ -21,12 +21,10 @@ Ab Repository-Wurzel:
 ```sh
 npm --prefix code ci
 npm --prefix code test
-npm --prefix code run demo:voice-integration
 ```
 
-Die Demo verwendet einen Fake-Voice-Gateway und den synthetischen Rechner, eine temporäre verschlüsselte Ablage und simulierte Playback-Ereignisse. Sie öffnet weder Mikrofon noch Providerverbindung. Ablauf: finales Kundentranskript → quellengebundene Beobachtung → Vorschlag → zwei getrennte Bestätigungen → Berechnung mit Profilversion 2 → Beraterübergabe. Jahresbrutto wird `11900000` Cent; Budget-Netto und zusätzliche Sparrate bleiben unverändert.
+`tests/voice-integration.test.mjs` verwendet einen Fake-Voice-Gateway und den synthetischen Rechner, eine temporäre verschlüsselte Ablage und simulierte Playback-Ereignisse. Sie öffnet weder Mikrofon noch Providerverbindung. Ablauf: finales Kundentranskript → quellengebundene Beobachtung → Vorschlag → zwei getrennte Bestätigungen → Berechnung mit Profilversion 2 → Beraterübergabe. Jahresbrutto wird `11900000` Cent; Budget-Netto und zusätzliche Sparrate bleiben unverändert.
 
-[Zusammenhängende JSON-Beispiele](../../../code/fixtures/voice-integration/) enthalten Session-Metadaten, Transkript, Extraktionsrequest, Paket, beide Bestätigungen, Übergabe und Ergebnis. Mit `npm --prefix code run contracts:voice-integration-examples` neu erzeugen. IDs und Zeitstempel sind Offline-Beispiele; für echte Requests neue Fälle, Sitzungen und Bestätigungen erzeugen.
 
 ## Lokalen Server konfigurieren
 

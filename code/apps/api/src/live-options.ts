@@ -1,4 +1,4 @@
-import { openAiResponsesTransport } from './erni-dialog/responses.js';
+import { openAiResponsesTransport } from './model/responses.js';
 import type { RuntimeOptions } from './insurance/runtime.js';
 
 type Env = Readonly<Record<string, string | undefined>>;

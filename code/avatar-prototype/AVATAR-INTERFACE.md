@@ -14,9 +14,9 @@ avatar.attachAudio(remoteStream);   // MediaStream or <audio> element that the u
 avatar.handle(event);               // every AvatarEvent, in the order they happen
 ```
 
-Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). Reference implementation for GPT-Live: [`openai-realtime-adapter.js`](openai-realtime-adapter.js).
+Types: [`pax-avatar.d.ts`](pax-avatar.d.ts). In the app: [`paxi-case-voice.ts`](../apps/web/src/app/core/voice/paxi-case-voice.ts) (GPT-Live events → emotions) and [`voice-avatar.ts`](../apps/web/src/app/core/voice/voice-avatar.ts) (reply segments → AvatarEvents).
 
-`emotionHoldMs` is configurable per instance (default `5000`; `0` disables the hold). It must be a finite non-negative number. The first emotion applies immediately; later requests keep only the latest candidate until the current hold expires. Repeated answers for the same emotion do not restart the hold. The live demo sets this option in [`realtime.html`](realtime.html).
+`emotionHoldMs` is configurable per instance (default `5000`; `0` disables the hold). It must be a finite non-negative number. The first emotion applies immediately; later requests keep only the latest candidate until the current hold expires. Repeated answers for the same emotion do not restart the hold. The live demo sets this option in the former `realtime.html` demo.
 
 `attachAudio` accepts a `MediaStream`, `HTMLMediaElement`, a function returning the current 0..1 level, or `null` to detach. Read `state` for `{ face, activity, playing, replyEmotion, level, localAudioActive }`. `reset()` starts a fresh conversation; `destroy()` stops animation, clears timers and audio resources, and empties the host. Design/demo code can call `show(face)` for any of the eleven expressions, always replaying its entry gesture.
 
@@ -59,7 +59,7 @@ confirmation evidence. It is not an emotion classifier or proof that the user he
 
 ### Emotion reference
 
-Allowed values are defined by `ReplyEmotion` in [`pax-avatar.d.ts`](pax-avatar.d.ts); classifier descriptions live in `EMOTION_CHOICES` in [`server.mjs`](server.mjs).
+Allowed values are defined by `ReplyEmotion` in [`pax-avatar.d.ts`](pax-avatar.d.ts); classifier descriptions live in `EMOTION_CHOICES` in [`emotions.ts`](../apps/api/src/voice/emotions.ts).
 
 | `emotion` value | Use when the advisor… |
 |---|---|
@@ -91,7 +91,7 @@ avatar.handle({ type: "emotion", emotion: "empathetic", playbackId });
 
 ## GPT-Live prototype mapping
 
-The reference adapter uses `gpt-live-1` for voice. [`server.mjs`](server.mjs) configures native Decisions delegation on `gpt-6-luna` for `ui_action`, plus independent input/output transcript triggers for reply emotions. The legacy filename `openai-realtime-adapter.js` does not mean it uses the Realtime API.
+The app uses `gpt-live-1` for voice. The backend's session ([`providers.ts`](../apps/api/src/voice/providers.ts)) sets independent input/output transcript triggers for reply emotions ([`emotions.ts`](../apps/api/src/voice/emotions.ts)); the former prototype also delegated a `ui_action` choice, which the app does not use.
 
 The browser action registry only logs pension-picture and human-advisor requests; it does not display a picture or contact anyone. It returns one result per delegation through `session.commentary.append`. Actions time out after 3 s; a 10 s watchdog answers stalled delegations. Invalid messages and nonfatal errors are logged. See [integration options](#integration-options) for alternatives and limitations.
 
@@ -116,7 +116,7 @@ These decisions are independent: emotion source, activity/playback source, sessi
 **A. Transcript-triggered Decisions (current; recommended for the standalone voice demo).** Configure `session.triggers` at session creation alongside `session.delegation`; `transport` is a sibling of `session` in the WebRTC request. Each entry uses `type`, `event_type`, and `decisions.questions`; a choice question uses `type`, `name`, `instructions`, and `choices` with `value` and optional `description`. This is the current input trigger structure (shortened choices):
 
 ```js
-// Inside session.triggers; use all nine EMOTION_CHOICES from server.mjs.
+// Inside session.triggers; use all nine EMOTION_CHOICES from code/apps/api/src/voice/emotions.ts.
 {
   type: "decisions",
   event_type: "session.input_transcript.delta",
@@ -138,7 +138,7 @@ avatar.handle({ type: "emotion", emotion: answer.choice, playbackId: source.play
 
 `source.playbackId` is the adapter's local segment ID saved when the matching `source_event_id` arrived; it is not an OpenAI response ID. Live may combine pending deltas and return results out of order. Track the newest applied source independently for input and output, discard older results, and discard finished playback IDs. The adapter does this; it ignores missing/failed/invalid answers. If adding WebRTC event filtering, allow **both transcript types and `decision.event`**; a trigger result is delivered only if its source transcript event is allowed. Keep `session.delegation.created` for actions. [Result shape and ordering](https://developers.openai.com/api/docs/guides/decisions-voice#react-to-transcripts).
 
-Tune the German `EMOTION_CHOICES` descriptions in [`server.mjs`](server.mjs), keeping the values unchanged. Distinguish acknowledgment from explanation, concern from genuine shock, and announcing an offer from actually presenting it. Test ambiguous utterances and corrections. Input predicts the reply tone; output follows what Live actually says. Pax queues input emotions behind listening/thinking rather than changing the listening face as in the docs' example.
+Tune the German `EMOTION_CHOICES` descriptions in [`emotions.ts`](../apps/api/src/voice/emotions.ts), keeping the values unchanged. Distinguish acknowledgment from explanation, concern from genuine shock, and announcing an offer from actually presenting it. Test ambiguous utterances and corrections. Input predicts the reply tone; output follows what Live actually says. Pax queues input emotions behind listening/thinking rather than changing the listening face as in the docs' example.
 
 **Cost/latency:** native delegation avoids an app round trip; transcript Decisions can overlap speech, but arrival before playback is not guaranteed. Decisions usage is additional to voice duration; caching can reduce repeated-input cost. Standalone `/v1/decisions` has input-token pricing and no output-token charge; consult its pricing rather than assuming a per-delta price for native triggers. Keep both directions initially; if needed, evaluate output-only for simpler timing and fewer evaluations. Measure actual latency/usage. [Decisions pricing/caching](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability), [voice/backend accounting](https://developers.openai.com/api/docs/guides/voice-latency-cost?api=live).
 
@@ -160,7 +160,7 @@ A later server sideband can receive reflected output audio with `start_ms`/`end_
 
 ### 3. Where the session is created
 
-**Dev:** keep `server.mjs` for the isolated prototype. **Angular integration:** move its `POST /session` into Dario's NestJS VoiceAdapter. The browser posts `{ sdp }`; the backend calls `POST https://api.openai.com/v1/live/sessions` with `{ session, transport: { type: "webrtc", sdp } }`, keeps the API key/configuration server-side, and returns the JSON answer. Apply `transport.sdp`, then wait for `session.started`; do not send `session.start` on WebRTC. [WebRTC setup](https://developers.openai.com/api/docs/guides/voice-webrtc?api=live).
+**Session:** the backend creates it (`POST /api/cases/:id/voice/sessions`, `OpenAiLiveGateway`). The browser posts `{ sdp }`; the backend calls `POST https://api.openai.com/v1/live/sessions` with `{ session, transport: { type: "webrtc", sdp } }`, keeps the API key/configuration server-side, and returns the JSON answer. Apply `transport.sdp`, then wait for `session.started`; do not send `session.start` on WebRTC. [WebRTC setup](https://developers.openai.com/api/docs/guides/voice-webrtc?api=live).
 
 Preserve the **one voice-only retry**: currently only a 4xx mentioning triggers/decisions/delegation causes retry without `triggers` and `delegation`, with action instructions removed. Return `X-Avatar-Decisions: disabled` and log the degraded mode. This is app fallback policy, not an API guarantee; it does not retry every voice/auth/network failure.
 
