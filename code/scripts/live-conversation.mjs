@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import {openAiResponsesTransport} from '../apps/api/dist/erni-dialog/responses.js';
+import {openAiResponsesTransport} from '../apps/api/dist/model/responses.js';
 import {formatReport,runConversation} from '../tests/helpers/live-conversation.mjs';
 
 /**

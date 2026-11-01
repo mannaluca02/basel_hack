@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { VoiceObservation } from '@pax/contracts';
-import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
+import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../model/responses.js';
 import { WorkflowError } from '../insurance/types.js';
 import { latestExchange, toolRules } from './exchange.js';
 import type { Locale } from '../insurance/i18n.js';

@@ -2,7 +2,7 @@
 
 Angular 22 mobile-first web app (PWA). Standalone components, signals, strict TypeScript, SCSS.
 
-Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (Angular 22 engines); the repo `.nvmrc` pins 26.
+Requires Node `^22.22.3 || ^24.15.0 || >=26.0.0` (Angular 22 engines); the repo `.nvmrc` pins 24 (as CI and `code/package.json` engines).
 
 Live voice runs in the app itself; the Voice Lab is a debug configuration of it, see
 [Live voice and Voice Lab](../../../documentation/baselhack/plans/voice-lab-debugging.md).
@@ -22,7 +22,7 @@ npm run start:live    # end to end without test data: a new empty case per start
 npm run start:debug:lab  # Voice Lab against the isolated lab backend (code: npm run start:voice-lab), port 4300
 ```
 
-This app keeps its own lockfile. The types of `@pax/contracts` come from its build, so run `npm ci && npm run build` in `code/` first.
+It is an npm workspace of `code/` (one lockfile there). The types of `@pax/contracts` come from its build, so run `npm ci && npm run build` in `code/` first.
 
 ## Structure
 
@@ -40,7 +40,7 @@ This app keeps its own lockfile. The types of `@pax/contracts` come from its bui
 - `src/app/core/config/app-environment.ts` – `APP_ENVIRONMENT` token; inject it instead of importing `environment`
 - `src/environments/` – `apiBaseUrl` and `dataSource` (`mock` | `api`); the development build swaps in `environment.development.ts`
 - `src/app/core/advisor/` – the only seam to the advisor backend:
-  - `contracts.ts` mirrors the planned contracts I04, I05, I08, I09, I10; `ui-models.ts` holds the UI types without a contract yet (`RiskItem`, `TranscriptEntry`, `InfoItem`, `ChartResult`, agent state), to be aligned in FE-06
+  - `contracts.ts` mirrors the interface contracts I04, I05, I08, I09, I10; `ui-models.ts` holds the UI types without a contract yet (`RiskItem`, `TranscriptEntry`, `InfoItem`, `ChartResult`, agent state), to be aligned in FE-06
   - inject `AdvisorDataSource`: `events` (live upserts), `snapshot()`, `connection`, `connect()` / `disconnect()`. `dataSource: 'mock'` binds `MockDataSource`, which replays a ~3 min synthetic call (`mock/mock-call-script.ts`, DE/EN texts, FR/IT fall back to DE). All amounts are in Rappen and come from the source; the UI never calculates them
   - components read `CaseStore` (`store/case-store.ts`), not the data source: one signal per slice (`charts`, `risks`, `transcript`, `info`, `progress`, `summary`, `agent`, `connection`, …) and `unread()` per tab, reset with `markRead(tab)`. It loads a snapshot on every (re)connect and applies live events on top. The version guard in `store/case-state.ts` drops a late result whose `profileVersion`, `runId`, `scenarioVersionId`, chart `revision` or `contextRevision` is older than the one held for the same item; a known `chartId` updates in place
 - `src/app/core/advisor/api/` and `src/app/features/review/` – the real backend (`dataSource: 'api'`, `npm run start:api`). Backend data uses the types of `@pax/contracts`, only as `import type`, so there is no second contract and nothing extra in the bundle:
@@ -48,7 +48,7 @@ This app keeps its own lockfile. The types of `@pax/contracts` come from its bui
   - `ApiDataSource` implements `AdvisorDataSource` over the SSE stream. The only live event says "the case changed"
   - `CustomerReview` reloads the central state after every event, reconnect and mutation. It is also the seam for Dario's voice client, which never holds customer credentials: `open(target, { questionTurnId, questionReplyId })`, `playbackEnded(playbackId)` on the real TTS `ended` only, `answerVoice(voiceLog)` and `cancel('new_question')` before any other question, which resolves to `false` when the question is still open and the conversation must not move on
   - `ReviewPanel` is the review stand above the tabs. It reports a question as presented only from the rendered elements. Accepting a package and confirming the complete profile are two separate questions, and a transport failure is never retried: the reload shows what happened
-  - To try it: `npm run demo:customer-review` in `code/` starts the real case service with synthetic data and prints the demo access code and the scenarios
+  - To try it: `npm run dev:demo` in `code/` starts the backend with the demo start and the app
 - The notice (`features/consent`) must keep matching `privacy.*` in the backend's `messages.ts`. `CONSENT_NOTICE_VERSION` is `PRIVACY_NOTICE.version`: raise both when the notice changes in substance, the backend then refuses a client showing the older text
 - `public/` – manifest and icons rendered from `assets/pax/logos/online/colour-positive`
 

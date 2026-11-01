@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { DraftSchema, type InsuranceDraft, type ProposalChangeInput } from '@pax/contracts';
 import { calculateBudget, calculateCapital, intakeQuestions } from '@pax/domain';
-import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../erni-dialog/responses.js';
+import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, type ResponsesTransport } from '../model/responses.js';
 import { applyChanges, at } from '../insurance/draft-proposals.js';
 import { questionText, t, type Locale } from '../insurance/i18n.js';
 import { WorkflowError } from '../insurance/types.js';

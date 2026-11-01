@@ -96,11 +96,10 @@ Im `code`-Workspace:
 
 ```sh
 npm test
-npm run demo:handover
 ```
 
-Die Demo erzeugt einen temporären synthetischen Fall, fordert die Übergabe an, liest den Zustand in beiden Agent-Kontexten, prüft den Stop-Vertrag, wiederholt denselben Befehl und nimmt ausdrücklich wieder auf. Es gibt dabei keine Rechner-, Modell- oder Telefonieaufrufe.
+`tests/human-handover.test.mjs` erzeugt einen temporären synthetischen Fall, fordert die Übergabe an, liest den Zustand in beiden Agent-Kontexten, prüft den Stop-Vertrag, wiederholt denselben Befehl und nimmt ausdrücklich wieder auf. Es gibt dabei keine Rechner-, Modell- oder Telefonieaufrufe.
 
-`npm run contracts:handover-examples` erzeugt sieben zusammengehörige Offline-JSONs unter [fixtures/human-handover](../../../code/fixtures/human-handover/). [Gemeinsame Schemas](../../../code/packages/contracts/src/human-handover.ts), [Service](../../../code/apps/api/src/insurance/human-handover.ts) und [Tests](../../../code/tests/human-handover.test.mjs).
+Eingefrorene Beispiel-JSONs liegen unter [fixtures/human-handover](../../../code/fixtures/human-handover/). [Gemeinsame Schemas](../../../code/packages/contracts/src/human-handover.ts), [Service](../../../code/apps/api/src/insurance/human-handover.ts) und [Tests](../../../code/tests/human-handover.test.mjs).
 
 Die Tests prüfen außerdem Rollen/CSRF, Revisionen, verspätete Rechenantworten auch nach schnellem Resume, Reconnect/SSE, Migration, Bestätigungsinvalidierung und Löschung. Alle Teams müssen denselben aktuellen Stand von `@pax/contracts` verwenden; der Eventvertrag kennt jetzt `interruptPolicy=immediate`. Der vorhandene Frontend-Mock-/API-Adapter ist in diesem Backend-Auftrag nicht umgebaut.

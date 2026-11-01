@@ -17,8 +17,8 @@ const REPLY_END_MS = 600;
 
 /**
  * The live call's voice for Paxi's face: segments the remote voice by energy into reply segments,
- * like Lukas's GPT-Live adapter (`avatar-prototype/openai-realtime-adapter.js`: started when the
- * energy rises, ended after 600 ms quiet). While a segment runs the renderer shows the reply
+ * as Lukas's former GPT-Live prototype adapter did (started when the energy rises, ended after
+ * 600 ms quiet). While a segment runs the renderer shows the reply
  * emotion GPT-Live classified (curious, pleased, empathetic, …); between segments listening and
  * thinking. The local-audio-visual mode would show only explaining and listening instead.
  *

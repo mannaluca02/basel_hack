@@ -22,6 +22,3 @@ __pycache__/
 /documentation/baselhack/.venv/
 /documentation/baselhack/**/__pycache__/
 
-# Incomplete media downloads
-/assets/pax/videos/**/*.part
-/assets/pax/videos/**/*.ytdl

@@ -1,6 +1,5 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createDemoApp} from '../apps/api/dist/main.js';
 import {FakeVoiceGateway} from './helpers/voice-fixture.mjs';
 import {credentials,demoApp} from './helpers/demo-http.mjs';
 
@@ -136,11 +135,3 @@ test('voice providers and the agent\'s voice extraction route over HTTP',async t
   assert.equal(extraction.body.confirmationStillRequired,true);
 });
 
-test('the offline fixture demo lists its fixtures',async t=>{
-  const app=await createDemoApp();t.after(()=>app.close());
-  await app.listen(0,'127.0.0.1');
-  const r=await fetch(`${await app.getUrl()}/api/demo/fixtures`);
-  assert.equal(r.status,200);
-  const body=await r.json();
-  assert.ok(Array.isArray(body.fixtures??body)&&(body.fixtures??body).length>0);
-});

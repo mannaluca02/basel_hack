@@ -2,7 +2,7 @@ import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createLifeInsuranceApp} from '../apps/api/dist/insurance/app.js';
-import {openAiResponsesTransport} from '../apps/api/dist/erni-dialog/responses.js';
+import {openAiResponsesTransport} from '../apps/api/dist/model/responses.js';
 
 // Dedicated ephemeral synthetic cases, separate from the normal local case database.
 const directory=await mkdtemp(join(tmpdir(),'pax-voice-lab-'));

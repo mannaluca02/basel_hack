@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {EncryptedCaseStore} from '../apps/api/dist/insurance/store.js';
 import {createLifeRuntime,hasExpired,sweepExpired} from '../apps/api/dist/insurance/runtime.js';
 import {emptyDatabase} from '../apps/api/dist/insurance/types.js';
-import {openAiResponsesTransport} from '../apps/api/dist/erni-dialog/responses.js';
+import {openAiResponsesTransport} from '../apps/api/dist/model/responses.js';
 import {SyntheticTestProvider} from './helpers/life-fixture.mjs';
 
 /** Encrypted local store, its lock and access codes; runtime retention; the OpenAI transport. */

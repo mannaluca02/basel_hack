@@ -40,7 +40,7 @@ sequenceDiagram
 
 ## Rückfall
 
-Lehnt OpenAI die Delegation ab, startet die Session ohne sie, und das Backend liest jeden Satz selbst aus: dieselben drei Auslesungen über die Responses API mit `gpt-6-luna` (`ANALYSIS_MODEL`, `apps/api/src/erni-dialog/responses.ts`). Dasselbe gilt mit `LIVE_REPORTS=0`. Ohne Delegation für einen Satz, etwa bei Smalltalk, wird nichts ausgelesen.
+Lehnt OpenAI die Delegation ab, startet die Session ohne sie, und das Backend liest jeden Satz selbst aus: dieselben drei Auslesungen über die Responses API mit `gpt-6-luna` (`ANALYSIS_MODEL`, `apps/api/src/model/responses.ts`). Dasselbe gilt mit `LIVE_REPORTS=0`. Ohne Delegation für einen Satz, etwa bei Smalltalk, wird nichts ausgelesen.
 
 ## Emotionen
 

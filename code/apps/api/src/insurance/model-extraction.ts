@@ -3,7 +3,7 @@ import { MODEL_EXTRACTION_NOTICE_VERSION,ModelExtractionConsentInputSchema,Model
 import { LifeInsuranceEngine } from './engine.js';
 import { WorkflowError,type Actor,type InsuranceCase } from './types.js';
 import { sha256Json } from '../calculation/hash.js';
-import type { ResponsesTransport } from '../erni-dialog/responses.js';
+import type { ResponsesTransport } from '../model/responses.js';
 
 export type ModelExtractionOptions={enabled?:boolean;transport?:ResponsesTransport};
 type Locale='de'|'fr'|'it'|'en';
