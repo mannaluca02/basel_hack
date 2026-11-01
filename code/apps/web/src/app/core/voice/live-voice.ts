@@ -1,3 +1,4 @@
+import { errorCode, httpFailure } from '../http/diagnostics';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -284,9 +285,10 @@ export class LiveVoice {
           if (speaker === 'customer') await this.extractLive(sid, messageId, personId, epoch);
           this.store.refresh();
         })
-        .catch(() => {
+        .catch((error: unknown) => {
           if (epoch === this.epoch) {
-            this.error.set('TURN_ROUTING_FAILED');
+            console.warn('[paxi]', { event: 'voice_error', code: 'TURN_ROUTING_FAILED', http: httpFailure(error) });
+            this.error.set(errorCode(error) ?? 'TURN_ROUTING_FAILED');
             this.stop();
           }
         });
@@ -446,8 +448,8 @@ export class LiveVoice {
       ) {
         this.customer.clearSession();
         this.store.clear();
-        this.error.set('SESSION_EXPIRED');
-      } else if (this.error() !== 'SESSION_EXPIRED') this.error.set('API_REQUEST_FAILED');
+        this.error.set(this.liveStart ? errorCode(error) ?? 'SESSION_EXPIRED' : 'SESSION_EXPIRED');
+      } else if (this.error() !== 'SESSION_EXPIRED') this.error.set(errorCode(error) ?? 'API_REQUEST_FAILED');
       this.store.refresh();
     } finally {
       this.busy.set(false);
@@ -464,7 +466,7 @@ export class LiveVoice {
       if (error instanceof HttpErrorResponse && error.status === 404) {
         this.customer.clearSession();
         this.store.clear();
-        this.error.set('SESSION_EXPIRED');
+        this.error.set(this.liveStart ? errorCode(error) ?? 'SESSION_EXPIRED' : 'SESSION_EXPIRED');
       }
       throw error;
     }

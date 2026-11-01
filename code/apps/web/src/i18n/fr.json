@@ -504,6 +504,7 @@
     "end": "Terminer la conversation"
   },
   "voice": {
+    "interrupted": "La conversation a été interrompue (code : {{code}}). Veuillez la redémarrer.",
     "start": "Conversation en direct avec Paxi",
     "stop": "Terminer la conversation",
     "title": "Parler avec Paxi",

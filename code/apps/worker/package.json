@@ -11,7 +11,8 @@
     "setup:local": "node scripts/setup-local.mjs",
     "check:persistence": "node scripts/check-persistence.mjs",
     "deploy": "wrangler deploy",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "diagnose": "node scripts/diagnose.mjs"
   },
   "dependencies": {
     "@pax/api": "0.1.0",

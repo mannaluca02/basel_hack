@@ -16,6 +16,7 @@ import { CaseStore } from '../../core/advisor/store/case-store';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { Consent } from '../../core/consent/consent';
 import { provideI18nTesting } from '../../core/i18n/i18n-testing';
+import { LiveVoice } from '../../core/voice/live-voice';
 import { LiveVoiceControl } from './live-voice-control';
 
 describe('LiveVoiceControl', () => {
@@ -209,5 +210,13 @@ describe('LiveVoiceControl', () => {
     expect(consents).toEqual([expect.objectContaining({ allowSyntheticModelExtraction: true })]);
     expect(microphone).toHaveBeenCalledOnce();
   });
+  it('shows an actionable live message with the diagnostic code', async () => {
+    await setup();
+    TestBed.inject(LiveVoice).error.set('CSRF_INVALID');
+    fixture.detectChanges();
+    expect(element().querySelector('[role="alert"]')!.textContent).toContain('Code: CSRF_INVALID');
+    expect(element().textContent).not.toContain('API trace');
+  });
+
 });
 

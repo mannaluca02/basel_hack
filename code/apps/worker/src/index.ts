@@ -1,3 +1,4 @@
+import {redactDiagnostic} from '../../api/dist/insurance/http.js';
 import {DurableObject} from 'cloudflare:workers';
 import {handleAsNodeRequest} from 'cloudflare:node';
 import {createLifeInsuranceApp} from '../../api/dist/insurance/app.js';
@@ -22,7 +23,7 @@ export class LifeInsuranceObject extends DurableObject<Env> {
 
   /** Shared by concurrent requests; a failed boot is cleaned up and retried by the next request or alarm. */
   private ready() {
-    return this.boot??=this.start().catch(error=>{this.boot=undefined;throw error;});
+    return this.boot??=this.start().catch(error=>{console.error(JSON.stringify({event:'do_boot_failed',...failure(error)}));this.boot=undefined;throw error;});
   }
 
   private async start() {
@@ -56,10 +57,12 @@ export class LifeInsuranceObject extends DurableObject<Env> {
   }
 
   async alarm() {
-    await this.ready();
-    await this.runtime!.sweepVoice();await this.runtime!.sweepRetention();
-    // Transactions also arm alarms, including writes from background engine work.
-    await this.store!.arm();
+    try {
+      await this.ready();
+      await this.runtime!.sweepVoice();await this.runtime!.sweepRetention();
+      // Transactions also arm alarms, including writes from background engine work.
+      await this.store!.arm();
+    }catch(error){console.error(JSON.stringify({event:'alarm_failed',...failure(error)}));throw error;}
   }
 
   async fetch(request: Request) {
@@ -88,3 +91,5 @@ export default {
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   },
 };
+
+function failure(error:unknown){return {error:error instanceof Error?error.name:'Error',message:redactDiagnostic(error instanceof Error?error.message:String(error)).slice(0,300)};}

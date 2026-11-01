@@ -191,6 +191,12 @@ Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, K
 
 ## Deploy on Cloudflare
 
+Diagnose (nur lesend): `CLOUDFLARE_ACCOUNT_ID=d4d88ec43765f1f4f61b1f9214b3f721 npm run diagnose -w @pax/worker`.
+Mit `-- --all` werden auch erfolgreiche Requests angezeigt; Ctrl-C beendet den Tail.
+Tail kann unter Last Requests auslassen. Dieselben `api_error`-Zeilen stehen im Cloudflare Dashboard → Workers & Pages → paxi → Observability; dort nach `api_error` suchen und nach `code`/`case` filtern.
+Die Gesprächsfehlermeldung zeigt den Code. In der Browser-Konsole nach `[paxi]` filtern: `api_error` zeigt HTTP-Status und Backend-Code, `voice_error` den Sprachfehler samt ausgewählten Providerdetails; bei `TURN_ROUTING_FAILED` steht der zugrunde liegende HTTP-Fehler unter `http`.
+
+
 Der Worker **`paxi`** liefert Angular mit `live-production` und die Nest-API unter derselben HTTPS-Origin aus: `https://paxi.<subdomain>.workers.dev`. Der Demo-Start ist bewusst ohne Zugangscode offen. Darios separater Voice-Agent wird nicht deployt; Persona und Skills sind für die integrierte Live-Voice gebündelt.
 
 Voraussetzungen: Node 22+, npm, Cloudflare-Konto mit Workers/Durable Objects und workers.dev-Subdomain. Die folgenden Konto- und Deploy-Befehle sind für die spätere Freigabe vorgesehen. Aus `code/` installieren und lokal prüfen:
