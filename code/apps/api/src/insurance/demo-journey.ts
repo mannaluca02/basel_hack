@@ -27,6 +27,10 @@ export const StandardAnalysesSchema=z.object({expectedProfileVersion:z.number().
 
 export async function personaDraft(id:DemoPersonaId,today=new Date()):Promise<InsuranceDraft> {
   const doc=JSON.parse(await readFile(new URL(DEMO_PERSONAS[id],import.meta.url),'utf8')) as {draft:unknown};
+  return normalizePersonaDraft(doc,today);
+}
+
+export function normalizePersonaDraft(doc:{draft:unknown},today=new Date()):InsuranceDraft {
   const draft=DraftSchema.parse(doc.draft);
   if(draft.financial?.dataClassification!=='synthetic')throw new Error('Demo persona must be synthetic');
   draft.financial.valuationDate=today.toISOString().slice(0,10);

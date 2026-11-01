@@ -10,9 +10,12 @@ import { PAX_PRODUCTS } from './products.js';
 import { lifeOpenApi } from './openapi.js';
 import { catalog,complianceSteps,localeOf,localizedCase,errorText,presentJourney,productText,t } from './i18n.js';
 
-type Request={headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
+type Request={paxHttp?:{publicOrigin?:string;sameOrigin?:boolean};protocol?:string;headers:Record<string,string|undefined>;ip?:string;method:string;actor:Actor};
 type Response={setHeader:(key:string,value:string)=>void;status:(code:number)=>Response;json:(value:unknown)=>void;send:(value:unknown)=>void;type:(value:string)=>Response};
 const allowedOrigins=new Set(['http://localhost:4200','http://127.0.0.1:4200','http://localhost:3000','http://127.0.0.1:3000']);
+const requestOrigin=(req:Request)=>`${(req.paxHttp?.sameOrigin?req.headers['x-forwarded-proto']:undefined)??req.protocol??'http'}://${req.headers.host}`;
+const originAllowed=(req:Request,origin:string)=>req.paxHttp?.sameOrigin?origin===(req.paxHttp.publicOrigin??requestOrigin(req)):allowedOrigins.has(origin);
+const secureCookie=(req:Request)=>(req.paxHttp?.publicOrigin??requestOrigin(req)).startsWith('https:')?'; Secure':'';
 const tokenFrom=(req:Request)=>{
   const header=req.headers.authorization;
   if(header?.startsWith('Bearer '))return {token:header.slice(7),cookie:false};
@@ -27,7 +30,7 @@ export class LifeSessionGuard implements CanActivate {
   canActivate(context:ExecutionContext) {
     const req=context.switchToHttp().getRequest<Request>();const {token,cookie}=tokenFrom(req);req.actor=this.r.sessions.authenticate(token);
     if(!['GET','HEAD','OPTIONS'].includes(req.method)) {
-      if(cookie){if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);this.r.sessions.verifyCsrf(req.actor,req.headers['x-csrf-token']??'');}
+      if(cookie){if(req.headers.origin&&!originAllowed(req,req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);this.r.sessions.verifyCsrf(req.actor,req.headers['x-csrf-token']??'');}
       const t=Date.now(),old=this.writes.get(req.actor.sessionHash);const row=old&&t-old.start<60_000?old:{start:t,count:0};
       row.count++;if(row.count>200)throw new WorkflowError('REQUEST_RATE_LIMIT',429);this.writes.set(req.actor.sessionHash,row);
       if(this.writes.size>1000)for(const [key,row] of this.writes)if(t-row.start>60_000)this.writes.delete(key);
@@ -64,15 +67,15 @@ export class PublicLifeController {
   @Get('openapi.json') openapi(){return lifeOpenApi();}
   @Post('demo/start') async demoStart(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
     if(!this.r.demo.startEnabled)throw new WorkflowError('NOT_FOUND',404);
-    if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
+    if(req.headers.origin&&!originAllowed(req,req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
     const {sessionToken,...session}=await this.r.demo.start(input);
-    res.setHeader('Set-Cookie',`pax_session=${sessionToken}; HttpOnly; SameSite=Strict; Path=/api; Max-Age=3600`);return {...session,role:'customer'};
+    res.setHeader('Set-Cookie',`pax_session=${sessionToken}; HttpOnly; SameSite=Strict; Path=/api; Max-Age=3600${secureCookie(req)}`);return {...session,role:'customer'};
   }
   @Post('sessions') async login(@Body() input:unknown,@Req() req:Request,@Res({passthrough:true}) res:Response){
-    if(req.headers.origin&&!allowedOrigins.has(req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
+    if(req.headers.origin&&!originAllowed(req,req.headers.origin))throw new WorkflowError('ORIGIN_FORBIDDEN',403);
     const body=z.object({accessCode:z.string().min(1).max(200)}).strict().parse(input);
     const result=await this.r.sessions.login(body.accessCode,req.ip??'local');
-    res.setHeader('Set-Cookie',`pax_session=${result.sessionToken}; HttpOnly; SameSite=Strict; Path=/api; Max-Age=3600`);return result;
+    res.setHeader('Set-Cookie',`pax_session=${result.sessionToken}; HttpOnly; SameSite=Strict; Path=/api; Max-Age=3600${secureCookie(req)}`);return result;
   }
 }
 @Controller('api') @UseGuards(LifeSessionGuard)
@@ -80,7 +83,7 @@ export class ProtectedLifeController {
   constructor(@Inject(LIFE_RUNTIME) private readonly r:LifeRuntime){}
   private async displayJourney(req:Request,id:string,result:unknown){return presentJourney(await result,this.r.engine.caseFor(req.actor,id).locale);}
   @Delete('sessions/current') async logout(@Req() req:Request,@Res({passthrough:true}) res:Response){
-    await this.r.sessions.revoke(req.actor);await this.r.voice.sweep();res.setHeader('Set-Cookie','pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0');return {revoked:true};
+    await this.r.sessions.revoke(req.actor);await this.r.voice.sweep();res.setHeader('Set-Cookie',`pax_session=; HttpOnly; SameSite=Strict; Path=/api; Max-Age=0${secureCookie(req)}`);return {revoked:true};
   }
   @Get('cases') list(@Req() req:Request){return this.r.engine.list(req.actor);}
   @Post('cases') async create(@Req() req:Request,@Body() body:unknown){return localizedCase(await this.r.engine.createCase(req.actor,body));}

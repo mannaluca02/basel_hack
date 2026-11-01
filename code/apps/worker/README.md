@@ -1,3 +1,38 @@
+# Worker live boot and assets (task C)
+
+The Worker now uses the shared `liveAppOptions(env)` mapping, real `LiveLogismataProvider`, backend live voice and OpenAI extraction. Task B still owns persistence, credentials and alarms; this branch retains the spike memory store until that work is merged. No standalone voice-agent server runs.
+
+Wrangler's custom build runs the API compiler and `scripts/assets.mjs`. That script uses the existing `loadSkills` / `parseSkill` / `skillsPrompt` implementation and assigned flags to generate prompt JSON. It copies all 12 product PDFs into gitignored `assets/_products/` and generates a SHA-256 manifest. Runtime reads through `ASSETS` and checks integrity at boot and every download. Only this subtree is written, leaving `assets/` available for Angular output. Keep the Angular build from clearing it after this step.
+
+`run_worker_first: true` prevents direct public PDF asset access: the Worker currently returns 404 for non-API paths. When Angular routing is added, keep `/_products/*` blocked before falling back to `ASSETS.fetch()`. The PDFs themselves are public source material, but API downloads require a session. Do not expose the complete assets binding indiscriminately.
+
+Persona JSON is bundled and passed through the same `normalizePersonaDraft` function as Node, including schema, synthetic classification and date checks. Runtime prompt loading is injected; the Node fs/default loaders remain unchanged. ReplayProvider and demo fixture file readers are not called in live mode. `erni-dialog/responses.ts` takes its API key as an argument. Only the Node entrypoint reads `process.env`; the Worker uses bindings. Nest shutdown hooks are disabled on Workers.
+
+Worker HTTP writes accept their own origin (or `PAX_PUBLIC_ORIGIN` when set); CORS is unnecessary for this same-origin deployment. The bridge overwrites forwarded protocol/host from the actual request URL. HTTPS session and logout cookies include Secure. Node localhost CORS and CSRF defaults remain intact.
+
+Non-secret vars in wrangler.jsonc: `PAX_DEMO_START=1`, `PAX_SYNTHETIC_VOICE_ENABLED=1`, `PAX_SYNTHETIC_EXTRACTION_ENABLED=1`, `LIVE_MODEL=gpt-live-1`, `LIVE_VOICE=juni`, `PAX_PUBLIC_ORIGIN` (empty means request origin). Secrets: `LOGISMATA_BEARER_TOKEN`, `OPENAI_API_KEY`; optional `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`. Copy `.dev.vars.example` to ignored `.dev.vars` and replace/remove placeholders. Missing calculator credentials fail calculations, not boot; missing OpenAI key disables its voice gateway. No secrets are loaded from `.env` automatically.
+
+Verification from `code/`:
+
+```sh
+npm ci --ignore-scripts
+npm run build -w @pax/worker
+npm run typecheck -w @pax/worker
+node apps/worker/scripts/sources-check.mjs
+npm test
+npm run dev -w @pax/worker -- --port 8798
+# another terminal
+SPIKE_URL=http://127.0.0.1:8798 npm run check -w @pax/worker
+```
+
+The source check asserts byte-identical Node/bundled prompts (default, empty and selected skills), persona equality, PDF hashes, rejection of corrupted assets, configured HTTPS origin checks and Secure login/logout cookies. The curl check verifies live status, privacy recipients, demo start, all PDF hashes, same-origin/foreign-origin handling, missing-key voice setup and SSE. With a Logismata token it requires at least one valid live calculation. For a real voice setup with an OpenAI key, set `VOICE_SDP_FILE` to a fresh browser-generated WebRTC SDP offer; response credentials are never printed. External checks explicitly report skips when inputs are missing.
+
+Local task C results: 462 tests / 461 passed / one skipped / zero failed; Worker typecheck and dry run passed; source check and curl check passed. No provider secrets were present, so real calculator and external voice success are unverified. Bundle: recorded spike baseline 3740.53 KiB / gzip 763.27 KiB; task C 3772.88 KiB / gzip 773.21 KiB. PDF assets are separate from the JS bundle. No account operations or deployment were performed.
+
+---
+
+## Historical spike evidence (superseded substitutions)
+
 # NestJS in a Durable Object: local feasibility spike
 
 Verdict: **works with caveats**. Tested 2026-11-01 under Wrangler 4.156.0 / local workerd. This is a feasibility harness, not the finished migration. No account, login, remote development or deployment was used.
