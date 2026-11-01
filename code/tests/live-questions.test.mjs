@@ -26,6 +26,11 @@ test('after the setup the open questions follow the conversation order and inclu
     'insurance.debtsConfirmed','insurance.existingPrivateRiskBenefitsConfirmed']);
   assert.ok(keys.indexOf('insurance.persons.person_1.withPillar2')<keys.indexOf('insurance.persons.person_1.retirementPensionAnnualCents'));
   assert.ok(keys.indexOf('financial.persons.person_1.income')<keys.indexOf('financial.expenses_add.living'));
+  // The needs right after income and retirement age: the charts get their lines early.
+  const need=keys.indexOf('insurance.persons.person_1.disabilityNeedAnnualCents');
+  assert.ok(keys.indexOf('insurance.persons.person_1.desiredWorkStopAge')<keys.indexOf('insurance.retirementNeedAnnualCents'));
+  assert.ok(keys.indexOf('insurance.retirementNeedAnnualCents')<need&&need<keys.indexOf('insurance.persons.person_1.retirementPensionAnnualCents'));
+  assert.ok(keys.indexOf('insurance.persons.person_1.deathNeedAnnualCents')<keys.indexOf('financial.expenses_add.living'));
   assert.equal(keys.at(-1),'insurance.relationshipSinceYear');
   for(const key of ['financial.expenses_add.living','financial.expenses_add.tax','financial.expenses_add.provision','financial.expenses_add.reserve',
     'financial.safetyBuffer','financial.assets','financial.expenses.housing'])assert.ok(keys.includes(key),key);
