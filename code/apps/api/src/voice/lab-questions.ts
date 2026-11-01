@@ -427,7 +427,7 @@ export async function answerObservations(transport: ResponsesTransport, turns: {
   const window = latestExchange(turns, asked === 'financial.partner' ? 3 : 1);
   const parameters = z.toJSONSchema(Arguments);
   ((parameters.properties as Record<string, { items: { properties: Record<string, unknown> } }>)['answers']!).items.properties['id'] = { type: 'string', enum: targets.map(x => x.key) };
-  const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, reasoning: { effort: 'low' }, instructions: INSTRUCTIONS,
+  const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, instructions: INSTRUCTIONS,
     input: [{ role: 'user', content: JSON.stringify({ conversation: window, fields: targets.map(x => ({ id: x.key, description: x.description,
       ...(x.kind.type === 'enum' || x.kind.type === 'list' ? { options: x.kind.options } : {}),
       ...(isAskedField(x.key, asked) ? { asked: true } : {}) })) }) }],

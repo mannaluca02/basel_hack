@@ -200,7 +200,7 @@ const values={
 
 test('only asking: the conversation fills the whole profile, then the acceptance confirms and calculates',async t=>{
   const {c,model}=await converse(t,intake,values);
-  assert.ok(model.requests.every(r=>r.model==='gpt-6-luna'&&r.service_tier==='fast'&&r.reasoning.effort==='low'),'GPT-6 Luna, fast tier');
+  assert.ok(model.requests.every(r=>r.model==='gpt-6-luna'&&r.service_tier==='fast'&&r.reasoning.effort==='medium'),'GPT-6 Luna, fast tier');
   assert.equal(c.draft.insurance.persons[0].grossAnnualIncomeCents,9500000,'the intake value stays: answering the same field again changes nothing');
 });
 
