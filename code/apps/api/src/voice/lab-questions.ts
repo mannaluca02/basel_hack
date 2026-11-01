@@ -5,6 +5,7 @@ import { ANALYSIS_MODEL, callResponses, submittedCall, type ResponsesRequest, ty
 import { applyChanges, at } from '../insurance/draft-proposals.js';
 import { questionText, t, type Locale } from '../insurance/i18n.js';
 import { WorkflowError } from '../insurance/types.js';
+import { latestExchange } from './exchange.js';
 type JsonValue = ProposalChangeInput['value'];
 
 /**
@@ -246,7 +247,7 @@ export type Answer = { key: string; value: number | boolean | string | string[] 
 const Arguments = z.object({ answers: z.array(z.object({ id: z.string(), value: z.string().max(300).nullable(),
   period: z.enum(['year', 'month']).nullable(), quote: z.string().max(500) }).strict()).max(40) }).strict();
 
-const INSTRUCTIONS = 'Read the conversation and submit the answers the USER gave to the listed fields. Values come only from user turns: anything only the assistant said, including examples, is never a value. ' +
+const INSTRUCTIONS = 'Read the latest exchange (the assistant question and the user answer) and submit the answers the USER gave to the listed fields. Values come only from user turns: anything only the assistant said, including examples, is never a value. ' +
   'A short answer takes its meaning from the assistant question it answers (Ja, Nein, Keine, Zwei, 2018 und 2021). Never guess, never infer, never compute an amount the user did not say; leave a field out if it is unclear. ' +
   'Amounts are digits only, no separators or currency (2500 for 2.500 Franken); numbers spoken as words become digits (500 for fünfhundert), the quote keeps the words. Set period to month or year only if the user said it, else null. Booleans are true or false. Lists are comma-separated. ' +
   'A value belongs only to the field the assistant just asked about or the user named: never move a value given for one topic into another field (an age to stop working is no planning horizon, a housing cost no safety buffer, a yes to one question no answer to another). ' +
@@ -313,12 +314,12 @@ export function validAnswers(targets: Target[], parsed: z.infer<typeof Arguments
 
 /**
  * The answers in the conversation so far (model-v1, same transport and consent as the intake
- * extraction). The whole window gives the context; the quote must come from the latest user turn
- * (see validAnswers).
+ * extraction). Only the latest exchange is read (`latestExchange`), and the quote must come from
+ * its answer (see validAnswers).
  */
 export async function answerObservations(transport: ResponsesTransport, turns: { role: 'user' | 'assistant'; text: string }[], targets: Target[], signal: AbortSignal): Promise<Answer[]> {
   if (!targets.length) return [];
-  const window = turns.slice(-16);
+  const window = latestExchange(turns, targets.some(x => x.key.startsWith('partner.')) ? 3 : 1);
   const parameters = z.toJSONSchema(Arguments);
   ((parameters.properties as Record<string, { items: { properties: Record<string, unknown> } }>)['answers']!).items.properties['id'] = { type: 'string', enum: targets.map(x => x.key) };
   const request: ResponsesRequest = { ...ANALYSIS_MODEL, store: false, reasoning: { effort: 'low' }, instructions: INSTRUCTIONS,

@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {DraftSchema} from '../packages/contracts/dist/index.js';
 import {answerChanges,answerTargets,askText,consequences,openAsks,openKeys,pendingView,validAnswers} from '../apps/api/dist/voice/lab-questions.js';
 import {setupDraft} from '../apps/api/dist/voice/lab-setup.js';
+import {latestExchange} from '../apps/api/dist/voice/exchange.js';
+import {modelObservations} from '../apps/api/dist/voice/lab-intake.js';
+import {answerObservations} from '../apps/api/dist/voice/lab-questions.js';
 import {FakeVoiceGateway} from './helpers/voice-fixture.mjs';
 import {demoApp} from './helpers/demo-http.mjs';
 
@@ -332,4 +335,33 @@ test('live: the intake extraction fills only empty fields; an answered 3a is not
   c=await current();
   assert.equal(c.draft.insurance.existingAnnualPillar3aContributionCents,600000,'the 3a stays');
   assert.equal(c.draft.insurance.annualSavingCents,2000000,'the additional saving is where it was asked');
+});
+
+const P=text=>({role:'assistant',text}),K=text=>({role:'user',text});
+const log=[P('Wie alt bist du?'),K('22'),P('Mit welchem Alter in Pension?'),K('67'),P('Und deine Risikobereitschaft?'),K('Niedrig'),
+  P('Was möchtest du erreichen?'),K('Ähh,'),K('Familie und ein eigenes Haus')];
+
+test('the recognition reads only the latest exchange: Paxi\'s question and the answer, fragments as one',()=>{
+  assert.deepEqual(latestExchange(log),[P('Was möchtest du erreichen?'),K('Ähh,'),K('Familie und ein eigenes Haus')]);
+  // A bare confirmation takes the exchange it confirms.
+  assert.deepEqual(latestExchange([P('Wie viel verdienst du?'),K('80000 im Jahr'),P('Brutto?'),K('Ja, brutto')]),
+    [P('Wie viel verdienst du?'),K('80000 im Jahr'),P('Brutto?'),K('Ja, brutto')]);
+  assert.deepEqual(latestExchange([P('Wie alt bist du?'),K('22'),P('Pensionsalter?'),K('Mit 67')]),[P('Pensionsalter?'),K('Mit 67')],'a number is an answer of its own');
+  assert.deepEqual(latestExchange(log,2).map(t=>t.text),['Und deine Risikobereitschaft?','Niedrig','Was möchtest du erreichen?','Ähh,','Familie und ein eigenes Haus']);
+  assert.deepEqual(latestExchange([P('Hallo')]),[]);
+});
+
+test('both models get only the latest exchange, not the whole log',async()=>{
+  const seen=[];
+  const transport=async request=>{seen.push(JSON.parse(request.input[0].content).conversation);
+    return {status:'completed',output:[{type:'function_call',name:request.tools[0].name,arguments:request.tools[0].name==='submit_answers'?'{"answers":[]}':'{"observations":[]}'}]};};
+  await modelObservations(transport,log,'m1','person_1',new AbortController().signal);
+  await answerObservations(transport,log,answerTargets(frame()),new AbortController().signal);
+  for(const conversation of seen)assert.deepEqual(conversation.map(t=>t.text),['Was möchtest du erreichen?','Ähh,','Familie und ein eigenes Haus']);
+  // The partner's age and rate may come one exchange after the other.
+  const married=answerTargets(pendingView(frame(),[{path:'insurance.relationship',value:'married'}],CASE));
+  seen.length=0;
+  await answerObservations(transport,[...log,P('Wie alt ist deine Partnerin, und wie viel arbeitet sie?'),K('Sie ist 33'),P('Und das Pensum?'),K('60 Prozent')],married,new AbortController().signal);
+  assert.ok(seen[0].some(t=>t.text==='Sie ist 33'));
+  assert.ok(!seen[0].some(t=>t.text==='22'),'never the whole log');
 });
