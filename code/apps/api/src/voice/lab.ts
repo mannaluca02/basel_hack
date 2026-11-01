@@ -187,7 +187,9 @@ export class VoiceLabController {
     const frame=setupDraft(c.draft,caseId,facts.birthYear!,facts.employmentRateBps!,source.sourceRef);
     const changes=(['financial','insurance'] as const).filter(key=>c.draft[key]===null).map(key=>({path:key,value:frame[key] as unknown as JsonValue}));
     const supersedesBatchIds=ctx.proposalBatches.filter(batch=>batch.status==='proposed'&&batch.changes.some(change=>change.path==='financial'||change.path==='insurance')).map(batch=>batch.id);
-    const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:source.messageId,source,expectedCaseRevision:ctx.caseRevision,
+    // Its own message id: once the person exists, the same turn is extracted again for the intake fields.
+    const setupSource={...source,messageId:source.messageId.replace(/^lab_/,'setup_')};
+    const proposalBatch=await this.r.extraction.proposeBatch(agent,id,{messageId:setupSource.messageId,source:setupSource,expectedCaseRevision:ctx.caseRevision,
       expectedProfileVersion:ctx.profileVersion,basisDraftHash:ctx.draftHash,changes,ambiguities:[],supersedesBatchIds});
     return reply({setup:{missing:[],quotes:facts.quotes}},{proposalBatch,issues:[],confirmationStillRequired:true});
   }

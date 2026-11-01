@@ -85,6 +85,8 @@ export class LiveVoice {
   private queue: Promise<void> = Promise.resolve();
 
   readonly apiMode = this.env.dataSource === 'api';
+  /** Live configuration: accepted automatically, no acceptance card. */
+  private readonly liveStart = this.env.liveStart === true;
   readonly personId = signal('');
   /** Voice transfer consent; the extraction consent is separate. */
   readonly consent = signal(false);
@@ -468,6 +470,7 @@ export class LiveVoice {
     personId: string,
     epoch: number,
   ): Promise<void> {
+    if (!personId) this.setupMessages.push(messageId);
     const asked = nextIntakeField(this.rows());
     this.evaluating.set(true);
     this.extractionFailed.set(false);
@@ -498,6 +501,14 @@ export class LiveVoice {
       }
       if (epoch !== this.epoch) return;
       this.extracted(result);
+      // Live build: what Paxi heard goes into the case at once (and recalculates once the profile
+      // is complete), so the charts follow the conversation without a button.
+      if (this.liveStart && result.extraction.result.proposalBatch) {
+        await this.acceptLive(epoch);
+        // The person now exists: what was said before her (income in the same sentence as the
+        // age, say) is extracted again for the intake fields.
+        if (!personId) await this.replaySetupTurns(sid, epoch);
+      }
       // A disabled/failing extractor and smalltalk are not answers to a question. In particular,
       // never advance the plan or mark fields skipped on infrastructure errors.
       if (result.extraction.result.issues?.length) this.extractionFailed.set(true);
@@ -517,6 +528,30 @@ export class LiveVoice {
       this.extractionFailed.set(true);
     } finally {
       this.evaluating.set(false);
+    }
+  }
+
+  /** Customer turns spoken before the case had a person; extracted again once it has one. */
+  private setupMessages: string[] = [];
+
+  private async replaySetupTurns(sid: string, epoch: number): Promise<void> {
+    const person = (await this.customer.loadCase(this.caseId())).draft.financial?.persons[0]?.id;
+    if (!person || epoch !== this.epoch) return;
+    for (const earlier of this.setupMessages.splice(0)) await this.extractLive(sid, earlier, person, epoch);
+  }
+
+  /** Live build: takes over the open proposals right away (POST demo-accept), then reloads. */
+  private async acceptLive(epoch: number): Promise<void> {
+    if (epoch !== this.epoch) return;
+    try {
+      const result = (await this.customer.demoAccept(this.caseId())) as { missing?: string[] };
+      this.trace.add('local', 'demo-accept', result);
+    } catch (error) {
+      // The conversation goes on; the next proposal tries again.
+      this.trace.add('local', 'demo-accept', { code: 'AUTO_ACCEPT_FAILED' });
+      if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 410)) throw error;
+    } finally {
+      this.store.refresh();
     }
   }
 

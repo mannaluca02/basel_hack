@@ -276,3 +276,30 @@ describe('PaxiCaseVoice reply emotions', () => {
   });
 });
 
+
+describe('PaxiCaseVoice turns around backchannels', () => {
+  it('keeps the customer\'s sentence whole when Paxi says "Oh," in between (live test 01.11.2026)', async () => {
+    vi.useFakeTimers();
+    try {
+      const f = connectedBrowser(), cb = callbacks();
+      await new PaxiCaseVoice(cb, f.browser).start();
+      f.emit({ type: 'session.started' });
+      const said = (speaker: 'input' | 'output', delta: string, id: string) =>
+        f.emit({ type: `session.${speaker}_transcript.delta`, event_id: id, delta });
+      said('input', 'Also ähm ich gehe zwei Tage in die Fachhoch', 'i1');
+      said('output', 'Oh,', 'o1');
+      said('input', 'schule', 'i2');
+      said('output', ' schön.', 'o2');
+      said('input', ' und drei Tage in der Woche arbeiten', 'i3');
+      await vi.advanceTimersByTimeAsync(500);
+      said('output', ' Das ist ja spannend. Wie alt bist du?', 'o3');
+      await vi.advanceTimersByTimeAsync(3000);
+      expect(cb.onTurn.mock.calls.map(([speaker, text]) => [speaker, text])).toEqual([
+        ['customer', 'Also ähm ich gehe zwei Tage in die Fachhochschule und drei Tage in der Woche arbeiten'],
+        ['agent', 'Oh, schön. Das ist ja spannend. Wie alt bist du?'],
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
