@@ -203,7 +203,14 @@ export class DemoJourney {
       catch(error){if(!(error instanceof WorkflowError))throw error;skipped.push(batch.id);}
     }
     let c=this.engine.caseFor(actor,caseId);
-    if(!c.draftDirty)return {accepted,skipped,profileVersion:c.confirmedVersions.at(-1)?.version??null,runs:[]};
+    if(!c.draftDirty){
+      // Checked after every answer of the live build: a confirmed profile whose analyses never ran
+      // (the calculator failed, say) is calculated now; otherwise nothing changed, nothing runs.
+      const version=c.confirmedVersions.at(-1)?.version??null;
+      if(version===null||c.runs.some(run=>run.profileVersion===version))return {accepted,skipped,profileVersion:version,runs:[]};
+      const {runs}=await this.runStandardAnalyses(actor,caseId,{expectedProfileVersion:version});
+      return {accepted,skipped,profileVersion:version,runs};
+    }
     try{
       await this.engine.confirm(actor,caseId,{expectedCaseRevision:c.caseRevision,confirmProfileAndAssumptions:true,
         allowSyntheticCalculatorTransfer:true,noticeVersion:'lifemap-synthetic-v2'});

@@ -257,15 +257,20 @@ describe('LiveVoice in the live build', () => {
       await settle();
       http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
       await settle();
-      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
+      const request = http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`);
+      bodies.push(request.request.body);
+      request.flush({
         mode: 'live', source: { text: 'x' },
         extraction: { adapter: 'model-v1', route: 'VoiceIntegrationService.propose', result: { proposalBatch: null, issues: [] }, answers },
       });
       await settle();
     };
+    const bodies: { askedKey?: string }[] = [];
 
     say('Wir wollen für die Pension sparen.');
     await turn({ proposalBatch: { id: 'ask_1' }, answered: ['goals'] });
+    // The question Paxi is on goes along, so the answer fills that field and no other.
+    expect(bodies[0].askedKey).toBe('goals');
     http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: ['ask_1'], skipped: [], profileVersion: null, runs: [], missing: [] });
     await settle();
     http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
@@ -297,6 +302,12 @@ describe('LiveVoice in the live build', () => {
       http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
         mode: 'live', source: { text }, extraction: { adapter: 'model-v1', route: 'x', result: { proposalBatch: null, issues: [] }, answers: { proposalBatch: null, answered: [] } },
       });
+      // Checked and updated after every answer, also one that gave nothing.
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: [], skipped: [], profileVersion: null, runs: [], missing: ['goals'] });
+      await settle();
+      http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: live.caseAsks() });
       await settle();
       steer(live);
     };

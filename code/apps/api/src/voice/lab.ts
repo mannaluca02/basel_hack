@@ -9,7 +9,7 @@ import { mapVoiceObservations } from './portfolio.js';
 import { parseExactAnnualGrossIncome } from './exact-income.js';
 import { INTAKE_SAMPLE_IDS, INTAKE_TEXT, modelObservations, scriptObservation } from './lab-intake.js';
 import { setupDraft, setupFacts, type SetupFacts } from './lab-setup.js';
-import { answerChanges, answerObservations, answerTargets, openAsks, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
+import { answerChanges, answerObservations, answerTargets, isAskedField, keyOfPath, openAsks, pendingView, type Answer, type LocationLookup } from './lab-questions.js';
 import { languageNumber } from '../insurance/i18n.js';
 import { at } from '../insurance/draft-proposals.js';
 import type { ResponsesTransport } from '../erni-dialog/responses.js';
@@ -22,7 +22,8 @@ const replaceable=<T extends {status:string;changes:unknown[];ambiguityIds?:stri
 const TurnSchema = z.discriminatedUnion('mode', [
   z.object({mode:z.literal('synthetic'),sample:z.enum(['income','correction','smalltalk',...INTAKE_SAMPLE_IDS]),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100)}).strict(),
   // Without personId only while the case has no person yet: the conversation then sets up the case frame.
-  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional()}).strict(),
+  // askedKey: the open question Paxi asked last (GET questions), so one statement fills that field and no other.
+  z.object({mode:z.literal('live'),voiceSessionId:z.uuid(),messageId:z.string().min(1).max(100),personId:z.string().min(1).max(100).optional(),askedKey:z.string().min(1).max(200).optional()}).strict(),
 ]);
 const samples = {
   de:{income:'Mein Bruttojahreseinkommen beträgt 119000 CHF.',correction:'Korrektur: Mein Bruttojahreseinkommen beträgt 118000 CHF.',smalltalk:'Guten Morgen!'},
@@ -119,7 +120,7 @@ export class VoiceLabController {
           const targets=answerTargets(pendingView(ctx.draft,replaceable(ctx.proposalBatches).flatMap(batch=>batch.changes),c.id))
             .filter(target=>{const person=/^(?:insurance|financial)\.persons\.([^.]+)\./.exec(target.key)?.[1];return !person||ctx.personIds.includes(person);});
           [observations,answers]=await Promise.all([modelObservations(transport,turns,b.messageId,personId,task.signal),
-            answerObservations(transport,turns,targets,task.signal).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
+            answerObservations(transport,turns,targets,task.signal,b.mode==='live'?b.askedKey:undefined).catch((error:unknown)=>{if(error instanceof WorkflowError&&MODEL_ERRORS.includes(error.code))return [];throw error;})]);
           this.r.modelExtraction.assertTransferAllowed(agent,id);
           if(task.signal.aborted)throw new WorkflowError('DIGITAL_TASK_CANCELLED');
         } catch(error) {
@@ -147,6 +148,9 @@ export class VoiceLabController {
         try {
           const dry=mapVoiceObservations(ctx.draft,[o],ctx.locale);
           if(view&&dry.changes.length&&dry.changes.every(change=>known(change.path)))continue;
+          // Once the app names the question Paxi is on, the intake extraction fills that field only:
+          // "dreitausend im Jahr" for the saving asked about is no 3a contribution.
+          if(view&&b.mode==='live'&&b.askedKey&&!dry.changes.some(change=>isAskedField(keyOfPath(view,change.path),b.askedKey)))continue;
           if(dry.issues.some(issue=>issue.code==='AMBIGUOUS_VALUE'))clarifications.push({fieldId:o.fieldId,quote:o.quote,value:o.value===null?null:String(o.value),code:'AMBIGUOUS_VALUE'});
           else if(dry.changes.length)exact.push(o);
         } catch(error) {if(!(error instanceof WorkflowError))throw error;}
