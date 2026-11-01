@@ -8,6 +8,10 @@ Paxi, ein KI-Vorsorgeberater für die Pax Challenge, mit dem man spricht. Live: 
 
 Alle lokalen Zugangsdaten (Logismata-Token, OpenAI-Schlüssel, Flags) stehen in einer einzigen Datei `.env` im Repo-Root, die von Git ausgeschlossen ist. Die Vorlage ohne echte Werte ist [`.env.example`](.env.example).
 
+## Lizenz
+
+Der eigene Code und die eigene Dokumentation stehen unter der [MIT-Lizenz](license.txt). Ausgenommen sind Inhalte Dritter: Marken, Logos und Schriften der Pax (u. a. `assets/pax/`, `site/media/fonts/`, `code/apps/web/public/brand/`) sowie die Challenge-, Produkt- und Anbieterunterlagen (u. a. `documentation/challenge_material/`, `documentation/baselhack/references/`). Für sie gelten die Rechte der jeweiligen Inhaber.
+
 ## Projektvorlage zum Ausfüllen
 
 ## [Project Name]
