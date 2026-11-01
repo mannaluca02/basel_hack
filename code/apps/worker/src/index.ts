@@ -18,6 +18,8 @@ interface Env extends StoreSecrets {ASSETS:Fetcher;LIFE: DurableObjectNamespace<
 export class LifeInsuranceObject extends DurableObject<Env> {
   private boot?: Promise<void>;
   private port?: number;
+  /** When this Durable Object instance started, plus a random id: a change on `/api` responses means a restart. */
+  private readonly instance=`${new Date().toISOString()}/${crypto.randomUUID().slice(0,8)}`;
   private runtime?: LifeRuntime;
   private store?: Awaited<ReturnType<typeof durableStore>>;
 
@@ -70,7 +72,9 @@ export class LifeInsuranceObject extends DurableObject<Env> {
     const headers=new Headers(request.headers);
     headers.set('x-forwarded-proto',new URL(request.url).protocol.slice(0,-1));
     headers.set('host',new URL(request.url).host);
-    return handleAsNodeRequest(this.port!,new Request(request,{headers}));
+    const response=await handleAsNodeRequest(this.port!,new Request(request,{headers}));
+    const marked=new Headers(response.headers);marked.set('X-Pax-Instance',this.instance);
+    return new Response(response.body,{status:response.status,statusText:response.statusText,headers:marked});
   }
 }
 
