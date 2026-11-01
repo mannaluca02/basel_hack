@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 import { DEFAULT_HUMAN_HANDOVER } from '@pax/contracts';
 import { Consent } from '../../consent/consent';
-import { provideI18nTesting } from '../../i18n/i18n-testing';
 import { AdvisorDataSource, AdvisorSnapshot } from '../advisor-data-source';
 import { CaseStore } from './case-store';
 import { CASE_ID, FakeDataSource, chart, contextUpdate, event, info, risk, snapshot } from './case-testing';

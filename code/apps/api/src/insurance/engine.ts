@@ -128,7 +128,7 @@ export class LifeInsuranceEngine {
     const questionDraft=DraftSchema.parse(c.draft),financial=questionDraft.financial;
     if(financial)for(const field of [...financial.persons.map(p=>p.income),...financial.expenses.map(e=>e.amount),financial.safetyBuffer,...financial.assets.map(a=>a.amount),...financial.provisions.map(p=>p.amount)])if(field.value!==null)field.confirmation='confirmed';
     const fields=[...new Set([...c.ambiguities.filter(a=>a.status==='open').map(a=>a.path),...intakeQuestions(questionDraft)])];
-    const askable=fields.filter(path=>waitingForAnswer(c,path,dialogue));
+    const askable=fields.filter(path=>waitingForAnswer(path,dialogue));
     return QuestionsResponseSchema.parse({profileVersion:currentVersion(c)?.version??null,caseRevision:c.caseRevision,contextRevision:c.contextRevision,
       mandatoryFields:fields,pendingAcceptanceBatchIds:pendingAcceptanceIds(dialogue),questions:(c.handover.stopDigitalConversation?[]:askable).slice(0,c.timeBudgetMinutes<=10?1:3).map(path=>({path,mandatory:true,
         text:ambiguities.find(a=>a.path===path&&a.locale===c.locale)?.question??questionText(c.locale,path)})),

@@ -18,7 +18,8 @@
     "test": "ng test web",
     "test:coverage": "ng test web --watch=false --coverage",
     "check:tokens": "node scripts/check-tokens.mjs",
-    "check:i18n": "node scripts/check-i18n.mjs"
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "check": "npm run check:tokens && npm run check:i18n && npm run build && npm test -- --watch=false"
   },
   "private": true,
   "packageManager": "npm@11.19.1",

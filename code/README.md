@@ -24,8 +24,9 @@ Beim ersten Start entstehen unter `code/.local/lifemap/` ein privates Verzeichni
 
 | Befehl | Wirkung |
 |---|---|
-| `npm test` | Vollständiger Build und alle Backend-Tests (über 440); Rechner und OpenAI synthetisch ersetzt, kein externer Zugriff |
+| `npm test` | Vollständiger Build und alle Backend-Tests; Rechner und OpenAI synthetisch ersetzt, kein externer Zugriff |
 | `npm run test:all` | Backend, Voice-Agent und Web-App zusammen |
+| `npm run check` | Vollständige Offline-Prüfung: Backend-/Voice-/Web-Tests, Farbkontrast und Übersetzungen, Web-Produktionsbuild und Worker-Typprüfung; vorher `npm --prefix voice-agent ci --ignore-scripts` ausführen |
 | `npm run test:coverage` | Backend-Tests mit Abdeckung je Datei (Web: `npm --prefix apps/web run test:coverage`, Voice-Agent: `npm --prefix voice-agent run test:coverage`) |
 | `npm run test:live` | Echte 24 Rechenoperationen mit ausschließlich erfundenen Daten; Baseline/Familie/Eigenheim/Pensionierung; Demo-Vertragsweg und Portal nach Neustart |
 | `npm run test:live:metadata` | Kleiner echter 3a-Metadaten-Smoke mit leerer Anfrage |
