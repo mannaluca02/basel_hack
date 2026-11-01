@@ -13,7 +13,8 @@ function fakeModel(setup,intake) {
   const transport=async request=>{
     requests.push(request);
     const name=request.tools[0].name;
-    const args=name==='submit_setup_facts'?setup.shift()??{age:{value:null,quote:''},employment_rate_percent:{value:null,quote:''}}:{observations:intake.shift()??[]};
+    // The open profile questions (lab-questions.ts) are not part of these tests: no answers.
+    const args=name==='submit_setup_facts'?setup.shift()??{age:{value:null,quote:''},employment_rate_percent:{value:null,quote:''}}:name==='submit_answers'?{answers:[]}:{observations:intake.shift()??[]};
     return {status:'completed',output:[{type:'function_call',name,arguments:JSON.stringify(args)}]};
   };
   return {transport,requests};

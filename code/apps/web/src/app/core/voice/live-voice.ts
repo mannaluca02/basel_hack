@@ -34,8 +34,17 @@ interface LiveTurnResult {
     adapter: string;
     route: string;
     result: { proposalBatch?: unknown; issues?: { code: string }[] };
+    /** The answers to the open profile questions (live, once the person exists). */
+    answers?: { proposalBatch: unknown; answered: string[] };
   };
 }
+/** One open profile question of the backend (`voice-lab/questions`), in conversation order. */
+interface CaseAsk {
+  key: string;
+  text: string;
+}
+/** Customer turns without an answer after which Paxi moves on to the next profile question. */
+const MAX_ASK_ATTEMPTS = 2;
 interface DialogueLine {
   id: number;
   speaker: 'customer' | 'agent';
@@ -108,6 +117,14 @@ export class LiveVoice {
   readonly extractionFailed = signal(false);
   readonly latestExtraction = signal<LiveTurnResult['extraction'] | null>(null);
   readonly latestSource = signal('');
+  /** Live build: what the profile still needs after the intake fields; null until loaded. */
+  readonly caseAsks = signal<readonly CaseAsk[] | null>(null);
+  private readonly askAttempts = signal<Readonly<Record<string, number>>>({});
+  /** Live build: the profile question Paxi asks next, once the intake fields are through. */
+  readonly caseAsk = computed(() => {
+    if (!this.liveStart || nextIntakeField(this.rows()) !== null) return null;
+    return this.caseAsks()?.find((ask) => (this.askAttempts()[ask.key] ?? 0) < MAX_ASK_ATTEMPTS) ?? null;
+  });
   /** The remote voice, for the avatar's local audio visual. */
   readonly audio = signal<MediaStream | null>(null);
   /** Activity events for the avatar renderer. */
@@ -208,6 +225,7 @@ export class LiveVoice {
     onStatus: (state, detail) => {
       this.state.set(state);
       if (detail) this.error.set(detail);
+      if (state === 'connected') void this.loadAsks(this.epoch);
     },
     onAudio: (stream) => {
       this.audio.set(stream);
@@ -356,6 +374,9 @@ export class LiveVoice {
       notice = this.extractionNotice();
     this.error.set(null);
     this.intake.set(emptyIntakeMemory);
+    // Loaded again once connected, in the call's language; every call gets its attempts anew.
+    this.caseAsks.set(null);
+    this.askAttempts.set({});
     if (notice?.enabled) {
       let granted = false;
       const session = this.currentSession();
@@ -471,7 +492,8 @@ export class LiveVoice {
     epoch: number,
   ): Promise<void> {
     if (!personId) this.setupMessages.push(messageId);
-    const asked = nextIntakeField(this.rows());
+    const asked = nextIntakeField(this.rows()),
+      askedCase = this.caseAsk()?.key;
     this.evaluating.set(true);
     this.extractionFailed.set(false);
     const post = () =>
@@ -503,12 +525,16 @@ export class LiveVoice {
       this.extracted(result);
       // Live build: what Paxi heard goes into the case at once (and recalculates once the profile
       // is complete), so the charts follow the conversation without a button.
-      if (this.liveStart && result.extraction.result.proposalBatch) {
+      if (this.liveStart && (result.extraction.result.proposalBatch || result.extraction.answers?.proposalBatch)) {
         await this.acceptLive(epoch);
         // The person now exists: what was said before her (income in the same sentence as the
         // age, say) is extracted again for the intake fields.
         if (!personId) await this.replaySetupTurns(sid, epoch);
+        await this.loadAsks(epoch);
       }
+      // A profile question still open after its turn counts as one unanswered attempt.
+      if (askedCase && this.caseAsks()?.some((ask) => ask.key === askedCase))
+        this.askAttempts.update((attempts) => ({ ...attempts, [askedCase]: (attempts[askedCase] ?? 0) + 1 }));
       // A disabled/failing extractor and smalltalk are not answers to a question. In particular,
       // never advance the plan or mark fields skipped on infrastructure errors.
       if (result.extraction.result.issues?.length) this.extractionFailed.set(true);
@@ -555,6 +581,18 @@ export class LiveVoice {
     }
   }
 
+  /** Live build: the open profile questions, fresh after every acceptance. */
+  private async loadAsks(epoch: number): Promise<void> {
+    if (!this.liveStart) return;
+    try {
+      const { asks } = await this.api.getCase<{ asks: CaseAsk[] }>('voice-lab/questions');
+      if (epoch === this.epoch) this.caseAsks.set(asks);
+    } catch {
+      // The last list stays; the next acceptance loads it again.
+      this.trace.add('local', 'voice-lab/questions', { code: 'QUESTIONS_UNAVAILABLE' });
+    }
+  }
+
   private question(id: IntakeFieldId): string {
     return this.transloco.translate(INTAKE_TEXT[id].question);
   }
@@ -566,13 +604,19 @@ export class LiveVoice {
   }
 
   private steer(rows: IntakeRow[]) {
-    return steeringContext(
+    const context = steeringContext(
       rows,
       (id) => this.question(id),
       nextIntakeField(rows) === 'annual_gross_income_chf'
         ? this.transloco.translate('lab.intake.clarify')
         : undefined,
     );
+    // Live build: after the intake fields, Paxi asks what the profile still needs (nothing is
+    // assumed); done only once the backend has nothing left, so the charts can be calculated.
+    if (!this.liveStart || !context.done) return context;
+    if (this.caseAsks() === null) return { ...context, done: false };
+    const ask = this.caseAsk();
+    return { ...context, done: !ask, nextQuestion: ask?.text ?? null };
   }
 
   private extracted(result: LiveTurnResult): void {

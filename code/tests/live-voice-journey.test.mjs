@@ -16,6 +16,8 @@ async function demo(t,replies=[]) {
   const directory=await mkdtemp(join(tmpdir(),'pax-live-voice-'));
   const gateway=new FakeVoiceGateway(),requests=[];
   const transport=async request=>{
+    // Open profile questions (lab-questions.ts) are covered by live-questions.test.mjs.
+    if(request.tools[0].name==='submit_answers')return {status:'completed',output:[{type:'function_call',name:'submit_answers',arguments:'{"answers":[]}'}]};
     requests.push(request);
     return {status:'completed',output:[{type:'function_call',name:'submit_intake_observations',arguments:JSON.stringify({observations:replies.shift()??[]})}]};
   };

@@ -11,6 +11,7 @@ import { Consent } from '../consent/consent';
 import { APP_ENVIRONMENT } from '../config/app-environment';
 import { provideI18nTesting } from '../i18n/i18n-testing';
 import { AppLanguage } from '../i18n/language';
+import { INTAKE_FIELDS } from './intake-plan';
 import { LiveVoice } from './live-voice';
 import { VoiceActivity } from './voice-activity';
 
@@ -202,6 +203,66 @@ describe('LiveVoice in the live build', () => {
     say('Ich verdiene 95000 Franken brutto im Jahr.');
     await answerTurn(http);
     http.expectNone(`/api/cases/${CASE_ID}/demo-accept`);
+  });
+
+  /** Every intake field given up on, so the profile questions are next. */
+  const intakeThrough = (live: LiveVoice) =>
+    live.intake.set({ attempts: Object.fromEntries(INTAKE_FIELDS.map((id) => [id, 2])), clarifications: {} });
+  const steer = (live: LiveVoice) =>
+    (live as unknown as { steer(rows: unknown): { done: boolean; nextQuestion: string | null } }).steer(live.rows());
+
+  it('asks the profile questions of the backend once the intake fields are through, and only then is done', () => {
+    const { live } = setup(true);
+    intakeThrough(live);
+    expect(steer(live)).toMatchObject({ done: false, nextQuestion: null });
+    live.caseAsks.set([{ key: 'goals', text: 'Was möchten Sie erreichen?' }]);
+    expect(steer(live)).toMatchObject({ done: false, nextQuestion: 'Was möchten Sie erreichen?' });
+    live.caseAsks.set([]);
+    expect(steer(live).done).toBe(true);
+  });
+
+  it('keeps the intake steering outside the live build', () => {
+    const { live } = setup(false);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Was möchten Sie erreichen?' }]);
+    expect(live.caseAsk()).toBeNull();
+    expect(steer(live).done).toBe(true);
+  });
+
+  it('takes the answers over, reloads the open questions and moves on after two unanswered turns', async () => {
+    const { live, http, say } = setup(true);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Ziele?' }, { key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }]);
+    const turn = async (answers: { proposalBatch: unknown; answered: string[] }) => {
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase());
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`).flush({
+        mode: 'live', source: { text: 'x' },
+        extraction: { adapter: 'model-v1', route: 'VoiceIntegrationService.propose', result: { proposalBatch: null, issues: [] }, answers },
+      });
+      await settle();
+    };
+
+    say('Wir wollen für die Pension sparen.');
+    await turn({ proposalBatch: { id: 'ask_1' }, answered: ['goals'] });
+    http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: ['ask_1'], skipped: [], profileVersion: null, runs: [], missing: [] });
+    await settle();
+    http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: [{ key: 'insurance.relationshipSinceYear', text: 'Seit wann?' }] });
+    await settle();
+    expect(live.caseAsk()?.key).toBe('insurance.relationshipSinceYear');
+
+    // Two turns without an answer: Paxi stops asking this one, nothing is assumed.
+    for (const text of ['Hmm.', 'Weiss ich nicht.']) {
+      say(text);
+      await turn({ proposalBatch: null, answered: [] });
+      http.expectNone(`/api/cases/${CASE_ID}/demo-accept`);
+    }
+    expect(live.caseAsk()).toBeNull();
+    expect(steer(live).done).toBe(true);
   });
 
   it('sets up the person from the first sentence, then extracts that sentence again for her', async () => {
