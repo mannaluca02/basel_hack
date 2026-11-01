@@ -108,14 +108,14 @@ let nextId = 0;
 
       <span class="visually-hidden" aria-live="polite">
         @if (errorLabel(); as error) {
-          {{ error | transloco }}
+          {{ error | transloco: { code: live.error() } }}
         } @else if (live.state() === 'connected') {
           {{ 'voice.connected' | transloco }}
         }
       </span>
       @if (errorLabel(); as error) {
         @if (!open()) {
-          <p class="error" role="alert">{{ error | transloco }}</p>
+          <p class="error" role="alert">{{ error | transloco: { code: live.error() } }}</p>
         }
       }
     }
@@ -351,7 +351,7 @@ export class LiveVoiceControl {
   protected readonly errorLabel = computed(() => {
     const error = this.live.error();
     if (!error || error === 'BACKEND_UNAVAILABLE') return null;
-    return ERROR_LABELS[error] ?? 'lab.error.recover';
+    return ERROR_LABELS[error] ?? 'voice.interrupted';
   });
 
   constructor() {

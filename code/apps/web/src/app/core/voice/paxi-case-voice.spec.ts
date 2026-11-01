@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { PaxiCaseVoice, VoiceBrowser } from './paxi-case-voice';
 import type { VoiceSessionStartResponse } from '@pax/contracts';
 
@@ -302,4 +303,35 @@ describe('PaxiCaseVoice turns around backchannels', () => {
       vi.useRealTimers();
     }
   });
+});
+
+it('records provider failure details without the event transcript and logs channel closure',async()=>{
+  const warn=vi.spyOn(console,'warn').mockImplementation(()=>{});
+  try {
+    const f=connectedBrowser(),options=callbacks(),transport=new PaxiCaseVoice(options,f.browser);await transport.start();
+    f.emit({type:'error',error:{type:'invalid_request_error',code:'bad_param',message:'token=SECRET invalid',param:'audio',transcript:'PRIVATE'},transcript:'PRIVATE'});
+    expect(warn).toHaveBeenCalledWith('[paxi]',{event:'voice_error',code:'VOICE_PROVIDER_ERROR',provider:{type:'invalid_request_error',code:'bad_param',message:'[REDACTED] invalid',param:'audio'}});
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('PRIVATE');
+    expect(options.onStatus).toHaveBeenLastCalledWith('error','VOICE_PROVIDER_ERROR');
+    await transport.start();f.channel.onclose?.();
+    expect(warn).toHaveBeenCalledWith('[paxi]',{event:'voice_channel_closed'});
+    expect(warn).toHaveBeenCalledWith('[paxi]',{event:'voice_error',code:'VOICE_CHANNEL_CLOSED'});
+  }finally{warn.mockRestore();}
+});
+
+
+it('preserves HTTP codes on signaling failure and records failed WebRTC state',async()=>{
+  const warn=vi.spyOn(console,'warn').mockImplementation(()=>{});
+  try {
+    const f=connectedBrowser(),options=callbacks(),transport=new PaxiCaseVoice(options,f.browser);
+    options.open.mockRejectedValueOnce(new HttpErrorResponse({status:403,error:{code:'CSRF_INVALID'}}));
+    await transport.start();
+    expect(options.onStatus).toHaveBeenLastCalledWith('error','CSRF_INVALID');
+    expect(warn).toHaveBeenCalledWith('[paxi]',{event:'voice_error',code:'CSRF_INVALID',status:403});
+    await transport.start();
+    (f.peer as unknown as {connectionState:string}).connectionState='failed';
+    (f.peer.onconnectionstatechange as unknown as ()=>void)();
+    expect(warn).toHaveBeenCalledWith('[paxi]',{event:'voice_connection_state',state:'failed'});
+    expect(options.onStatus).toHaveBeenLastCalledWith('error','VOICE_DISCONNECTED');
+  }finally{warn.mockRestore();}
 });

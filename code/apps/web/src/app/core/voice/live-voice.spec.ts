@@ -188,6 +188,21 @@ describe('LiveVoice in the live build', () => {
     await settle();
   }
 
+  it('records the HTTP cause when turn routing fails', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const { live, http, say } = setup(true);
+      say('Test');
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase());
+      await settle();
+      http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({ code: 'STALE_CONTEXT' }, { status: 409, statusText: 'Conflict' });
+      await settle();
+      expect(warn).toHaveBeenCalledWith('[paxi]', { event: 'voice_error', code: 'TURN_ROUTING_FAILED', http: { status: 409, code: 'STALE_CONTEXT' } });
+      expect(live.error()).toBe('STALE_CONTEXT');
+    } finally { warn.mockRestore(); }
+  });
+
   it('takes what Paxi heard into the case at once, without the acceptance card', async () => {
     const { http, say } = setup(true);
     say('Ich verdiene 95000 Franken brutto im Jahr.');

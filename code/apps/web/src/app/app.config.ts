@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideAdvisorDataSource } from './core/advisor/provide-advisor-data-source';
 import { provideI18n } from './core/i18n/i18n.providers';
+import { apiErrorInterceptor } from './core/http/diagnostics';
 import { localeInterceptor } from './core/i18n/locale.interceptor';
 import { KeepAliveRouteReuseStrategy } from './core/layout/keep-alive-route-reuse-strategy';
 import { labTraceInterceptor } from './core/voice/lab-trace';
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     { provide: RouteReuseStrategy, useClass: KeepAliveRouteReuseStrategy },
     provideHttpClient(withFetch(), withInterceptors(
         // The trace records only while the Voice Lab is open, and exists only in debug builds.
-        environment.debugVoice ? [localeInterceptor, labTraceInterceptor] : [localeInterceptor],
+        environment.debugVoice ? [apiErrorInterceptor, localeInterceptor, labTraceInterceptor] : [apiErrorInterceptor, localeInterceptor],
       ),),
     provideI18n(),
     provideAdvisorDataSource(),
