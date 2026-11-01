@@ -188,3 +188,17 @@ Der gemeinsame Schalter für persönliche Beratung ist als `handover` in Fall, K
 ## Voice am gemeinsamen Fall
 
 [Anbindung für Dario und Erni](../documentation/baselhack/plans/voice-backend-integration.md): Nest-Voice-Modul, serverseitige OpenAI-/ElevenLabs-Adapter, explizite synthetische Voice-Zustimmung, verschlüsselte finale Transkripte und quellengebundene atomare Vorschläge. `npm run demo:voice-integration` prüft den vollständigen Backend-Fluss ohne Mikrofon oder externe Modellaufrufe. `npm run contracts:voice-integration-examples` erzeugt die Team-JSON-Beispiele. Voice bleibt ohne `PAX_SYNTHETIC_VOICE_ENABLED=1` deaktiviert.
+
+## Deploy on Cloudflare (draft)
+
+The same-origin live Angular app and `/api` run through `apps/worker`. From `code/`:
+
+```sh
+npm ci --ignore-scripts
+# Copy apps/worker/.dev.vars.example to apps/worker/.dev.vars; replace/remove placeholders.
+npm run build -w @pax/worker # local dry run only
+npm run dev -w @pax/worker -- --port 8799
+SPIKE_URL=http://127.0.0.1:8799 npm run check -w @pax/worker
+```
+
+See [Worker setup](apps/worker/README.md) for bindings, secrets and verification. The live production build uses `/api`, demo/live start and built-in voice; local `dev:live` remains unchanged. Microphone access requires HTTPS except on localhost. Phase 2 will supply account ID **[pending]**, final Worker/domain **[pending]**, secret provisioning and deployment steps **[pending]**. No account IDs or public deployment are configured here.

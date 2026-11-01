@@ -49,8 +49,19 @@ export class LifeInsuranceObject extends DurableObject<Env> {
 }
 
 export default {
-  fetch(request: Request,env: Env) {
-    if(!new URL(request.url).pathname.startsWith('/api/'))return new Response('Not found',{status:404});
-    return env.LIFE.getByName('singleton').fetch(request);
+  async fetch(request: Request,env: Env) {
+    const path=new URL(request.url).pathname;
+    if(path==='/api'||path.startsWith('/api/'))return env.LIFE.getByName('singleton').fetch(request);
+    if(path==='/_products'||path.startsWith('/_products/'))return new Response('Not found',{status:404});
+    const response=await env.ASSETS.fetch(request);
+    const headers=new Headers(response.headers);
+    headers.set('X-Content-Type-Options','nosniff');
+    if(headers.get('Content-Type')?.includes('text/html')) {
+      headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self' https://api.openai.com wss://api.openai.com https://api.elevenlabs.io wss://api.elevenlabs.io; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
+      headers.set('Permissions-Policy','microphone=(self)');
+      headers.set('Referrer-Policy','strict-origin-when-cross-origin');
+    }
+    if(headers.get('Content-Type')?.includes('text/html')||path==='/ngsw.json'||path==='/ngsw-worker.js')headers.set('Cache-Control','no-cache');
+    return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   },
 };
