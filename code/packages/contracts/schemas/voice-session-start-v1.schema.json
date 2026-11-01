@@ -244,6 +244,9 @@
     },
     "replayed": {
       "type": "boolean"
+    },
+    "reports": {
+      "type": "boolean"
     }
   },
   "required": [

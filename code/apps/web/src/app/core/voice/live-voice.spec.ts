@@ -334,6 +334,40 @@ describe('LiveVoice in the live build', () => {
     expect(steer(live).done).toBe(false);
   });
 
+  it('with reports, sends the background model\'s calls with the turn and keeps its tools current', async () => {
+    const { live, http, say } = setup(true);
+    intakeThrough(live);
+    live.caseAsks.set([{ key: 'goals', text: 'Ziele?' }]);
+    const internals = live as unknown as { reports: boolean; voice: { options: { onDelegation(id: string): void; onReport(id: string, calls: unknown[]): void }; updateDelegation(d: unknown): void } };
+    internals.reports = true;
+    const update = vi.spyOn(internals.voice, 'updateDelegation');
+    const calls = [{ name: 'submit_answers', arguments: '{"answers":[]}' }];
+    internals.voice.options.onDelegation('del_1');
+    say('Wir wollen für die Pension sparen.');
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}`).flush(reviewCase());
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/voice/sessions/session_1/turns`).flush({});
+    await settle();
+    // The turn waits for its report.
+    http.expectNone(`/api/cases/${CASE_ID}/voice-lab/turns`);
+    internals.voice.options.onReport('del_1', calls);
+    await settle();
+    const request = http.expectOne(`/api/cases/${CASE_ID}/voice-lab/turns`);
+    expect(request.request.body).toMatchObject({ askedKey: 'goals', report: { calls } });
+    request.flush({ mode: 'live', source: { text: 'x' }, extraction: { adapter: 'model-v1', delegated: true, route: 'x', result: { proposalBatch: null, issues: [] } } });
+    await settle();
+    http.expectOne(`/api/cases/${CASE_ID}/demo-accept`).flush({ accepted: [], skipped: [], profileVersion: null, runs: [], missing: ['goals'] });
+    await settle();
+    http.match((r) => r.url === `/api/cases/${CASE_ID}`).forEach((r) => r.flush(reviewCase()));
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/questions`).flush({ asks: live.caseAsks() });
+    await settle();
+    const delegation = { type: 'responses', responses: { tools: [] } };
+    http.expectOne(`/api/cases/${CASE_ID}/voice-lab/delegation?askedKey=goals`).flush({ delegation });
+    await settle();
+    expect(update).toHaveBeenCalledWith(delegation);
+  });
+
   it('sets up the person from the first sentence, then extracts that sentence again for her', async () => {
     sessionStorage.clear();
     sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify({ caseId: CASE_ID, csrfToken: 'csrf_test' }));

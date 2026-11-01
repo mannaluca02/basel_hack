@@ -335,3 +335,31 @@ it('preserves HTTP codes on signaling failure and records failed WebRTC state',a
     expect(options.onStatus).toHaveBeenLastCalledWith('error','VOICE_DISCONNECTED');
   }finally{warn.mockRestore();}
 });
+
+it('settles the sentence GPT-Live hands to its background model, answers every tool call and reports them once',async()=>{
+  const f=connectedBrowser(),options={...callbacks(),onDelegation:vi.fn(),onReport:vi.fn()},transport=new PaxiCaseVoice(options,f.browser);await transport.start();
+  f.emit({type:'session.started'});
+  f.emit({type:'session.input_transcript.delta',event_id:'said',delta:'Ich verdiene 95000 brutto im Jahr.'});
+  f.emit({type:'session.delegation.created',delegation:{id:'del_1',target:'responses',response_id:'resp_1'}});
+  expect(options.onDelegation).toHaveBeenCalledWith('del_1');
+  expect(options.onTurn).toHaveBeenCalledWith('customer','Ich verdiene 95000 brutto im Jahr.','client-settled');
+  const item=(call_id:string,name:string)=>({type:'response.event',delegation_id:'del_1',event:{type:'response.output_item.done',item:{type:'function_call',call_id,name,arguments:'{"observations":[]}'}}});
+  f.emit(item('call_1','submit_intake_observations'));f.emit(item('call_2','submit_answers'));
+  f.channel.send.mockClear();
+  f.emit({type:'response.event',delegation_id:'del_1',event:{type:'response.completed'}});
+  const sent=f.channel.send.mock.calls.map(([raw])=>JSON.parse(raw as string));
+  expect(sent.map(event=>event.type)).toEqual(['response.item.create','response.item.create','response.create']);
+  expect(sent[0].item).toEqual({type:'function_call_output',call_id:'call_1',output:'{"noted":true}'});
+  expect(options.onReport).toHaveBeenCalledWith('del_1',[{name:'submit_intake_observations',arguments:'{"observations":[]}'},{name:'submit_answers',arguments:'{"observations":[]}'}]);
+  // The backend's reply after the outputs completes again: nothing more to answer or report.
+  f.channel.send.mockClear();
+  f.emit({type:'response.event',delegation_id:'del_1',event:{type:'response.completed'}});
+  expect(f.channel.send).not.toHaveBeenCalled();expect(options.onReport).toHaveBeenCalledOnce();
+  // New tools for the case go out once per change.
+  transport.updateDelegation({type:'responses',responses:{tools:[]}});transport.updateDelegation({type:'responses',responses:{tools:[]}});
+  expect(f.channel.send.mock.calls.map(([raw])=>JSON.parse(raw as string))).toEqual([{type:'session.update',session:{delegation:{type:'responses',responses:{tools:[]}}}}]);
+  // A refused tool update costs the notes, not the call.
+  f.emit({type:'error',error:{type:'invalid_request_error',code:'responses_validation_failed',message:'bad tools'}});
+  expect(options.onStatus).not.toHaveBeenCalledWith('error',expect.anything());
+  transport.stop();
+});

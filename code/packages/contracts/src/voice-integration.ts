@@ -22,7 +22,8 @@ export const VoiceConnectionSchema = z.discriminatedUnion('provider', [
     z.object({ provider: z.literal('gpt-live'), session: z.object({ id: z.string().min(1).max(200) }).strict(), transport: z.object({ type: z.literal('webrtc'), sdp: z.string().min(1).max(150000) }).strict() }).strict(),
     z.object({ provider: z.literal('elevenlabs'), token: z.string().min(1).max(16000), conversationId: z.string().min(1).max(200), agentId: z.string().min(1).max(200) }).strict(),
 ]);
-export const VoiceSessionStartResponseSchema = z.object({ voiceSession: VoiceSessionSchema, connection: VoiceConnectionSchema, prompt: z.string().max(32000), replayed: z.boolean() }).strict();
+// reports: GPT-Live hands turns with details to its background model; the browser sends its tool calls with the turn.
+export const VoiceSessionStartResponseSchema = z.object({ voiceSession: VoiceSessionSchema, connection: VoiceConnectionSchema, prompt: z.string().max(32000), replayed: z.boolean(), reports: z.boolean().optional() }).strict();
 export const VoiceTurnInputSchema = z.object({ speaker: z.enum(['customer', 'agent']), log: VoiceLogSchema }).strict();
 export const StoredVoiceTurnSchema = VoiceTurnInputSchema.extend({ receivedAt: z.iso.datetime() }).strict();
 export const VoiceTranscriptSchema = z.object({ caseId: Id, voiceSession: VoiceSessionSchema, turns: z.array(StoredVoiceTurnSchema).max(250) }).strict();
