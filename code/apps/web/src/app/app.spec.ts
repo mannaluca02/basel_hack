@@ -123,10 +123,10 @@ describe('App', () => {
 
     it('talks in the centre until the shown tab has a chart, risk or info, then keeps the corner', async () => {
       const { fixture, root, navigate } = await renderShell();
-      await navigate('/chat');
+      await navigate('/risks');
       expect(spot(root)).toBe('centre');
 
-      // News in another tab, or the conversation itself, does not move Paxi.
+      // News in another tab does not move Paxi.
       source.emit(event('transcript', line()), event('chart', chart()));
       await fixture.whenStable();
       expect(spot(root)).toBe('centre');
@@ -136,6 +136,33 @@ describe('App', () => {
 
       await navigate('/chat');
       expect(spot(root)).toBe('corner');
+    });
+
+    it('hides the shown tab while Paxi talks in the centre, and shows it once he is in the corner', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/graphics');
+      const content = () => root.querySelector('main .tab-content') as HTMLElement;
+      expect(content().querySelector('app-graphics-tab .empty')).not.toBeNull();
+      expect(getComputedStyle(content()).visibility).toBe('hidden');
+
+      source.emit(event('chart', chart()));
+      await fixture.whenStable();
+
+      expect(spot(root)).toBe('corner');
+      expect(getComputedStyle(content()).visibility).toBe('visible');
+    });
+
+    it('moves to the corner on the Chat tab once the conversation has lines', async () => {
+      const { fixture, root, navigate } = await renderShell();
+      await navigate('/chat');
+      expect(spot(root)).toBe('centre');
+
+      source.emit(event('transcript', line()));
+      await fixture.whenStable();
+      expect(spot(root)).toBe('corner');
+
+      await navigate('/graphics');
+      expect(spot(root)).toBe('centre');
     });
 
     it('moves to the corner for an info item in the Info tab too', async () => {
@@ -370,7 +397,7 @@ describe('App review stand', () => {
   it('stays on screen above the tabs against the real backend', async () => {
     const root = await renderWith('api');
 
-    expect(root.querySelector('main app-review-panel + router-outlet')).not.toBeNull();
+    expect(root.querySelector('main app-review-panel + .tab-content > router-outlet')).not.toBeNull();
   });
 
   it('is not shown for the scripted demo, which has no case service behind it', async () => {

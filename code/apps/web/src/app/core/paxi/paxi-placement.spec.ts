@@ -20,12 +20,21 @@ describe('PaxiPlacement', () => {
     store.connect();
   });
 
-  it('keeps Paxi in the centre while the shown tab is empty or the Chat', () => {
+  it('keeps Paxi in the centre while the shown tab is empty', () => {
     placement.tab.set('graphics');
     expect(placement.spot()).toBe('centre');
 
     placement.tab.set('chat');
+    expect(placement.spot()).toBe('centre');
+  });
+
+  it('moves Paxi to the corner on the Chat tab with lines, but only while it is shown', () => {
+    placement.tab.set('chat');
     source.emit(event('transcript', line()), event('risk', risk()));
+    expect(placement.spot()).toBe('corner');
+
+    // The risk was never on screen: the empty Graphics tab gets the centre back.
+    placement.tab.set('graphics');
     expect(placement.spot()).toBe('centre');
   });
 

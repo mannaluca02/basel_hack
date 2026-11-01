@@ -21,7 +21,8 @@ const BODY_SHARE = 0.6;
  * moves between both by layout, so the renderer, its audio and its expression carry on.
  *
  * Paxi is the agent dock: the ring shows the captured information, a tap opens the summary.
- * The parent sizes the spots with `--paxi-top`, `--paxi-centre`, `--paxi-corner`, `--paxi-gap`.
+ * The parent sizes the spots with `--paxi-top` (least space above the centre spot),
+ * `--paxi-centre`, `--paxi-corner`, `--paxi-gap`.
  */
 @Component({
   selector: 'app-paxi-stage',
@@ -39,7 +40,16 @@ const BODY_SHARE = 0.6;
     }
   `,
   styles: `
+    // Three caption lines and the gap above them.
     :host {
+      --caption-space: 5.5rem;
+      // Paxi and his caption in the middle of the stage; never above the top spacing, so a low
+      // landscape screen keeps the caption on screen.
+      --centre-top: max(
+        var(--paxi-top),
+        calc(50cqh - (var(--paxi-centre) + var(--caption-space)) / 2)
+      );
+
       position: relative;
       container-type: size;
       pointer-events: none;
@@ -47,7 +57,7 @@ const BODY_SHARE = 0.6;
 
     .paxi {
       position: absolute;
-      top: var(--paxi-top);
+      top: var(--centre-top);
       left: calc(50cqw - var(--paxi-centre) / 2);
       width: var(--paxi-centre);
       height: var(--paxi-centre);
@@ -74,7 +84,7 @@ const BODY_SHARE = 0.6;
     // Three lines at most; the Chat tab keeps the whole conversation.
     .caption {
       position: absolute;
-      top: calc(var(--paxi-top) + var(--paxi-centre) + 0.75rem);
+      top: calc(var(--centre-top) + var(--paxi-centre) + 0.75rem);
       left: 50%;
       display: -webkit-box;
       width: min(36rem, calc(100cqw - 2rem));

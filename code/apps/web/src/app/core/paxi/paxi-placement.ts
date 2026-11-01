@@ -6,10 +6,13 @@ import type { WorkspaceTab } from '../advisor/store/case-state';
 export type PaxiSpot = 'centre' | 'corner';
 
 /**
- * Where Paxi stands. Paxi starts in the centre and moves to the corner as soon as the shown
- * Graphics, Risks or Info tab has at least one item; the Chat tab never moves Paxi. Once in the
- * corner Paxi stays there, also on the Chat tab, until the case has no chart, risk or info any
- * more (a new case).
+ * Where Paxi stands. Paxi starts in the centre, where the shell hides the tab content, and moves
+ * to the corner as soon as the shown Graphics, Risks or Info tab has at least one item. Once in
+ * the corner Paxi stays there, on every tab, until the case has no chart, risk or info any more
+ * (a new case).
+ *
+ * The Chat tab moves Paxi to the corner while it is shown and has lines, so the conversation can
+ * be read; it does not keep him there, since the other tabs would show their empty state.
  */
 @Injectable({ providedIn: 'root' })
 export class PaxiPlacement {
@@ -39,5 +42,13 @@ export class PaxiPlacement {
     computation: (now, before) => now.any && (now.shown || (before?.value ?? false)),
   });
 
-  readonly spot = computed<PaxiSpot>(() => (this.cornered() ? 'corner' : 'centre'));
+  private readonly reading = computed(
+    () => this.tab() === 'chat' && this.store.transcript().length > 0,
+  );
+
+  readonly spot = computed<PaxiSpot>(() => {
+    // Read first, always: `cornered` must see every render to remember a shown tab.
+    const cornered = this.cornered();
+    return cornered || this.reading() ? 'corner' : 'centre';
+  });
 }
