@@ -230,6 +230,12 @@ describe('JourneyView', () => {
     };
     quote.flush(state.quote);
     await serve();
+    // From the offer on, the chosen recommendation stays on top, with the dossier.
+    const recommended = () => element().querySelector('.recommended');
+    expect(recommended()?.textContent).toContain('Deine Empfehlung');
+    expect(recommended()?.textContent).toContain('Pax Disability closes the gap');
+    expect(recommended()?.querySelector('[data-action="dossier"]')).not.toBeNull();
+    expect(element().querySelectorAll('[data-action="dossier"]').length).toBe(1);
 
     // The product documents, each a download; the application needs them read.
     const links = Array.from(element().querySelectorAll<HTMLAnchorElement>('.documents a'));
@@ -291,6 +297,7 @@ describe('JourneyView', () => {
     );
     expect(element().querySelector('.policy')?.textContent).toContain('Demo-Police Pax');
     expect(element().querySelector('app-nps-card')).toBeNull();
+    expect(recommended()?.textContent).toContain('Pax Disability');
 
     // The advice dossier opens in a dialog on the same page, loaded with the app's session.
     const open = button('dossier')!;

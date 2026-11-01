@@ -176,6 +176,15 @@ export class JourneyView {
     return recommendation.status === 'human_review_required' ? 'review' : 'select';
   });
   protected readonly stageIndex = computed(() => STAGE_OF[this.step()]);
+  /**
+   * What the customer chose from the recommendation, from the offer on: the policy's products, else
+   * the offer's. Shown on top with the dossier, so the advice stays in view until the end.
+   */
+  protected readonly chosen = computed(() =>
+    this.stageIndex() > 0
+      ? (this.currentPolicy()?.configuration ?? this.quote()?.configurations ?? [])
+      : [],
+  );
 
   /** Selected fund-linked products whose person has no suitable pre-check for this profile yet. */
   protected readonly pendingSuitability = computed(() => {
@@ -221,7 +230,18 @@ export class JourneyView {
     );
   }
 
-  protected need(candidate: Candidate): string {
+  /** The recommendation's reason for a chosen product (the portal keeps only the product). */
+  protected why(item: { id: string; productId: string; personId: string | null }): string {
+    const candidates = this.recommendation()?.candidates ?? [];
+    return (
+      (
+        candidates.find((c) => c.id === item.id) ??
+        candidates.find((c) => c.productId === item.productId && c.personId === item.personId)
+      )?.explanation ?? ''
+    );
+  }
+
+    protected need(candidate: Candidate): string {
     return this.format.chf(candidate.needAmountCents / 100, { maximumFractionDigits: 0 });
   }
 

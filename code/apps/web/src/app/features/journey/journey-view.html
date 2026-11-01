@@ -36,6 +36,30 @@
   }
 
   @if (!loading()) {
+    @if (chosen().length) {
+      <section class="recommended card" aria-labelledby="journey-chosen">
+        <h2 id="journey-chosen">{{ 'journey.chosen.title' | transloco }}</h2>
+        <p class="note">{{ 'journey.chosen.intro' | transloco }}</p>
+        <ul class="chosen">
+          @for (item of chosen(); track item.id) {
+            <li>
+              <span class="product">
+                {{ item.productName }}
+                @if (personNumber(item.personId); as number) {
+                  <span class="person">· {{ 'review.person' | transloco: { number } }}</span>
+                }
+              </span>
+              <span class="amount">{{ 'journey.need' | transloco }}: {{ need($any(item)) }}</span>
+              @if (why(item); as reason) {
+                <span class="why">{{ reason }}</span>
+              }
+            </li>
+          }
+        </ul>
+        <ng-container *ngTemplateOutlet="dossier" />
+      </section>
+    }
+
     <div class="panel card" aria-live="polite">
       @switch (step()) {
         @case ('locked') {
@@ -204,19 +228,9 @@
       } @empty {
         <p class="note">{{ 'journey.noPolicy' | transloco }}</p>
       }
-      @if (caseId()) {
-        <p>
-          <button
-            #dossierButton
-            type="button"
-            class="action"
-            data-action="dossier"
-            (click)="openDossier(dossierButton)"
-          >
-            {{ 'journey.dossier' | transloco }}
-          </button>
-        </p>
-        <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
+      <!-- Until the customer chose, the dossier lives here; afterwards with the recommendation. -->
+      @if (!chosen().length) {
+        <ng-container *ngTemplateOutlet="dossier" />
       }
     </section>
   }
@@ -234,6 +248,23 @@
       {{ (busy() ? 'journey.working' : 'journey.simulateReview') | transloco }}
     </button>
     <p class="note">{{ 'journey.simulatedNote' | transloco }}</p>
+  }
+</ng-template>
+
+<ng-template #dossier>
+  @if (caseId()) {
+    <p>
+      <button
+        #dossierButton
+        type="button"
+        class="action"
+        data-action="dossier"
+        (click)="openDossier(dossierButton)"
+      >
+        {{ 'journey.dossier' | transloco }}
+      </button>
+    </p>
+    <p class="note">{{ 'journey.dossierNote' | transloco }}</p>
   }
 </ng-template>
 

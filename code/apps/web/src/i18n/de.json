@@ -665,7 +665,11 @@
     "dossierTitle": "Beratungsdossier",
     "dossierClose": "Beratungsdossier schliessen",
     "print": "Drucken",
-    "dossierFailed": "Das Beratungsdossier konnte nicht geladen werden."
+    "dossierFailed": "Das Beratungsdossier konnte nicht geladen werden.",
+    "chosen": {
+      "title": "Deine Empfehlung",
+      "intro": "Diese Lösungen hast du aus der Bedarfsanalyse gewählt. Alle Zahlen und Gründe stehen im Beratungsdossier."
+    }
   },
   "insights": {
     "title": "Produktmanagement-Einblicke",

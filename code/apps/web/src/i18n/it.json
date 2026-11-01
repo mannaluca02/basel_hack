@@ -665,7 +665,11 @@
     "dossierTitle": "Dossier di consulenza",
     "dossierClose": "Chiudi il dossier di consulenza",
     "print": "Stampa",
-    "dossierFailed": "Non è stato possibile caricare il dossier di consulenza."
+    "dossierFailed": "Non è stato possibile caricare il dossier di consulenza.",
+    "chosen": {
+      "title": "La tua raccomandazione",
+      "intro": "Hai scelto queste soluzioni dall’analisi del fabbisogno. Tutte le cifre e le motivazioni sono nel dossier di consulenza."
+    }
   },
   "insights": {
     "title": "Approfondimenti per la gestione prodotti",
