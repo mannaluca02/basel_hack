@@ -1,13 +1,10 @@
-import { randomBytes,createCipheriv,createDecipheriv } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { mkdir,readFile,writeFile,rename,unlink,open,lstat,chmod } from 'node:fs/promises';
 import { join,resolve } from 'node:path';
-import { DEFAULT_HUMAN_HANDOVER } from '@pax/contracts';
+import {decodeDatabase,encodeDatabase} from './store-codec.js';
 import { z } from 'zod';
 import { emptyDatabase,type Database,WorkflowError } from './types.js';
 
-const AAD=Buffer.from('pax-lifemap-synthetic-store-v1');
-const Envelope=z.object({version:z.literal(1),iv:z.string(),tag:z.string(),ciphertext:z.string()}).strict();
-const Root=z.object({version:z.literal(1),sessions:z.record(z.string(),z.unknown()),cases:z.record(z.string(),z.unknown()),audit:z.array(z.unknown()),feedback:z.array(z.unknown())}).strict();
 export type BootstrapCredentials={customerAccessCode:string;reviewerAccessCode:string};
 
 export class EncryptedCaseStore {
@@ -37,14 +34,7 @@ export class EncryptedCaseStore {
       }
       if(key.length!==32)throw new Error('Invalid key');
       let state=emptyDatabase();
-      if(ciphertext!==null) {
-        if(Buffer.byteLength(ciphertext)>32_000_000)throw new Error('Store too large');
-        const e=Envelope.parse(JSON.parse(ciphertext));const decipher=createDecipheriv('aes-256-gcm',key,Buffer.from(e.iv,'base64'));
-        decipher.setAAD(AAD);decipher.setAuthTag(Buffer.from(e.tag,'base64'));
-        const decoded=Buffer.concat([decipher.update(Buffer.from(e.ciphertext,'base64')),decipher.final()]);
-        state=Root.parse(JSON.parse(decoded.toString('utf8'))) as Database;
-        for(const c of Object.values(state.cases)){c.proposalBatches??=[];c.ambiguities??=[];c.voiceSessions??=[];c.agentTurns??=[];c.suitabilityChecks??=[];c.confirmationRequests??=[];c.modelExtractionConsent??=null;c.handover??=structuredClone(DEFAULT_HUMAN_HANDOVER);}
-      }
+      if(ciphertext!==null)state=decodeDatabase(ciphertext,key);
       return new EncryptedCaseStore(dir,key,state,lockId);
     } catch {await unlink(lockPath).catch(()=>{});throw new WorkflowError('STORE_INTEGRITY_OR_KEY_FAILURE',500);}
   }
@@ -64,11 +54,7 @@ export class EncryptedCaseStore {
   async transaction<T>(fn:(db:Database)=>T|Promise<T>):Promise<T> {
     const next=this.queue.then(async()=>{
       if(this.closed)throw new WorkflowError('STORE_CLOSED',503);
-      const copy=structuredClone(this.state);const result=await fn(copy);const plain=Buffer.from(JSON.stringify(copy));
-      if(plain.length>20_000_000)throw new WorkflowError('STORE_CAPACITY',413);
-      const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',this.key,iv);cipher.setAAD(AAD);
-      const data=Buffer.concat([cipher.update(plain),cipher.final()]);
-      const envelope=JSON.stringify({version:1,iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ciphertext:data.toString('base64')});
+      const copy=structuredClone(this.state);const result=await fn(copy);const envelope=encodeDatabase(copy,this.key);
       const temporary=join(this.directory,`write-${randomBytes(8).toString('hex')}.tmp`);
       try {
         const file=await open(temporary,'wx',0o600);try{await file.writeFile(envelope);await file.sync();}finally{await file.close();}

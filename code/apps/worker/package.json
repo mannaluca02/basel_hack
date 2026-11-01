@@ -7,7 +7,9 @@
     "dev": "wrangler dev --local",
     "build": "wrangler deploy --dry-run --outdir dist",
     "check": "node scripts/check.mjs",
-    "typecheck": "wrangler types .wrangler/worker-configuration.d.ts && tsc -p tsconfig.json"
+    "typecheck": "wrangler types .wrangler/worker-configuration.d.ts && tsc -p tsconfig.json",
+    "setup:local": "node scripts/setup-local.mjs",
+    "check:persistence": "node scripts/check-persistence.mjs"
   },
   "dependencies": {
     "@pax/api": "0.1.0",

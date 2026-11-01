@@ -1,4 +1,4 @@
-# NestJS in a Durable Object: local feasibility spike
+# NestJS in a Durable Object: local Worker harness
 
 Verdict: **works with caveats**. Tested 2026-11-01 under Wrangler 4.156.0 / local workerd. This is a feasibility harness, not the finished migration. No account, login, remote development or deployment was used.
 
@@ -10,6 +10,7 @@ From the repository root, with Node 22 (also tested with Node 24.19.0):
 cd code
 npm ci --ignore-scripts
 npm run build
+npm run setup:local -w @pax/worker
 npm run dev -w @pax/worker -- --port 8797
 ```
 
@@ -24,17 +25,17 @@ cd apps/worker
 ../../node_modules/.bin/wrangler check startup --outfile /tmp/life-startup.cpuprofile
 ```
 
-The check script uses curl and asserts status codes, case identity/revision across requests, and the initial SSE event. Cookies are kept in a temporary directory and deleted. It prints no tokens. No `.env` or `.dev.vars` is needed. The original lockfile was out of sync with the existing Angular workspace; updating it for this workspace also reconciled those missing entries.
+The check script uses curl and asserts status codes, case identity/revision across requests, and the initial SSE event. Cookies are kept in a temporary directory and deleted. It prints no tokens. A gitignored `.dev.vars` with `LIFEMAP_STORE_KEY` is now required (see durable persistence below). The original lockfile was out of sync with the existing Angular workspace; updating it for this workspace also reconciled those missing entries.
 
 ## What runs
 
-`src/index.ts` routes `/api/*` to `LIFE.getByName('singleton')`. The SQLite-backed DO declaration/migration is real; this spike deliberately does not use its storage. Each DO instance memoizes its boot promise and calls the existing `createLifeInsuranceApp()` once. Nest listens on port 0; the resulting assigned port is a workerd routing key, not a network listener. DO `fetch()` awaits boot then calls `handleAsNodeRequest(port, request)`. Port 0 avoids collisions if an isolate ever hosts more than one instance. Non-API paths return 404; `/paxi/*` and Angular assets are outside this spike.
+`src/index.ts` routes `/api/*` to `LIFE.getByName('singleton')`. The SQLite-backed DO now uses durable encrypted KV storage (details below). Each DO instance memoizes its boot promise and calls the existing `createLifeInsuranceApp()` once. Nest listens on port 0; the resulting assigned port is a workerd routing key, not a network listener. DO `fetch()` awaits boot then calls `handleAsNodeRequest(port, request)`. Port 0 avoids collisions if an isolate ever hosts more than one instance. Non-API paths return 404; `/paxi/*` and Angular assets are outside this spike.
 
 The worker imports the API's `dist` output, after `tsc -b`. This preserves TypeScript decorator metadata and keeps the existing controllers, guards, filters, Express and SSE implementation. Worker code has its own generated-runtime-type check.
 
 Spike substitutions:
 
-- `src/memory-store.ts`: serialized copy-on-write transactions and cloned reads, with the existing capacity/closed guards, but no encryption or persistence. All data disappears on DO eviction or dev restart. Random per-instance bootstrap credentials remain internal; public demo start requires no code.
+- `src/durable-store.ts`: durable encrypted copy-on-write transactions and cloned reads. State and fallback bootstrap credentials survive eviction/restart; public demo start requires no code.
 - `ProductDocuments.empty()`: empty catalog, so PDF routes remain unavailable.
 - `RuntimeOptions.personaDraft`: bundled synthetic Mueller JSON, with the normal valuation/availability date adjustments. This allows `POST /api/demo/start {}` to load the actual confirmed persona, not just an empty case.
 - Stub calculation provider throws the existing `ProviderFailure('UNAVAILABLE')`. The engine records failed calculation outcomes normally; this does not prove real calculations or recommendations. Voice/model extraction remain disabled.
@@ -95,8 +96,8 @@ Wrangler dry-run reported 3740.53 KiB raw / 763.27 KiB gzip (about 3.65 MiB / 0.
 
 ## Follow-up seams
 
-1. **Store persistence**: `apps/api/src/insurance/store.ts`, `runtime.ts`, and `apps/worker/src/memory-store.ts`. Retain serialized transaction, clone/rollback, closed-state and capacity semantics; replace volatile state with encrypted DO SQLite storage. Decide key lifecycle and enforce DO storage value limits (do not assume the existing 20 MB blob fits one KV value). Remove filesystem locking/PID probing and the temporary `directory` label dependency in `apps/api/src/main.ts`.
-2. **Timers/alarms**: `apps/api/src/insurance/runtime.ts` retention and voice sweep, with existing `hasExpired` / `sweepExpired`; expose callable sweep hooks and opt out of intervals in DO. Schedule/re-arm DO alarms. SSE's active-connection poll in `insurance/http.ts` can remain in memory but needs cancellation/load validation.
+1. **Store persistence**: implemented by task B in `insurance/store-codec.ts` and `apps/worker/src/durable-store.ts`; see storage layout and verification below.
+2. **Timers/alarms**: implemented by task B through runtime sweep methods, `internalTimers:false`, and DO alarms. SSE's active-connection poll in `insurance/http.ts` remains outside this change.
 3. **Documents**: `apps/api/src/insurance/documents.ts` metadata and byte loading need an asset-backed implementation preserving hash checks; replace the empty factory in this spike.
 4. **Demo persona**: `insurance/demo-journey.ts` / `runtime.ts` now accept `personaDraft`; supply bundled public fixtures or an asset loader, retaining schema/date validation.
 5. **Voice assets**: `apps/api/src/voice/prompt.ts` reads persona/skills and dynamically imports `voice-agent/skills.mjs`; package or inject these before enabling voice settings/generation. Lazy evaluation only avoids startup failure.
@@ -111,3 +112,43 @@ Wrangler dry-run reported 3740.53 KiB raw / 763.27 KiB gzip (about 3.65 MiB / 0.
 - Worker generated-type check and curl self-check: passed.
 - `wrangler deploy --dry-run`: succeeded, 3740.53 KiB raw / 763.27 KiB gzip after final address/date validation edits. Startup figures above were measured immediately before those small edits.
 - No remote calls to Cloudflare account APIs, no deployment and no secrets committed. No production throughput, memory, alarm, restart persistence, PDFs, successful calculations or enabled voice were tested.
+
+
+## Durable persistence and alarms (task B)
+
+This section supersedes the original spike's volatile-store and interval limitations above. No Cloudflare login, account or deployment is required. Task C's asset/config substitutions remain unchanged.
+
+- Shared API `insurance/store-codec.ts` owns JSON serialization, AES-256-GCM, v1 AAD `pax-lifemap-synthetic-store-v1`, 20,000,000-byte plaintext cap (`STORE_CAPACITY`, 413), root validation and legacy case defaults. Node's `cases.enc` format, file locking, permissions and atomic rename behavior are unchanged.
+- DO KV `store:manifest` holds `{version:1,chunks:N}`. `store:chunk:0` through `N-1` hold contiguous slices of the same encrypted JSON envelope, each at most 1,000,000 ASCII bytes. The [current SQLite DO limits](https://developers.cloudflare.com/durable-objects/platform/limits/) are 2 MB combined key/value and 2 MB per SQL row; chunks leave room for keys and serialization overhead.
+- Every write runs through a promise queue: clone state, run callback, encrypt, write all chunks and manifest, remove obsolete chunks, update alarm, then swap in-memory state. All storage operations use one `storage.transaction`. Failure rolls back durable changes and leaves memory untouched (`STORE_WRITE_FAILED`, 503); the queue accepts later writes. Load corruption/wrong key fails closed with `STORE_INTEGRITY_OR_KEY_FAILURE`. Reads/results remain clones; closed guards remain `STORE_CLOSED`.
+- `LIFEMAP_STORE_KEY` must be canonical base64 for exactly 32 bytes. Missing/invalid values fail boot with a non-secret error naming the setting. `npm run setup:local -w @pax/worker` creates `.dev.vars` with mode 0600 only if absent and never prints the key. `.dev.vars.example` contains placeholders only. Keep this key with local Wrangler state; losing/changing it makes existing case data unreadable. No key rotation is implemented.
+- `store:credentials` stores generated fallback access codes once, as JSON, mirroring Node's separate access-code file. These codes are not part of the encrypted case envelope. Optional `PAX_CUSTOMER_ACCESS_CODE` and `PAX_REVIEWER_ACCESS_CODE` secrets override each role independently without replacing its persisted fallback. None are logged.
+- `RuntimeOptions.internalTimers=false` disables the two cleanup intervals; Node defaults remain enabled. Runtime exposes `sweepRetention()` and `sweepVoice()`. DO boot runs both; `alarm()` runs both and re-arms through the store's queue. Writes atomically arm the next case/session expiry or audit timestamp + 24 h, or at most 5 s while voice sessions are starting/active. Earlier alarms are preserved across writes. Empty state cancels its alarm; idle data wakes only at its next retention deadline. Existing read-time expiration guards still reject expired cases immediately. Alarm delivery is subject to platform scheduling/retries, rather than a hard real-time guarantee.
+
+### Repeatable verification
+
+Use Node 22 or 24. From `code/`:
+
+```sh
+npm ci --ignore-scripts
+npm run build
+npm run setup:local -w @pax/worker
+npm run check:persistence -w @pax/worker
+npm test
+npm run typecheck -w @pax/worker
+npm run build -w @pax/worker
+```
+
+Persistence check starts/stops two complete local Wrangler/workerd processes against one temporary storage directory on port 18897 (override `PERSISTENCE_PORT`). It first runs the HTTP/SSE check, then creates a public demo, retains its cookie privately, restarts, reads the same case/revision with that cookie, stops again, and inspects SQLite KV values for ciphertext envelopes and absence of plaintext case data. It needs Python 3's standard SQLite module and removes temporary state. Persistence output:
+
+```text
+Created demo and authenticated case: 201 / 200
+Full local Worker restart: same cookie, case ID and context revision: PASS
+SQLite KV inspection: encrypted AES-GCM envelope chunks; no plaintext case ID or case JSON: PASS
+```
+
+For HTTP/SSE checks, start `npm run dev -w @pax/worker -- --port 8797` separately, then `npm run check -w @pax/worker`.
+
+`tests/durable-store.test.mjs` runs in the root `npm test`: shared envelope authentication, migration defaults, capacity, strict key validation, reopen/credentials, multi-chunk commits/stale deletion, injected mid-transaction failures, queue recovery, clone isolation, closed state, and alarm deadlines/cancellation. The test transpiles only the Worker store with the installed TypeScript compiler and injects transactional fake storage; it does not need Wrangler types or Cloudflare globals at runtime.
+
+Verified locally on Node 24.22.2: root suite 470 tests (469 pass, 1 skip, 0 fail), Worker typecheck and dry-run build pass. Real eviction, production memory/CPU at the 20 MB cap, and enabled voice-provider alarm behavior remain unverified. Whole-database encryption still copies the entire database per write; chunking solves per-value storage limits, not peak memory or throughput.
