@@ -2,18 +2,46 @@
 @font-face{font-family:'Pax Civil';src:url('media/fonts/PaxCivil-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:'Pax Civil';src:url('media/fonts/PaxCivil-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
 /* 1rem = 100 pixels of the 1600 × 900 closing slide, so it scales as one piece. */
+:root{--glide:cubic-bezier(.2,.8,.2,1)}
 html{font-size:max(58px,min(100vw / 16,100svh / 9))}
 *{box-sizing:border-box}
 body{margin:0;background:#f9f7f0 url('media/grain.svg');background-size:180px 180px;background-blend-mode:multiply;color:#360573;font-family:'Pax Civil',Arial,sans-serif;font-synthesis:none}
-main{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.54rem .9rem .4rem}
+.closing{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.54rem .9rem .4rem}
 .eyebrow{font-size:.15rem;letter-spacing:.2em;font-weight:700;margin:0 0 .14rem}
-h1{font-size:.73rem;letter-spacing:-.055em;line-height:.98;margin:0;font-weight:700}
+h1,h2{letter-spacing:-.055em;line-height:.98;margin:0;font-weight:700}
+.closing h2{font-size:.73rem}
+.cover{position:relative;min-height:100svh;display:grid;grid-template-columns:1fr 6.2rem;grid-template-rows:auto 1fr;column-gap:.4rem;align-items:center;padding:.68rem .4rem .68rem 1rem;overflow:hidden}
+.logo{grid-column:1 / -1;display:block;width:1.65rem;height:.65rem;object-fit:contain;object-position:left center}
+.cover .eyebrow{font-size:.17rem;margin-bottom:.24rem}
+.cover h1{font-size:1.15rem;margin-bottom:.3rem}
+.lede{font-size:.29rem;line-height:1.4;letter-spacing:-.02em;margin:0}
+.hero-avatar{position:relative;width:6.2rem;aspect-ratio:1;transform:rotate(-5deg)}
+.hero-avatar::before{content:'';position:absolute;inset:.1rem;z-index:-1;border-radius:50%;background:#e5edc9}
+.cover-note{position:absolute;left:1rem;bottom:.3rem;margin:0;font-size:max(.14rem,11px);opacity:.65}
+.architecture{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:.65rem .9rem;color:#330066}
+.architecture .eyebrow{font-size:.17rem;letter-spacing:.15em}
+.architecture h2{font-size:.6rem;letter-spacing:-.035em;line-height:1.12;margin:0 0 .35rem}
+.flow-hint{display:none;margin:0 0 .12rem;font-size:.22rem;color:#65566c}
+.flow-chart{overflow-x:auto;border-radius:.16rem}
+.flow-chart:focus-visible{outline:3px solid #360573;outline-offset:4px}
+.architecture-diagram{display:block;width:100%;min-width:840px;height:auto;font-family:'Pax Civil',Arial,sans-serif}
+.svg-node-title{font-size:23px;font-weight:700;fill:#330066}
+.svg-node-copy{font-size:17px;font-weight:400;fill:#65566c}
+.svg-group-title{font-size:17px;font-weight:500;fill:#330066}
+.svg-label{font-size:15px;font-weight:400}
+.flow-legend{display:flex;flex-wrap:wrap;gap:.08rem .4rem;margin-top:.25rem;font-size:.18rem}
+.flow-legend span::before{content:'';display:inline-block;width:.25rem;height:3px;margin-right:.1rem;vertical-align:middle;background:currentColor}
+.legend-green{color:#638c00}
+.legend-purple{color:#5b2288}
+.legend-blue{color:#287e9a}
+.flow-source{margin:.16rem 0 0;font-size:.16rem;color:#65566c}
 .closing-heading{text-align:center}
-.closing-pair{display:flex;align-items:center;justify-content:center;height:3.8rem;margin-top:.17rem;color:inherit;border-radius:.16rem}
+.closing-pair{display:flex;align-items:center;justify-content:center;height:3.8rem;margin-top:.17rem;color:inherit;border-radius:.16rem;transition:transform .25s var(--glide)}
 .qr-mascot{position:relative;width:3.3rem;height:3.3rem;flex:0 0 3.3rem}
 .qr-mascot svg{display:block;width:100%;height:100%}
-.qr-motion{position:relative;width:100%;height:100%;transform-origin:50% 85%}
-.qr-mascot>.qr-floor{position:absolute;width:94%;height:.38rem;left:3%;top:calc(100% + .18rem);transform-origin:center;overflow:visible}
+/* Moving parts get their own layer, so a frame never repaints the grain and blend beneath them. */
+.qr-motion{position:relative;width:100%;height:100%;transform-origin:50% 85%;will-change:transform;animation:fade-in .5s ease-out}
+.qr-mascot>.qr-floor{position:absolute;width:94%;height:.38rem;left:3%;top:calc(100% + .18rem);transform-origin:center;overflow:visible;will-change:transform}
 footer{margin-top:.5rem;text-align:center}
 .team-name{font-size:.32rem;font-weight:700;margin:0 0 .06rem;line-height:1.1}
 .love{font-size:.2rem;margin:0 0 .06rem}
@@ -25,24 +53,45 @@ footer{margin-top:.5rem;text-align:center}
 .teammate:nth-child(2) .head{transform:rotate(4deg)}
 .teammate:nth-child(4) .head{transform:rotate(-5deg)}
 .teammate:nth-child(5) .head{transform:rotate(3deg)}
-.repo{position:absolute;top:.4rem;right:.45rem;padding:.1rem .2rem;border:2px solid currentColor;border-radius:1rem;font-size:.17rem;font-weight:500;color:inherit;text-decoration:none;transition:background-color .2s,color .2s}
-.repo:hover{background:#360573;color:#f9f7f0}
+.repo{position:absolute;top:.4rem;right:.45rem;padding:.1rem .2rem;border:2px solid currentColor;border-radius:1rem;font-size:.17rem;font-weight:500;color:inherit;text-decoration:none;transition:background-color .2s,color .2s,transform .15s var(--glide)}
+@media(hover:hover){.repo:hover{background:#360573;color:#f9f7f0}.closing-pair:hover{transform:scale(1.03)}}
+.repo:active,.closing-pair:active{transform:scale(.97)}
+a{-webkit-tap-highlight-color:transparent}
 a:focus-visible{outline:3px solid #360573;outline-offset:4px}
-.portrait-gaze{animation:look-around 8s ease-in-out infinite;animation-delay:var(--look-delay,0s)}
 .round-eye{animation:portrait-blink 5.7s infinite;animation-delay:var(--look-delay,0s)}
-.pointer-eyes{transform:translate(var(--look-x,0px),var(--look-y,0px));transition:transform .17s ease-out}
-.pointer-tracking .portrait-gaze{animation:none;transform:none}
-.teammate .head>svg{transform:translate(var(--head-x,0px),var(--head-y,0px)) rotate(var(--head-turn,0deg));transform-origin:50% 75%;transition:transform .4s ease-out}
-.pointer-tracking .pointer-eyes,.pointer-tracking>svg{transition:none}
+.hero-avatar>svg,.teammate .head>svg{transform-origin:50% 75%;will-change:transform}
+.logo,.cover-copy{animation:rise .6s var(--glide) backwards}
+.cover-copy{animation-delay:.08s}
+.hero-avatar{animation:rise-hero .8s var(--glide) .1s backwards}
+/* The closing stays hidden until it scrolls in, so its entrance is actually seen. */
+.closing.pending>*{opacity:0}
+.closing:not(.pending) :is(.closing-heading,.closing-pair,.team-name,.love,.teammate,.repo){animation-name:rise;animation-duration:.6s;animation-timing-function:var(--glide);animation-fill-mode:backwards}
+.closing-pair{animation-delay:.08s}
+.team-name,.love{animation-delay:.16s}
+.teammate{animation-delay:calc(.2s + var(--i,0) * .05s)}
+.repo{animation-delay:.5s}
 .closing-confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:16}
-@keyframes look-around{0%,12%,100%{transform:translate(0,0)}25%,36%{transform:translate(-3px,-.5px)}57%,70%{transform:translate(3px,0)}84%,89%{transform:translate(0,-.5px)}}
+@keyframes rise{from{opacity:0;transform:translateY(.16rem)}}
+@keyframes rise-hero{from{opacity:0;transform:translateY(.24rem) rotate(-5deg)}}
+@keyframes fade-in{from{opacity:0}}
 @keyframes portrait-blink{0%,44%,48%,100%{transform:scaleY(1)}46%{transform:scaleY(.07)}}
 /* Six heads no longer fit one row: stack the slide, three heads per row. */
-@media(max-width:900px){
-  html{font-size:clamp(46px,100vw / 7.2,72px)}
-  main{padding:.5rem .3rem}
-  .eyebrow{font-size:.2rem;letter-spacing:.14em}
-  h1{font-size:.8rem}
+@media(max-width:900px) and (orientation:portrait),(max-width:900px) and (min-height:521px){
+  /* 13.8rem is the full stack, so it fits short windows too instead of scrolling. */
+  html{font-size:clamp(40px,min(100vw / 7.2,100svh / 13.8),72px)}
+  .closing{padding:.5rem .3rem}
+  .eyebrow,.cover .eyebrow,.architecture .eyebrow{font-size:.2rem;letter-spacing:.14em}
+  .closing h2{font-size:.8rem}
+  .cover{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;row-gap:.3rem;padding:.4rem .3rem .7rem}
+  .cover h1{font-size:1.02rem}
+  .lede{font-size:.3rem}
+  .hero-avatar{width:5rem;justify-self:center}
+  .cover-note{left:.3rem;right:.3rem;bottom:.2rem}
+  .architecture{min-height:0;padding:.6rem .3rem}
+  .architecture h2{font-size:.7rem;margin-bottom:.2rem}
+  .flow-hint{display:block}
+  .flow-legend{font-size:.24rem}
+  .flow-source{font-size:.22rem}
   footer{margin-top:.8rem}
   .team-name{font-size:.44rem}
   .love{font-size:.28rem;margin-bottom:.2rem}
@@ -52,5 +101,24 @@ a:focus-visible{outline:3px solid #360573;outline-offset:4px}
   .teammate .head{height:1.9rem;width:1.9rem}
   .teammate p{font-size:.28rem}
   .repo{position:static;margin-top:.5rem;padding:.16rem .36rem;font-size:.26rem}
+}
+/* Landscape phones are too short to stack: the QR sits beside the text. */
+@media(orientation:landscape) and (max-height:520px){
+  html{font-size:min(100vw / 15,100svh / 4.6)}
+  .cover{grid-template-columns:1fr 3.2rem;padding:.2rem .4rem .45rem}
+  .logo{width:1.1rem;height:.44rem}
+  .cover h1{font-size:.84rem;margin-bottom:.16rem}
+  .cover .eyebrow{font-size:max(.15rem,10px);margin-bottom:.12rem}
+  .lede{font-size:.24rem}
+  .hero-avatar{width:3.2rem}
+  .cover-note{left:.4rem;bottom:.12rem}
+  .architecture{min-height:0;padding:.3rem .4rem}
+  .flow-hint{display:block}
+  .closing{display:grid;grid-template-columns:auto auto;align-content:center;justify-content:center;column-gap:.5rem;padding:.2rem .3rem}
+  .closing-heading{grid-column:2;grid-row:1}
+  .closing-pair{grid-column:1;grid-row:1 / 3;margin:0}
+  footer{grid-column:2;grid-row:2;margin-top:.24rem}
+  .eyebrow{font-size:max(.15rem,10px)}
+  .repo{top:.16rem;right:.2rem;font-size:max(.17rem,12px)}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

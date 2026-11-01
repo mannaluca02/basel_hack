@@ -19,7 +19,7 @@ function smile(group) {
   path(group, 'M88 130 Q100 140 112 130', { fill: 'none', stroke: '#65362d', 'stroke-width': 2.5, 'stroke-linecap': 'round' });
 }
 function addRoundEyes(char, person) {
-  const eyes = element('g', { class: 'portrait-gaze' });
+  const eyes = element('g');
   for (const cx of [77, 123]) {
     const eye = element('g', { class: 'round-eye' });
     eye.style.transformOrigin = `${cx}px 100px`;
@@ -91,8 +91,8 @@ export function createPresentationCharacter(host, name = 'Paxi', { hero = false 
     });
     host.querySelector('[data-part="highlight"]').setAttribute('opacity', '.16');
     // Leave Lukas's Paxi component unchanged; only portrait heads replace its eyes.
-    host.querySelector('[data-part="eyeL"]').parentElement.style.opacity = '0';
-    host.querySelector('[data-part="glints"]').style.opacity = '0';
+    host.querySelector('[data-part="eyeL"]').parentElement.style.display = 'none';
+    host.querySelector('[data-part="glints"]').style.display = 'none';
     addRoundEyes(char, person);
     addBeard(char, person);
     smile(char);
